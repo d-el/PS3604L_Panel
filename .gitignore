@@ -1,1 +1,4 @@
-﻿/Debug/
+﻿/.settings
+/Debug
+/doc
+!/doc/Doxyfile
