@@ -29,6 +29,8 @@ void hardInit(void){
 	//rtc_init();
 	//i2c_init(i2c2);
 	uart_init(uart1, BR9600);
+	uart_init(uart3, BR57600);
+	uart_init(uart4, BR115200);
 	//uart_init(uart2, BR38400);
 	//pvd_init();
 }

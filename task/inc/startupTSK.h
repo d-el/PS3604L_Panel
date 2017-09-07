@@ -1,26 +1,24 @@
-﻿/*!****************************************************************************
- * @file		httpServerTSK.h
+/*!****************************************************************************
+ * @file		startupTSK.h
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
- * @date		06.09.2017
+ * @date		02.08.2017
  * @copyright	GNU Lesser General Public License v3
- * @brief		HTTP Server
+ * @brief		This task create start screen
  */
-#ifndef httpServerTSK_H
-#define httpServerTSK_H
+#ifndef startupTSK_H
+#define startupTSK_H
 
 /*!****************************************************************************
  * Include
  */
-#include "lwip/opt.h"
-#include "lwip/arch.h"
-#include "lwip/api.h"
-#include <stdio.h>
-#include <string.h>
-#include <task/inc/httpServerTSK.h>
-#include "debugCore.h"
-#include "gpio.h"
-#include "uart.h"
+#include "display.h"
+#include "beep.h"
+#include "ui.h"
+#include "version.h"
+#include "systemTSK.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 /*!****************************************************************************
  * Define
@@ -37,6 +35,7 @@
 /*!****************************************************************************
  * Exported variables
  */
+extern uint32_t startCounter;
 
 /*!****************************************************************************
  * Macro functions
@@ -45,7 +44,7 @@
 /*!****************************************************************************
  * Function declaration
  */
-void httpServerTSK(void *pPrm);
+void startupTSK(void *pPrm);
 
-#endif //httpServerTSK__H
+#endif //startupTSK_H
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

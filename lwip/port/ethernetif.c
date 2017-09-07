@@ -52,10 +52,9 @@
 #include "err.h"
 #include "ethernetif.h"
 #include "lwip/timers.h"
-
-#include "main.h"
+#include "board.h"
 #include "stm32f4x7_eth.h"
-#include <string.h>
+#include "string.h"
 
 
 #define netifMTU                                (1500)

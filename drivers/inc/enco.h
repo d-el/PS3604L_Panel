@@ -15,7 +15,7 @@
  */
 #include "stm32f4xx.h"
 #include "gpio.h"
-//#include "prmSystem.h"
+#include "prmSystem.h"
 
 /*!****************************************************************************
  * User define

@@ -57,38 +57,14 @@ void LwIP_Init(void){
 	netif_set_up(&xnetif);
 }
 
-void vTaskLED1(void *pvParameters){
-	static uint8_t  buf[3] = { 0x55, 0xAA, 0x77 };
-
-	for(;;){
-		gppin_toggle(GP_LED0);
-		uart_write(uart1, &buf[0], sizeof(buf));
-		vTaskDelay(500);
-	}
-}
-
-void systemTSK(void *pvParameters){
-	/* Create a new TCP connection handle */
-	struct netconn *conn;
-	conn = netconn_new(NETCONN_TCP);
-
-	xTaskCreate(vTaskLED1, "LED1", 512, NULL, 2, (TaskHandle_t *) NULL);
-	xTaskCreate(httpServerTSK, "httpServerTSK", 512, conn, 2, (TaskHandle_t *) NULL);
-	//xTaskCreate(tcpEchoServerTSK, 	"tcpEchoServerTSK", 512, conn, 2, ( TaskHandle_t * ) NULL);
-
-	for(;;){
-		vTaskDelay(500);
-	}
-}
-
-int main(){
+/*!****************************************************************************
+ *
+ */
+void main(void){
 	hardInit();
-
-
 	/* Initilaize the LwIP stack */
 	LwIP_Init();
-	xTaskCreate(systemTSK, "systemTSK", 512, NULL, 2, (TaskHandle_t *) NULL);
-
-	vTaskStartScheduler();
-	return 0;
+	//vTaskStartScheduler();
+	OSinit();
+	while(1);
 }

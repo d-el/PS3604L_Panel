@@ -16,6 +16,7 @@
 * MEMORY
 */
 const pinMode_type   const pinsMode[] = {
+/*0 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bMode
 /*1 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bOnOff
 /*2 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bView
 /*3 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bNext
@@ -23,10 +24,10 @@ const pinMode_type   const pinsMode[] = {
 /*5 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bUp
 /*6 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bDown
 
-/*0 */makepin(GPIOD, 12, 	outPushPull,	pullDisable,    0,  0),  //LED0
-/*1 */makepin(GPIOD, 13,	outPushPull,	pullDisable,    0,  0),  //LED1
-/*2 */makepin(GPIOD, 14, 	outPushPull,	pullDisable,    0,  0),  //LED2
-/*3 */makepin(GPIOD, 15, 	outPushPull,	pullDisable,    0,  0),  //LED3
+/*7 */makepin(GPIOD, 12, 	outPushPull,	pullDisable,    0,  0),  //LED0
+/*8 */makepin(GPIOD, 13,	outPushPull,	pullDisable,    0,  0),  //LED1
+/*9 */makepin(GPIOD, 14, 	outPushPull,	pullDisable,    0,  0),  //LED2
+/*10*/makepin(GPIOD, 15, 	outPushPull,	pullDisable,    0,  0),  //LED3
 };
 const uint32_t pinNum = sizeof(pinsMode) / sizeof(pinMode_type);
 

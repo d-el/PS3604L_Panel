@@ -1,19 +1,26 @@
 ﻿/*!****************************************************************************
- * @file    ledpwm.h
+ * @file    settingTSK.h
  * @author  d_el
  * @version V1.0
- * @date    27.12.2015, by d_el
- * @brief   pwm for lcd led
+ * @date    01.01.2016, by d_el
+ * @brief   --
  * @copyright GNU Public License
  */
-#ifndef ledpwm_H
-#define ledpwm_H
+#ifndef settingTSK_H
+#define settingTSK_H
 
 /*!****************************************************************************
  * Include
  */
-#include "stm32f4xx.h"
-#include "gpio.h"
+#include "FreeRTOS.h"
+#include "OSinit.h"
+#include "pstypes.h"
+#include "storage.h"
+#include "rtc.h"
+#include "main.h"
+#include "menuSystem.h"
+#include "enco.h"
+#include "systemTSK.h"
 
 /*!****************************************************************************
  * User define
@@ -26,6 +33,10 @@
 /*!****************************************************************************
  * User typedef
  */
+typedef struct {
+	uint16_t u;
+	uint16_t i;
+} settingSct_type;
 
 /*!****************************************************************************
  * Extern viriables
@@ -34,12 +45,21 @@
 /*!****************************************************************************
  * Macro functions
  */
-#define setLcdBrightness(x)    (TIM2->CCR1 = (x)) //[XXX_X %]
 
 /*!****************************************************************************
  * Prototypes for the functions
  */
-void ledPwm_init(void);
+void settingTSK(void *pPrm);
+uint32_t PrepareU(const menuItem_type *item);
+uint32_t PrepareI(const menuItem_type *item);
+uint32_t regSave(const menuItem_type *item);
+uint32_t savePointU(const menuItem_type *item);
+uint32_t savePointI(const menuItem_type *item);
+uint32_t setBright(const menuItem_type *item);
+uint32_t rtcPeriodic(const menuItem_type *item);
+uint32_t rtcSelectc(const menuItem_type *item);
+uint32_t rtcUselectc(const menuItem_type *item);
+uint32_t rtcCh(const menuItem_type *item);
 
-#endif //ledpwm_H
+#endif //settingTSK_H
 /*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
