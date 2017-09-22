@@ -36,9 +36,10 @@ void baseTSK(void *pPrm){
 	//Печать статических символов
 	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 10, kUp | kDown);
-	enSetNtic(5);
+	enSetNtic(2);
 
 	while(1){
+		gppin_set(GP_LED3);
 		sysTimeMeasStart(sysTimeBs);
 
 		/**************************************
@@ -255,9 +256,11 @@ void baseTSK(void *pPrm){
 		//Измерение времени выполнения одной итерации задачи
 		sysTimeMeasStop(sysTimeBs);
 		timebs_us = sysTimeMeasGet_us(sysTimeBs);
+		gppin_reset(GP_LED3);
 
 		/*************************************/
-		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));                       //Запускать задачу каждые 30ms
+		//vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));                       //Запускать задачу каждые 30ms
+		vTaskDelay(pdMS_TO_TICKS(5));
 	}
 }
 
@@ -308,57 +311,57 @@ void printStatusBar(void){
 			grf_fillRect(0, 108, 160, 19, black);
 			errPrev = 0;
 		}
-		lcd_setColor(black, white);
-
-		//Выходная мощность
-		sprintf(str, "%02u.%03u W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
-		lcd_putStr(0, 110, &font6x8, 0, str);
-
-		//Сопротивление нагузки
-		if(fp.tf.meas.resistens != 99999){
-			sprintf(str, "%05u  \xB1", fp.tf.meas.resistens);
-			lcd_putStr(0, 120, &font6x8, 0, str);
-		}else{
-			lcd_putStr(0, 120, &font6x8, 0, " ---   \xB1");
-		}
-
-		//Печать температуры
-		sprintf(str, "%02u.%u \xB0 C", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
-		lcd_putStr(60, 120, &font6x8, 0, str);
-
-		//Печать времени
-		rtc_getTime(&timeStrct);
-		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
-		lcd_putStr(110, 110, &font6x8, 0, str);
-		strftime(str, sizeof(str), "%d.%m.%y", &timeStrct);
-		lcd_putStr(110, 120, &font6x8, 0, str);
-
-		//WLAN
-		static TickType_t xTime;
-		static uint8_t ledon = 0;
-		if(wlan.wlanActive != 0){
-			if(wlan.wlanRxActive != 0){
-				xTime = xTaskGetTickCount();
-				//wlan.wlanRxActive = 0;
-				ledon = 1;
-			}
-			if((ledon != 0)&&((xTaskGetTickCount() - xTime) >= 500)){
-				ledon = 0;
-			}
-
-			if(ledon == 0){
-				lcd_setColor(black, white);
-			}else{
-				lcd_setColor(black, red);
-			}
-
-			sprintf(str, "WLAN");
-			lcd_putStr(60, 110, &font6x8, 0, str);
-		}
-		else{
-			sprintf(str, "    ");
-			lcd_putStr(60, 110, &font6x8, 0, str);
-		}
+//		lcd_setColor(black, white);
+//
+//		//Выходная мощность
+//		sprintf(str, "%02u.%03u W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
+//		lcd_putStr(0, 110, &font6x8, 0, str);
+//
+//		//Сопротивление нагузки
+//		if(fp.tf.meas.resistens != 99999){
+//			sprintf(str, "%05u  \xB1", fp.tf.meas.resistens);
+//			lcd_putStr(0, 120, &font6x8, 0, str);
+//		}else{
+//			lcd_putStr(0, 120, &font6x8, 0, " ---   \xB1");
+//		}
+//
+//		//Печать температуры
+//		sprintf(str, "%02u.%u \xB0 C", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
+//		lcd_putStr(60, 120, &font6x8, 0, str);
+//
+//		//Печать времени
+//		rtc_getTime(&timeStrct);
+//		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
+//		lcd_putStr(110, 110, &font6x8, 0, str);
+//		strftime(str, sizeof(str), "%d.%m.%y", &timeStrct);
+//		lcd_putStr(110, 120, &font6x8, 0, str);
+//
+//		//WLAN
+//		static TickType_t xTime;
+//		static uint8_t ledon = 0;
+//		if(wlan.wlanActive != 0){
+//			if(wlan.wlanRxActive != 0){
+//				xTime = xTaskGetTickCount();
+//				//wlan.wlanRxActive = 0;
+//				ledon = 1;
+//			}
+//			if((ledon != 0)&&((xTaskGetTickCount() - xTime) >= 500)){
+//				ledon = 0;
+//			}
+//
+//			if(ledon == 0){
+//				lcd_setColor(black, white);
+//			}else{
+//				lcd_setColor(black, red);
+//			}
+//
+//			sprintf(str, "WLAN");
+//			lcd_putStr(60, 110, &font6x8, 0, str);
+//		}
+//		else{
+//			sprintf(str, "    ");
+//			lcd_putStr(60, 110, &font6x8, 0, str);
+//		}
 
 		errPrev = 0;
 	}

@@ -38,14 +38,19 @@ void lcd_setPixel(uint16_t x, uint16_t y, uint16_t color){
  * @brief Заливка одним цветом
  */
 void lcd_fillScreen(uint16_t color){
-	color = ~color;
+	for(uint32_t x = 0; x < DISP_W; x++){
+		for(uint32_t y = 0; y < DISP_H; y++){
+			lcd_setPixel(x, y, color);
+		}
+	}
+	/*color = ~color;
 	uint32_t color32 = ((uint32_t) color << 16) | color;
 	uint32_t *data = (uint32_t*) &videoBff[0];
 	uint32_t *dataEnd = data + (DISP_W * DISP_H / 2);
 
 	while(data < dataEnd){
 		*data++ = color32;
-	}
+	}*/
 }
 
 /*!****************************************************************************

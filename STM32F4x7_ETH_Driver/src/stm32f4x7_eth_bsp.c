@@ -164,10 +164,10 @@ void ETH_GPIO_Config(void){
  */
 void ETH_NVIC_Config(void){
 	/* 2 bit for pre-emption priority, 2 bits for subpriority */
-	NVIC_SetPriorityGrouping(4);
+	//NVIC_SetPriorityGrouping(4);
 
 	/* Enable the Ethernet global Interrupt */
-	#define ETH_InterruptPrior	5
+	#define ETH_InterruptPrior	14
 	NVIC_EnableIRQ(ETH_IRQn);
 	NVIC_SetPriority(ETH_IRQn, ETH_InterruptPrior);
 }

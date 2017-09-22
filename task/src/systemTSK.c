@@ -15,12 +15,14 @@
 /*!****************************************************************************
  * Memory
  */
-frontPanel_type fp; ///< Data structure front panel
+frontPanel_type fp;		///< Data structure front panel
+struct netif xnetif; 	///< Network interface structure
 
 /*!****************************************************************************
  * Local prototypes for the functions
  */
 void loadParameters(void);
+void LwIP_Init(const uint8_t *ipaddr, const uint8_t *netmask, const uint8_t *gateway);
 
 /*!****************************************************************************
  * @brief
@@ -32,6 +34,14 @@ void systemTSK(void *pPrm){
 
 	loadParameters();
 	pvd_setSuplyFaultCallBack(shutdown);
+
+	// Initilaize the LwIP stack
+	uint8_t ip[4] 		= {192	,168	,1		,10};
+	uint8_t netmask[4]	= {255	,255	,255	,0};
+	uint8_t gateway[4]	= {192	,168	,1		,1};
+	LwIP_Init(ip, netmask, gateway);
+	ping_init();
+	Result &= xTaskCreate(httpServerTSK,	"httpServerTSK",	HTTP_TSK_SZ_STACK,	NULL,	HTTP_TSK_PRIO, NULL);
 
 	while(1){
 		if(selWindowPrev != fp.currentSelWindow){
@@ -154,7 +164,7 @@ void systemTSK(void *pPrm){
 		 * Вызов периодических функций
 		 */
 		static uint8_t ledCount = 0;
-		if(ledCount++ == 10){
+		/*if(ledCount++ == 10){
 			LED_ON();
 			ledCount = 0;
 		}
@@ -166,7 +176,7 @@ void systemTSK(void *pPrm){
 		}
 		if(ledCount == 3){
 			LED_OFF();
-		}
+		}*/
 
 		/*************************************/
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));
@@ -224,8 +234,58 @@ void shutdown(void){
 	spfd_disable();
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
 	LED_ON();
-	delay_ms(10000);
+	//delay_ms(10000);
 	NVIC_SystemReset();
+}
+
+/*!****************************************************************************
+ * @param ip
+ * @param netmask
+ * @param gateway
+ */
+void LwIP_Init(const uint8_t *ipaddr, const uint8_t *netmask, const uint8_t *gateway){
+	ip_addr_t l_ipaddr;
+	ip_addr_t l_netmask;
+	ip_addr_t l_gateway;
+
+	memcpy(&l_ipaddr.addr, ipaddr, sizeof(l_ipaddr.addr));
+	memcpy(&l_netmask.addr, netmask, sizeof(l_netmask.addr));
+	memcpy(&l_gateway.addr, gateway, sizeof(l_gateway.addr));
+
+	/* Create tcp_ip stack thread */
+	tcpip_init( NULL, NULL);
+
+	/* IP address setting & display on STM32_evalboard LCD*/
+/*#ifdef USE_DHCP
+	ipaddr.addr = 0;
+	netmask.addr = 0;
+	gw.addr = 0;
+#else
+	IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
+	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
+	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+#endif*/
+
+	/* - netif_add(struct netif *netif, struct ip_addr *ipaddr,
+	 struct ip_addr *netmask, struct ip_addr *gw,
+	 void *state, err_t (* init)(struct netif *netif),
+	 err_t (* input)(struct pbuf *p, struct netif *netif))
+
+	 Adds your network interface to the netif_list. Allocate a struct
+	 netif and pass a pointer to this structure as the first argument.
+	 Give pointers to cleared ip_addr structures when using DHCP,
+	 or fill them with sane numbers otherwise. The state pointer may be NULL.
+
+	 The init function pointer must point to a initialization function for
+	 your ethernet netif interface. The following code illustrates it's use.*/
+
+	netif_add(&xnetif, &l_ipaddr, &l_netmask, &l_gateway, NULL, &ethernetif_init, &tcpip_input);
+
+	/*  Registers the default network interface. */
+	netif_set_default(&xnetif);
+
+	/*  When the netif is fully configured this function must be called.*/
+	netif_set_up(&xnetif);
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

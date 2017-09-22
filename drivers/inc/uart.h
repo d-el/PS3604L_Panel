@@ -117,13 +117,13 @@ typedef void (*uartCallback_type)(uart_type *uart);
 extern uart_type *uart1;
 #endif //UART1_USE
 
-#if (UART2_USE == 1)
-extern uart_type *uart2;
-#endif //UART2_USE
-
 #if (UART3_USE == 1)
 extern uart_type *uart3;
 #endif //UART3_USE
+
+#if (UART4_USE == 1)
+extern uart_type *uart4;
+#endif //UART4_USE
 
 /*!****************************************************************************
  * Macro functions

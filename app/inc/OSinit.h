@@ -15,7 +15,7 @@
 #include "semphr.h"
 #include "timers.h"
 #include "httpServerTSK.h"
-//#include "systemTSK.h"
+#include "systemTSK.h"
 //#include "baseTSK.h"
 //#include "chargeTSK.h"
 //#include "settingTSK.h"
@@ -46,8 +46,6 @@
 #define CUBE_TSK_PRIO           1
 #define BUBLE_TSK_PRIO          1
 #define HTTP_TSK_PRIO          	1
-
-extern uint8_t __attribute__((section (".ram2bss"))) ucHeap[ configTOTAL_HEAP_SIZE ];
 
 /*!****************************************************************************
  * TaskHandle

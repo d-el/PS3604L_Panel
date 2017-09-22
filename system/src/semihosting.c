@@ -21,7 +21,8 @@
 /*!****************************************************************************
  * Memory
  */
-static unsigned char g_buf[128];
+#define DEBUG_BUF_LEN		256
+static unsigned char g_buf[DEBUG_BUF_LEN];
 static unsigned char g_buf_len = 0;
 
 /*!****************************************************************************
@@ -58,8 +59,8 @@ void SH_SendString(const char *str){
 /*!****************************************************************************
  * @brief    print debug message, printf format
  */
-#define DEBAG_PRINT_APP "> "
-char debugPrintString[128] = { DEBAG_PRINT_APP };
+#define DEBAG_PRINT_APP ""
+char debugPrintString[DEBUG_BUF_LEN] = { DEBAG_PRINT_APP };
 void debugn(const char *fmt, ...){
 	if(coreIsInDebugMode() == 0){
 		return;

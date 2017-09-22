@@ -18,9 +18,9 @@
 #include "crc.h"
 #include "24AAxx.h"
 #include "bkp.h"
-//#include "startupTSK.h"
-//#include "baseTSK.h"
-//#include "chargeTSK.h"
+#include "startupTSK.h"
+#include "baseTSK.h"
+#include "chargeTSK.h"
 
 /*!****************************************************************************
  * Define

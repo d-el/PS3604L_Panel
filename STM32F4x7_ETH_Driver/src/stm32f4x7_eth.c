@@ -76,7 +76,7 @@
 
 #if defined   (__CC_ARM) /*!< ARM Compiler */
 __align(4)
-ETH_DMADESCTypeDef DMARxDscrTab[ETH_RXBUFNB];/* Ethernet Rx MA Descriptor */
+ETH_DMADESCTypeDef DMARxDscrTab[ETH_RXBUFNB];/* Ethernet Rx DMA Descriptor */
 __align(4)
 ETH_DMADESCTypeDef DMATxDscrTab[ETH_TXBUFNB];/* Ethernet Tx DMA Descriptor */
 __align(4)
@@ -86,7 +86,7 @@ uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE]; /* Ethernet Transmit Buffer */
 
 #elif defined ( __ICCARM__ ) /*!< IAR Compiler */
 #pragma data_alignment=4
-ETH_DMADESCTypeDef DMARxDscrTab[ETH_RXBUFNB];/* Ethernet Rx MA Descriptor */
+ETH_DMADESCTypeDef DMARxDscrTab[ETH_RXBUFNB];/* Ethernet Rx DMA Descriptor */
 #pragma data_alignment=4
 ETH_DMADESCTypeDef DMATxDscrTab[ETH_TXBUFNB];/* Ethernet Tx DMA Descriptor */
 #pragma data_alignment=4
@@ -278,7 +278,7 @@ void ETH_StructInit(ETH_InitTypeDef* ETH_InitStruct){
 uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress){
 	uint32_t RegValue = 0, tmpreg = 0;
 	__IO uint32_t i = 0;
-	uint32_t hclk = 60000000;
+	uint32_t hclk;
 	__IO uint32_t timeout = 0;
 	/* Check the parameters */
 	/* MAC --------------------------*/
@@ -436,6 +436,19 @@ uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress){
 		_eth_delay_(PHY_CONFIG_DELAY);
 
 	}
+
+	/*
+	 * Interrupt source:
+	 *	- Link Down (link status negated)
+	 */
+	#define PHY_ISFR					29
+	#define PHY_IMR						30
+	#define PHY_ISFR_LINK_DOWN_MASK		0x0010
+	if(!ETH_WritePHYRegister(PHYAddress, PHY_IMR, PHY_ISFR_LINK_DOWN_MASK)){
+		/* Return ERROR in case of write timeout */
+		return ETH_ERROR;
+	}
+
 	/*------------------------ ETHERNET MACCR Configuration --------------------*/
 	/* Get the ETHERNET MACCR value */
 	tmpreg = ETH->MACCR;

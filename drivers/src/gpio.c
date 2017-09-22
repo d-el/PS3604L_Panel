@@ -16,18 +16,26 @@
 * MEMORY
 */
 const pinMode_type   const pinsMode[] = {
-/*0 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bMode
-/*1 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bOnOff
-/*2 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bView
-/*3 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bNext
-/*4 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bZero
-/*5 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bUp
-/*6 */makepin(GPIOA, 0, 	digitalInput, 	pullUp, 		0, 0), //bDown
+/*0 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bMode
+/*1 */makepin(GPIOC, 7, 	digitalInput, 	pullUp, 		0, 0), //bOnOff
+/*2 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bView
+/*3 */makepin(GPIOC, 8, 	digitalInput, 	pullUp, 		0, 0), //bNext
+/*4 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bZero
+/*5 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bUp
+/*6 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bDown
 
-/*7 */makepin(GPIOD, 12, 	outPushPull,	pullDisable,    0,  0),  //LED0
-/*8 */makepin(GPIOD, 13,	outPushPull,	pullDisable,    0,  0),  //LED1
+/*7 */makepin(GPIOD, 12, 	outPushPull,	pullDisable,    0,  0),  //LED0 enco
+/*8 */makepin(GPIOD, 13,	outPushPull,	pullDisable,    0,  0),  //LED1 enco
 /*9 */makepin(GPIOD, 14, 	outPushPull,	pullDisable,    0,  0),  //LED2
 /*10*/makepin(GPIOD, 15, 	outPushPull,	pullDisable,    0,  0),  //LED3
+
+/*11*/makepin(GPIOB, 0, 	digitalInput, 	pullUp, 		0, 0),	//LANnINT
+/*12*/makepin(GPIOD, 5, 	outPushPull,	pullDisable,    1,  0), //SSD_RES
+/*13*/makepin(GPIOD, 6, 	outPushPull,	pullDisable,    0,  0), //SSD_DC
+/*14*/makepin(GPIOD, 7, 	outPushPull,	pullDisable,    1,  0), //SSD_CS
+
+/*15*/makepin(GPIOA, 8, 	alternateFunctionPushPull, pullDisable, 0, 0),	//MCO1
+/*16*/makepin(GPIOC, 9, 	alternateFunctionPushPull, pullDisable, 0, 0),	//MCO2
 };
 const uint32_t pinNum = sizeof(pinsMode) / sizeof(pinMode_type);
 

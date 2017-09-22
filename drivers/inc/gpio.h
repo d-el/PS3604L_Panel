@@ -102,10 +102,15 @@ typedef enum{
 /*5 */GP_bUp,
 /*6 */GP_bDown,
 
-/*7 */  GP_LED0,
-/*8 */  GP_LED1,
-/*9 */  GP_LED2,
-/*10*/  GP_LED3,
+/*7 */GP_LED0,
+/*8 */GP_LED1,
+/*9 */GP_LED2,
+/*10*/GP_LED3,
+
+/*11*/GP_LANnINT,
+/*12*/GP_SSD_RES,
+/*13*/GP_SSD_DC,
+/*14*/GP_SSD_CS,
 
 GP_NOT_USED
 }GPnum_type;

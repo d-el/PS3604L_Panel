@@ -1,45 +1,42 @@
-﻿/*!****************************************************************************
- * @file    ledpwm.h
- * @author  d_el
- * @version V1.0
- * @date    27.12.2015, by d_el
- * @brief   pwm for lcd led
- * @copyright GNU Public License
+/*!****************************************************************************
+ * @file		pingServer.h
+ * @author		d_el - Storozhenko Roman
+ * @version		V1.0
+ * @date		22 сент. 2017 г.
+ * @copyright	GNU Lesser General Public License v3
+ * @brief		--
  */
-#ifndef ledpwm_H
-#define ledpwm_H
+#ifndef pingServer_H
+#define pingServer_H
 
 /*!****************************************************************************
  * Include
  */
-#include "stm32f4xx.h"
-#include "gpio.h"
 
 /*!****************************************************************************
- * User define
+ * Define
  */
 
 /*!****************************************************************************
- * User enum
+ * Enumeration
  */
 
 /*!****************************************************************************
- * User typedef
+ * Typedef
  */
 
 /*!****************************************************************************
- * Extern viriables
+ * Exported variables
  */
 
 /*!****************************************************************************
  * Macro functions
  */
-#define setLcdBrightness(x)    (TIM5->CCR1 = (x)) //[XXX_X %]
 
 /*!****************************************************************************
- * Prototypes for the functions
+ * Function declaration
  */
-void ledPwm_init(void);
+void ping_init(void);
 
-#endif //ledpwm_H
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+#endif //pingServer_H
+/*************** LGPL ************** END OF FILE *********** D_EL ************/

@@ -36,6 +36,7 @@
  * Include
  */
 #include "gpio.h"
+//#include "drivers.h"
 
 /*!****************************************************************************
  * User define
@@ -45,12 +46,13 @@
 #define APB2_FREQ           42000000    //[Hz]
 
 /* MAC ADDRESS*/
-#define MAC_ADDR0   	28
-#define MAC_ADDR1   	02
-#define MAC_ADDR2   	19
-#define MAC_ADDR3   	92
-#define MAC_ADDR4   	00
-#define MAC_ADDR5   	00
+extern uint8_t macAddress[6];
+#define MAC_ADDR0   	macAddress[0]
+#define MAC_ADDR1   	macAddress[1]
+#define MAC_ADDR2   	macAddress[2]
+#define MAC_ADDR3   	macAddress[3]
+#define MAC_ADDR4   	macAddress[4]
+#define MAC_ADDR5   	macAddress[5]
 
 /*Static IP ADDRESS*/
 #define IP_ADDR0   		192

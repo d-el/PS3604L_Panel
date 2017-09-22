@@ -26,7 +26,10 @@
 #include "cube3dTSK.h"
 #include "chargeTSK.h"
 #include "pvd.h"
-
+#include "ethernetif.h"
+#include "tcpip.h"
+#include "netif.h"
+#include "pingService.h"
 
 /*!****************************************************************************
  * Define
@@ -55,12 +58,14 @@ typedef enum {
 } selWindow_type;
 
 typedef struct {
-	uint16_t lcdLight;	///< [X_X %]
+	uint32_t 	ipAddress;
+	uint16_t 	lcdLight;		///< [X_X %]
 } frontPanelSetting_type;
 
 typedef struct {
 	uint16_t sysSettingLoadDefault	:1;
 	uint16_t userSettingLoadDefault	:1;
+	uint16_t rtcOscillatorError		:1;
 } frontPanelState_type;
 
 typedef struct {

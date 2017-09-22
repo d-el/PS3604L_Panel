@@ -14,18 +14,18 @@
  */
 #include "stm32f4xx.h"
 #include "stdint.h"
-//#include "specificMath.h"
 #include <time.h>
 
 /*!****************************************************************************
  * Define
  */
-#define RTC_LSE_TIMEOUT	(10000)
+#define RTC_LSE_TIMEOUT	(100000000)
 
 /*!****************************************************************************
  * Typedef
  */
 typedef enum {
+	rtc_Ok,
 	rtc_wasOn,
 	rtc_initOk,
 	rtc_setOk,
