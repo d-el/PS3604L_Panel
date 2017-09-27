@@ -1,8 +1,9 @@
-﻿/******************************************************************************
+﻿
+/******************************************************************************
  * @file			charge.h
  * @author		D_EL - Storozhenko Roman
  * @version      V1.0
- * @date			
+ * @date
  * @copyright GNU Public License
  */
 #ifndef CHARGE_H
@@ -18,7 +19,7 @@
 #include "pstypes.h"
 #include "graphics.h"
 #include "baseTSK.h"
-#include "uartTSK.h"
+#include "regulatorConnTSK.h"
 #include "spfd54124b.h"
 #include "key.h"
 #include "enco.h"

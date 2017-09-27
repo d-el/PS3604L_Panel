@@ -15,6 +15,8 @@
 /*!****************************************************************************
  * MEMORY
  */
+SemaphoreHandle_t uart1TxSem;
+SemaphoreHandle_t uart1RxSem;
 wlan_type wlan;
 uint8_t wlanTx[128];
 uint8_t wlanMas[128];
@@ -46,6 +48,13 @@ void debugWlanPrint(char *string){
 uint32_t pos;
 void wlanTSK(void *pPrm){
 	TickType_t	xLastWakeTime = xTaskGetTickCount();
+
+	//Create semaphore
+	vSemaphoreCreateBinary(uart1TxSem);
+	xSemaphoreTake(uart1TxSem, portMAX_DELAY);
+
+	vSemaphoreCreateBinary(uart1RxSem);
+	xSemaphoreTake(uart1RxSem, portMAX_DELAY);
 
 	//gppin_set(GP_GPIO2);
 

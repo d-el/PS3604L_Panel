@@ -16,14 +16,24 @@
 #include "timers.h"
 #include "httpServerTSK.h"
 #include "systemTSK.h"
-//#include "baseTSK.h"
-//#include "chargeTSK.h"
-//#include "settingTSK.h"
 //#include "wlanTSK.h"
 
-/*!****************************************************************************
- *-------NAME--------------------size [4byte Word] */
-#define SYSTEM_TSK_SZ_STACK     128+128
+/*!**** NAME ****************** size [4byte Word] ****************************/
+#define SYSTEM_TSK_PRIO         7
+#define UART_TSK_PRIO           6
+//#define NETIF_TSK_PRIO          5
+//#define TCPIP_TSK_PRIO         	4
+#define HTTP_TSK_PRIO          	3
+#define WLAN_TSK_PRIO           2
+#define STARTUP_TSK_PRIO        1
+#define BASE_TSK_PRIO           1
+#define CHARG_TSK_PRIO          1
+#define SETT_TSK_PRIO           1
+#define CUBE_TSK_PRIO           1
+#define BUBLE_TSK_PRIO          1
+
+/*!**** NAME ****************** size [4byte Word] ****************************/
+#define SYSTEM_TSK_SZ_STACK     256
 #define BASE_TSK_SZ_STACK       256
 #define CHARG_TSK_SZ_STACK      256
 #define UART_TSK_SZ_STACK       256
@@ -33,31 +43,6 @@
 #define CUBE_TSK_SZ_STACK       256
 #define BUBLE_TSK_SZ_STACK      64
 #define HTTP_TSK_SZ_STACK      	512
-
-/*!****************************************************************************
- *-------NAME--------------------size [4byte Word] */
-#define SYSTEM_TSK_PRIO         3
-#define BASE_TSK_PRIO           1
-#define CHARG_TSK_PRIO          1
-#define UART_TSK_PRIO           2
-#define WLAN_TSK_PRIO           1
-#define SETT_TSK_PRIO           1
-#define STARTUP_TSK_PRIO        1
-#define CUBE_TSK_PRIO           1
-#define BUBLE_TSK_PRIO          1
-#define HTTP_TSK_PRIO          	1
-
-/*!****************************************************************************
- * TaskHandle
- */
-extern TaskHandle_t windowTskHandle;
-
-/*!****************************************************************************
- * Semaphore
- */
-extern SemaphoreHandle_t uart1TxSem;
-extern SemaphoreHandle_t uart1RxSem;
-extern SemaphoreHandle_t uart2RxSem;
 
 /*!****************************************************************************
  * Function declaration

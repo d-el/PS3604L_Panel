@@ -15,6 +15,7 @@
 /*!****************************************************************************
  * Memory
  */
+TaskHandle_t 	windowTskHandle;
 frontPanel_type fp;		///< Data structure front panel
 struct netif xnetif; 	///< Network interface structure
 
@@ -29,6 +30,7 @@ void LwIP_Init(const uint8_t *ipaddr, const uint8_t *netmask, const uint8_t *gat
  */
 void systemTSK(void *pPrm){
 	TickType_t 		xLastWakeTime = xTaskGetTickCount();
+
 	selWindow_type 	selWindowPrev = noneWindow;
 	BaseType_t 		Result = pdTRUE;
 
@@ -182,12 +184,16 @@ void systemTSK(void *pPrm){
 		//Link Down
 		if(gppin_get(GP_LANnINT) == 0){
 			ETH_ReadPHYRegister(1, PHY_BSR);
-			fp.state.lanLink = 0;
+			if(fp.state.lanLink != 0){
+				netif_set_down(&xnetif);
+				fp.state.lanLink = 0;
+			}
 		}
+
 		//Link Up
 		if(fp.state.lanLink == 0){
-			if((ETH_ReadPHYRegister(1, PHY_BSR) & PHY_Linked_Status) != 0){
-				gppin_set(GP_LED2);
+			if(ETH_AutoNegotiation(1, NULL) == ETH_SUCCESS){
+				netif_set_up(&xnetif);	//When the netif is fully configured this function must be called
 				fp.state.lanLink = 1;
 			}
 		}
@@ -232,6 +238,7 @@ void loadParameters(void){
  */
 void selWindow(selWindow_type window){
 	fp.currentSelWindow = window;
+	//vTaskSuspend(NULL);
 	while(windowTskHandle != NULL){
 		vTaskDelay(1000);
 	}
@@ -269,17 +276,6 @@ void LwIP_Init(const uint8_t *ipaddr, const uint8_t *netmask, const uint8_t *gat
 	/* Create tcp_ip stack thread */
 	tcpip_init( NULL, NULL);
 
-	/* IP address setting & display on STM32_evalboard LCD*/
-/*#ifdef USE_DHCP
-	ipaddr.addr = 0;
-	netmask.addr = 0;
-	gw.addr = 0;
-#else
-	IP4_ADDR(&ipaddr, IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
-	IP4_ADDR(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
-	IP4_ADDR(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
-#endif*/
-
 	/* - netif_add(struct netif *netif, struct ip_addr *ipaddr,
 	 struct ip_addr *netmask, struct ip_addr *gw,
 	 void *state, err_t (* init)(struct netif *netif),
@@ -298,8 +294,7 @@ void LwIP_Init(const uint8_t *ipaddr, const uint8_t *netmask, const uint8_t *gat
 	/*  Registers the default network interface. */
 	netif_set_default(&xnetif);
 
-	/*  When the netif is fully configured this function must be called.*/
-	netif_set_up(&xnetif);
+	//netif_set_up(&xnetif);
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

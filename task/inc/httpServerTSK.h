@@ -12,13 +12,12 @@
 /*!****************************************************************************
  * Include
  */
-#include "lwip/opt.h"
-#include "lwip/arch.h"
+//#include "lwip/opt.h"
+//#include "lwip/arch.h"
 #include "lwip/api.h"
 #include "lwip/ip.h"
 #include <stdio.h>
 #include <string.h>
-#include <task/inc/httpServerTSK.h>
 #include "debugCore.h"
 #include "gpio.h"
 #include "uart.h"

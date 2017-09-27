@@ -1,5 +1,5 @@
 ﻿/*!****************************************************************************
- * @file    uartTSK.c
+ * @file    regulatorConnTSK.c
  * @author  D_EL
  * @version V1.0.0
  * @date    2015-08-10
@@ -10,13 +10,14 @@
 /*!****************************************************************************
  * Include
  */
-#include "uartTSK.h"
+#include "regulatorConnTSK.h"
 
 /*!****************************************************************************
  * MEMORY
  */
-QueueHandle_t queueCommand;
-uartTsk_type uartTsk = { .state = uartUndef };
+QueueHandle_t 		queueCommand;
+SemaphoreHandle_t 	regulatorConnUartRxSem;
+uartTsk_type 		uartTsk = { .state = uartUndef };
 
 /******************************************************************************
  * Local prototypes for the functions
@@ -41,6 +42,12 @@ void uartTSK(void *pPrm){
 	if(queueCommand == NULL)
 		while(1)
 			;
+	// Create Semaphore for UART
+	vSemaphoreCreateBinary(regulatorConnUartRxSem);
+	if(regulatorConnUartRxSem == NULL)
+		while(1)
+			;
+	xSemaphoreTake(regulatorConnUartRxSem, portMAX_DELAY);
 
 	while(1){
 		uartTsk.queueLen = uxQueueMessagesWaiting(queueCommand);
@@ -51,7 +58,7 @@ void uartTSK(void *pPrm){
 		uart_write(uartTskUse, uartTskUse->pTxBff, sizeof(task_type) + sizeof(uint16_t));
 
 		uart_read(uartTskUse, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type) + sizeof(uint16_t));
-		res = xSemaphoreTake(uart2RxSem, pdMS_TO_TICKS(UART_TSK_MAX_WAIT_ms));
+		res = xSemaphoreTake(regulatorConnUartRxSem, pdMS_TO_TICKS(UART_TSK_MAX_WAIT_ms));
 		if(res == pdTRUE){
 			//Приняли ответ
 			crc = GetCrc(uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type) + sizeof(uint16_t));
@@ -139,7 +146,7 @@ uint8_t waitForTf(void){
 static void uartTskHook(uart_type *puart){
 	BaseType_t xHigherPriorityTaskWoken;
 	xHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(uart2RxSem, &xHigherPriorityTaskWoken);
+	xSemaphoreGiveFromISR(regulatorConnUartRxSem, &xHigherPriorityTaskWoken);
 	if(xHigherPriorityTaskWoken != pdFALSE){
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	}

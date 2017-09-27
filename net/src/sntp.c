@@ -42,25 +42,25 @@
  * - as a DNS name if SNTP_SERVER_DNS is set to 1
  * May contain multiple server names (e.g. "pool.ntp.org","second.time.server")
  */
-#define SNTP_SERVER_ADDRESS         "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org"
+#define SNTP_SERVER_ADDRESS         "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org", "second.time.server"
 
 /** SNTP receive timeout - in milliseconds
  * Also used as retry timeout - this shouldn't be too low.
  * Default is 3 seconds.
  */
-#define SNTP_RECV_TIMEOUT           3000
+#define SNTP_RECV_TIMEOUT           5000
 
 /** Default retry timeout (in milliseconds) if the response
  * received is invalid.
  * This is doubled with each retry until SNTP_RETRY_TIMEOUT_MAX is reached.
  */
-#define SNTP_RETRY_TIMEOUT          300
+#define SNTP_RETRY_TIMEOUT          5000
 
 /** SNTP update delay - in milliseconds
  * Default is 1 hour.
  * SNTPv4 RFC 4330 enforces a minimum update time of 15 seconds!
  */
-#define SNTP_UPDATE_DELAY           15000
+#define SNTP_UPDATE_DELAY           30000
 
 #define SNTP_RECEIVE_TIME_SIZE      1
 
@@ -156,7 +156,7 @@ static void sntp_process(u32_t *receive_timestamp){
 	rtc_setTimeUnix(tLocal);
 	char str[32];
 	ctime_r(&tLocal, str);
-	debugn("time: = %s", str);
+	debugn(str);
 }
 
 /**
@@ -165,18 +165,6 @@ static void sntp_process(u32_t *receive_timestamp){
 static void sntp_initialize_request(struct sntp_msg *req){
 	memset(req, 0, SNTP_MSG_LEN);
 	req->li_vn_mode = SNTP_LI_NO_WARNING | SNTP_VERSION | SNTP_MODE_CLIENT;
-}
-
-/**
- * Retry: send a new request (and increase retry timeout).
- *
- * @param arg is unused (only necessary to conform to sys_timeout)
- */
-static void sntp_retry(void* arg){
-	LWIP_UNUSED_ARG(arg);
-	debug("sntp_retry: Next request will be sent in %u ms\n", SNTP_RETRY_TIMEOUT);
-	/* set up a timer to send a retry and increase the retry delay */
-	sys_timeout(SNTP_RETRY_TIMEOUT, sntp_request, NULL);
 }
 
 /**
@@ -200,7 +188,7 @@ static void sntp_try_next_server(void* arg){
 		/* instantly send a request to the next server */
 		sntp_request(NULL);
 	}else{
-		sntp_retry(NULL);
+		sys_timeout(SNTP_RETRY_TIMEOUT, sntp_request, NULL);
 	}
 }
 
@@ -255,13 +243,13 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t 
 
 		/* Set up timeout for next request */
 		sys_timeout((u32_t) SNTP_UPDATE_DELAY, sntp_request, NULL);
-		debug("sntp_recv: Scheduled next time request: %u ms\n", (u32_t) SNTP_UPDATE_DELAY);
+		//debug("sntp_recv: Scheduled next time request: %u ms\n", (u32_t) SNTP_UPDATE_DELAY);
 	}else if(err == SNTP_ERR_KOD){
 		/* Kiss-of-death packet. Use another server or increase UPDATE_DELAY. */
 		sntp_try_next_server(NULL);
 	}else{
 		/* another error, try the same server again */
-		sntp_retry(NULL);
+		sys_timeout(SNTP_RETRY_TIMEOUT, sntp_request, NULL);
 	}
 }
 
@@ -274,7 +262,7 @@ static void sntp_send_request(ip_addr_t *server_addr){
 	p = pbuf_alloc(PBUF_TRANSPORT, SNTP_MSG_LEN, PBUF_RAM);
 	if(p != NULL){
 		struct sntp_msg *sntpmsg = (struct sntp_msg *) p->payload;
-		debug("sntp_send_request: Sending request to server\n");
+		//debug("sntp_send_request: Sending request to server\n");
 		/* initialize request message */
 		sntp_initialize_request(sntpmsg);
 		/* send request */
@@ -282,7 +270,7 @@ static void sntp_send_request(ip_addr_t *server_addr){
 		/* set up receive timeout: try next server or retry on timeout */
 		sys_timeout((u32_t) SNTP_RECV_TIMEOUT, sntp_try_next_server, NULL);
 	}else{
-		debug("sntp_send_request: Out of memory, trying again in %u ms\n", SNTP_RETRY_TIMEOUT);
+		//debug("sntp_send_request: Out of memory, trying again in %u ms\n", SNTP_RETRY_TIMEOUT);
 		/* out of memory: set up a timer to send a retry */
 		sys_timeout(SNTP_RETRY_TIMEOUT, sntp_request, NULL);
 	}
@@ -319,7 +307,7 @@ static void sntp_request(void *arg){
 	LWIP_UNUSED_ARG(arg);
 
 	/* initialize SNTP server address */
-	debug("dns_gethostbyname, number server: %u, url: %s\n", sntp_current_server, sntp_server_addresses[sntp_current_server]);
+	//debug("dns_gethostbyname, number server: %u, url: %s\n", sntp_current_server, sntp_server_addresses[sntp_current_server]);
 	err = dns_gethostbyname(sntp_server_addresses[sntp_current_server], &sntp_server_address, sntp_dns_found, NULL);
 
 	if(err == ERR_INPROGRESS){
@@ -333,7 +321,7 @@ static void sntp_request(void *arg){
 		sntp_send_request(&sntp_server_address);
 	}else{
 		/* address conversion failed, try another server */
-		debug("sntp_request: Invalid server address, trying next server.\n");
+		//debug("sntp_request: Invalid server address, trying next server.\n");
 		sys_timeout(SNTP_RETRY_TIMEOUT, sntp_try_next_server, NULL);
 	}
 }

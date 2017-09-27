@@ -369,64 +369,13 @@ uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress){
 	_eth_delay_(PHY_RESET_DELAY);
 
 	if(ETH_InitStruct->ETH_AutoNegotiation != ETH_AutoNegotiation_Disable){
-		/* We wait for linked status... */
-		do{
-			timeout++;
-		}while(!(ETH_ReadPHYRegister(PHYAddress, PHY_BSR) & PHY_Linked_Status) && (timeout < PHY_READ_TO));
-
-		/* Return ERROR in case of timeout */
-		if(timeout == PHY_READ_TO){
-			return ETH_ERROR;
-		}
-
-		/* Reset Timeout counter */
-		timeout = 0;
 		/* Enable Auto-Negotiation */
 		if(!(ETH_WritePHYRegister(PHYAddress, PHY_BCR, PHY_AutoNegotiation))){
 			/* Return ERROR in case of write timeout */
 			return ETH_ERROR;
 		}
-
-		/* Wait until the auto-negotiation will be completed */
-		do{
-			timeout++;
-		}while(!(ETH_ReadPHYRegister(PHYAddress, PHY_BSR) & PHY_AutoNego_Complete) && (timeout < (uint32_t) PHY_READ_TO));
-
-		/* Return ERROR in case of timeout */
-		if(timeout == PHY_READ_TO){
-			return ETH_ERROR;
-		}
-
-		/* Reset Timeout counter */
-		timeout = 0;
-
-		/* Read the result of the auto-negotiation */
-		RegValue = ETH_ReadPHYRegister(PHYAddress, PHY_SR);
-
-		switch(RegValue & PHY_DUPLEX_SPEED_STATUS_MASK){
-			case PHY_100BTX_FULL:
-				ETH_InitStruct->ETH_Mode = ETH_Mode_FullDuplex;
-				ETH_InitStruct->ETH_Speed = ETH_Speed_100M;
-				break;
-
-			case PHY_100BTX_HALF:
-				ETH_InitStruct->ETH_Mode = ETH_Mode_HalfDuplex;
-				ETH_InitStruct->ETH_Speed = ETH_Speed_100M;
-				break;
-
-			case PHY_10M_FULL:
-				ETH_InitStruct->ETH_Mode = ETH_Mode_FullDuplex;
-				ETH_InitStruct->ETH_Speed = ETH_Speed_10M;
-				break;
-
-			case PHY_10M_HALF:
-				ETH_InitStruct->ETH_Mode = ETH_Mode_HalfDuplex;
-				ETH_InitStruct->ETH_Speed = ETH_Speed_10M;
-				break;
-
-			default:
-				break;
-		}
+		ETH_InitStruct->ETH_Mode = ETH_Mode_FullDuplex;
+		ETH_InitStruct->ETH_Speed = ETH_Speed_100M;
 	}else{
 		if(!ETH_WritePHYRegister(PHYAddress, PHY_BCR, ((uint16_t) (ETH_InitStruct->ETH_Mode >> 3) | (uint16_t) (ETH_InitStruct->ETH_Speed >> 1)))){
 			/* Return ERROR in case of write timeout */
@@ -434,16 +383,12 @@ uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress){
 		}
 		/* Delay to assure PHY configuration */
 		_eth_delay_(PHY_CONFIG_DELAY);
-
 	}
 
 	/*
 	 * Interrupt source:
 	 *	- Link Down (link status negated)
 	 */
-	#define PHY_ISFR					29
-	#define PHY_IMR						30
-	#define PHY_ISFR_LINK_DOWN_MASK		0x0010
 	if(!ETH_WritePHYRegister(PHYAddress, PHY_IMR, PHY_ISFR_LINK_DOWN_MASK)){
 		/* Return ERROR in case of write timeout */
 		return ETH_ERROR;
@@ -552,6 +497,62 @@ uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress){
 #endif /* USE_ENHANCED_DMA_DESCRIPTORS */
 
 	/* Return Ethernet configuration success */
+	return ETH_SUCCESS;
+}
+
+/**
+ * @brief Configure MAC from current LAN configuration
+ * @param arg: out current LAN configuration
+ * @retval ETH_ERROR: MAC Auto Negotiation failed
+ *         ETH_SUCCESS: MAC Auto Negotiation initialized
+ */
+uint32_t ETH_AutoNegotiation(uint16_t PHYAddress, ETH_ConnectTypeDef *arg){
+	ETH_ConnectTypeDef conn;
+
+	uint16_t phy_bsr = ETH_ReadPHYRegister(PHYAddress, PHY_BSR);
+
+	if(((phy_bsr & PHY_Linked_Status) == 0) || ((phy_bsr & PHY_AutoNego_Complete) == 0)){
+		return ETH_ERROR;
+	}
+
+	uint16_t phy_sr = ETH_ReadPHYRegister(PHYAddress, PHY_SR);
+
+	switch(phy_sr & PHY_DUPLEX_SPEED_STATUS_MASK){
+		case PHY_100BTX_FULL:
+			conn.ETH_Mode = ETH_Mode_FullDuplex;
+			conn.ETH_Speed = ETH_Speed_100M;
+			break;
+
+		case PHY_100BTX_HALF:
+			conn.ETH_Mode = ETH_Mode_HalfDuplex;
+			conn.ETH_Speed = ETH_Speed_100M;
+			break;
+
+		case PHY_10M_FULL:
+			conn.ETH_Mode = ETH_Mode_FullDuplex;
+			conn.ETH_Speed = ETH_Speed_10M;
+			break;
+
+		case PHY_10M_HALF:
+			conn.ETH_Mode = ETH_Mode_HalfDuplex;
+			conn.ETH_Speed = ETH_Speed_10M;
+			break;
+
+		default:
+			break;
+	}
+
+	/* Set the FES bit according to ETH_Speed value */
+	/* Set the DM bit according to ETH_Mode value */
+	uint32_t maccr = ETH->MACCR;
+	maccr &= ~(ETH_Speed_100M | ETH_Mode_FullDuplex);
+	maccr |= conn.ETH_Mode | conn.ETH_Speed;
+	/* Write to ETHERNET MACCR */
+	ETH->MACCR = maccr;
+
+	if(arg != NULL){
+		*arg = conn;
+	}
 	return ETH_SUCCESS;
 }
 

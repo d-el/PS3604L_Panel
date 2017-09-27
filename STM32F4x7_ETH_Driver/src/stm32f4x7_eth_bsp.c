@@ -39,11 +39,6 @@ void ETH_BSP_Config(void){
 
 	/* Configure the Ethernet MAC/DMA */
 	ETH_MACDMA_Config();
-
-	if(EthInitStatus == 0){
-		while(1)
-			;
-	}
 }
 
 /**
@@ -149,10 +144,10 @@ void ETH_GPIO_Config(void){
 	gppin_init(GPIOB, 13, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD1   -------> PB13
 	gppin_init(GPIOE, 2, outPushPull, pullDisable, 0, 0);  					//ETH_RST_PIN     -------> PE2
 
-	_gppin_reset(GPIOE, 1 << 2);
+	//_gppin_reset(GPIOE, 1 << 2);
 	for(i = 0; i < 20000; i++)
 		;
-	_gppin_set(GPIOE, 1 << 2);
+	//_gppin_set(GPIOE, 1 << 2);
 	for(i = 0; i < 20000; i++)
 		;
 }

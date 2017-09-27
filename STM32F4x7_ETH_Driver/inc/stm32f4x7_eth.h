@@ -226,6 +226,19 @@ typedef struct {
                                                              This parameter can be a value of @ref ETH_DMA_Arbitration */
 }ETH_InitTypeDef;
 
+/**
+  * @brief  ETH_ModeETH MAC Connect structure definition
+  * @note   ETH_Mode:	ETH_Mode_FullDuplex, ETH_Mode_HalfDuplex
+  * 		ETH_Speed:	ETH_Speed_100M, ETH_Speed_10M
+  */
+typedef struct  {
+uint32_t             ETH_Speed;                     /*!< Sets the Ethernet speed: 10/100 Mbps
+                                                         This parameter can be a value of @ref ETH_Speed */
+
+uint32_t             ETH_Mode;                      /*!< Selects the MAC duplex mode: Half-Duplex or Full-Duplex mode
+                                                         This parameter can be a value of @ref ETH_Duplex_Mode */
+}ETH_ConnectTypeDef;
+
 /**--------------------------------------------------------------------------**/
 /**
   * @brief                           DMA descriptors types
@@ -544,8 +557,8 @@ typedef struct  {
 /** @defgroup PHY_Read_write_Timeouts
   * @{
   */
-#define PHY_READ_TO                     ((uint32_t)0x000FFFF)/*((uint32_t)0x0004FFFF)*/
-#define PHY_WRITE_TO                    ((uint32_t)0x000FFFF)/*((uint32_t)0x0004FFFF)*/
+#define PHY_READ_TO                     ((uint32_t)0x0000FFFF)
+#define PHY_WRITE_TO                    ((uint32_t)0x0000FFFF)
 
 /**
   * @}
@@ -1772,6 +1785,7 @@ typedef struct  {
   */
 void ETH_DeInit(void);
 uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress);
+uint32_t ETH_AutoNegotiation(uint16_t PHYAddress, ETH_ConnectTypeDef *arg);
 void ETH_StructInit(ETH_InitTypeDef* ETH_InitStruct);
 void ETH_SoftwareReset(void);
 FlagStatus ETH_GetSoftwareResetStatus(void);
