@@ -311,31 +311,31 @@ void printStatusBar(void){
 			grf_fillRect(0, 108, 160, 19, black);
 			errPrev = 0;
 		}
-//		lcd_setColor(black, white);
-//
-//		//Выходная мощность
-//		sprintf(str, "%02u.%03u W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
-//		lcd_putStr(0, 110, &font6x8, 0, str);
-//
-//		//Сопротивление нагузки
-//		if(fp.tf.meas.resistens != 99999){
-//			sprintf(str, "%05u  \xB1", fp.tf.meas.resistens);
-//			lcd_putStr(0, 120, &font6x8, 0, str);
-//		}else{
-//			lcd_putStr(0, 120, &font6x8, 0, " ---   \xB1");
-//		}
-//
-//		//Печать температуры
-//		sprintf(str, "%02u.%u \xB0 C", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
-//		lcd_putStr(60, 120, &font6x8, 0, str);
-//
-//		//Печать времени
-//		rtc_getTime(&timeStrct);
-//		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
-//		lcd_putStr(110, 110, &font6x8, 0, str);
-//		strftime(str, sizeof(str), "%d.%m.%y", &timeStrct);
-//		lcd_putStr(110, 120, &font6x8, 0, str);
-//
+		lcd_setColor(black, white);
+
+		//Выходная мощность
+		sprintf(str, "%02u.%03u W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
+		lcd_putStr(0, 110, &font6x8, 0, str);
+
+		//Сопротивление нагузки
+		if(fp.tf.meas.resistens != 99999){
+			sprintf(str, "%05u  \xB1", fp.tf.meas.resistens);
+			lcd_putStr(0, 120, &font6x8, 0, str);
+		}else{
+			lcd_putStr(0, 120, &font6x8, 0, " ---   \xB1");
+		}
+
+		//Печать температуры
+		sprintf(str, "%02u.%u \xB0 C", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
+		lcd_putStr(60, 120, &font6x8, 0, str);
+
+		//Печать времени
+		rtc_getTime(&timeStrct);
+		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
+		lcd_putStr(110, 110, &font6x8, 0, str);
+		strftime(str, sizeof(str), "%d.%m.%y", &timeStrct);
+		lcd_putStr(110, 120, &font6x8, 0, str);
+
 //		//WLAN
 //		static TickType_t xTime;
 //		static uint8_t ledon = 0;
@@ -362,6 +362,33 @@ void printStatusBar(void){
 //			sprintf(str, "    ");
 //			lcd_putStr(60, 110, &font6x8, 0, str);
 //		}
+
+		//LAN
+		static TickType_t xTime;
+		static uint8_t ledon = 0;
+		if(fp.state.lanLink != 0){
+			if(fp.state.lanActive != 0){
+				xTime = xTaskGetTickCount();
+				ledon = 1;
+				fp.state.lanActive = 0;
+			}
+			if((ledon != 0)&&((xTaskGetTickCount() - xTime) >= 200)){
+				ledon = 0;
+			}
+
+			if(ledon == 0){
+				lcd_setColor(black, white);
+			}else{
+				lcd_setColor(black, red);
+			}
+
+			sprintf(str, "LAN");
+			lcd_putStr(60, 110, &font6x8, 0, str);
+		}
+		else{
+			sprintf(str, "    ");
+			lcd_putStr(60, 110, &font6x8, 0, str);
+		}
 
 		errPrev = 0;
 	}

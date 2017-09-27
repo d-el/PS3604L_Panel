@@ -30,6 +30,9 @@
 #include "tcpip.h"
 #include "netif.h"
 #include "pingService.h"
+#include "sntp.h"
+#include "stm32f4x7_eth.h"
+
 
 /*!****************************************************************************
  * Define
@@ -66,6 +69,8 @@ typedef struct {
 	uint16_t sysSettingLoadDefault	:1;
 	uint16_t userSettingLoadDefault	:1;
 	uint16_t rtcOscillatorError		:1;
+	uint16_t lanLink				:1;
+	uint16_t lanActive				:1;
 } frontPanelState_type;
 
 typedef struct {

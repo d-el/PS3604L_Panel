@@ -9,6 +9,8 @@
 #ifndef __SIMIHOSTTING_IMPL
 #define __SIMIHOSTTING_IMPL
 
+#include "stdint.h"
+
 /*!****************************************************************************
  * Function declaration
  */

@@ -1,13 +1,13 @@
 /*!****************************************************************************
- * @file		pingServer.h
- * @author		d_el - Storozhenko Roman
+ * @file		sntp.h
+ * @author		Author: Simon Goldschmidt (lwIP raw API part), d_el - Storozhenko Roman
  * @version		V1.0
- * @date		22.09.2017
+ * @date		24.09.2017
  * @copyright	GNU Lesser General Public License v3
- * @brief		Ping service
+ * @brief		SNTP client module
  */
-#ifndef pingServer_H
-#define pingServer_H
+#ifndef sntp_H
+#define sntp_H
 
 /*!****************************************************************************
  * Include
@@ -36,7 +36,7 @@
 /*!****************************************************************************
  * Function declaration
  */
-void ping_init(void);
+void sntp_init(void);
 
-#endif //pingServer_H
+#endif //sntp_H
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

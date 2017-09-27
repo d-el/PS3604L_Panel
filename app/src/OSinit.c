@@ -40,12 +40,10 @@ void vTaskLED1(void *pvParameters){
 		//Link Down
 		if(gppin_get(GP_LANnINT) == 0){
 			ETH_ReadPHYRegister(1, PHY_BSR);
-			gppin_reset(GP_LED2);
-			linkState = 0;
+			fp.state.lanLink = 0;
 		}
-
 		//Link Up
-		if(linkState == 0){
+		if(fp.state.lanLink == 0){
 			if((ETH_ReadPHYRegister(1, PHY_BSR) & PHY_Linked_Status) != 0){
 				gppin_set(GP_LED2);
 				linkState = 1;

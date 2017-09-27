@@ -190,6 +190,8 @@ void httpServerTSK(void *pPrm){
 		/* accept any icoming connection */
 		err = netconn_accept(conn, &newconn);
 
+		fp.state.lanActive = 1;
+
 		/* serve connection */
 		http_server_serve(newconn);
 

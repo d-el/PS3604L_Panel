@@ -41,7 +41,8 @@ void systemTSK(void *pPrm){
 	uint8_t gateway[4]	= {192	,168	,1		,1};
 	LwIP_Init(ip, netmask, gateway);
 	ping_init();
-	Result &= xTaskCreate(httpServerTSK,	"httpServerTSK",	HTTP_TSK_SZ_STACK,	NULL,	HTTP_TSK_PRIO, NULL);
+	sntp_init();
+	Result &= xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 
 	while(1){
 		if(selWindowPrev != fp.currentSelWindow){
@@ -177,6 +178,19 @@ void systemTSK(void *pPrm){
 		if(ledCount == 3){
 			LED_OFF();
 		}*/
+
+		//Link Down
+		if(gppin_get(GP_LANnINT) == 0){
+			ETH_ReadPHYRegister(1, PHY_BSR);
+			fp.state.lanLink = 0;
+		}
+		//Link Up
+		if(fp.state.lanLink == 0){
+			if((ETH_ReadPHYRegister(1, PHY_BSR) & PHY_Linked_Status) != 0){
+				gppin_set(GP_LED2);
+				fp.state.lanLink = 1;
+			}
+		}
 
 		/*************************************/
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));

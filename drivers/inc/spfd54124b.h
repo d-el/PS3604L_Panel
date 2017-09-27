@@ -112,25 +112,25 @@ static inline void spfd_setPixel(uint16_t x, uint16_t y, uint16_t color){
 	(color & 1 << 15) ? (spfd_setBit(n * 18 + 0)) : (spfd_resetBit(n * 18 + 0));*/
 
 	n++;
-	(color & 1 << 0) ? (spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
-	(color & 1 << 1) ? (spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
-	(color & 1 << 2) ? (spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
-	(color & 1 << 3) ? (spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
-	(color & 1 << 4) ? (spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
-	(color & 1 << 5) ? (spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
-	(color & 1 << 6) ? (spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
-	(color & 1 << 7) ? (spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
+	(color & 1 << 15) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
+	(color & 1 << 14) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
+	(color & 1 << 13) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
+	(color & 1 << 12) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
+	(color & 1 << 11) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
+	(color & 1 << 10) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
+	(color & 1 << 9) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
+	(color & 1 << 8) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;
 
 	//spfd_setBit(n * 18 + 9);
 	 n++;
-	(color & 1 << 8) ? 	(spfd_setBit(n)) : (spfd_resetBit(n)); n++;
-	(color & 1 << 9) ? 	(spfd_setBit(n)) : (spfd_resetBit(n)); n++;
-	(color & 1 << 10) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
-	(color & 1 << 11) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
-	(color & 1 << 12) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
-	(color & 1 << 13) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
-	(color & 1 << 14) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
-	(color & 1 << 15) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
+	(color & 1 << 7) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
+	(color & 1 << 6) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
+	(color & 1 << 5) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
+	(color & 1 << 4) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
+	(color & 1 << 3) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
+	(color & 1 << 2) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
+	(color & 1 << 1) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
+	(color & 1 << 0) ? (spfd_setBit(n)) : (spfd_resetBit(n)); n++;
 }
 
 /*!****************************************************************************

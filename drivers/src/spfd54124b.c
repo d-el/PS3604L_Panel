@@ -45,7 +45,6 @@ void spfd_spiInit(void){
 	SPI3->CR1 |= SPI_CR1_DFF;		//16-bit data frame format is selected for transmission/reception
 	SPI3->CR1 |= SPI_CR1_LSBFIRST;	//LSB transmitted first
 
-	//SPI3->CR2 = SPI_CR2_DS_3;				//Data size 9bit
 	SPI3->CR1 |= SPI_CR1_SPE;				//SPI enable
 }
 
