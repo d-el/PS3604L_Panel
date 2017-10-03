@@ -36,7 +36,7 @@ MENU_ITEM(ammeter		,"Ameter"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,N
 		MENU_ITEM(iSetMEasI		,"Imeas"	,"A"	,&prmh[Nmeas_i]		,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,iSetAdcI	,iSetMEasI	,iPoint1	,iSetMEasI)
 
 /*		  name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-MENU_ITEM(rtc			,"RTC"		,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ammeter	,brightness	,rtc		,date)
+MENU_ITEM(rtc			,"RTC"		,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ammeter	,lan		,rtc		,date)
 	/*		  name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 	MENU_ITEM(date			,"Ddate"	,""		,&prmh[NutcTime]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,date		,time		,rtc		,date)
 	MENU_ITEM(time			,"Time"		,""		,&prmh[NutcTime2]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,date		,timeYear	,rtc		,time)
@@ -48,7 +48,14 @@ MENU_ITEM(rtc			,"RTC"		,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,NULL		
 	MENU_ITEM(timeSec		,"Sec"		,""		,&prmh[Nsec]		,chmodMenuAlways	,0		,rtcCh		,rtcSelectc	,NULL		,NULL		,timeMin	,timeSec	,rtc		,timeSec)
 
 /*		  name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-MENU_ITEM(brightness	,"Bright"	,"%"	,&prmh[Nbrightness]	,chmodMenuAlways	,0		,setBright	,NULL		,NULL		,NULL		,rtc		,brightness	,brightness	,brightness)
+MENU_ITEM(lan			,"LAN"	,""	,NULL						,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,rtc		,brightness	,lan		,ipaddr)
+	/*		  name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
+	MENU_ITEM(ipaddr		,"ip"	,""		,&prmh[Nipadr]		,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ipaddr		,netmask	,lan		,ipaddr)
+	MENU_ITEM(netmask		,"nm"	,""		,&prmh[Nnetmask]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ipaddr		,gatewey	,lan		,netmask)
+	MENU_ITEM(gatewey		,"gw"	,""		,&prmh[Ngateway]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,netmask	,gatewey	,lan		,gatewey)
+
+/*		  name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
+MENU_ITEM(brightness	,"Bright"	,"%"	,&prmh[Nbrightness]	,chmodMenuAlways	,0		,setBright	,NULL		,NULL		,NULL		,lan		,brightness	,brightness	,brightness)
 
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

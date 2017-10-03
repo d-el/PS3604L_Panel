@@ -28,6 +28,20 @@ void lcd_setColor(uint16_t backgroundColor, uint16_t contentColor){
 }
 
 /*!****************************************************************************
+ * @brief
+ */
+void lcd_setBackgroundColor(uint16_t backgroundColor){
+	uiBackgroundColor = backgroundColor;
+}
+
+/*!****************************************************************************
+ * @brief
+ */
+void lcd_setContentColor(uint16_t contentColor){
+	uiContentColor = contentColor;
+}
+
+/*!****************************************************************************
  * @brief Вывод пикселя
  */
 void lcd_setPixel(uint16_t x, uint16_t y, uint16_t color){
@@ -43,14 +57,6 @@ void lcd_fillScreen(uint16_t color){
 			lcd_setPixel(x, y, color);
 		}
 	}
-	/*color = ~color;
-	uint32_t color32 = ((uint32_t) color << 16) | color;
-	uint32_t *data = (uint32_t*) &videoBff[0];
-	uint32_t *dataEnd = data + (DISP_W * DISP_H / 2);
-
-	while(data < dataEnd){
-		*data++ = color32;
-	}*/
 }
 
 /*!****************************************************************************

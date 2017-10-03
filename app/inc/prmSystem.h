@@ -59,6 +59,7 @@ typedef union {
 	float 		_floatFrmt;
 	uint32_t 	_unixTimeFrmt;
 	uint32_t 	_unixDateFrmt;
+	uint32_t	_ipAdrFrmt;
 } prmval_type;
 
 typedef enum {
@@ -71,6 +72,7 @@ typedef enum {
 	floatFrmt,
 	unixTimeFrmt,
 	unixDateFrmt,
+	ipAdrFrmt,
 } typePrm_type;
 
 typedef enum {

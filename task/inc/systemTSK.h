@@ -37,7 +37,7 @@
 /*!****************************************************************************
  * Define
  */
-#define SYSTEM_TSK_PERIOD   (150)		///< [ms]
+#define SYSTEM_TSK_PERIOD   (100)		///< [ms]
 #define I_SHORT_CIRCUIT     (40000)   	///< [X_XXXX A]
 #define MAX_VAL_U           (36000)   	///< [X_XXX V]
 #define MAX_VAL_I           (40000)   	///< [X_XXXX A]
@@ -61,7 +61,9 @@ typedef enum {
 } selWindow_type;
 
 typedef struct {
-	uint32_t 	ipAddress;
+	uint32_t 	ipadr;
+	uint32_t 	netmask;
+	uint32_t 	gateway;
 	uint16_t 	lcdLight;		///< [X_X %]
 } frontPanelSetting_type;
 

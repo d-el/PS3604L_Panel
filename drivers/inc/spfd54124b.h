@@ -34,7 +34,7 @@ typedef enum {
 	lilac = 0x91D4,
 
 	darkGreen = 0x3DA5,
-	halfLightGray = 0xDF7B,
+	halfLightGray = 0x39E6,
 	halfLightYellow = 0xFFF8,
 	halfLightRed = 0xFF18,
 	halfLightGreen = 0xC7F8,

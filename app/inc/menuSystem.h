@@ -79,9 +79,6 @@ typedef struct menuItem{
  * Prototypes for the functions
  */
 void menuEngine(const menuItem_type *startMenuItem);
-void printUsigVar(char *string, const menuItem_type *menuItem, uint32_t var);
-void printSigVar(char *string, const menuItem_type *menuItem, int32_t var);
-void printFloatVar(char *string, const menuItem_type *menuItem);
 
 #endif /* MENUSYSTEM_H */
 /******************* (C) COPYRIGHT ***************** END OF FILE ********* D_EL *****/

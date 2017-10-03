@@ -55,14 +55,17 @@ void prm_setVal(const prmHandle_type *const prmHandle, const prmval_type *const 
 		case s16Frmt:
 			prmHandle->prm->_s16Frmt = prmval->_s16Frmt;
 			break;
-		case u32Frmt:
-			unixTimeFrmt: unixDateFrmt: prmHandle->prm->_u32Frmt = prmval->_u32Frmt;
+		case u32Frmt: unixTimeFrmt: unixDateFrmt:
+			prmHandle->prm->_u32Frmt = prmval->_u32Frmt;
 			break;
 		case s32Frmt:
 			prmHandle->prm->_s32Frmt = prmval->_s32Frmt;
 			break;
 		case floatFrmt:
 			prmHandle->prm->_floatFrmt = prmval->_floatFrmt;
+			break;
+		case ipAdrFrmt:
+			prmHandle->prm->_ipAdrFrmt = prmval->_ipAdrFrmt;
 			break;
 	}
 }

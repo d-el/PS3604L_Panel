@@ -62,6 +62,8 @@ extern const image_type ImageLogo;
  * Function prototype
  */
 void lcd_setColor(uint16_t backgroundColor, uint16_t contentColor);
+void lcd_setBackgroundColor(uint16_t backgroundColor);
+void lcd_setContentColor(uint16_t contentColor);
 void lcd_setPixel(uint16_t x, uint16_t y, uint16_t color);
 void lcd_fillScreen(uint16_t color);
 void lcd_fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);

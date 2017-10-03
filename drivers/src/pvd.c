@@ -50,7 +50,7 @@ void pvd_disable(void){
 /*!****************************************************************************
  *
  */
-void pvd_setSuplyFaultCallBack(suplyFaultCallBack_type callBack){
+void pvd_setSupplyFaultCallBack(suplyFaultCallBack_type callBack){
 	suplyFaultCallBack = callBack;
 }
 

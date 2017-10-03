@@ -28,7 +28,6 @@ void macAddressSet(void){
  * MCU peripheral initialization
  */
 void hardInit(void){
-	//clock_init();
 	clock_init();
 	gpio_init();
 

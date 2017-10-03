@@ -104,6 +104,10 @@ void uartTSK(void *pPrm){
 uint8_t sendCommand(request_type command){
 	BaseType_t res;
 
+	if(queueCommand == NULL){
+		return 1;
+	}
+
 	res = xQueueSend(queueCommand, (void* )&command, 0);
 	if(res == pdPASS){
 		return 0;
@@ -121,19 +125,21 @@ uint8_t waitForTf(void){
 	uint32_t l_errorAnswer;
 	uint32_t cnt;
 
-	cnt = 200;
+	cnt = 3;	// 3 attempt for failure connect
 	l_normAnswer = uartTsk.normAnswer;
 	l_noAnswer = uartTsk.noAnswer;
 	l_errorAnswer = uartTsk.errorAnswer;
 
 	while(cnt != 0){
-		if((l_normAnswer + 2) == (uartTsk.normAnswer)){
+		if((l_normAnswer + 1) >= (uartTsk.normAnswer)){
 			return 0;
 		}
 		if(l_noAnswer != uartTsk.noAnswer){
+			l_noAnswer = uartTsk.noAnswer;
 			cnt--;
 		}
 		if(l_errorAnswer != uartTsk.errorAnswer){
+			l_errorAnswer = uartTsk.errorAnswer;
 			cnt--;
 		}
 	}

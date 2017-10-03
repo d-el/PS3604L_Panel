@@ -75,9 +75,9 @@ extern uint8_t macAddress[6];
 /*!****************************************************************************
  * Macro functions
  */
-#define LED_ON()            gppin_set(GP_LED0)
-#define LED_OFF()           gppin_reset(GP_LED0)
-#define LED_TOGGLE()        gppin_togle(GP_LED0)
+#define LED_ON()            /*gppin_set(GP_LED0)*/
+#define LED_OFF()           /*gppin_reset(GP_LED0)*/
+#define LED_TOGGLE()        /*gppin_togle(GP_LED0)*/
 
 /*!****************************************************************************
  * Prototypes for the functions

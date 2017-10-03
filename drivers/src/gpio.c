@@ -16,10 +16,11 @@
 * MEMORY
 */
 const pinMode_type   const pinsMode[] = {
-/*0 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bMode
-/*1 */makepin(GPIOC, 7, 	digitalInput, 	pullUp, 		0, 0), //bOnOff
-/*2 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bView
+/*0 */makepin(GPIOC, 7, 	digitalInput, 	pullUp, 		0, 0), //bMode
+/*1 */makepin(GPIOA, 10, 	digitalInput, 	pullUp, 		0, 0), //bOnOff
+/*2 */makepin(GPIOA, 9, 	digitalInput, 	pullUp, 		0, 0), //bView
 /*3 */makepin(GPIOC, 8, 	digitalInput, 	pullUp, 		0, 0), //bNext
+
 /*4 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bZero
 /*5 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bUp
 /*6 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bDown

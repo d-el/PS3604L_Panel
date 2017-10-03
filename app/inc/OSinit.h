@@ -16,7 +16,6 @@
 #include "timers.h"
 #include "httpServerTSK.h"
 #include "systemTSK.h"
-//#include "wlanTSK.h"
 
 /*!**** NAME ****************** size [4byte Word] ****************************/
 #define SYSTEM_TSK_PRIO         7

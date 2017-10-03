@@ -51,7 +51,7 @@ typedef void (*suplyFaultCallBack_type)(void);
  */
 void pvd_init(void);
 void pvd_disable(void);
-void pvd_setSuplyFaultCallBack(suplyFaultCallBack_type callBack);
+void pvd_setSupplyFaultCallBack(suplyFaultCallBack_type callBack);
 
 #endif //pvd_H
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

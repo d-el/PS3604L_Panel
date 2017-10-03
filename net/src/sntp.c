@@ -236,10 +236,10 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t 
 	if(err == ERR_OK){
 		sntp_process(receive_timestamp);
 
-		/*
+
 		udp_remove(pcb);
 		return;
-		*/
+
 
 		/* Set up timeout for next request */
 		sys_timeout((u32_t) SNTP_UPDATE_DELAY, sntp_request, NULL);
