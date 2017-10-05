@@ -35,7 +35,7 @@ void hardInit(void){
 	sysTimeMeasEnable();
 	enco_init();
 	//beep_init();
-	ledPwm_init();
+	//ledPwm_init();
 	spfd_init();
 	//ssd_init();
 	rtcStatus_type rtcStatus = rtc_init();

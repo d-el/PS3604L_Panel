@@ -1,10 +1,10 @@
 ﻿/*!****************************************************************************
- * @file    settingTSK.c
- * @author  d_el
- * @version V1.0
- * @date    01.01.2016, by d_el
- * @brief   --
- * @copyright GNU Public License
+ * @file		settingTSK.c
+ * @author		d_el - Storozhenko Roman
+ * @version		V1.0
+ * @date		01.01.2016
+ * @copyright	GNU Lesser General Public License v3
+ * @brief		This task create start screen
  */
 
 /*!****************************************************************************
@@ -138,4 +138,4 @@ uint32_t rtcCh(const menuItem_type *item){
 	return 0;
 }
 
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/*************** LGPL ************** END OF FILE *********** D_EL ************/

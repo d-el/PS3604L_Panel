@@ -22,8 +22,8 @@ const pinMode_type   const pinsMode[] = {
 /*3 */makepin(GPIOC, 8, 	digitalInput, 	pullUp, 		0, 0), //bNext
 
 /*4 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bZero
-/*5 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bUp
-/*6 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bDown
+/*5 */makepin(GPIOD, 2, 	digitalInput, 	pullUp, 		0, 0), //bUp
+/*6 */makepin(GPIOD, 3, 	digitalInput, 	pullUp, 		0, 0), //bDown
 
 /*7 */makepin(GPIOD, 12, 	outPushPull,	pullDisable,    0,  0),  //LED0 enco
 /*8 */makepin(GPIOD, 13,	outPushPull,	pullDisable,    0,  0),  //LED1 enco

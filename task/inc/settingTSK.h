@@ -1,10 +1,10 @@
 ﻿/*!****************************************************************************
- * @file    settingTSK.h
- * @author  d_el
- * @version V1.0
- * @date    01.01.2016, by d_el
- * @brief   --
- * @copyright GNU Public License
+ * @file		settingTSK.h
+ * @author		d_el - Storozhenko Roman
+ * @version		V1.0
+ * @date		01.01.2016
+ * @copyright	GNU Lesser General Public License v3
+ * @brief		This task create start screen
  */
 #ifndef settingTSK_H
 #define settingTSK_H
@@ -23,15 +23,15 @@
 #include "systemTSK.h"
 
 /*!****************************************************************************
- * User define
+ * Define
  */
 
 /*!****************************************************************************
- * User enum
+ * Enumeration
  */
 
 /*!****************************************************************************
- * User typedef
+ * Typedef
  */
 typedef struct {
 	uint16_t u;
@@ -39,7 +39,7 @@ typedef struct {
 } settingSct_type;
 
 /*!****************************************************************************
- * Extern viriables
+ * Exported variables
  */
 
 /*!****************************************************************************
@@ -47,7 +47,7 @@ typedef struct {
  */
 
 /*!****************************************************************************
- * Prototypes for the functions
+ * Function declaration
  */
 void settingTSK(void *pPrm);
 uint32_t PrepareU(const menuItem_type *item);
@@ -62,4 +62,4 @@ uint32_t rtcUselectc(const menuItem_type *item);
 uint32_t rtcCh(const menuItem_type *item);
 
 #endif //settingTSK_H
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/*************** LGPL ************** END OF FILE *********** D_EL ************/

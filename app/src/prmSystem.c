@@ -17,18 +17,61 @@
 /*!****************************************************************************
  * MEMORY
  */
-#define parametres(_label, _units, _prm, _type, _chmod, _def, _min, _max, _step, _bigstep, _power, _save)	\
+////! Parameter constant step
+//#define parametres_prmLimConst(_type, _min, _max, _step, _bigstep, _power, _limtype)	\
+//	_step * power##_power,
+//#define parametres_prmLimVariable(_type, _min, _max, _step, _bigstep, _power, _limtype)
+//#define parametres(_label, _units, _prm, _type, _chmod, _def, _min, _max, _step, _bigstep, _power, _limtype, _save)	\
+//	parametres_##_limtype(_type, _min, _max, _step, _bigstep, _power, _limtype)
+//const prmval_type prmLimConstStep[] = {
+//	#include "parametres.h"
+//};
+//#undef parametres_prmLimConst
+//#undef parametres_prmLimVariable
+//#undef parametres
+//
+////! Parameter variable step
+//#define parametres_prmLimConst(_type, _min, _max, _step, _bigstep, _power, _limtype)
+//#define parametres_prmLimVariable(_type, _min, _max, _step, _bigstep, _power, _limtype) \
+//	_step * power##_power,
+//#define parametres(_label, _units, _prm, _type, _chmod, _def, _min, _max, _step, _bigstep, _power, _limtype, _save)	\
+//	parametres_##_limtype(_type, _min, _max, _step, _bigstep, _power, _limtype)
+//prmval_type prmLimVariableStep[] = {
+//	#include "parametres.h"
+//};
+//#undef parametres_prmLimConst
+//#undef parametres_prmLimVariable
+//#undef parametres
+
+
+//! prmLim Step
+#define parametres_prmLimConst(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)	\
+	static const prmval_type prmLimConstStep##_##m_label = { ._##ipAdrFrmt = m_step * m_power };
+#define parametres_prmLimVariable(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power) \
+	static prmval_type prmLimVariableStep##_##m_label = { m_step * m_power };
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_save)	\
+	parametres_##m_limtype(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)
+#include "parametres.h"
+#undef parametres_prmLimConst
+#undef parametres_prmLimVariable
+#undef parametres
+
+
+//! Parameter handler macros
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_save)	\
 {														\
-	.prm 				= (prmval_type*)&_prm,			\
-	.def._##_type 		= (_def * power##_power),		\
-	.min._##_type 		= (_min * power##_power),		\
-	.max._##_type 		= (_max * power##_power),		\
-	.step._##_type 		= (_step * power##_power),		\
-	.bigstep._##_type 	= (_bigstep * power##_power),	\
-	.type 				= _type,						\
-	.chmod 				= _chmod,						\
-	.power				= _power,						\
-	.save				= _save,						\
+	.prm 				= (prmval_type*)&m_prm,			\
+	.def._##m_type 		= (m_def * power##m_power),		\
+	.min._##m_type 		= (m_min * power##m_power),		\
+	.max._##m_type 		= (m_max * power##m_power),		\
+	.step._##m_type 		= (m_step * power##m_power),		\
+	.pstep				= (prmval_type*)&m_limtype##Step_##m_label,			\
+	.bigstep._##m_type 	= (m_bigstep * power##m_power),	\
+	.type 				= m_type,						\
+	.chmod 				= m_chmod,						\
+	.power				= m_power,						\
+	.prmLim				= m_limtype,						\
+	.save				= m_save,						\
 },
 //! Parameters handlers
 const prmHandle_type prmh[] = {

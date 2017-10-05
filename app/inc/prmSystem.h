@@ -36,21 +36,25 @@
 /*!****************************************************************************
  * Enumeration
  */
-#define parametres(_label, _units, _prm, _type, _chmod, _def, _min, _max, _step, _bigstep, _power, _save)	\
-	N##_label,
 
+//! Number parameter handler
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_save)	\
+	N##m_label,
 typedef enum {
 #include "parametres.h"
-	endOfNumberPrm,
+	endOfNumberPrm
 } parametresNum_type;
-
 #undef parametres
 
 /*!****************************************************************************
- * Ttypedef
+ * Typedef
  */
+typedef uint8_t u8;
+
 typedef union {
 	uint8_t 	_u8Frmt;
+	uint8_t		u8;
+	uint8_t 	u8Frmt;
 	int8_t 		_s8Frmt;
 	uint16_t 	_u16Frmt;
 	int16_t 	_s16Frmt;
@@ -60,6 +64,7 @@ typedef union {
 	uint32_t 	_unixTimeFrmt;
 	uint32_t 	_unixDateFrmt;
 	uint32_t	_ipAdrFrmt;
+
 } prmval_type;
 
 typedef enum {
@@ -85,17 +90,24 @@ typedef enum {
 	prmEeprom,
 } nvSavePrm_type;
 
+typedef enum {
+	prmLimConst,
+	prmLimVariable,
+} prmLim_type;
+
 typedef struct {
 	prmval_type 	*prm;			//Pointer to parametr
 	prmval_type 	def;
 	prmval_type 	min;
 	prmval_type 	max;
 	prmval_type 	step;
+	prmval_type 	*pstep;
 	prmval_type 	bigstep;
 	typePrm_type 	type 	:4;
 	chmodPrm_type 	chmod 	:2;
 	uint8_t 		power 	:4;
 	nvSavePrm_type 	save 	:2;
+	prmLim_type		prmLim	:1;
 } prmHandle_type;
 
 /*!****************************************************************************
