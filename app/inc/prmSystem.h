@@ -38,7 +38,7 @@
  */
 
 //! Number parameter handler
-#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_save)	\
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_steptype, m_save)	\
 	N##m_label,
 typedef enum {
 #include "parametres.h"
@@ -49,22 +49,17 @@ typedef enum {
 /*!****************************************************************************
  * Typedef
  */
-typedef uint8_t u8;
-
 typedef union {
-	uint8_t 	_u8Frmt;
-	uint8_t		u8;
-	uint8_t 	u8Frmt;
-	int8_t 		_s8Frmt;
-	uint16_t 	_u16Frmt;
-	int16_t 	_s16Frmt;
-	uint32_t 	_u32Frmt;
-	int32_t 	_s32Frmt;
-	float 		_floatFrmt;
-	uint32_t 	_unixTimeFrmt;
-	uint32_t 	_unixDateFrmt;
-	uint32_t	_ipAdrFrmt;
-
+	uint8_t 	t_u8Frmt;
+	int8_t 		t_s8Frmt;
+	uint16_t 	t_u16Frmt;
+	int16_t 	t_s16Frmt;
+	uint32_t 	t_u32Frmt;
+	int32_t 	t_s32Frmt;
+	float 		t_floatFrmt;
+	uint32_t 	t_unixTimeFrmt;
+	uint32_t 	t_unixDateFrmt;
+	uint32_t	t_ipAdrFrmt;
 } prmval_type;
 
 typedef enum {
@@ -78,36 +73,40 @@ typedef enum {
 	unixTimeFrmt,
 	unixDateFrmt,
 	ipAdrFrmt,
-} typePrm_type;
+} prmType_type;
 
 typedef enum {
 	chmodNone,
 	chmodAlways,
-} chmodPrm_type;
+} prmChmod_type;
 
 typedef enum {
 	prmNotSave,
 	prmEeprom,
-} nvSavePrm_type;
+} prmNvSave_type;
 
 typedef enum {
 	prmLimConst,
 	prmLimVariable,
 } prmLim_type;
 
+typedef enum {
+	prmStepConst,
+	prmStepVariable,
+} prmStep_type;
+
 typedef struct {
-	prmval_type 	*prm;			//Pointer to parametr
+	prmval_type 	*prm;			//Pointer to parameter
 	prmval_type 	def;
-	prmval_type 	min;
-	prmval_type 	max;
-	prmval_type 	step;
-	prmval_type 	*pstep;
+	prmval_type 	*min;
+	prmval_type 	*max;
+	prmval_type 	*step;
 	prmval_type 	bigstep;
-	typePrm_type 	type 	:4;
-	chmodPrm_type 	chmod 	:2;
+	prmType_type 	type 	:4;
+	prmChmod_type 	chmod 	:2;
 	uint8_t 		power 	:4;
-	nvSavePrm_type 	save 	:2;
-	prmLim_type		prmLim	:1;
+	prmNvSave_type 	save 	:2;
+	prmStep_type	stepType:1;
 } prmHandle_type;
 
 /*!****************************************************************************

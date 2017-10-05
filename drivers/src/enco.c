@@ -79,107 +79,95 @@ enStatus_type enAdd(const prmHandle_type *prmHandle, const prmval_type *prmval, 
 	extern uint32_t ipMul;
 
 	switch(prmHandle->type){
-		case frmt_u8:
-			s32t = prmHandle->prm->_u8Frmt + (prmval->_u8Frmt * multiply);
-			if(s32t > prmHandle->max._u8Frmt){
-				prmHandle->prm->_u8Frmt = prmHandle->max._u8Frmt;
+		case u8Frmt:
+			s32t = prmHandle->prm->t_u8Frmt + (prmval->t_u8Frmt * multiply);
+			if(s32t > prmHandle->max->t_u8Frmt){
+				prmHandle->prm->t_u8Frmt = prmHandle->max->t_u8Frmt;
 				return enLimUp;
-			}else if(s32t < prmHandle->min._u8Frmt){
-				prmHandle->prm->_u8Frmt = prmHandle->min._u8Frmt;
+			}else if(s32t < prmHandle->min->t_u8Frmt){
+				prmHandle->prm->t_u8Frmt = prmHandle->min->t_u8Frmt;
 				return enLimDown;
 			}else{
-				prmHandle->prm->_u8Frmt = s32t;
+				prmHandle->prm->t_u8Frmt = s32t;
 			}
 			break;
 
 		case s8Frmt:
-			s32t = prmHandle->prm->_s8Frmt + (prmval->_s8Frmt * multiply);
-			if(s32t > prmHandle->max._s8Frmt){
-				prmHandle->prm->_s8Frmt = prmHandle->max._s8Frmt;
+			s32t = prmHandle->prm->t_s8Frmt + (prmval->t_s8Frmt * multiply);
+			if(s32t > prmHandle->max->t_s8Frmt){
+				prmHandle->prm->t_s8Frmt = prmHandle->max->t_s8Frmt;
 				return enLimUp;
-			}else if(s32t < prmHandle->min._s8Frmt){
-				prmHandle->prm->_s8Frmt = prmHandle->min._s8Frmt;
+			}else if(s32t < prmHandle->min->t_s8Frmt){
+				prmHandle->prm->t_s8Frmt = prmHandle->min->t_s8Frmt;
 				return enLimDown;
 			}else{
-				prmHandle->prm->_s8Frmt = s32t;
+				prmHandle->prm->t_s8Frmt = s32t;
 			}
 			break;
 
 		case u16Frmt:
-			s32t = prmHandle->prm->_u16Frmt + (prmval->_u16Frmt * multiply);
-			if(s32t > prmHandle->max._u16Frmt){
-				prmHandle->prm->_u16Frmt = prmHandle->max._u16Frmt;
+			s32t = prmHandle->prm->t_u16Frmt + (prmval->t_u16Frmt * multiply);
+			if(s32t > prmHandle->max->t_u16Frmt){
+				prmHandle->prm->t_u16Frmt = prmHandle->max->t_u16Frmt;
 				return enLimUp;
-			}else if(s32t < prmHandle->min._u16Frmt){
-				prmHandle->prm->_u16Frmt = prmHandle->min._u16Frmt;
+			}else if(s32t < prmHandle->min->t_u16Frmt){
+				prmHandle->prm->t_u16Frmt = prmHandle->min->t_u16Frmt;
 				return enLimDown;
 			}else{
-				prmHandle->prm->_u16Frmt = s32t;
+				prmHandle->prm->t_u16Frmt = s32t;
 			}
 			break;
 
 		case s16Frmt:
-			s32t = prmHandle->prm->_s16Frmt + (prmval->_s16Frmt * multiply);
-			if(s32t > prmHandle->max._s16Frmt){
-				prmHandle->prm->_s16Frmt = prmHandle->max._s16Frmt;
+			s32t = prmHandle->prm->t_s16Frmt + (prmval->t_s16Frmt * multiply);
+			if(s32t > prmHandle->max->t_s16Frmt){
+				prmHandle->prm->t_s16Frmt = prmHandle->max->t_s16Frmt;
 				return enLimUp;
-			}else if(s32t < prmHandle->min._s16Frmt){
-				prmHandle->prm->_s16Frmt = prmHandle->min._s16Frmt;
+			}else if(s32t < prmHandle->min->t_s16Frmt){
+				prmHandle->prm->t_s16Frmt = prmHandle->min->t_s16Frmt;
 				return enLimDown;
 			}else{
-				prmHandle->prm->_s16Frmt = s32t;
+				prmHandle->prm->t_s16Frmt = s32t;
 			}
 			break;
 
 		case u32Frmt:
-			s64t = prmHandle->prm->_u32Frmt + ((int64_t) prmval->_u32Frmt * multiply);
-			if(s64t > prmHandle->max._u32Frmt){
-				prmHandle->prm->_u32Frmt = prmHandle->max._u32Frmt;
+		case ipAdrFrmt:
+			s64t = prmHandle->prm->t_u32Frmt + ((int64_t) prmval->t_u32Frmt * multiply);
+			if(s64t > prmHandle->max->t_u32Frmt){
+				prmHandle->prm->t_u32Frmt = prmHandle->max->t_u32Frmt;
 				return enLimUp;
-			}else if(s64t < prmHandle->min._u32Frmt){
-				prmHandle->prm->_u32Frmt = prmHandle->min._u32Frmt;
+			}else if(s64t < prmHandle->min->t_u32Frmt){
+				prmHandle->prm->t_u32Frmt = prmHandle->min->t_u32Frmt;
 				return enLimDown;
 			}else{
-				prmHandle->prm->_u32Frmt = s64t;
+				prmHandle->prm->t_u32Frmt = s64t;
 			}
 			break;
 
 		case s32Frmt:
-			s64t = prmHandle->prm->_s32Frmt + ((int64_t) prmval->_s32Frmt * multiply);
-			if(s64t > prmHandle->max._s32Frmt){
-				prmHandle->prm->_s32Frmt = prmHandle->max._s32Frmt;
+			s64t = prmHandle->prm->t_s32Frmt + ((int64_t) prmval->t_s32Frmt * multiply);
+			if(s64t > prmHandle->max->t_s32Frmt){
+				prmHandle->prm->t_s32Frmt = prmHandle->max->t_s32Frmt;
 				return enLimUp;
-			}else if(s64t < prmHandle->min._s32Frmt){
-				prmHandle->prm->_s32Frmt = prmHandle->min._s32Frmt;
+			}else if(s64t < prmHandle->min->t_s32Frmt){
+				prmHandle->prm->t_s32Frmt = prmHandle->min->t_s32Frmt;
 				return enLimDown;
 			}else{
-				prmHandle->prm->_s32Frmt = s64t;
+				prmHandle->prm->t_s32Frmt = s64t;
 			}
 			break;
 
 		case floatFrmt:
-			ftemp = prmHandle->prm->_floatFrmt + (prmval->_floatFrmt * multiply);
-			if(ftemp > prmHandle->max._floatFrmt){
-				prmHandle->prm->_floatFrmt = prmHandle->max._floatFrmt;
+			ftemp = prmHandle->prm->t_floatFrmt + (prmval->t_floatFrmt * multiply);
+			if(ftemp > prmHandle->max->t_floatFrmt){
+				prmHandle->prm->t_floatFrmt = prmHandle->max->t_floatFrmt;
 				return enLimUp;
-			}else if(ftemp < prmHandle->min._floatFrmt){
-				prmHandle->prm->_floatFrmt = prmHandle->min._floatFrmt;
+			}else if(ftemp < prmHandle->min->t_floatFrmt){
+				prmHandle->prm->t_floatFrmt = prmHandle->min->t_floatFrmt;
 				return enLimDown;
 			}else{
-				prmHandle->prm->_floatFrmt = ftemp;
-			}
-			break;
-
-		case ipAdrFrmt:
-			s64t = prmHandle->prm->_ipAdrFrmt + ((int64_t) prmval->_ipAdrFrmt * multiply);
-			if(s64t > prmHandle->max._ipAdrFrmt){
-				prmHandle->prm->_ipAdrFrmt = prmHandle->max._ipAdrFrmt;
-				return enLimUp;
-			}else if(s64t < prmHandle->min._u32Frmt){
-				prmHandle->prm->_ipAdrFrmt = prmHandle->min._ipAdrFrmt;
-				return enLimDown;
-			}else{
-				prmHandle->prm->_ipAdrFrmt = s64t;
+				prmHandle->prm->t_floatFrmt = ftemp;
 			}
 			break;
 	}
@@ -204,7 +192,7 @@ enStatus_type enBigStepDown(const prmHandle_type *prmHandle){
 }
 
 /*!****************************************************************************
- * @brief  Прочитать значние
+ * @brief  Обновляет значение переменной
  * @retval enNoCharge, enCharge, enLimDown, enLimUp, enTransitionDown, enTransitionUp
  */
 enStatus_type enUpDate(const prmHandle_type *prmHandle){
@@ -230,7 +218,7 @@ enStatus_type enUpDate(const prmHandle_type *prmHandle){
 			step = step * 5;
 		}
 
-		status = enAdd(prmHandle, prmHandle->pstep, step);
+		status = enAdd(prmHandle, prmHandle->step, step);
 
 		ntic = 0;
 	}else{
@@ -241,8 +229,6 @@ enStatus_type enUpDate(const prmHandle_type *prmHandle){
 }
 
 /*!****************************************************************************
- * @brief  Прочитать значние
- * @retval enNoCharge, enCharge, enLimDown, enLimUp, enTransitionDown, enTransitionUp
  */
 void enSetNtic(uint16_t n){
 	enco.ntic = n;

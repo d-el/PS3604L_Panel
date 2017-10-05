@@ -108,7 +108,7 @@ uint32_t regSave(const menuItem_type *item){
  * @brief    set LCD Bright callback
  */
 uint32_t setBright(const menuItem_type *item){
-	setLcdBrightness(item->prmHandle->prm->_u16Frmt);
+	setLcdBrightness(item->prmHandle->prm->t_u16Frmt);
 	return 0;
 }
 

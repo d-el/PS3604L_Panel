@@ -265,7 +265,9 @@ void menuEngine(const menuItem_type *startMenuItem){
 					}else{
 						if(editSection < 3){	//Изменяем редактируемый разряд
 							editSection++;
-							vMenu->prmHandle->pstep->_ipAdrFrmt = 1UL << (3 - editSection) * 8;
+							vMenu->prmHandle->step->t_ipAdrFrmt = 1UL << (3 - editSection) * 8;
+							vMenu->prmHandle->min->t_ipAdrFrmt = vMenu->prmHandle->prm->t_ipAdrFrmt & ~(255UL << (3 - editSection) * 8);
+							vMenu->prmHandle->max->t_ipAdrFrmt = vMenu->prmHandle->prm->t_ipAdrFrmt | 255UL << (3 - editSection) * 8;
 						}
 					}
 					bigstepUp = 0;
@@ -276,7 +278,9 @@ void menuEngine(const menuItem_type *startMenuItem){
 					}else{
 						if(editSection > 0){	//Изменяем редактируемый разряд
 							editSection--;
-							vMenu->prmHandle->pstep->_ipAdrFrmt = 1UL << (3 - editSection) * 8;
+							vMenu->prmHandle->step->t_ipAdrFrmt = 1UL << (3 - editSection) * 8;
+							vMenu->prmHandle->min->t_ipAdrFrmt = vMenu->prmHandle->prm->t_ipAdrFrmt & ~(255UL << (3 - editSection) * 8);
+							vMenu->prmHandle->max->t_ipAdrFrmt = vMenu->prmHandle->prm->t_ipAdrFrmt | 255UL << (3 - editSection) * 8;
 						}
 					}
 					bigstepDown = 0;
@@ -387,28 +391,28 @@ void printItem(const menuItem_type *menuItem, uint8_t itemNumber, uint8_t isSele
 	}
 	else{
 		switch(menuItem->prmHandle->type){
-			case frmt_u8:
-				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->_u8Frmt);
+			case u8Frmt:
+				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->t_u8Frmt);
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case s8Frmt:
-				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->_s8Frmt);
+				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->t_s8Frmt);
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case u16Frmt:
-				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->_u16Frmt);
+				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->t_u16Frmt);
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case s16Frmt:
-				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->_s16Frmt);
+				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->t_s16Frmt);
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case u32Frmt:
-				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->_u32Frmt);
+				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->t_u32Frmt);
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case s32Frmt:
-				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->_s32Frmt);
+				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->t_s32Frmt);
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case floatFrmt:
@@ -416,17 +420,17 @@ void printItem(const menuItem_type *menuItem, uint8_t itemNumber, uint8_t isSele
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case unixDateFrmt:
-				gmtime_r(&menuItem->prmHandle->prm->_unixDateFrmt, &tm);
+				gmtime_r(&menuItem->prmHandle->prm->t_unixDateFrmt, &tm);
 				strftime(vstring, sizeof(vstring), "%Y.%m.%d", &tm);
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case unixTimeFrmt:
-				gmtime_r(&menuItem->prmHandle->prm->_unixTimeFrmt, &tm);
+				gmtime_r(&menuItem->prmHandle->prm->t_unixTimeFrmt, &tm);
 				strftime(vstring, sizeof(vstring), "%H:%M:%S", &tm);
 				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case ipAdrFrmt:
-				printIpVar(vstring, menuItem->prmHandle->prm->_ipAdrFrmt, selectedSectionNumber, &selectionPosition, &selectionLength);
+				printIpVar(vstring, menuItem->prmHandle->prm->t_ipAdrFrmt, selectedSectionNumber, &selectionPosition, &selectionLength);
 				outItemStringWithSelection(mstring, vstring, itemNumber, isSelected, selectionPosition, selectionLength);
 				break;
 			default:
@@ -503,25 +507,25 @@ void printSigVar(char *string, const menuItem_type *menuItem, int32_t var){
 void printFloatVar(char *string, const menuItem_type *menuItem){
 	switch(menuItem->prmHandle->power){
 		case 0:
-			sprintf(string, "%.0f%s", menuItem->prmHandle->prm->_floatFrmt, menuItem->units);
+			sprintf(string, "%.0f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 			break;
 		case 1:
-			sprintf(string, "%.1f%s", menuItem->prmHandle->prm->_floatFrmt, menuItem->units);
+			sprintf(string, "%.1f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 			break;
 		case 2:
-			sprintf(string, "%.2f%s", menuItem->prmHandle->prm->_floatFrmt, menuItem->units);
+			sprintf(string, "%.2f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 			break;
 		case 3:
-			sprintf(string, "%.3f%s", menuItem->prmHandle->prm->_floatFrmt, menuItem->units);
+			sprintf(string, "%.3f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 			break;
 		case 4:
-			sprintf(string, "%.4f%s", menuItem->prmHandle->prm->_floatFrmt, menuItem->units);
+			sprintf(string, "%.4f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 			break;
 		case 5:
-			sprintf(string, "%.5f%s", menuItem->prmHandle->prm->_floatFrmt, menuItem->units);
+			sprintf(string, "%.5f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 			break;
 		case 6:
-			sprintf(string, "%.6f%s", menuItem->prmHandle->prm->_floatFrmt, menuItem->units);
+			sprintf(string, "%.6f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 			break;
 		default:
 			sprintf(string, "Error");

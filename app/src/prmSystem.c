@@ -17,60 +17,55 @@
 /*!****************************************************************************
  * MEMORY
  */
-////! Parameter constant step
-//#define parametres_prmLimConst(_type, _min, _max, _step, _bigstep, _power, _limtype)	\
-//	_step * power##_power,
-//#define parametres_prmLimVariable(_type, _min, _max, _step, _bigstep, _power, _limtype)
-//#define parametres(_label, _units, _prm, _type, _chmod, _def, _min, _max, _step, _bigstep, _power, _limtype, _save)	\
-//	parametres_##_limtype(_type, _min, _max, _step, _bigstep, _power, _limtype)
-//const prmval_type prmLimConstStep[] = {
-//	#include "parametres.h"
-//};
-//#undef parametres_prmLimConst
-//#undef parametres_prmLimVariable
-//#undef parametres
-//
-////! Parameter variable step
-//#define parametres_prmLimConst(_type, _min, _max, _step, _bigstep, _power, _limtype)
-//#define parametres_prmLimVariable(_type, _min, _max, _step, _bigstep, _power, _limtype) \
-//	_step * power##_power,
-//#define parametres(_label, _units, _prm, _type, _chmod, _def, _min, _max, _step, _bigstep, _power, _limtype, _save)	\
-//	parametres_##_limtype(_type, _min, _max, _step, _bigstep, _power, _limtype)
-//prmval_type prmLimVariableStep[] = {
-//	#include "parametres.h"
-//};
-//#undef parametres_prmLimConst
-//#undef parametres_prmLimVariable
-//#undef parametres
-
-
-//! prmLim Step
+//! prmLimConstMin, prmLimVariableMin
 #define parametres_prmLimConst(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)	\
-	static const prmval_type prmLimConstStep##_##m_label = { ._##ipAdrFrmt = m_step * m_power };
+	static const prmval_type prmLimConstMin_##m_label = {m_min * m_power };
 #define parametres_prmLimVariable(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power) \
-	static prmval_type prmLimVariableStep##_##m_label = { m_step * m_power };
-#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_save)	\
-	parametres_##m_limtype(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)
+	static prmval_type prmLimVariableMin_##m_label = { m_min * m_power };
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
+	parametres_##m_limType(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)
 #include "parametres.h"
 #undef parametres_prmLimConst
 #undef parametres_prmLimVariable
 #undef parametres
 
+//! prmLimConstMax, prmLimVariableMax
+#define parametres_prmLimConst(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)	\
+	static const prmval_type prmLimConstMax_##m_label = {m_max * m_power };
+#define parametres_prmLimVariable(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power) \
+	static prmval_type prmLimVariableMax_##m_label = { m_max * m_power };
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
+	parametres_##m_limType(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)
+#include "parametres.h"
+#undef parametres_prmLimConst
+#undef parametres_prmLimVariable
+#undef parametres
+
+//! prmStep
+#define parametres_prmStepConst(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)	\
+	static const prmval_type prmStepConst_##m_label = {m_step * m_power };
+#define parametres_prmStepVariable(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power) \
+	static prmval_type prmStepVariable_##m_label = { m_step * m_power };
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
+	parametres_##m_stepType(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)
+#include "parametres.h"
+#undef parametres_prmStepConst
+#undef parametres_prmStepVariable
+#undef parametres
 
 //! Parameter handler macros
-#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_save)	\
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
 {														\
 	.prm 				= (prmval_type*)&m_prm,			\
-	.def._##m_type 		= (m_def * power##m_power),		\
-	.min._##m_type 		= (m_min * power##m_power),		\
-	.max._##m_type 		= (m_max * power##m_power),		\
-	.step._##m_type 		= (m_step * power##m_power),		\
-	.pstep				= (prmval_type*)&m_limtype##Step_##m_label,			\
-	.bigstep._##m_type 	= (m_bigstep * power##m_power),	\
+	.def.t_##m_type 	= (m_def * power##m_power),		\
+	.min 				= (prmval_type*)&m_limType##Min_##m_label,		\
+	.max 				= (prmval_type*)&m_limType##Max_##m_label,		\
+	.step				= (prmval_type*)&m_stepType##_##m_label,	\
+	.bigstep.t_##m_type = (m_bigstep * power##m_power),	\
 	.type 				= m_type,						\
 	.chmod 				= m_chmod,						\
 	.power				= m_power,						\
-	.prmLim				= m_limtype,						\
+	.stepType			= m_stepType,					\
 	.save				= m_save,						\
 },
 //! Parameters handlers
@@ -87,28 +82,28 @@ const uint16_t prmHandleLen = sizeof(prmh) / sizeof(prmHandle_type);
 void prm_setVal(const prmHandle_type *const prmHandle, const prmval_type *const prmval){
 	switch(prmHandle->type){
 		case u8Frmt:
-			prmHandle->prm->_u8Frmt = prmval->_u8Frmt;
+			prmHandle->prm->t_u8Frmt = prmval->t_u8Frmt;
 			break;
 		case s8Frmt:
-			prmHandle->prm->_s8Frmt = prmval->_s8Frmt;
+			prmHandle->prm->t_s8Frmt = prmval->t_s8Frmt;
 			break;
 		case u16Frmt:
-			prmHandle->prm->_u16Frmt = prmval->_u16Frmt;
+			prmHandle->prm->t_u16Frmt = prmval->t_u16Frmt;
 			break;
 		case s16Frmt:
-			prmHandle->prm->_s16Frmt = prmval->_s16Frmt;
+			prmHandle->prm->t_s16Frmt = prmval->t_s16Frmt;
 			break;
-		case u32Frmt: unixTimeFrmt: unixDateFrmt:
-			prmHandle->prm->_u32Frmt = prmval->_u32Frmt;
+		case u32Frmt:
+		case unixTimeFrmt:
+		case unixDateFrmt:
+		case ipAdrFrmt:
+			prmHandle->prm->t_u32Frmt = prmval->t_u32Frmt;
 			break;
 		case s32Frmt:
-			prmHandle->prm->_s32Frmt = prmval->_s32Frmt;
+			prmHandle->prm->t_s32Frmt = prmval->t_s32Frmt;
 			break;
 		case floatFrmt:
-			prmHandle->prm->_floatFrmt = prmval->_floatFrmt;
-			break;
-		case ipAdrFrmt:
-			prmHandle->prm->_ipAdrFrmt = prmval->_ipAdrFrmt;
+			prmHandle->prm->t_floatFrmt = prmval->t_floatFrmt;
 			break;
 	}
 }
