@@ -12,6 +12,8 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
+#include "OSinit.h"
+
 /*!****************************************************************************
  * SYS_LIGHTWEIGHT_PROT==1: if you want inter-task protection for certain
  * critical regions during buffer allocation, deallocation and memory
@@ -210,12 +212,12 @@
 #define DEFAULT_ACCEPTMBOX_SIZE         2000
 
 /// tcpip_thread
-#define TCPIP_THREAD_STACKSIZE          1024
-#define TCPIP_THREAD_PRIO               4
+#define TCPIP_THREAD_STACKSIZE          TCPIP_SZ_STACK
+#define TCPIP_THREAD_PRIO               TCPIP_TSK_PRIO
 
 /// Eth_if
-#define netifINTERFACE_TASK_STACK_SIZE	512
-#define netifINTERFACE_TASK_PRIORITY	5
+#define netifINTERFACE_TASK_STACK_SIZE	NETIF_SZ_STACK
+#define netifINTERFACE_TASK_PRIORITY	NETIF_TSK_PRIO
 
 #endif /* __LWIPOPTS_H__ */
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

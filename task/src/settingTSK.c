@@ -138,4 +138,12 @@ uint32_t rtcCh(const menuItem_type *item){
 	return 0;
 }
 
+/*!****************************************************************************
+ * @brief    NET pfUnselect
+ */
+uint32_t netUpdate(const menuItem_type *item){
+	netSettingUpdate();
+	return 0;
+}
+
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

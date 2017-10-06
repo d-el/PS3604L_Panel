@@ -15,6 +15,7 @@
 #include "lwipopts.h"
 #include "lwip/raw.h"
 #include "lwip/icmp.h"
+#include "assert.h"
 
 /*!****************************************************************************
  * MEMORY
@@ -26,7 +27,7 @@ static struct raw_pcb 	*ping_pcb;
 /* Ping using the raw ip */
 static u8_t pingRecv(void *arg, struct raw_pcb *pcb, struct pbuf *p, ip_addr_t *addr){
 	struct icmp_echo_hdr *iecho;
-	LWIP_ASSERT("p != NULL", p != NULL);
+	assert(p != NULL);
 
 	if(pbuf_header(p, -PBUF_IP_HLEN) == 0){
 		iecho = (struct icmp_echo_hdr *) p->payload;
@@ -49,7 +50,7 @@ static u8_t pingRecv(void *arg, struct raw_pcb *pcb, struct pbuf *p, ip_addr_t *
  */
 void ping_init(void){
 	ping_pcb = raw_new(IP_PROTO_ICMP);
-	LWIP_ASSERT("ping_pcb != NULL", ping_pcb != NULL);
+	assert(ping_pcb != NULL);
 	raw_recv(ping_pcb, pingRecv, NULL);
 	raw_bind(ping_pcb, IP_ADDR_ANY);
 }

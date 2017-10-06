@@ -21,6 +21,7 @@
 #include "menuSystem.h"
 #include "enco.h"
 #include "systemTSK.h"
+#include "netif.h"
 
 /*!****************************************************************************
  * Define
@@ -60,6 +61,7 @@ uint32_t rtcPeriodic(const menuItem_type *item);
 uint32_t rtcSelectc(const menuItem_type *item);
 uint32_t rtcUselectc(const menuItem_type *item);
 uint32_t rtcCh(const menuItem_type *item);
+uint32_t netUpdate(const menuItem_type *item);
 
 #endif //settingTSK_H
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

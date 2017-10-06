@@ -55,7 +55,7 @@ parametres(meas_adci	,""	,fp.tf.meas.adci			,u16Frmt		,chmodNone		,0			,0		,0			
 //Panel settings
 parametres(brightness	,""	,fp.fpSet.lcdLight			,u16Frmt		,chmodAlways	,60.0		,10.0	,100.0		,0.1	,10.0	,1	,prmLimConst	,prmStepConst	,prmEeprom)
 
-parametres(ipadr		,""	,fp.fpSet.ipadr				,ipAdrFrmt		,chmodAlways	,0xC0A8010A	,0		,0xFFFFFFFF	,1		,1		,0	,prmLimVariable	,prmStepVariable,prmEeprom) /* 192.168.1.10 */
+parametres(ipadr		,""	,fp.fpSet.ipadr				,ipAdrFrmt		,chmodAlways	,0xC0A8010A	,0		,0xFFFFFFFF	,1		,1		,0	,prmLimVariable	,prmStepVariable,prmEeprom) /* 192.168.1.15 */
 parametres(netmask		,""	,fp.fpSet.netmask			,ipAdrFrmt		,chmodAlways	,0xFFFFFF00	,0		,0xFFFFFFFF	,1		,1		,0	,prmLimVariable	,prmStepVariable,prmEeprom) /* 255.255.255.0 */
 parametres(gateway		,""	,fp.fpSet.gateway			,ipAdrFrmt		,chmodAlways	,0xC0A80101	,0		,0xFFFFFFFF	,1		,1		,0	,prmLimVariable	,prmStepVariable,prmEeprom) /* 192.168.1.1 */
 

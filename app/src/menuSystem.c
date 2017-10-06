@@ -1,9 +1,10 @@
 ﻿/*!****************************************************************************
- * @file    menuSystem.c
- * @author  Storozhenko Roman - D_EL
- * @version V1.0
- * @date    10.02.2016
- * @brief   parametres system
+ * @file		menuSystem.c
+ * @author		Storozhenko Roman - D_EL
+ * @version		V1.1
+ * @copyright	GNU Lesser General Public License v3
+ * @date		10.02.2016
+ * @brief		menu system
  */
 
 /*!****************************************************************************
@@ -662,4 +663,4 @@ void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, ui
 	lcd_putStr(poschars * MENU_CHAR_W, MENU_Y_DISTANCE + MENU_Y_DISTANCE * itemNumber, &font8x12, 0, string);
 }
 
-/******************* (C) COPYRIGHT ***************** END OF FILE ********* D_EL *****/
+/*************** LGPL ************** END OF FILE *********** D_EL ************/

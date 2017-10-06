@@ -1,9 +1,10 @@
 ﻿/*!****************************************************************************
- * @file    menuSystem.h
- * @author  Storozhenko Roman - D_EL
- * @version V1.0
- * @date    10.02.2016
- * @brief   parametres system
+ * @file		menuSystem.h
+ * @author		Storozhenko Roman - D_EL
+ * @version		V1.1
+ * @copyright	GNU Lesser General Public License v3
+ * @date		10.02.2016
+ * @brief		menu system
  */
 #ifndef MENUSYSTEM_H
 #define MENUSYSTEM_H
@@ -81,4 +82,4 @@ typedef struct menuItem{
 void menuEngine(const menuItem_type *startMenuItem);
 
 #endif /* MENUSYSTEM_H */
-/******************* (C) COPYRIGHT ***************** END OF FILE ********* D_EL *****/
+/*************** LGPL ************** END OF FILE *********** D_EL ************/

@@ -16,14 +16,15 @@
  * Memory
  */
 frontPanel_type	fp;					///< Data structure front panel
-struct netif	xnetif; 			///< Network interface structure
 TaskHandle_t	windowTskHandle;	///< Program task handler
+struct netif	xnetif; 			///< Network interface structure
 
 /*!****************************************************************************
  * Local prototypes for the functions
  */
 void loadParameters(void);
 void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
+void netSettingUpdate(void);
 
 /*!****************************************************************************
  * @brief
@@ -39,7 +40,12 @@ void systemTSK(void *pPrm){
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	ping_init();													// Initialize service ping protocol
 	sntp_init();													// Initialize service SNTP
+	Result &= xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
+	//Result &= xTaskCreate(wlanTSK, "wlanTSK", WLAN_TSK_SZ_STACK, NULL, WLAN_TSK_PRIO, NULL);
 	Result &= xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
+	assert(Result == pdTRUE);
+
+	selWindow(startupWindow);
 
 	while(1){
 		if(selWindowPrev != fp.currentSelWindow){
@@ -48,6 +54,8 @@ void systemTSK(void *pPrm){
 			}
 
 			switch(fp.currentSelWindow){
+				case noneWindow:
+					break;
 				case startupWindow:
 					Result = xTaskCreate(startupTSK, "startupTSK", STARTUP_TSK_SZ_STACK, NULL, STARTUP_TSK_PRIO, &windowTskHandle);
 					break;
@@ -63,16 +71,13 @@ void systemTSK(void *pPrm){
 				case cube3dWindow:
 					Result = xTaskCreate(cube3dTSK, "cube3dTSK", CUBE_TSK_SZ_STACK, NULL, CUBE_TSK_PRIO, &windowTskHandle);
 					break;
+				case bubblesWindow:
+					Result = xTaskCreate(cube3dTSK, "cube3dTSK", BUBLE_TSK_SZ_STACK, NULL, BUBLE_TSK_PRIO, &windowTskHandle);
+					break;
 				default:
-					while(1)
-						;	//Fail windowTskHandle
+					assert(!"Fail selector");
 			}
-
-			if(Result != pdTRUE){
-				while(1)	// Create task failed
-					;
-			}
-
+			assert(Result == pdTRUE);	//Fail windowTskHandle
 			selWindowPrev = fp.currentSelWindow;
 		}
 
@@ -161,6 +166,7 @@ void selWindow(selWindow_type window){
  */
 void shutdown(void){
 	pvd_disable();
+	vTaskSuspendAll();
 	setLcdBrightness(0);
 	LED_OFF();
 	nvMem_savePrm(&userConfRegion);
@@ -172,7 +178,7 @@ void shutdown(void){
 }
 
 /*!****************************************************************************
- * @param ip:		 Internet Protocol
+ * @param ip:		 Internet Protocol address
  * @param netmask:
  * @param gateway
  */
@@ -185,10 +191,6 @@ void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gat
 	l_ipaddr.addr = htonl(ipaddr);
 	l_netmask.addr = htonl(netmask);
 	l_gateway.addr = htonl(gateway);
-
-	debug("ip %s\n", ipaddr_ntoa(&l_ipaddr));
-	debug("nm: %s\n", ipaddr_ntoa(&l_netmask));
-	debug("gw: %s\n", ipaddr_ntoa(&l_gateway));
 
 	/* Create tcp_ip stack thread */
 	tcpip_init( NULL, NULL);
@@ -211,6 +213,21 @@ void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gat
 	 * Далее производится детектирование Link и Negotiation, перенастройка
 	 * MAC под текущее физическое подключение, netif_set_up
 	 */
+}
+
+/*!****************************************************************************
+ */
+void netSettingUpdate(void){
+	ip_addr_t l_ipaddr;
+	ip_addr_t l_netmask;
+	ip_addr_t l_gateway;
+
+	//With convert 32-bits host order to network order
+	l_ipaddr.addr = htonl(fp.fpSet.ipadr);
+	l_netmask.addr = htonl(fp.fpSet.netmask);
+	l_gateway.addr = htonl(fp.fpSet.gateway);
+
+	netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

@@ -12,6 +12,11 @@
  */
 #include "httpServerTSK.h"
 
+/**
+ * HTTP_SERVER_DEBUG: Enable debugging for http server
+ */
+#define HTTP_DEBUG	0	//1 - ON, 0 - OFF
+
 /*!****************************************************************************
  * MEMORY
  */
@@ -104,20 +109,8 @@ void http_server_serve(struct netconn *conn){
 	if(res == ERR_OK){
 		netbuf_data(inbuf, (void**)&buf, &buflen);
 
-		/*debugn(	"\r\n======================\r\n"
-				"Receive\r\n"
-				);
-		SH_SendString(buf);*/
-
-		/*ip_addr_t *remote_addr = &conn->pcb.ip->remote_ip;
-		ipcnt_type *i = ipFind(remote_addr->addr);
-		if(i != NULL){
-			i->cnt++;
-		}else{
-			ipInsert(remote_addr->addr);
-		}*/
-
 		if(httpStrcmp(buf, "GET /")){
+			printdmsg(HTTP_DEBUG, ("GET /"));
 			if(httpStrcmp(buf, "GET / ")){	//Main page
 				strcpy(data, http_200);
 				strcat(data, http_server);
@@ -140,10 +133,10 @@ void http_server_serve(struct netconn *conn){
 		}
 
 		else if(httpStrcmp(buf, "POST /")){
-
+			printdmsg(HTTP_DEBUG, ("POST /"));
 		}
 
-		// Transmit page data to client
+		printdmsg(HTTP_DEBUG, ("Transmit page data to client, length %u bytes\n", strlen(pageData)));
 		netconn_write(conn, pageData, strlen(pageData), NETCONN_NOCOPY);
 	}
 
@@ -172,30 +165,31 @@ void httpServerTSK(void *pPrm){
 	/* Create a new TCP connection handle */
 	conn = netconn_new(NETCONN_TCP);
 	if(conn == NULL){
-		debugn("can not create netconn");
+		println("can not create netconn");
 		httpServerError();
 	}
 
 	/* Bind to port 80 (HTTP) with default IP address */
 	err = netconn_bind(conn, NULL, 80);
 	if(err != ERR_OK){
-		debugn("can not bind netconn");
+		println("can not bind netconn");
 		httpServerError();
 	}
 
-	/* Put the connection into LISTEN state */
+	printdmsg(HTTP_DEBUG, ("Put the connection into LISTEN state\n"));
 	netconn_listen(conn);
 
 	while(1){
-		/* accept any icoming connection */
+		printdmsg(HTTP_DEBUG, ("Accept any icoming connection\n"));
 		err = netconn_accept(conn, &newconn);
 
 		fp.state.lanActive = 1;
 
-		/* serve connection */
+		printdmsg(HTTP_DEBUG, ("Serve connection\n"));
+		printdmsg(HTTP_DEBUG, ("Remote IP address: %s\n", ipaddr_ntoa(&newconn->pcb.ip->remote_ip)));
 		http_server_serve(newconn);
 
-		/* delete connection */
+		printdmsg(HTTP_DEBUG, ("Delete connection\n\n"));
 		netconn_delete(newconn);
 	}
 }

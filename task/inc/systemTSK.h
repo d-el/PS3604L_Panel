@@ -25,14 +25,12 @@
 #include "settingTSK.h"
 #include "cube3dTSK.h"
 #include "chargeTSK.h"
+#include "httpServerTSK.h"
 #include "pvd.h"
-#include "ethernetif.h"
-#include "tcpip.h"
-#include "netif.h"
+#include "net.h"
 #include "pingService.h"
 #include "sntp.h"
-#include "stm32f4x7_eth.h"
-
+#include "assert.h"
 
 /*!****************************************************************************
  * Define
@@ -57,7 +55,8 @@ typedef enum {
 	settingWindow,
 	baseWindow,
 	chargerWindow,
-	cube3dWindow
+	cube3dWindow,
+	bubblesWindow
 } selWindow_type;
 
 typedef struct {
@@ -96,6 +95,8 @@ extern frontPanel_type fp;
  */
 void selWindow(selWindow_type window);
 void systemTSK(void *pPrm);
+void netSettingUpdate(void);
+void selWindow(selWindow_type window);
 void shutdown(void);
 
 #endif //systemTSK_H

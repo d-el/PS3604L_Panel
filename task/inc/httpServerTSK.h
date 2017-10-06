@@ -12,13 +12,11 @@
 /*!****************************************************************************
  * Include
  */
-//#include "lwip/opt.h"
-//#include "lwip/arch.h"
 #include "lwip/api.h"
 #include "lwip/ip.h"
-#include <stdio.h>
-#include <string.h>
-#include "debugCore.h"
+#include "stdio.h"
+#include "string.h"
+#include "debugPrint.h"
 #include "gpio.h"
 #include "uart.h"
 #include "rtc.h"

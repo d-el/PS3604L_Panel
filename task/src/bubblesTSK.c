@@ -9,7 +9,8 @@
 /*!****************************************************************************
  * Include
  */
-#include <bubblesTSK.h>
+#include "bubblesTSK.h"
+#include "task.h"
 
 /*!****************************************************************************
  * MEMORY
@@ -33,7 +34,6 @@ void bubblesTSK(void *pPrm){
 		physics();
 		moveball();
 		vTaskDelay(pdMS_TO_TICKS(60));
-
 	}
 }
 
@@ -191,70 +191,4 @@ void physics(void){
 	}
 }
 
-/*yDistance = ball[0].new_ycenter - ball[1].new_ycenter;
- yAbsDistance = abs(yDistance);
-
- xDistance = ball[0].new_xcenter - ball[1].new_xcenter;
- xAbsDistance = abs(xDistance);
-
- Sumradius = ball[0].radius + ball[1].radius;
-
- if((yAbsDistance <= Sumradius) && (xAbsDistance <= Sumradius)){
- static uint8_t clash;
- clash++;
- sprintf(str, "%u", clash);
- LCD_PutStr8x12(100, 100, str);
-
- ball[0].speedx = - ball[0].speedx;
- ball[0].speedy = - ball[0].speedy;
- ball[1].speedx = - ball[1].speedx;
- ball[1].speedy = - ball[1].speedy;
- }*/
-/*if( ( abs( ball[0].new_ycenter - ball[1].new_ycenter ) - (ball[0].radius + ball[1].radius ) ) ==
- ( abs( ball[0].new_xcenter - ball[1].new_xcenter ) - (ball[0].radius + ball[1].radius ) ) ){
-
- static uint8_t clash;
- sprintf(str, "%u", clash);
- LCD_PutStr8x12(0, 0, str);
- clash++;
-
- ball[0].speedx = - ball[0].speedx +1;
- ball[0].speedy = - ball[0].speedy +1;
-
- ball[1].speedx = - ball[1].speedx -1;
- ball[1].speedy = - ball[1].speedy -1;
- }*/
-
-/* шарик с R=5
- { 0xE0, 0xF0, 0xF8, 0xFC, 0xFC, 0xFC, 0xF8, 0xF0, 0xE0, 0x00,
- 0x00, 0x01, 0x03, 0x07, 0x07, 0x07, 0x03, 0x01, 0x00, 0x00 },*/
-
-//vTaskDelay(30);
-//столкнулись
-/* ball[0].speedx = - ball[0].speedx +1;
- ball[0].speedy = - ball[0].speedy +1;
-
- ball[1].speedx = - ball[1].speedx -1;
- ball[1].speedy = - ball[1].speedy -1;*/
-
-/* else{
- uint8_t x = 0, y = 0;
- sprintf(str, "%X", 1);
- LCD_PutStr8x12(x, y, str);
- x++;
- y++;
-
- } */
-
-//
-//void play(void)	// Our Budding Game Engine
-//{
-//    uint16_t i;
-//	while(1){
-//        moveball();
-//        physics();
-//        delay_ms(i); // Reduce game speed to human playable level
-//
-//    }
-//}
 /******************* (C) COPYRIGHT ***************** END OF FILE ********* D_EL *****/

@@ -48,7 +48,7 @@ MENU_ITEM(rtc			,"RTC"		,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,NULL		
 	MENU_ITEM(timeSec		,"Sec"		,""		,&prmh[Nsec]		,chmodMenuAlways	,0		,rtcCh		,rtcSelectc	,NULL		,NULL		,timeMin	,timeSec	,rtc		,timeSec)
 
 /*		  name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-MENU_ITEM(lan			,"LAN"	,""	,NULL						,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,rtc		,brightness	,lan		,ipaddr)
+MENU_ITEM(lan			,"LAN"	,""	,NULL						,chmodMenuAlways	,0		,NULL		,NULL		,netUpdate	,NULL		,rtc		,brightness	,lan		,ipaddr)
 	/*		  name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 	MENU_ITEM(ipaddr		,"ip"	,""		,&prmh[Nipadr]		,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ipaddr		,netmask	,lan		,ipaddr)
 	MENU_ITEM(netmask		,"nm"	,""		,&prmh[Nnetmask]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ipaddr		,gatewey	,lan		,netmask)
