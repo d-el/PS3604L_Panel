@@ -24,6 +24,7 @@
 #include "startupTSK.h"
 #include "settingTSK.h"
 #include "cube3dTSK.h"
+#include "bubblesTSK.h"
 #include "chargeTSK.h"
 #include "httpServerTSK.h"
 #include "pvd.h"
@@ -64,6 +65,7 @@ typedef struct {
 	uint32_t 	netmask;
 	uint32_t 	gateway;
 	uint16_t 	lcdLight;		///< [X_X %]
+	uint8_t		timezone;		///< -12 to +12
 } frontPanelSetting_type;
 
 typedef struct {

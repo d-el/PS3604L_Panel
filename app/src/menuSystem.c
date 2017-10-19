@@ -174,20 +174,19 @@ void menuEngine(const menuItem_type *startMenuItem){
 			//Parent
 			if(keyState(kMode)){
 				if((*sMenu) != NULL){
-					if((*sMenu)->pfUnselect != NULL){
-						(*sMenu)->pfUnselect(*sMenu);		//Call pfExit
+					if((*sMenu == (*sMenu)->child) && ((*sMenu)->pfSelect != NULL)){
+						(*sMenu)->pfSelect(*sMenu);		//Call pfSelect
 					}
-
 				}
 				if(sMenu > selectPathMenu){
-					lcd_fillScreen(black);
 					*topMenu = NULL;
 					*sMenu = NULL;
 					topMenu--;
 					sMenu--;
-					if((*sMenu == (*sMenu)->child) && ((*sMenu)->pfSelect != NULL)){
-						(*sMenu)->pfSelect(*sMenu);			//Call pfSelect
+					if((*sMenu)->pfUnselect != NULL){
+						(*sMenu)->pfUnselect(*sMenu);			//Call pfUnselect
 					}
+					lcd_fillScreen(black);
 				}else{	//Выходим из меню
 					return;
 				}
@@ -229,27 +228,6 @@ void menuEngine(const menuItem_type *startMenuItem){
 						break;
 					}
 					vMenu = vMenu->next;
-
-					/*if(vMenu != vMenu->child){
-					 *sMenu = vMenu; 			//Available select as is parent
-					 if((*sMenu)->pfSelect != NULL){
-					 (*sMenu)->pfSelect(*sMenu);		//Call pfSelect
-					 }
-					 break;
-					 }*/
-					/*if(vMenu->prmHandle != NULL){	//Is parametr handle
-					 if((vMenu->flags.bit.chmod == chmodMenuAlways)&&(vMenu->prmHandle->chmod == chmodAlways)){
-					 *sMenu = vMenu; 		//Available select
-					 if((*sMenu)->pfSelect != NULL){
-					 (*sMenu)->pfSelect(*sMenu);
-					 }
-					 break;
-					 }
-					 }
-					 if(vMenu == vMenu->next){
-					 break;
-					 }
-					 vMenu = vMenu->next;*/
 				}
 			}
 		}
@@ -332,10 +310,6 @@ void menuEngine(const menuItem_type *startMenuItem){
 		vMenu = *topMenu;
 		while(1){
 			printItem(vMenu, itemNum, vMenu == *sMenu, editSection);
-
-			//outItemString(mstring, vstring, vMenu == *sMenu, itemNum, 0, 0);
-			//void outItemString(char *label, char *val, uint8_t isSelected, uint8_t itemNumber, uint8_t digitCol, uint8_t digitLen){
-
 			if(vMenu == vMenu->next){
 				break;
 			}

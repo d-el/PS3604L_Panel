@@ -2,7 +2,7 @@
  * @file		uart.c
  * @author		d_el - Storozhenko Roman
  * @version		V1.5
- * @date    	09.01.2016
+ * @date		09.01.2016
  * @copyright	GNU Lesser General Public License v3
  * @brief		Driver for uart STM32F4 MCUs
  */
@@ -61,25 +61,25 @@ uint16_t usartBaudRateDiv[] = {
  * @brief
  */
 void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
-    uint32_t            dmaChannelRx;
-    uint32_t            dmaChannelTx;
+	uint32_t dmaChannelRx;
+	uint32_t dmaChannelTx;
 
 	#if(UART1_USE > 0)
 	if(uartx == uart1){
 		/************************************************
 		 * Memory setting
 		 */
-        dmaChannelTx       		= 4;
-        dmaChannelRx       		= 4;
-		uartx->pUart        	= USART1;
-		uartx->pTxBff       	= uart1TxBff;
-		uartx->pRxBff       	= uart1RxBff;
-		uartx->pDmaStreamTx 	= DMA2_Stream7;
-		uartx->pDmaStreamRx 	= DMA2_Stream2;
-        uartx->dmaIfcrTx		= &DMA2->HIFCR;
-        uartx->dmaIfcrRx		= &DMA2->LIFCR;
-        uartx->dmaIfcrMaskTx 	= DMA_HIFCR_CTCIF7;
-        uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF2;
+		dmaChannelTx			= 4;
+		dmaChannelRx			= 4;
+		uartx->pUart			= USART1;
+		uartx->pTxBff			= uart1TxBff;
+		uartx->pRxBff			= uart1RxBff;
+		uartx->pDmaStreamTx		= DMA2_Stream7;
+		uartx->pDmaStreamRx		= DMA2_Stream2;
+		uartx->dmaIfcrTx		= &DMA2->HIFCR;
+		uartx->dmaIfcrRx		= &DMA2->LIFCR;
+		uartx->dmaIfcrMaskTx 	= DMA_HIFCR_CTCIF7;
+		uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF2;
 
 		#if(UART1_RX_IDLE_LINE_MODE > 0)
 		uartx->rxIdleLineMode = 1;

@@ -43,7 +43,9 @@
  */
 #define SYSTEM_FREQ         168000000   //[Hz]
 #define APB1_FREQ           42000000    //[Hz]
+#define APB1_TIM_FREQ       84000000    //[Hz]
 #define APB2_FREQ           42000000    //[Hz]
+#define APB2_TIM_FREQ       84000000    //[Hz]
 
 /* MAC ADDRESS*/
 extern uint8_t macAddress[6];
@@ -54,23 +56,23 @@ extern uint8_t macAddress[6];
 #define MAC_ADDR4   	macAddress[4]
 #define MAC_ADDR5   	macAddress[5]
 
-/*Static IP ADDRESS*/
-#define IP_ADDR0   		192
-#define IP_ADDR1   		168
-#define IP_ADDR2   		1
-#define IP_ADDR3   		10
-
-/*NETMASK*/
-#define NETMASK_ADDR0   255
-#define NETMASK_ADDR1   255
-#define NETMASK_ADDR2   255
-#define NETMASK_ADDR3   0
-
-/*Gateway Address*/
-#define GW_ADDR0   		192
-#define GW_ADDR1   		168
-#define GW_ADDR2   		1
-#define GW_ADDR3   		1
+///*Static IP ADDRESS*/
+//#define IP_ADDR0   		192
+//#define IP_ADDR1   		168
+//#define IP_ADDR2   		1
+//#define IP_ADDR3   		10
+//
+///*NETMASK*/
+//#define NETMASK_ADDR0   255
+//#define NETMASK_ADDR1   255
+//#define NETMASK_ADDR2   255
+//#define NETMASK_ADDR3   0
+//
+///*Gateway Address*/
+//#define GW_ADDR0   		192
+//#define GW_ADDR1   		168
+//#define GW_ADDR2   		1
+//#define GW_ADDR3   		1
 
 /*!****************************************************************************
  * Macro functions

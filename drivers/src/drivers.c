@@ -34,8 +34,8 @@ void hardInit(void){
 	ETH_BSP_Config();	//configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();
-	//beep_init();
-	//ledPwm_init();
+	beep_init();
+	ledPwm_init();
 	spfd_init();
 	//ssd_init();
 	rtcStatus_type rtcStatus = rtc_init();

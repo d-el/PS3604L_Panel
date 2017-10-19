@@ -40,7 +40,7 @@ void systemTSK(void *pPrm){
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	ping_init();													// Initialize service ping protocol
 	sntp_init();													// Initialize service SNTP
-	Result &= xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
+	//Result &= xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	//Result &= xTaskCreate(wlanTSK, "wlanTSK", WLAN_TSK_SZ_STACK, NULL, WLAN_TSK_PRIO, NULL);
 	Result &= xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(Result == pdTRUE);
@@ -72,7 +72,7 @@ void systemTSK(void *pPrm){
 					Result = xTaskCreate(cube3dTSK, "cube3dTSK", CUBE_TSK_SZ_STACK, NULL, CUBE_TSK_PRIO, &windowTskHandle);
 					break;
 				case bubblesWindow:
-					Result = xTaskCreate(cube3dTSK, "cube3dTSK", BUBLE_TSK_SZ_STACK, NULL, BUBLE_TSK_PRIO, &windowTskHandle);
+					Result = xTaskCreate(bubblesTSK, "bubblesTSK", BUBLE_TSK_SZ_STACK, NULL, BUBLE_TSK_PRIO, &windowTskHandle);
 					break;
 				default:
 					assert(!"Fail selector");
@@ -150,7 +150,7 @@ void loadParameters(void){
 }
 
 /*!****************************************************************************
- * @brief	Select window task & wait selectable
+ * @brief	Select window task & wait selected
  * 			This function need call from current GUI window
  * @param 	window	window task identifier
  */

@@ -14,14 +14,16 @@
 #include "systemTSK.h"
 #include "rtc.h"
 
+prmval_type abc = { .t_u32Frmt = 10000 };
+
 /*!****************************************************************************
  * MEMORY
  */
 //! prmLimConstMin, prmLimVariableMin
 #define parametres_prmLimConst(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)	\
-	static const prmval_type prmLimConstMin_##m_label = {m_min * m_power };
+	static const prmval_type prmLimConstMin_##m_label = { .t_##m_type = (m_min * power##m_power) };
 #define parametres_prmLimVariable(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power) \
-	static prmval_type prmLimVariableMin_##m_label = { m_min * m_power };
+	static prmval_type prmLimVariableMin_##m_label = { .t_##m_type = (m_min * power##m_power) };
 #define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
 	parametres_##m_limType(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)
 #include "parametres.h"
@@ -31,9 +33,9 @@
 
 //! prmLimConstMax, prmLimVariableMax
 #define parametres_prmLimConst(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)	\
-	static const prmval_type prmLimConstMax_##m_label = {m_max * m_power };
+	static const prmval_type prmLimConstMax_##m_label = { .t_##m_type = (m_max * power##m_power) };
 #define parametres_prmLimVariable(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power) \
-	static prmval_type prmLimVariableMax_##m_label = { m_max * m_power };
+	static prmval_type prmLimVariableMax_##m_label = { .t_##m_type = (m_max * power##m_power) };
 #define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
 	parametres_##m_limType(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)
 #include "parametres.h"
@@ -43,10 +45,10 @@
 
 //! prmStep
 #define parametres_prmStepConst(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)	\
-	static const prmval_type prmStepConst_##m_label = {m_step * m_power };
+	static const prmval_type prmStepConst_##m_label = { .t_##m_type = (m_step * power##m_power) };
 #define parametres_prmStepVariable(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power) \
-	static prmval_type prmStepVariable_##m_label = { m_step * m_power };
-#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
+	static prmval_type prmStepVariable_##m_label = {.t_##m_type = (m_step * power##m_power) };
+#define parametres(m_label, m_units, m_prm, m_type, m_chmod, vm_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
 	parametres_##m_stepType(m_label, m_type, m_min, m_max, m_step, m_bigstep, m_power)
 #include "parametres.h"
 #undef parametres_prmStepConst

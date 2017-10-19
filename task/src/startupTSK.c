@@ -56,11 +56,11 @@ void startupTSK(void *pPrm){
 			keyProc();
 		}
 
-		//if(keyState(kMode)){
+		if(keyState(kMode)){
 			selWindow(settingWindow);
-		//}else{
-		//	selWindow(baseWindow);
-		//}
+		}else{
+			selWindow(baseWindow);
+		}
 
 		if((fp.state.sysSettingLoadDefault != 0)||((fp.state.userSettingLoadDefault != 0))){
 			lcd_fillScreen(black);

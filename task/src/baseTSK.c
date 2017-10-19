@@ -163,8 +163,12 @@ void baseTSK(void *pPrm){
 			IdleTime = xTaskGetTickCount();
 		}
 		if((xTaskGetTickCount() - IdleTime) >= IDLE_TIME){
+			if((time(NULL) % 1) != 0){
+				selWindow(cube3dWindow);
+			}else{
+				selWindow(bubblesWindow);
+			}
 			retEf = 1;
-			selWindow(cube3dWindow);
 		}
 
 		/**************************************
@@ -328,6 +332,13 @@ void printStatusBar(void){
 		//Печать температуры
 		sprintf(str, "%02u.%u \xB0 C", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
 		lcd_putStr(60, 120, &font6x8, 0, str);
+
+		//
+		/*time_t unixTime;
+		unixTime = time(NULL);
+		localtime_r(&unixTime, &timeStrct);
+		print(str, "Current local time and date: %s", asctime(&timeStrct));
+		print(str);*/
 
 		//Печать времени
 		rtc_getTime(&timeStrct);

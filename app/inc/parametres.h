@@ -18,6 +18,7 @@ parametres(mday			,""	,timeStrct.tm_mday			,s32Frmt		,chmodAlways	,1			,1		,31		
 parametres(hour			,""	,timeStrct.tm_hour			,s32Frmt		,chmodAlways	,0			,0		,23			,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
 parametres(min			,""	,timeStrct.tm_min			,s32Frmt		,chmodAlways	,0			,0		,59			,1		,10		,0	,prmLimConst	,prmStepConst	,prmNotSave)
 parametres(sec			,""	,timeStrct.tm_sec			,s32Frmt		,chmodAlways	,0			,0		,59			,1		,10		,0	,prmLimConst	,prmStepConst	,prmNotSave)
+parametres(timezone		,"" ,fp.fpSet.timezone			,s8Frmt			,chmodAlways	,0			,-12	,12			,1		,1		,0	,prmLimConst	,prmStepConst	,prmEeprom)
 
 //Base Task 0
 parametres(bsSet0u		,""	,bs.set[0].u				,u16Frmt		,chmodAlways	,0			,0		,36.000		,0.010	,1.000	,3	,prmLimConst	,prmStepConst	,prmEeprom)

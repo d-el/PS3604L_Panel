@@ -128,8 +128,8 @@ extern uart_type *uart4;
 /*!****************************************************************************
  * Macro functions
  */
-#define uartGetRemainTx(uartx)      (uartx->pDmaStreamTx->NDTR)
-#define uartGetRemainRx(uartx)      (uartx->pDmaStreamRx->NDTR)
+#define uartGetRemainTx(uartx)		(uartx->pDmaStreamTx->NDTR)
+#define uartGetRemainRx(uartx)		(uartx->pDmaStreamRx->NDTR)
 #define UART_FREQ 					(42000000U)		///< [Hz]
 #define uartMakeMantissa(baud)		(UART_FREQ / 16 / (baud))
 #define uartMakeFraction(baud)		(((UART_FREQ + (baud) / 2)  / (baud)) - (uartMakeMantissa(baud) * 16))

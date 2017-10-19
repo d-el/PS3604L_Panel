@@ -47,30 +47,32 @@ void nextColor(void){
 }
 
 void paint_ball(int16_t x, int16_t y, int16_t r, uint16_t color){
-	uint32_t h, w, mask;
-
-	//lcd_gotoxy(x - 5, y - 5, x + 5 - 1, y + 5 - 1);
-	for(h = 0; h < 10; h++){
-
-		mask = (1 << 15);
-		for(w = 0; w < 10; w++){
-			if((ball_[h] & mask) != 0){
-				//spfd_lcdDat16(color);
-			}else{
-				//spfd_lcdDat16(black);
-			}
-			mask >>= 1;
-		}
-	}
+	grf_circle(x, y, r, color);
+//	uint32_t h, w, mask;
+//
+//	//lcd_gotoxy(x - 5, y - 5, x + 5 - 1, y + 5 - 1);
+//	for(h = 0; h < 10; h++){
+//
+//		mask = (1 << 15);
+//		for(w = 0; w < 10; w++){
+//			if((ball_[h] & mask) != 0){
+//				lcd_setContentColor(color);
+//			}else{
+//				//spfd_lcdDat16(black);
+//			}
+//			mask >>= 1;
+//		}
+//	}
 }
 
 void clear_ball(int16_t x, int16_t y, int16_t r, uint16_t color){
-	uint32_t h;
-
-	//lcd_gotoxy(x - 5, y - 5, x + 5 - 1, y + 5 - 1);
-	for(h = 0; h < 10 * 10; h++){
-		//spfd_lcdDat16(black);
-	}
+	grf_circle(x, y, r, black);
+//	uint32_t h;
+//
+//	//lcd_gotoxy(x - 5, y - 5, x + 5 - 1, y + 5 - 1);
+//	for(h = 0; h < 10 * 10; h++){
+//		//spfd_lcdDat16(black);
+//	}
 }
 
 void initialize(void){ // Initialize the game
@@ -78,8 +80,8 @@ void initialize(void){ // Initialize the game
 	ball[0].radius = 5;
 	ball[0].speedx = 3 + _rand(2); //Generate Random X direction.
 	ball[0].speedy = 2 + _rand(2); //Generate Random Y direction.
-	ball[0].old_xcenter = xSize / 2;
-	ball[0].old_ycenter = ySize / 2;
+	//ball[0].old_xcenter = xSize / 2;
+	//ball[0].old_ycenter = ySize / 2;
 	ball[0].new_xcenter = xSize / 2;
 	ball[0].new_ycenter = ySize / 2;
 
@@ -87,8 +89,8 @@ void initialize(void){ // Initialize the game
 	ball[1].radius = 5;
 	ball[1].speedx = 3 + _rand(2); // Generate Random X direction.
 	ball[1].speedy = -2 + _rand(2); // Generate Random Y direction.
-	ball[1].old_xcenter = xSize / 2 + 15;
-	ball[1].old_ycenter = ySize / 2 + 15;
+	//ball[1].old_xcenter = xSize / 2 + 15;
+	//ball[1].old_ycenter = ySize / 2 + 15;
 	ball[1].new_xcenter = xSize / 2 + 15;
 	ball[1].new_ycenter = ySize / 2 + 15;
 
@@ -96,8 +98,8 @@ void initialize(void){ // Initialize the game
 	ball[2].radius = 5;
 	ball[2].speedx = -4 + _rand(2); // Generate Random X direction.
 	ball[2].speedy = 3 + _rand(2); // Generate Random Y direction.
-	ball[2].old_xcenter = xSize / 2 - 15;
-	ball[2].old_ycenter = ySize / 2 - 15;
+	//ball[2].old_xcenter = xSize / 2 - 15;
+	//ball[2].old_ycenter = ySize / 2 - 15;
 	ball[2].new_xcenter = xSize / 2 - 15;
 	ball[2].new_ycenter = ySize / 2 - 15;
 
@@ -105,8 +107,8 @@ void initialize(void){ // Initialize the game
 	ball[3].radius = 5;
 	ball[3].speedx = -3 + _rand(2); // Generate Random X direction.
 	ball[3].speedy = 2 + _rand(2); // Generate Random Y direction.
-	ball[3].old_xcenter = xSize / 2 + 10;
-	ball[3].old_ycenter = ySize / 2 + 10;
+	//ball[3].old_xcenter = xSize / 2 + 10;
+	//ball[3].old_ycenter = ySize / 2 + 10;
 	ball[3].new_xcenter = xSize / 2 + 10;
 	ball[3].new_ycenter = ySize / 2 + 10;
 
@@ -114,8 +116,8 @@ void initialize(void){ // Initialize the game
 	ball[4].radius = 5;
 	ball[4].speedx = 2 + _rand(2); // Generate Random X direction.
 	ball[4].speedy = -4 + _rand(2); // Generate Random Y direction.
-	ball[4].old_xcenter = xSize / 2 - 10;
-	ball[4].old_ycenter = ySize / 2 - 10;
+	//ball[4].old_xcenter = xSize / 2 - 10;
+	//ball[4].old_ycenter = ySize / 2 - 10;
 	ball[4].new_xcenter = xSize / 2 - 10;
 	ball[4].new_ycenter = ySize / 2 - 10;
 }
@@ -128,7 +130,7 @@ void moveball(void){
 		ball[i].new_xcenter = ball[i].new_xcenter + ball[i].speedx;
 		ball[i].new_ycenter = ball[i].new_ycenter + ball[i].speedy;
 
-		clear_ball(ball[i].old_xcenter, ball[i].old_ycenter, ball[i].radius, black);
+		//clear_ball(ball[i].old_xcenter, ball[i].old_ycenter, ball[i].radius, black);
 		paint_ball(ball[i].new_xcenter, ball[i].new_ycenter, ball[i].radius, ball[i].color);
 	}
 }
@@ -140,45 +142,41 @@ void physics(void){
 
 	for(i = 0; i < CountOfBalls; i++){
 		//From Top
-		if((ball[i].new_ycenter - ball[i].radius) <= 1){
+		if((ball[i].new_ycenter - ball[i].radius + ball[i].speedy) <=  0){
 			ball[i].speedy = -ball[i].speedy; // Reflect From Top
 			//nextColor();
-			// return;
 		}
 		//From Bottom
-		if((ball[i].new_ycenter + ball[i].radius) >= (ySize - 1)){
+		if((ball[i].new_ycenter + ball[i].radius + ball[i].speedy) >= (ySize - 1)){
 			ball[i].speedy = -ball[i].speedy; // Reflect From Bottom
 			//nextColor();
-			//return;
 		}
 		//From Left
-		if((ball[i].new_xcenter - ball[i].radius) <= 1){
+		if((ball[i].new_xcenter - ball[i].radius + ball[i].speedx) <= 0){
 			ball[i].speedx = -ball[i].speedx;
 			//nextColor();
-			//return;
 		}
 		//From Right
 		if((ball[i].new_xcenter + ball[i].radius + ball[i].speedx) >= (xSize - 1)){
 			ball[i].speedx = -ball[i].speedx;
 			//nextColor();
-			//return;
 		}
 
 	}
 
-	for(j = 0; j < CountOfBalls; j++){
+	/*for(j = 0; j < CountOfBalls; j++){
 
 		for(k = j + 1; k < CountOfBalls; k++){
 
-			yDistance = ball[j].new_ycenter - ball[k].new_ycenter;
+			yDistance = ball[j].new_ycenter + ball[j].speedy - ball[k].new_ycenter + ball[k].speedy;
 			yAbsDistance = abs(yDistance);
 
-			xDistance = ball[j].new_xcenter - ball[k].new_xcenter;
+			xDistance = ball[j].new_xcenter + ball[j].speedx - ball[k].new_xcenter + ball[k].speedx;
 			xAbsDistance = abs(xDistance);
 
 			Sumradius = ball[j].radius + ball[k].radius;
 
-			if((yAbsDistance <= Sumradius) && (xAbsDistance <= Sumradius)){
+			if((yAbsDistance <= Sumradius) || (xAbsDistance <= Sumradius)){
 				//clash
 				//BeepTime(20);
 				ball[j].speedx = -ball[j].speedx;
@@ -188,7 +186,7 @@ void physics(void){
 				ball[k].speedy = -ball[k].speedy;
 			}
 		}
-	}
+	}*/
 }
 
 /******************* (C) COPYRIGHT ***************** END OF FILE ********* D_EL *****/

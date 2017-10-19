@@ -43,8 +43,8 @@ uint8_t nvMemTmpBff[SIZE_BUFF];
 
 //! User setting data
 const nvMem_dataDescriptor_type nvMem_userConfDescriptor[] = {
-	{ &bs, 				sizeof(bs) },
-	{ &ch, 				sizeof(ch) },
+	{ &bs,				sizeof(bs) },
+	{ &ch,				sizeof(ch) },
 	{ &startCounter,	sizeof(startCounter) },
 };
 nvMem_partition_type userConfRegion = {
@@ -64,7 +64,7 @@ nvMem_partition_type userReservConfRegion = {
 
 //! System setting data
 const nvMem_dataDescriptor_type nvMem_systemSettingDescriptor[] = {
-		{ &fp.fpSet, sizeof(frontPanelSetting_type) },
+	{ &fp.fpSet, sizeof(frontPanelSetting_type) },
 };
 nvMem_partition_type systemSettingRegion = {
 	.memType = i2cEeprom,
