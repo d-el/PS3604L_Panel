@@ -41,7 +41,7 @@
 #define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_steptype, m_save)	\
 	N##m_label,
 typedef enum {
-#include "parametres.h"
+	#include "parametres.h"
 	endOfNumberPrm
 } parametresNum_type;
 #undef parametres

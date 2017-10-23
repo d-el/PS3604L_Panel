@@ -1,11 +1,11 @@
 /*!****************************************************************************
 * @file     version
 * @author   d_el - Storozhenko Roman
-* @date     19.10.2017 01:30:34
+* @date     24.10.2017 02:22:55
 * @major    2
 * @minor    0
 * @revision 0
-* @build    1278
+* @build    1336
 */
 
 #include "version.h"
@@ -13,10 +13,10 @@
 const uint32_t fwinfoMajor    = 2;
 const uint32_t fwinfoMinor    = 0;
 const uint32_t fwinfoRevision = 0;
-const uint32_t fwinfoBuild    = 1278;
-const char fwinfoVersion[] = {"2.0.0.1278"};
-const char fwinfoDate[]    = {"19.10.2017"};
-const char fwinfoTime[]    = {"01:30:34"};
+const uint32_t fwinfoBuild    = 1336;
+const char fwinfoVersion[] = {"2.0.0.1336"};
+const char fwinfoDate[]    = {"24.10.2017"};
+const char fwinfoTime[]    = {"02:22:55"};
 
 #include "stdint.h"
 

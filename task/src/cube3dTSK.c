@@ -12,54 +12,34 @@
 #include "cube3dTSK.h"
 
 /*!****************************************************************************
+ * User define
+ */
+#define CUBE_SIZE   33      //Длина ребра / 2
+#define DOTS_COUNT  8       //Всего вершин
+#define MESH_COUNT  12      //Количество ребер
+#define LCD_X_SIZE  160     //Разрешение по горизонтали
+#define LCD_Y_SIZE  100		//Разрешение по вертикали
+
+/*!****************************************************************************
  * MEMORY
  */
 uint16_t colors[12] = {	//Цвета граней
 		red, green, blue, red, green, blue, red, green, blue, red, green, blue, };
 
-const float cospi[] = { 1,  //0
-		0.99518473, 0.98078528, 0.95694034, 0.92387953, 0.88192126, 0.83146961, 0.77301045, //7
-		0.70710678, 0.63439328, 0.55557023, 0.47139674, 0.38268343, 0.29028468, 0.19509032, 0.09801714, //15
-		0  //16
-		};
-
-/** массивы содержат номера начальных (s1) и конечных (f1) точек,
+/** Массивы содержат номера начальных (s1) и конечных (f1) точек,
  *  по ним соединяем все и рисуем ребра(сетку)
  */
 const uint8_t s1[MESH_COUNT] = { 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7 };
-
 const uint8_t f1[MESH_COUNT] = { 1, 2, 3, 0, 4, 5, 6, 7, 5, 6, 7, 4 };
 
 /*!****************************************************************************
- * @brief
+ * Local functions declaration
  */
-float cos_(uint8_t angle){
-	return _IQcos(angle);
-}
-
-/*!****************************************************************************
- * @brief
- */
-float sin_(uint8_t angle){
-	uint8_t a1, a2;
-	a1 = angle & 0x0f;
-	a2 = angle >> 4;
-	if(a2 == 0)
-		return (float) (cospi[16 - a1]);
-	if(a2 == 1)
-		return (float) (cospi[a1]);
-	if(a2 == 2)
-		return (float) (cospi[16 - a1] * (-1));
-	if(a2 == 3)
-		return (float) (cospi[a1] * (-1));
-	return 0;
-}
 
 /*!****************************************************************************
  * @brief
  */
 void cube3dTSK(void *pPrm){
-	uint16_t old_val_encoder;
 	/** углы поворота по осям, от 0 до 63 включительно,
 	 *  это полный оборот на 360
 	 */
@@ -75,7 +55,7 @@ void cube3dTSK(void *pPrm){
 	char x2d[MESH_COUNT], y2d[MESH_COUNT];   //”Плоские” точки
 	pairsOfPoints_type pairsOfPoints[MESH_COUNT];
 
-	old_val_encoder = enGeReg();
+	uint16_t  old_val_encoder = enGeReg();
 	lcd_fillScreen(black);
 	lcd_setColor(black, white);
 
@@ -165,6 +145,7 @@ void cube3dTSK(void *pPrm){
 		}
 		dir_x = dir_y = dir_z = alpha;
 
+		//Выходим если нажата кнопка или повернут энкодер
 		if((keyProc() != 0) || (old_val_encoder != enGeReg())){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			selWindow(baseWindow);
@@ -175,7 +156,7 @@ void cube3dTSK(void *pPrm){
 		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
 		lcd_putStr(48, 110, &arial, 0, str);
 
-		vTaskDelay(40);
+		vTaskDelay(pdMS_TO_TICKS(40));
 	}
 }
 

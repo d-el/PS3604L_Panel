@@ -34,6 +34,13 @@
 /*!****************************************************************************
  * User typedef
  */
+#define MENU_ITEM(_name, _label, _units, _prmHandle, _chmod, _pfPrm, _pfChanges, _pfSelect, _pfUnselect, _pfPeriod, _previous, _next, _parent , _child) \
+	mN_##_name,
+typedef enum{
+	#include "menuTree.h"
+}menuItemNumber_type;
+#undef MENU_ITEM
+
 typedef enum {
 	chmodMenuNone, chmodMenuAlways,
 } chmodMenu_type;
@@ -69,7 +76,7 @@ typedef struct menuItem{
  */
 #define MENU_ITEM(_name, _label, _units, _prmHandle, _chmod, _pfPrm, _pfChanges, _pfSelect, _pfUnselect, _pfPeriod, _previous, _next, _parent , _child) \
 	extern const menuItem_type item_##_name;
-#include "menuTree.h"
+	#include "menuTree.h"
 #undef MENU_ITEM
 
 /*!****************************************************************************
@@ -79,7 +86,7 @@ typedef struct menuItem{
 /*!****************************************************************************
  * Prototypes for the functions
  */
-void menuEngine(const menuItem_type *startMenuItem);
+void menuEngine(menuItemNumber_type menuItemNumber);
 
 #endif /* MENUSYSTEM_H */
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

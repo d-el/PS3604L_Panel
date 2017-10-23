@@ -12,7 +12,6 @@
  * Memory
  */
 base_type	bs;
-uint8_t 	retEf = 0;
 uint32_t 	timebs_us __attribute((used));
 
 /******************************************************************************
@@ -163,12 +162,11 @@ void baseTSK(void *pPrm){
 			IdleTime = xTaskGetTickCount();
 		}
 		if((xTaskGetTickCount() - IdleTime) >= IDLE_TIME){
-			if((time(NULL) % 1) != 0){
+			if((xTaskGetTickCount() % 2) != 0){
 				selWindow(cube3dWindow);
 			}else{
 				selWindow(bubblesWindow);
 			}
-			retEf = 1;
 		}
 
 		/**************************************

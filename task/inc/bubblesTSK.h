@@ -18,13 +18,13 @@
 #include "ui.h"
 #include "display.h"
 #include "beep.h"
+#include "rtc.h"
+#include "enco.h"
+#include "systemTSK.h"
 
 /*!****************************************************************************
  * User define
  */
-#define xSize           160
-#define ySize           128
-#define CountOfBalls    5
 
 /*!****************************************************************************
  * Typedef

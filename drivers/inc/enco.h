@@ -25,40 +25,15 @@
  * User typedef
  */
 typedef enum {
-	enNONCIRC, enCIRC
-} enMode_type;
-
-typedef enum {
-	enU8, enS8, enU16, enS16, enU32, enS32, enFloat
-} enMemType_type;
-
-typedef enum {
 	enNoCharge, enCharge, enNoLim, enLimDown, enLimUp, enTransitionDown, enTransitionUp,
 } enStatus_type;
 
-typedef union {
-	uint8_t u8v;
-	int8_t s8v;
-	uint16_t u16v;
-	int16_t s16v;
-	uint32_t u32v;
-	int32_t s32v;
-	float fv;
-} encoVal_type;
-
 typedef struct {
-	//void            *pval;
-	//encoVal_type    min;
-	//encoVal_type    max;
-	//encoVal_type    step;
-	//encoVal_type    bigStep;
-	//enMemType_type  memtype;
-	//enMode_type     mode;
 	uint16_t ntic;
 } enco_type;
 
 /*!****************************************************************************
- * Extern viriables
+ * External variables
  */
 extern enco_type enco;
 

@@ -13,6 +13,13 @@
 #include "task.h"
 
 /*!****************************************************************************
+ * User define
+ */
+#define xSize           160
+#define ySize           110
+#define CountOfBalls    5
+
+/*!****************************************************************************
  * MEMORY
  */
 ball_type	ball[CountOfBalls];
@@ -21,18 +28,33 @@ uint16_t	bcolorsCurrent;
 uint16_t 	ball_[] = { 0x1E00, 0x3F00, 0x7F80, 0xF3C0, 0xE1C0, 0xE1C0, 0xF3C0, 0x7F80, 0x3F00, 0x1E00, };
 
 /*!****************************************************************************
- * Local prototypes for the functions
+ * Local functions declaration
  */
 void initialize(void);
 void physics(void);
 void moveball(void);
 
 void bubblesTSK(void *pPrm){
+	uint16_t  old_val_encoder = enGeReg();
 	lcd_fillScreen(black);
+	lcd_setColor(black, white);
 	initialize();
+
 	while(1){
 		physics();
 		moveball();
+
+		//Выходим если нажата кновка или повернут энкодер
+		if((keyProc() != 0) || (old_val_encoder != enGeReg())){
+			BeepTime(ui.beep.key.time, ui.beep.key.freq);
+			selWindow(baseWindow);
+		}
+
+		//Печать времени
+		rtc_getTime(&timeStrct);
+		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
+		lcd_putStr(48, 110, &arial, 0, str);
+
 		vTaskDelay(pdMS_TO_TICKS(60));
 	}
 }

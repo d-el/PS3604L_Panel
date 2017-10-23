@@ -16,30 +16,31 @@
 /*!****************************************************************************
  * MEMORY
  */
-#define MENU_ITEM(_name, _label, _units, _prmHandle, _chmod, _pfPrm, _pfChanges, _pfSelect, _pfUnselect, _pfPeriod, _previous, _next, _parent , _child) \
-const menuItem_type item_##_name = {				\
-	.label 					= _label,					\
-	.units 					= _units,					\
-	.prmHandle 				= _prmHandle,				\
-	.flags.bit.chmod 		= _chmod,					\
-	.flags.bit.pfParamert	= _pfPrm,					\
-	.pfChanges 				= _pfChanges,				\
-	.pfSelect				= _pfSelect,				\
-	.pfUnselect				= _pfUnselect, 				\
-	.pfPeriod				= _pfPeriod, 				\
-	.previous				= &item_##_previous,		\
-	.next 					= &item_##_next,			\
-	.parent					= &item_##_parent,			\
-	.child					= &item_##_child,			\
+#define MENU_ITEM(_name, _label, _units, _prmHandle, _chmod, _pfPrm, _pfChanges, _pfSelect, _pfUnselect, _pfPeriod, _previous, _next, _parent, _child) \
+	{														\
+		.label 					= _label,					\
+		.units 					= _units,					\
+		.prmHandle 				= _prmHandle,				\
+		.flags.bit.chmod 		= _chmod,					\
+		.flags.bit.pfParamert	= _pfPrm,					\
+		.pfChanges 				= _pfChanges,				\
+		.pfSelect				= _pfSelect,				\
+		.pfUnselect				= _pfUnselect, 				\
+		.pfPeriod				= _pfPeriod, 				\
+		.previous				= &menuTree[mN_##_previous],\
+		.next 					= &menuTree[mN_##_next],	\
+		.parent					= &menuTree[mN_##_parent],	\
+		.child					= &menuTree[mN_##_child],	\
+	},
+const menuItem_type menuTree[] = {
+	#include "menuTree.h"
 };
-#include "menuTree.h"
 #undef MENU_ITEM
 
 char mstring[22];
 char vstring[22];
 const menuItem_type *pathMenu[5];
 const menuItem_type *selectPathMenu[5];
-uint32_t ipMul;
 
 /*!****************************************************************************
  * Define
@@ -66,7 +67,7 @@ void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, ui
  * @brief
  * @param 	startMenuItem	- starting menu item
  */
-void menuEngine(const menuItem_type *startMenuItem){
+void menuEngine(menuItemNumber_type menuItemNumber){
 	TickType_t 			xLastWakeTime;              //Вемя ОС
 
 	const menuItem_type **topMenu = pathMenu;
@@ -79,7 +80,7 @@ void menuEngine(const menuItem_type *startMenuItem){
 	uint8_t 			editSection = 0;
 	enStatus_type 		enstatus;
 
-	pathMenu[0] = startMenuItem;
+	pathMenu[0] = &menuTree[menuItemNumber];
 	*sMenu = *topMenu;
 
 	xLastWakeTime = xTaskGetTickCount();      //Инициализируем xLastWakeTime текущим временем
