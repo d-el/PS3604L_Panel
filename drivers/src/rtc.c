@@ -76,46 +76,35 @@ rtcStatus_type rtc_init(void){
  * @param
  * @retval
  */
-void rtc_getTime(struct tm *time){
+time_t time(time_t *arg){
+	time_t unixTime;
+	struct tm tm;
 	uint32_t rtctr = RTC->TR;
 	uint32_t rtcdr = RTC->DR;
 
-	time->tm_sec = ((rtctr & RTC_TR_SU) >> RTC_TR_SU_Pos) + ((rtctr & RTC_TR_ST) >> RTC_TR_ST_Pos) * 10;
+	tm.tm_sec = ((rtctr & RTC_TR_SU) >> RTC_TR_SU_Pos) + ((rtctr & RTC_TR_ST) >> RTC_TR_ST_Pos) * 10;
 
-	time->tm_min = ((rtctr & RTC_TR_MNU) >> RTC_TR_MNU_Pos) + ((rtctr & RTC_TR_MNT) >> RTC_TR_MNT_Pos) * 10;
+	tm.tm_min = ((rtctr & RTC_TR_MNU) >> RTC_TR_MNU_Pos) + ((rtctr & RTC_TR_MNT) >> RTC_TR_MNT_Pos) * 10;
 
-	time->tm_hour = ((rtctr & RTC_TR_HU) >> RTC_TR_HU_Pos) + ((rtctr & RTC_TR_HT) >> RTC_TR_HT_Pos) * 10;
+	tm.tm_hour = ((rtctr & RTC_TR_HU) >> RTC_TR_HU_Pos) + ((rtctr & RTC_TR_HT) >> RTC_TR_HT_Pos) * 10;
 
-	time->tm_mday = ((rtcdr & RTC_DR_DU) >> RTC_DR_DU_Pos) + ((rtcdr & RTC_DR_DT) >> RTC_DR_DT_Pos) * 10;
+	tm.tm_mday = ((rtcdr & RTC_DR_DU) >> RTC_DR_DU_Pos) + ((rtcdr & RTC_DR_DT) >> RTC_DR_DT_Pos) * 10;
 
-	time->tm_mon = ((rtcdr & RTC_DR_MU) >> RTC_DR_MU_Pos) + ((rtcdr & RTC_DR_MT) >> RTC_DR_MT_Pos) * 10;
+	tm.tm_mon = ((rtcdr & RTC_DR_MU) >> RTC_DR_MU_Pos) + ((rtcdr & RTC_DR_MT) >> RTC_DR_MT_Pos) * 10;
 
-	time->tm_wday = ((rtcdr & RTC_DR_WDU) >> RTC_DR_WDU_Pos);
+	tm.tm_wday = ((rtcdr & RTC_DR_WDU) >> RTC_DR_WDU_Pos);
 
-	time->tm_year = ((rtcdr & RTC_DR_YU) >> RTC_DR_YU_Pos) + ((rtcdr & RTC_DR_YT) >> RTC_DR_YT_Pos) * 10 + 100;
+	tm.tm_year = ((rtcdr & RTC_DR_YU) >> RTC_DR_YU_Pos) + ((rtcdr & RTC_DR_YT) >> RTC_DR_YT_Pos) * 10 + 100;
 
-	time->tm_yday = 0;
-	time->tm_isdst = 0;
+	tm.tm_yday = 0;
+	tm.tm_isdst = 0;
 
-	mktime(time);
-}
-
-/*!****************************************************************************
- * @brief
- * @param
- * @retval
- */
-time_t time(time_t *arg){
-	time_t time;
-	struct tm tm;
-
-	rtc_getTime(&tm);
-	time = mktime(&tm);
+	unixTime = mktime(&tm);
 
 	if(arg != NULL){
-		*arg = time;
+		*arg = unixTime;
 	}
-	return time;
+	return unixTime;
 }
 
 /*!****************************************************************************

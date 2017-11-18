@@ -2,9 +2,11 @@
  * @file		display.h
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
- * @date		25.04.2017
- * @copyright	GNU Lesser General Public License v3
- * @brief		Character generator, primitive graphics
+ * @date		17.11.2017
+ * @copyright	Copyright (C) 2017 d_el
+ * 				All rights reserved
+ * 				This software may be modified and distributed under the terms
+ * 				of the BSD license.  See the LICENSE file for details
  */
 #ifndef display_H
 #define display_H
@@ -13,6 +15,7 @@
  * Include
  */
 #include "spfd54124b.h"
+#include "stdint.h"
 
 /*!****************************************************************************
  * Define
@@ -27,6 +30,8 @@
 /*!****************************************************************************
  * Typedef
  */
+typedef lcd_color_type disp_color_type;
+
 typedef struct {
 	const uint8_t *data;
 	uint8_t w;
@@ -46,7 +51,6 @@ typedef struct {
 /*!****************************************************************************
  * Exported variables
  */
-extern char str[30];
 extern const font_type font8x12;
 extern const font_type font6x8;
 extern const font_type arial;
@@ -61,17 +65,15 @@ extern const image_type ImageLogo;
 /*!****************************************************************************
  * Function prototype
  */
-void lcd_setColor(uint16_t backgroundColor, uint16_t contentColor);
-void lcd_setBackgroundColor(uint16_t backgroundColor);
-void lcd_setContentColor(uint16_t contentColor);
-void lcd_setPixel(uint16_t x, uint16_t y, uint16_t color);
-void lcd_fillScreen(uint16_t color);
-void lcd_fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-void lcd_putChar(uint16_t x, uint16_t y, const font_type *font, char c);
-void lcd_putStr(uint16_t x, uint16_t y, const font_type *font, uint8_t distance, const char *s);
-void lcd_PrintImage16bit(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const void *pIm);
-void lcd_PrintImage8bit(uint8_t x, uint8_t y, uint8_t w, uint8_t h, const void *pIm);
-void lcd_PrintImageMonochrome(uint8_t x, uint8_t y, uint16_t color, uint16_t backgroundColor, const image_type *image);
+void disp_setColor(lcd_color_type backgroundColor, lcd_color_type contentColor);
+void disp_setBackgroundColor(lcd_color_type backgroundColor);
+void disp_setContentColor(lcd_color_type contentColor);
+void disp_setPixel(uint16_t x, uint16_t y, lcd_color_type color);
+void disp_fillScreen(lcd_color_type color);
+void disp_fillRect(int16_t x, int16_t y, int16_t w, int16_t h, lcd_color_type color);
+void disp_putChar(uint16_t x, uint16_t y, const font_type *font, char c);
+void disp_putStr(uint16_t x, uint16_t y, const font_type *font, uint8_t distance, const char *s);
+void disp_PrintImageMonochrome(uint8_t x, uint8_t y, lcd_color_type color, lcd_color_type backgroundColor, const image_type *image);
 
 #endif //display_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************* END OF FILE *********** D_EL ****************/

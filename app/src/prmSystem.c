@@ -1,8 +1,8 @@
 ﻿/*!****************************************************************************
  * @file		prmSystem.c
  * @author		d_el - Storozhenko Roman
- * @version		V1.0
- * @date		08.02.2017
+ * @version		V1.1
+ * @date		18.10.2017
  * @copyright	GNU Lesser General Public License v3
  * @brief		Parameters system
  */
@@ -57,18 +57,19 @@ prmval_type abc = { .t_u32Frmt = 10000 };
 
 //! Parameter handler macros
 #define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limType, m_stepType, m_save)	\
-{														\
-	.prm 				= (prmval_type*)&m_prm,			\
-	.def.t_##m_type 	= (m_def * power##m_power),		\
+{																		\
+	.prm 				= (prmval_type*)&m_prm,							\
+	.def.t_##m_type 	= (m_def * power##m_power),						\
 	.min 				= (prmval_type*)&m_limType##Min_##m_label,		\
 	.max 				= (prmval_type*)&m_limType##Max_##m_label,		\
-	.step				= (prmval_type*)&m_stepType##_##m_label,	\
-	.bigstep.t_##m_type = (m_bigstep * power##m_power),	\
-	.type 				= m_type,						\
-	.chmod 				= m_chmod,						\
-	.power				= m_power,						\
-	.stepType			= m_stepType,					\
-	.save				= m_save,						\
+	.step				= (prmval_type*)&m_stepType##_##m_label,		\
+	.bigstep.t_##m_type = (m_bigstep * power##m_power),					\
+	.type 				= m_type,										\
+	.chmod 				= m_chmod,										\
+	.power				= m_power,										\
+	.limType			= m_limType,									\
+	.stepType			= m_stepType,									\
+	.save				= m_save,										\
 },
 //! Parameters handlers
 const prmHandle_type prmh[] = {

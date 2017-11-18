@@ -36,8 +36,8 @@ void moveball(void);
 
 void bubblesTSK(void *pPrm){
 	uint16_t  old_val_encoder = enGeReg();
-	lcd_fillScreen(black);
-	lcd_setColor(black, white);
+	disp_fillScreen(black);
+	disp_setColor(black, white);
 	initialize();
 
 	while(1){
@@ -51,9 +51,9 @@ void bubblesTSK(void *pPrm){
 		}
 
 		//Печать времени
-		rtc_getTime(&timeStrct);
+		/*rtc_getTime(&timeStrct);
 		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
-		lcd_putStr(48, 110, &arial, 0, str);
+		lcd_putStr(48, 110, &arial, 0, str);*/
 
 		vTaskDelay(pdMS_TO_TICKS(60));
 	}
@@ -100,8 +100,8 @@ void clear_ball(int16_t x, int16_t y, int16_t r, uint16_t color){
 void initialize(void){ // Initialize the game
 	ball[0].color = red;
 	ball[0].radius = 5;
-	ball[0].speedx = 3 + _rand(2); //Generate Random X direction.
-	ball[0].speedy = 2 + _rand(2); //Generate Random Y direction.
+	ball[0].speedx = 3 + grf_rand(2); //Generate Random X direction.
+	ball[0].speedy = 2 + grf_rand(2); //Generate Random Y direction.
 	//ball[0].old_xcenter = xSize / 2;
 	//ball[0].old_ycenter = ySize / 2;
 	ball[0].new_xcenter = xSize / 2;
@@ -109,8 +109,8 @@ void initialize(void){ // Initialize the game
 
 	ball[1].color = green;
 	ball[1].radius = 5;
-	ball[1].speedx = 3 + _rand(2); // Generate Random X direction.
-	ball[1].speedy = -2 + _rand(2); // Generate Random Y direction.
+	ball[1].speedx = 3 + grf_rand(2); // Generate Random X direction.
+	ball[1].speedy = -2 + grf_rand(2); // Generate Random Y direction.
 	//ball[1].old_xcenter = xSize / 2 + 15;
 	//ball[1].old_ycenter = ySize / 2 + 15;
 	ball[1].new_xcenter = xSize / 2 + 15;
@@ -118,8 +118,8 @@ void initialize(void){ // Initialize the game
 
 	ball[2].color = blue;
 	ball[2].radius = 5;
-	ball[2].speedx = -4 + _rand(2); // Generate Random X direction.
-	ball[2].speedy = 3 + _rand(2); // Generate Random Y direction.
+	ball[2].speedx = -4 + grf_rand(2); // Generate Random X direction.
+	ball[2].speedy = 3 + grf_rand(2); // Generate Random Y direction.
 	//ball[2].old_xcenter = xSize / 2 - 15;
 	//ball[2].old_ycenter = ySize / 2 - 15;
 	ball[2].new_xcenter = xSize / 2 - 15;
@@ -127,8 +127,8 @@ void initialize(void){ // Initialize the game
 
 	ball[3].color = white;
 	ball[3].radius = 5;
-	ball[3].speedx = -3 + _rand(2); // Generate Random X direction.
-	ball[3].speedy = 2 + _rand(2); // Generate Random Y direction.
+	ball[3].speedx = -3 + grf_rand(2); // Generate Random X direction.
+	ball[3].speedy = 2 + grf_rand(2); // Generate Random Y direction.
 	//ball[3].old_xcenter = xSize / 2 + 10;
 	//ball[3].old_ycenter = ySize / 2 + 10;
 	ball[3].new_xcenter = xSize / 2 + 10;
@@ -136,8 +136,8 @@ void initialize(void){ // Initialize the game
 
 	ball[4].color = sky;
 	ball[4].radius = 5;
-	ball[4].speedx = 2 + _rand(2); // Generate Random X direction.
-	ball[4].speedy = -4 + _rand(2); // Generate Random Y direction.
+	ball[4].speedx = 2 + grf_rand(2); // Generate Random X direction.
+	ball[4].speedy = -4 + grf_rand(2); // Generate Random Y direction.
 	//ball[4].old_xcenter = xSize / 2 - 10;
 	//ball[4].old_ycenter = ySize / 2 - 10;
 	ball[4].new_xcenter = xSize / 2 - 10;

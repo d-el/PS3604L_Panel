@@ -29,9 +29,10 @@ void baseTSK(void *pPrm){
 	uint8_t 				bigstepDown = 0;
 	uint8_t 				setDef = 0;
 	enStatus_type 			enstatus;
+	char 					str[30];
 
-	lcd_setColor(black, red);
-	lcd_fillScreen(black);
+	disp_setColor(black, red);
+	disp_fillScreen(black);
 	//Печать статических символов
 	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 10, kUp | kDown);
@@ -82,21 +83,6 @@ void baseTSK(void *pPrm){
 				setDef = 1;
 			}
 		}
-
-		/**************************************
-		 * Настройка клавиатуры
-		 */
-		/*if(fvarParamNew != 0){
-		 if(varParam == VAR_VOLT){
-		 kc.AutoPress = AutoPressON;                                         //Разрешить автонажатие
-		 }
-		 if(varParam == VAR_CURR){
-		 kc.AutoPress = AutoPressON;
-		 }
-		 if(varParam == VAR_MODE){
-		 kc.AutoPress = AutoPressOFF;
-		 }
-		 }*/
 
 		/***************************************
 		 * Вынимаем значение с энкодера
@@ -179,37 +165,37 @@ void baseTSK(void *pPrm){
 			sprintf(str, "%02u.%03u", bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u % 1000);
 		}
 		if(varParam == VAR_VOLT){
-			lcd_setColor(black, ui.color.cursor);
+			disp_setColor(black, ui.color.cursor);
 		}else{
-			lcd_setColor(black, ui.color.voltage);
+			disp_setColor(black, ui.color.voltage);
 		}
-		lcd_putStr(16, 0, &dSegBold, 6, str);
-		lcd_putChar(150, 18, &font8x12, 'V');
+		disp_putStr(16, 0, &dSegBold, 6, str);
+		disp_putChar(150, 18, &font8x12, 'V');
 
 		//Печать значения тока
 		if(varParam == VAR_CURR){
-			lcd_setColor(black, ui.color.cursor);
+			disp_setColor(black, ui.color.cursor);
 		}else{
-			lcd_setColor(black, ui.color.current);
+			disp_setColor(black, ui.color.current);
 		}
 
 		if(fp.tf.state.bit.switchIsON != 0){
 			if(measI < 99000){
 				sprintf(str, "%2u.%03u", measI / 1000, measI % 1000);
-				lcd_putChar(150, 36, &font8x12, 'm');
-				lcd_putChar(150, 49, &font8x12, 'A');
+				disp_putChar(150, 36, &font8x12, 'm');
+				disp_putChar(150, 49, &font8x12, 'A');
 			}else{
 				sprintf(str, "%2u.%03u", measI / 1000000, (measI / 1000) % 1000);
-				lcd_putChar(150, 36, &font8x12, ' ');
-				lcd_putChar(150, 49, &font8x12, 'A');
+				disp_putChar(150, 36, &font8x12, ' ');
+				disp_putChar(150, 49, &font8x12, 'A');
 			}
 
 		}else{
 			strcpy(str, "--.---");
-			lcd_putChar(150, 36, &font8x12, ' ');
-			lcd_putChar(150, 49, &font8x12, ' ');
+			disp_putChar(150, 36, &font8x12, ' ');
+			disp_putChar(150, 49, &font8x12, ' ');
 		}
-		lcd_putStr(16, 36, &dSegBold, 6, str);
+		disp_putStr(16, 36, &dSegBold, 6, str);
 
 		//Печать текущий набор настроек
 		switch(bs.curPreSet){
@@ -229,27 +215,27 @@ void baseTSK(void *pPrm){
 
 		//Печать значения Imax
 		if(varParam == VAR_CURR){
-			lcd_setColor(black, ui.color.cursor);
+			disp_setColor(black, ui.color.cursor);
 		}else{
-			lcd_setColor(black, ui.color.imax);
+			disp_setColor(black, ui.color.imax);
 		}
 		sprintf(str, "Lim = %2u.%03u A ", bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
-		lcd_putStr(16, 70, &arial, 0, str);
+		disp_putStr(16, 70, &arial, 0, str);
 
 		//Печать режима по току
 		if(varParam == VAR_MODE){
-			lcd_setColor(black, ui.color.cursor);
+			disp_setColor(black, ui.color.cursor);
 		}else{
-			lcd_setColor(black, ui.color.mode);
+			disp_setColor(black, ui.color.mode);
 		}
 		if(bs.set[bs.curPreSet].mode == baseImax){
-			lcd_putStr(16, 88, &arial, 0, "I max            ");
+			disp_putStr(16, 88, &arial, 0, "I max            ");
 		}
 		if(bs.set[bs.curPreSet].mode == baseILimitation){
-			lcd_putStr(16, 88, &arial, 0, "Limitation     ");
+			disp_putStr(16, 88, &arial, 0, "Limitation     ");
 		}
 		if(bs.set[bs.curPreSet].mode == baseUnprotected){
-			lcd_putStr(16, 88, &arial, 0, "Unprotected");
+			disp_putStr(16, 88, &arial, 0, "Unprotected");
 		}
 
 		//Параметры нагрузки, время
@@ -266,13 +252,53 @@ void baseTSK(void *pPrm){
 	}
 }
 
+void reset(struct tm* tm){
+    (*tm) = (const struct tm){0};
+
+    tm->tm_sec = 0;
+    tm->tm_min = 0;
+    tm->tm_hour = 12;
+    tm->tm_mon = 9 - 1;
+    tm->tm_mday = 30;
+    tm->tm_year = 2016 - 1900;
+}
+
+static const char *dst(const int flag)
+{
+    if (flag > 0)
+        return "(>0: is DST)";
+    else
+    if (flag < 0)
+        return "(<0: Unknown if DST)";
+    else
+        return "(=0: not DST)";
+}
+
+static struct tm newtm(const int year, const int month, const int day,
+                       const int hour, const int min, const int sec,
+                       const int isdst)
+{
+    struct tm t = { .tm_year  = year - 1900,
+                    .tm_mon   = month - 1,
+                    .tm_mday  = day,
+                    .tm_hour  = hour,
+                    .tm_min   = min,
+                    .tm_sec   = sec,
+                    .tm_isdst = isdst };
+    return t;
+}
+
 /*!****************************************************************************
  *
  */
+int timezone = 3;
+int daylight = 1;
+
 void printStatusBar(void){
-	static uint8_t errPrev = 0;
-	static uint8_t modeIlimPrev = 0;
-	static uint8_t ovfCurrent = 0;
+	static uint8_t	errPrev = 0;
+	static uint8_t	modeIlimPrev = 0;
+	static uint8_t	ovfCurrent = 0;
+	char 			str[30];
 
 	if(modeIlimPrev != fp.tf.state.bit.modeIlim){
 		if(fp.tf.state.bit.modeIlim != 0){
@@ -291,20 +317,20 @@ void printStatusBar(void){
 	if((fp.tf.state.bit.errorLinearRegTemperSens != 0) || (fp.tf.state.bit.ovfLinearRegTemper != 0) || (fp.tf.state.bit.reverseVoltage != 0)
 			|| (uartTsk.state == uartNoConnect)){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
-		lcd_setColor(black, white);
+		disp_setColor(black, white);
 		if(errPrev == 0){
 			grf_fillRect(0, 108, 160, 19, black);
 			errPrev = 0;
 		}
 
 		if(fp.tf.state.bit.errorLinearRegTemperSens != 0){
-			lcd_putStr(16, 112, &arial, 0, "Err Temp Sensor");
+			disp_putStr(16, 112, &arial, 0, "Err Temp Sensor");
 		}else if(fp.tf.state.bit.ovfLinearRegTemper != 0){
-			lcd_putStr(16, 112, &arial, 0, "Overflow Temp");
+			disp_putStr(16, 112, &arial, 0, "Overflow Temp");
 		}else if(fp.tf.state.bit.reverseVoltage != 0){
-			lcd_putStr(16, 112, &arial, 0, "Reverse Voltage");
+			disp_putStr(16, 112, &arial, 0, "Reverse Voltage");
 		}else if(uartTsk.state == uartNoConnect){
-			lcd_putStr(35, 112, &arial, 0, "No Connect");
+			disp_putStr(35, 112, &arial, 0, "No Connect");
 		}
 
 		errPrev = 1;
@@ -313,23 +339,23 @@ void printStatusBar(void){
 			grf_fillRect(0, 108, 160, 19, black);
 			errPrev = 0;
 		}
-		lcd_setColor(black, white);
+		disp_setColor(black, white);
 
 		//Выходная мощность
 		sprintf(str, "%02u.%03u W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
-		lcd_putStr(0, 110, &font6x8, 0, str);
+		disp_putStr(0, 110, &font6x8, 0, str);
 
 		//Сопротивление нагузки
 		if(fp.tf.meas.resistens != 99999){
 			sprintf(str, "%05u  \xB1", fp.tf.meas.resistens);
-			lcd_putStr(0, 120, &font6x8, 0, str);
+			disp_putStr(0, 120, &font6x8, 0, str);
 		}else{
-			lcd_putStr(0, 120, &font6x8, 0, " ---   \xB1");
+			disp_putStr(0, 120, &font6x8, 0, " ---   \xB1");
 		}
 
 		//Печать температуры
 		sprintf(str, "%02u.%u \xB0 C", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
-		lcd_putStr(60, 120, &font6x8, 0, str);
+		disp_putStr(60, 120, &font6x8, 0, str);
 
 		//
 		/*time_t unixTime;
@@ -338,12 +364,89 @@ void printStatusBar(void){
 		print(str, "Current local time and date: %s", asctime(&timeStrct));
 		print(str);*/
 
-		//Печать времени
-		rtc_getTime(&timeStrct);
-		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
-		lcd_putStr(110, 110, &font6x8, 0, str);
-		strftime(str, sizeof(str), "%d.%m.%y", &timeStrct);
-		lcd_putStr(110, 120, &font6x8, 0, str);
+//		//Печать времени
+//		struct tm 	timeStrct;
+//		rtc_getTime(&timeStrct);
+//
+//		//time_t unixTime = 1504260000;
+//
+		//timeStrct.tm_isdst = 2;
+		//unixTime = mktime(&timeStrct);
+		//gmtime_r(&unixTime, &timeStrct);
+
+		_timezone = 2 * 60 * 60;
+		_daylight = 1;
+
+		time_t unixTime = time(NULL);
+		unixTime = unixTime + fp.fpSet.timezone * 60 * 60;
+
+		struct tm tmUtc;
+		gmtime_r(&unixTime, &tmUtc);
+
+		struct tm tmLocal;
+		localtime_r(&unixTime, &tmLocal);
+
+		//println("tmUtc.tm_hour %u", tmUtc.tm_hour);
+		//println("tmLocal.tm_hour %u", tmLocal.tm_hour);
+
+		strftime(str, sizeof(str), "%H:%M:%S", &tmUtc);
+		disp_putStr(110, 110, &font6x8, 0, str);
+		//println(str);
+		strftime(str, sizeof(str), "%d.%m.%y", &tmUtc);
+		disp_putStr(110, 120, &font6x8, 0, str);
+//		println(str);
+//		println("");
+
+		//_timezone = timezone * 60 * 60;
+		//_daylight = daylight;
+
+		//struct timezone tz1;
+
+//	    struct tm   tm = { 0 };
+//	    struct tm   *ptm = &tm;
+//
+//	    struct tm   *ptm2 = NULL;
+//
+//	    time_t unixTime = 1504260000; //2017-09-01T10:00:00+00:00
+//
+//	    ptm2 = localtime_r(&unixTime, ptm);
+//
+//	    //strftime(str, sizeof(str), "%d.%m.%y %H:%M:%S", ptm);
+//		//println(str);
+//
+//	    println("%s:\n\t%02d:%02d:%02d   %02d-%02d-%04d\n", "tv", ptm->tm_hour, ptm->tm_min, ptm->tm_sec,
+//	    		ptm->tm_mday, ptm->tm_mon, ptm->tm_year + 1900);
+//
+//	    println("%s:\n\t%02d:%02d:%02d   %02d-%02d-%04d\n", "tv", ptm2->tm_hour, ptm2->tm_min, ptm2->tm_sec,
+//	    		ptm2->tm_mday, ptm2->tm_mon, ptm2->tm_year + 1900);
+
+//	    int secs;
+//
+//	    tm = newtm(2016,9,30, 12,0,0, 0);
+//	        secs = mktime(&tm);
+//
+//	        println(": %04d-%02d-%02d %02d:%02d:%02d %s %lld\n",
+//	               tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,
+//	               tm.tm_hour, tm.tm_min, tm.tm_sec, dst(tm.tm_isdst), (long long)secs);
+
+	    /*reset(&tm);
+	    tm.tm_isdst = 0;
+	    secs = mktime(&tm);
+	    println("%i\n", secs);
+
+
+	    reset(&tm);
+	    tm.tm_isdst = 1;
+	    secs = mktime(&tm);
+	    println("%i\n", secs);
+
+	    reset(&tm);
+	    tm.tm_isdst = -1;
+	    secs = mktime(&tm);
+	    println("%i\n", secs);*/
+
+		//extern time_zone;
+		//time_zone = 0;
 
 //		//WLAN
 //		static TickType_t xTime;
@@ -372,6 +475,7 @@ void printStatusBar(void){
 //			lcd_putStr(60, 110, &font6x8, 0, str);
 //		}
 
+
 		//LAN
 		static TickType_t xTime;
 		static uint8_t ledon = 0;
@@ -386,21 +490,39 @@ void printStatusBar(void){
 			}
 
 			if(ledon == 0){
-				lcd_setColor(black, white);
+				disp_setColor(black, white);
 			}else{
-				lcd_setColor(black, red);
+				disp_setColor(black, red);
 			}
 
 			sprintf(str, "LAN");
-			lcd_putStr(60, 110, &font6x8, 0, str);
+			disp_putStr(60, 110, &font6x8, 0, str);
 		}
 		else{
 			sprintf(str, "    ");
-			lcd_putStr(60, 110, &font6x8, 0, str);
+			disp_putStr(60, 110, &font6x8, 0, str);
 		}
 
 		errPrev = 0;
 	}
 }
+
+
+
+
+/**************************************
+ * Настройка клавиатуры
+ */
+/*if(fvarParamNew != 0){
+ if(varParam == VAR_VOLT){
+ kc.AutoPress = AutoPressON;                                         //Разрешить автонажатие
+ }
+ if(varParam == VAR_CURR){
+ kc.AutoPress = AutoPressON;
+ }
+ if(varParam == VAR_MODE){
+ kc.AutoPress = AutoPressOFF;
+ }
+ }*/
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

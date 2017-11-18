@@ -142,12 +142,9 @@ static void sntp_process(u32_t *receive_timestamp){
 	 */
 	time_t t = (ntohl(receive_timestamp[0]) - DIFF_SEC_1900_1970);
 
-	int8_t timezone = 3;
-	#define SEC_1HOUR	(60 * 60)
-	time_t tLocal = t + timezone * SEC_1HOUR;
-	rtc_setTimeUnix(tLocal);
+	rtc_setTimeUnix(t);
 	char str[32];
-	ctime_r(&tLocal, str);
+	ctime_r(&t, str);
 	printdmsg(SNTP_DEBUG, (str));
 }
 

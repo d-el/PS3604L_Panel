@@ -133,6 +133,8 @@ enStatus_type enAdd(const prmHandle_type *prmHandle, const prmval_type *prmval, 
 
 		case u32Frmt:
 		case ipAdrFrmt:
+		case unixTimeFrmt:
+		case unixDateFrmt:
 			s64t = prmHandle->prm->t_u32Frmt + ((int64_t) prmval->t_u32Frmt * multiply);
 			if(s64t > prmHandle->max->t_u32Frmt){
 				prmHandle->prm->t_u32Frmt = prmHandle->max->t_u32Frmt;
@@ -169,6 +171,8 @@ enStatus_type enAdd(const prmHandle_type *prmHandle, const prmval_type *prmval, 
 			}else{
 				prmHandle->prm->t_floatFrmt = ftemp;
 			}
+			break;
+		default:
 			break;
 	}
 

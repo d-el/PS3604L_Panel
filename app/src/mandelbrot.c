@@ -73,7 +73,7 @@ void iq_mandel(_iq cx, _iq cy, _iq scale){
 			}else{
 				change++;
 			}
-			lcd_setPixel(x + DISP_W / 2, y + DISP_H / 2, lcd_colors[i]);
+			disp_setPixel(x + DISP_W / 2, y + DISP_H / 2, lcd_colors[i]);
 		}
 	}
 }

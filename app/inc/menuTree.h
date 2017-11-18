@@ -37,23 +37,11 @@ MENU_ITEM(ammeter		,"Ameter"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,N
 
 /*		  name 				,label		,units	,prmHandle		,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 MENU_ITEM(datetime			,"Clock"	,""		,NULL			,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ammeter	,lan		,datetime	,mdate)
-		/*		name 			,label	,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-		MENU_ITEM(mdate			,"Date"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtime		,datetime	,date)
-			MENU_ITEM(date			,"Date"		,""		,&prmh[NutcTime]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,date		,timeYear	,mdate		,date)
-			/*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-			MENU_ITEM(timeYear		,"Year"		,""		,&prmh[Nyear]		,chmodMenuAlways	,0		,rtcCh		,rtcSelectc	,NULL		,rtcPeriodic,time		,timeMon	,mdate		,timeYear)
-			MENU_ITEM(timeMon		,"Mon"		,""		,&prmh[Nmon]		,chmodMenuAlways	,0		,rtcCh		,rtcSelectc	,NULL		,NULL		,timeYear	,timeMday	,mdate		,timeMon)
-			MENU_ITEM(timeMday		,"Mday"		,""		,&prmh[Nmday]		,chmodMenuAlways	,0		,rtcCh		,rtcSelectc	,NULL		,NULL		,timeMon	,timeMday	,mdate		,timeMday)
-		/*		name 			,label	,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-		MENU_ITEM(mtime			,"Time"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtimezone	,datetime	,time)
-			/*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-			MENU_ITEM(time			,"Time"		,""		,&prmh[NutcTime2]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,time		,timeHour	,mtime	,time)
-			MENU_ITEM(timeHour		,"Hour"		,""		,&prmh[Nhour]		,chmodMenuAlways	,0		,rtcCh		,rtcSelectc	,NULL		,NULL		,timeMday	,timeMin	,mtime	,timeHour)
-			MENU_ITEM(timeMin		,"Min"		,""		,&prmh[Nmin]		,chmodMenuAlways	,0		,rtcCh		,rtcSelectc	,NULL		,NULL		,timeHour	,timeSec	,mtime	,timeMin)
-			MENU_ITEM(timeSec		,"Sec"		,""		,&prmh[Nsec]		,chmodMenuAlways	,0		,rtcCh		,rtcSelectc	,NULL		,NULL		,timeMin	,timeSec	,mtime	,timeSec)
-		/*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-		MENU_ITEM(mtimezone		,"Timezone"	,""		,&prmh[Ntimezone]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mtime		,mtimezone	,datetime	,mtimezone)
-		
+	/*		name 		,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
+	MENU_ITEM(mdate		,"Date"		,""		,&prmh[NutcTime]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtime		,datetime	,mdate)
+	MENU_ITEM(mtime		,"Time"		,""		,&prmh[NutcTime]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtimezone	,datetime	,mtime)
+	MENU_ITEM(mtimezone	,"Timezone"	,""		,&prmh[Ntimezone]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mtime		,mtimezone	,datetime	,mtimezone)
+
 /*		name 			,label		,units	,prmHandle		,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 MENU_ITEM(lan			,"LAN"		,""		,NULL			,chmodMenuAlways	,0		,NULL		,NULL		,netUpdate	,NULL		,datetime	,brightness	,lan		,ipaddr)
 	/*		  name 			,label	,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/

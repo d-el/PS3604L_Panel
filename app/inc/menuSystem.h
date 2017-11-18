@@ -3,7 +3,7 @@
  * @author		Storozhenko Roman - D_EL
  * @version		V1.1
  * @copyright	GNU Lesser General Public License v3
- * @date		10.02.2016
+ * @date		10.02.2017
  * @brief		menu system
  */
 #ifndef MENUSYSTEM_H

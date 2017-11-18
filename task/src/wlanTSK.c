@@ -158,9 +158,9 @@ void wlanTSK(void *pPrm){
 		//if(strstr("\r\n+IPD", wlanRx) == NULL){
 		static uint32_t cnt = 0;
 		if(wlanRx[2] == '+'){
-			uint8_t idClient;
-			uint8_t lenRx;
-			sscanf (wlanRx, "\r\n+IPD,%d,%d", &idClient, &lenRx);
+			uint32_t idClient;
+			uint32_t lenRx;
+			sscanf (wlanRx, "\r\n+IPD,%u,%u", &idClient, &lenRx);
 			//sprintf(wlanMas, "cnt = %u, id = %u, len = %u", cnt, idClient, lenRx);
 			//debugWlanPrint(wlanMas);
 

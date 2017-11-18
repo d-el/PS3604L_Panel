@@ -28,8 +28,9 @@ void chargeTSK(void *pPrm){
 	uint8_t 				setDef = 0;
 	enStatus_type 			enstatus;
 	uint8_t 				chargerIsOn = 0;
+	char 					str[30];
 
-	lcd_fillScreen(black);
+	disp_fillScreen(black);
 
 	//Печать статических символов
 	grf_line(0, 107, 159, 107, halfLightGray);
@@ -135,11 +136,11 @@ void chargeTSK(void *pPrm){
 			sprintf(str, "U:        %02u.%03u", ch.u / 1000, ch.u % 1000);
 		}
 		if((varParam == C_VOLT) && (fp.tf.state.bit.switchIsON == 0)){
-			lcd_setColor(black, ui.color.cursor);
+			disp_setColor(black, ui.color.cursor);
 		}else{
-			lcd_setColor(black, ui.color.voltage);
+			disp_setColor(black, ui.color.voltage);
 		}
-		lcd_putStr(10, 00, &arial, 0, str);
+		disp_putStr(10, 00, &arial, 0, str);
 
 		//Печать значения тока
 		if(fp.tf.state.bit.switchIsON != 0){
@@ -148,11 +149,11 @@ void chargeTSK(void *pPrm){
 			sprintf(str, "I:         %01u.%03u A", ch.i / 1000, ch.i % 1000);
 		}
 		if((varParam == C_CURR) && (fp.tf.state.bit.switchIsON == 0)){
-			lcd_setColor(black, ui.color.cursor);
+			disp_setColor(black, ui.color.cursor);
 		}else{
-			lcd_setColor(black, ui.color.current);
+			disp_setColor(black, ui.color.current);
 		}
-		lcd_putStr(10, 20, &arial, 0, str);
+		disp_putStr(10, 20, &arial, 0, str);
 
 		//Time
 		if(ch.mode == ch_modeTime){
@@ -170,11 +171,11 @@ void chargeTSK(void *pPrm){
 
 		}
 		if((varParam == C_TIME) && (fp.tf.state.bit.switchIsON == 0)){
-			lcd_setColor(black, ui.color.cursor);
+			disp_setColor(black, ui.color.cursor);
 		}else{
-			lcd_setColor(black, ui.color.current);
+			disp_setColor(black, ui.color.current);
 		}
-		lcd_putStr(10, 40, &arial, 0, str);
+		disp_putStr(10, 40, &arial, 0, str);
 
 		//Печать значения режима
 		if(ch.mode == ch_modeTime){
@@ -183,16 +184,16 @@ void chargeTSK(void *pPrm){
 			sprintf(str, "Mode: VOLTAGE");
 		}
 		if((varParam == C_MODE) && (fp.tf.state.bit.switchIsON == 0)){
-			lcd_setColor(black, ui.color.cursor);
+			disp_setColor(black, ui.color.cursor);
 		}else{
-			lcd_setColor(black, ui.color.mode);
+			disp_setColor(black, ui.color.mode);
 		}
-		lcd_putStr(10, 60, &arial, 0, str);
+		disp_putStr(10, 60, &arial, 0, str);
 
 		//Печать значения емкости
 		sprintf(str, "C:         %01u.%03u A/h", fp.tf.meas.capacity / 1000, fp.tf.meas.capacity % 1000);
-		lcd_setColor(black, ui.color.capacity);
-		lcd_putStr(10, 80, &arial, 0, str);
+		disp_setColor(black, ui.color.capacity);
+		disp_putStr(10, 80, &arial, 0, str);
 
 		//Детект окончания
 		if((chargerIsOn != 0) && (fp.tf.state.bit.switchIsON == 0)){

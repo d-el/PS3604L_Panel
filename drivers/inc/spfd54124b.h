@@ -57,6 +57,7 @@ typedef enum {
 /*!****************************************************************************
  * Typedef
  */
+typedef uint32_t lcd_color_type;
 
 /*!****************************************************************************
  * Exported variables
@@ -90,26 +91,6 @@ static inline void spfd_resetBit(uint64_t n){
 static inline void spfd_setPixel(uint16_t x, uint16_t y, uint16_t color){
 	//return;
 	uint64_t n = ((y * SPFD54124B_W) + x) * 18;
-
-	/*spfd_setBit(n * 18 + 17);
-	(color & 1 << 0) ? (spfd_setBit(n * 18 + 16)) : 	(spfd_resetBit(n * 18 + 16));
-	(color & 1 << 1) ? (spfd_setBit(n * 18 + 15)) : 	(spfd_resetBit(n * 18 + 15));
-	(color & 1 << 2) ? (spfd_setBit(n * 18 + 14)) : 	(spfd_resetBit(n * 18 + 14));
-	(color & 1 << 3) ? (spfd_setBit(n * 18 + 13)) : 	(spfd_resetBit(n * 18 + 13));
-	(color & 1 << 4) ? (spfd_setBit(n * 18 + 12)) : 	(spfd_resetBit(n * 18 + 12));
-	(color & 1 << 5) ? (spfd_setBit(n * 18 + 11)) : 	(spfd_resetBit(n * 18 + 11));
-	(color & 1 << 6) ? (spfd_setBit(n * 18 + 10)) : 	(spfd_resetBit(n * 18 + 10));
-	(color & 1 << 7) ? (spfd_setBit(n * 18 + 9))  : 	(spfd_resetBit(n * 18 + 9));
-
-	spfd_setBit(n * 18 + 8);
-	(color & 1 << 8) ? 	(spfd_setBit(n * 18 + 7)) : (spfd_resetBit(n * 18 + 7));
-	(color & 1 << 9) ? 	(spfd_setBit(n * 18 + 6)) : (spfd_resetBit(n * 18 + 6));
-	(color & 1 << 10) ? (spfd_setBit(n * 18 + 5)) : (spfd_resetBit(n * 18 + 5));
-	(color & 1 << 11) ? (spfd_setBit(n * 18 + 4)) : (spfd_resetBit(n * 18 + 4));
-	(color & 1 << 12) ? (spfd_setBit(n * 18 + 3)) : (spfd_resetBit(n * 18 + 3));
-	(color & 1 << 13) ? (spfd_setBit(n * 18 + 2)) : (spfd_resetBit(n * 18 + 2));
-	(color & 1 << 14) ? (spfd_setBit(n * 18 + 1)) : (spfd_resetBit(n * 18 + 1));
-	(color & 1 << 15) ? (spfd_setBit(n * 18 + 0)) : (spfd_resetBit(n * 18 + 0));*/
 
 	n++;
 	(color & 1 << 15) ?	(spfd_setBit(n)) : 	(spfd_resetBit(n)); n++;

@@ -61,8 +61,8 @@ uint16_t usartBaudRateDiv[] = {
  * @brief
  */
 void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
-	uint32_t dmaChannelRx;
-	uint32_t dmaChannelTx;
+	uint32_t dmaChannelRx = 0;
+	uint32_t dmaChannelTx = 0;
 
 	#if(UART1_USE > 0)
 	if(uartx == uart1){

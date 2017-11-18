@@ -50,7 +50,6 @@ extern struct tm timeStrct;
  * Function declaration
  */
 rtcStatus_type rtc_init(void);
-void rtc_getTime(struct tm *time);
 rtcStatus_type rtc_setTime(const struct tm *t);
 rtcStatus_type rtc_setTimeUnix(time_t time);
 void rtc_writeToBkp(uint32_t val);

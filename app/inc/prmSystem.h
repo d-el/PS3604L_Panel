@@ -96,16 +96,17 @@ typedef enum {
 } prmStep_type;
 
 typedef struct {
-	prmval_type 	*prm;			//Pointer to parameter
-	prmval_type 	def;
-	prmval_type 	*min;
-	prmval_type 	*max;
-	prmval_type 	*step;
-	prmval_type 	bigstep;
-	prmType_type 	type 	:4;
-	prmChmod_type 	chmod 	:2;
-	uint8_t 		power 	:4;
-	prmNvSave_type 	save 	:2;
+	prmval_type		*prm;			//Pointer to parameter
+	prmval_type		def;
+	prmval_type		*min;
+	prmval_type		*max;
+	prmval_type		*step;
+	prmval_type		bigstep;
+	prmType_type	type 	:4;
+	prmChmod_type	chmod 	:2;
+	uint8_t			power 	:4;
+	prmNvSave_type	save 	:2;
+	prmLim_type		limType :1;
 	prmStep_type	stepType:1;
 } prmHandle_type;
 

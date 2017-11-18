@@ -150,7 +150,7 @@
 					</folderInfo>
 					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.364184543.688754632" name="stm32f4x7_eth.c" rcbsApplicability="disable" resourcePath="STM32F4x7_ETH_Driver/src/stm32f4x7_eth.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.4995280.325876619">
 						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.4995280.325876619" name="Cross ARM GNU C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.4995280">
-							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otheroptimizations.2033734880" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otheroptimizations" useByScannerDiscovery="true" value="-O0" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otheroptimizations.2033734880" name="Other optimization flags" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otheroptimizations" useByScannerDiscovery="true" value="-O0" valueType="string"/>
 							<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.2105288120" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
 						</tool>
 					</fileInfo>

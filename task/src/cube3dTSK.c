@@ -56,8 +56,8 @@ void cube3dTSK(void *pPrm){
 	pairsOfPoints_type pairsOfPoints[MESH_COUNT];
 
 	uint16_t  old_val_encoder = enGeReg();
-	lcd_fillScreen(black);
-	lcd_setColor(black, white);
+	disp_fillScreen(black);
+	disp_setColor(black, white);
 
 	while(1){
 		//Расставляем точки модели, считаем что центр куба
@@ -135,15 +135,15 @@ void cube3dTSK(void *pPrm){
 					pairsOfPoints[i].x2, pairsOfPoints[i].y2, colors[i]);
 		}
 
-		//Устанавливаем новые углы
+		//Calculate new angles
 		static _iq alpha = 0;
 		alpha += _IQ((2 * M_PI) / 64);
 		if(alpha > _IQ(M_PI)){
-			alpha -= _IQ(M_PI);
-		}else if(alpha < _IQ(-M_PI)){
-			alpha += _IQ(M_PI);
+			alpha -= _IQ(2 * M_PI);
 		}
-		dir_x = dir_y = dir_z = alpha;
+		dir_x = alpha;
+		dir_y = alpha;
+		dir_z = alpha;
 
 		//Выходим если нажата кнопка или повернут энкодер
 		if((keyProc() != 0) || (old_val_encoder != enGeReg())){
@@ -152,9 +152,9 @@ void cube3dTSK(void *pPrm){
 		}
 
 		//Печать времени
-		rtc_getTime(&timeStrct);
+		/*rtc_getTime(&timeStrct);
 		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
-		lcd_putStr(48, 110, &arial, 0, str);
+		lcd_putStr(48, 110, &arial, 0, str);*/
 
 		vTaskDelay(pdMS_TO_TICKS(40));
 	}
