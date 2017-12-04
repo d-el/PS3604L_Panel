@@ -73,6 +73,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 
 	const menuItem_type **topMenu = selectedTopMenuPath;
 	const menuItem_type **sMenu = selectedMenuPath;
+	const menuItem_type *sMenuPrev = NULL;
 	const menuItem_type *vMenu;
 
 	uint8_t 			bigstepUp = 0;
@@ -133,7 +134,6 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 							}
 							break;
 						}
-						editSection = 0;
 					}
 					if(vMenu == vMenu->previous){					//Ending
 						break;
@@ -168,7 +168,6 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 							}
 							break;
 						}
-						editSection = 0;
 					}
 					if(vMenu == vMenu->next){						//Ending
 						break;
@@ -238,6 +237,21 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 					vMenu = vMenu->next;
 				}
 			}
+		}
+
+		//Детектируем переключение пункта
+		if(sMenuPrev != *sMenu){
+			vMenu = *sMenu;
+			if(sMenuPrev != NULL){
+
+			}
+
+			editSection = 0;
+			if(vMenu->prmHandle->limType == prmLimVariable){
+				setLimit(vMenu, editSection);
+			}
+
+			sMenuPrev = *sMenu;
 		}
 
 		/************************
@@ -375,6 +389,7 @@ void setLimit(const menuItem_type *menuItem, uint8_t editSection){
 		return;
 	}*/
 	struct tm tm;
+	uint32_t unixTime;
 
 	switch(menuItem->prmHandle->type){
 		case ipAdrFrmt:
@@ -383,41 +398,31 @@ void setLimit(const menuItem_type *menuItem, uint8_t editSection){
 			menuItem->prmHandle->max->t_ipAdrFrmt = menuItem->prmHandle->prm->t_ipAdrFrmt | 255UL << (3 - editSection) * 8;
 			break;
 
-		case unixDateFrmt:
-			switch(editSection){
-				case 0:	// Day
-					menuItem->prmHandle->step->t_unixDateFrmt = 24 * 60 * 60;
-					menuItem->prmHandle->min->t_unixDateFrmt = 0;
-					menuItem->prmHandle->max->t_unixDateFrmt = 0xFFFFFFFFU;
-					break;
-				case 1:	// Month
-					gmtime_r(&menuItem->prmHandle->prm->t_unixDateFrmt, &tm);
-					tm.tm_mon = 0;
-					menuItem->prmHandle->min->t_unixDateFrmt = unixTime = mktime(&tm);
-					tm.tm_mon = 11;
-					menuItem->prmHandle->max->t_unixDateFrmt = unixTime = mktime(&tm) - 1;
-					menuItem->prmHandle->step->t_unixDateFrmt = 24 * 60 * 60;
-					break;
-				case 2:
-					gmtime_r(&menuItem->prmHandle->prm->t_unixDateFrmt, &tm);
-					tm.tm_mday = 0;
-					tm.tm_hour = 0;
-					tm.tm_min = 0;
-					tm.tm_sec = 0;
-					menuItem->prmHandle->min->t_unixDateFrmt = unixTime = mktime(&tm);
-					if(tm.tm_mon < 11){
-						tm.tm_mon++;
-					}else{
-						tm.tm_mon = 0;
-						tm.tm_year++;
-					}
-					menuItem->prmHandle->max->t_unixDateFrmt = unixTime = mktime(&tm) - 1;
-					menuItem->prmHandle->step->t_unixDateFrmt = 24 * 60 * 60;
-					break;
-			}
-			break;
+		/*case unixDateFrmt:
+			menuItem->prmHandle->step->t_unixDateFrmt = 24 * 60 * 60;
+			menuItem->prmHandle->min->t_unixDateFrmt = 0;
+			menuItem->prmHandle->max->t_unixDateFrmt = 0xFFFFFFFFU;
+			break;*/
 
 		case unixTimeFrmt:
+			unixTime = menuItem->prmHandle->prm->t_unixTimeFrmt % (24 * 60 * 60);
+			switch(editSection){
+				case 0:	// Hour
+					menuItem->prmHandle->step->t_unixDateFrmt = 60 * 60;
+					menuItem->prmHandle->min->t_unixDateFrmt = menuItem->prmHandle->prm->t_unixTimeFrmt - unixTime;
+					menuItem->prmHandle->max->t_unixDateFrmt = menuItem->prmHandle->prm->t_unixTimeFrmt - unixTime + 24 * 60 * 60 - 1;
+					break;
+				case 1:	// Minute
+					menuItem->prmHandle->step->t_unixDateFrmt = 60;
+					menuItem->prmHandle->min->t_unixDateFrmt = menuItem->prmHandle->prm->t_unixTimeFrmt - unixTime;
+					menuItem->prmHandle->max->t_unixDateFrmt = menuItem->prmHandle->prm->t_unixTimeFrmt - unixTime + 24 * 60 * 60 - 1;
+					break;
+				case 2: // Second
+					menuItem->prmHandle->step->t_unixDateFrmt = 1;
+					menuItem->prmHandle->min->t_unixDateFrmt = menuItem->prmHandle->prm->t_unixTimeFrmt - unixTime;
+					menuItem->prmHandle->max->t_unixDateFrmt = menuItem->prmHandle->prm->t_unixTimeFrmt - unixTime + 24 * 60 * 60 - 1;
+					break;
+			}
 			break;
 	}
 }
@@ -495,7 +500,8 @@ void printItem(const menuItem_type *menuItem, uint8_t itemNumber, uint8_t isSele
 				break;
 			case unixDateFrmt:
 				printDateVar(vstring, menuItem->prmHandle->prm->t_unixDateFrmt, selectedSectionNumber, &selectionPosition, &selectionLength);
-				outItemStringWithSelection(mstring, vstring, itemNumber, isSelected, selectionPosition, selectionLength);
+				//outItemStringWithSelection(mstring, vstring, itemNumber, isSelected, selectionPosition, selectionLength);
+				outItemString(mstring, vstring, itemNumber, isSelected);
 				break;
 			case unixTimeFrmt:
 				printTimeVar(vstring, menuItem->prmHandle->prm->t_unixTimeFrmt, selectedSectionNumber, &selectionPosition, &selectionLength);

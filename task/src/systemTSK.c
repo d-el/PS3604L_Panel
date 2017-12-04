@@ -43,7 +43,7 @@ void systemTSK(void *pPrm){
 	//Result &= xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	//Result &= xTaskCreate(wlanTSK, "wlanTSK", WLAN_TSK_SZ_STACK, NULL, WLAN_TSK_PRIO, NULL);
 	Result &= xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
-	assert(Result == pdTRUE);
+	stopif(Result != pdTRUE, return, "can not create httpServerTSK");
 
 	selWindow(startupWindow);
 

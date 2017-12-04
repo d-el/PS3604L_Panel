@@ -31,6 +31,11 @@
  */
 #define SNTP_DEBUG                  0	//1 - ON, 0 - OFF
 
+/**
+ * SNTP_SINGLESYNC: Enable single sync
+ */
+#define SNTP_SINGLESYNC				1	//1 - single, 0 - periodical
+
 /** SNTP server port */
 #ifndef SNTP_PORT
 #define SNTP_PORT                   123
@@ -225,12 +230,14 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t 
 	if(err == ERR_OK){
 		sntp_process(receive_timestamp);
 
+	#if(SNTP_SINGLESYNC > 0)
 		udp_remove(pcb);
 		return;
-
+	#else
 		/* Set up timeout for next request */
 		sys_timeout((u32_t) SNTP_UPDATE_DELAY, sntp_request, NULL);
 		printdmsg(SNTP_DEBUG, ("sntp_recv: Scheduled next time request: %u ms\n", (u32_t) SNTP_UPDATE_DELAY));
+	#endif
 	}else if(err == SNTP_ERR_KOD){
 		/* Kiss-of-death packet. Use another server or increase UPDATE_DELAY. */
 		sntp_try_next_server(NULL);
@@ -319,7 +326,7 @@ static void sntp_request(void *arg){
  */
 void sntp_init(void){
 	sntp_pcb = udp_new();
-	assert(sntp_pcb != NULL);
+	stopif(sntp_pcb == NULL, return, "can not create sntp_pcb");
 	if(sntp_pcb != NULL){
 		udp_recv(sntp_pcb, sntp_recv, NULL);
 		sntp_request(NULL);

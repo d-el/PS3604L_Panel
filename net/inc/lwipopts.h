@@ -52,6 +52,18 @@
  */
 #define MEMP_NUM_PBUF           100
 
+/**
+ * MEMP_NUM_NETBUF: the number of struct netbufs.
+ * (only needed if you use the sequential API, like api_lib.c)
+ */
+#define MEMP_NUM_NETBUF			4
+
+/**
+ * MEMP_NUM_NETCONN: the number of struct netconns.
+ * (only needed if you use the sequential API, like api_lib.c)
+ */
+#define MEMP_NUM_NETCONN		4
+
 /*!****************************************************************************
  * MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
  * per active UDP "connection"

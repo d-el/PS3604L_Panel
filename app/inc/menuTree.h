@@ -39,7 +39,7 @@ MENU_ITEM(ammeter		,"Ameter"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,N
 MENU_ITEM(datetime			,"Clock"	,""		,NULL			,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ammeter	,lan		,datetime	,mdate)
 	/*		name 		,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 	MENU_ITEM(mdate		,"Date"		,""		,&prmh[NutcTime]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtime		,datetime	,mdate)
-	MENU_ITEM(mtime		,"Time"		,""		,&prmh[NutcTime]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtimezone	,datetime	,mtime)
+	MENU_ITEM(mtime		,"Time"		,""		,&prmh[NutcTime2]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtimezone	,datetime	,mtime)
 	MENU_ITEM(mtimezone	,"Timezone"	,""		,&prmh[Ntimezone]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mtime		,mtimezone	,datetime	,mtimezone)
 
 /*		name 			,label		,units	,prmHandle		,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/

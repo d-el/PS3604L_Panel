@@ -7,18 +7,18 @@
  * @brief		Parameters table
  */
 
-//			label		,units,prm						,type			,chmod			,def		,min	,max		,step	,bigst	,pow,limtype		,savetype
+//			label		,units,prm						,type			,chmod			,def		,min		,max		,step	,bigst	,pow,limtype		,savetype
 
 /* RTC */
-parametres(utcTime		,""	,unixTime					,unixDateFrmt	,chmodAlways	,0			,0		,0			,0		,0		,0	,prmLimVariable	,prmStepVariable,prmNotSave)
-parametres(utcTime2		,""	,unixTime					,unixTimeFrmt	,chmodAlways	,0			,0		,0			,0		,0		,0	,prmLimVariable	,prmStepVariable,prmNotSave)
-parametres(year			,""	,timeStrct.tm_year			,s32Frmt		,chmodAlways	,117		,117	,217		,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
-parametres(mon			,""	,timeStrct.tm_mon			,s32Frmt		,chmodAlways	,1			,1		,12			,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
-parametres(mday			,""	,timeStrct.tm_mday			,s32Frmt		,chmodAlways	,1			,1		,31			,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
-parametres(hour			,""	,timeStrct.tm_hour			,s32Frmt		,chmodAlways	,0			,0		,23			,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
-parametres(min			,""	,timeStrct.tm_min			,s32Frmt		,chmodAlways	,0			,0		,59			,1		,10		,0	,prmLimConst	,prmStepConst	,prmNotSave)
-parametres(sec			,""	,timeStrct.tm_sec			,s32Frmt		,chmodAlways	,0			,0		,59			,1		,10		,0	,prmLimConst	,prmStepConst	,prmNotSave)
-parametres(timezone		,"" ,fp.fpSet.timezone			,s8Frmt			,chmodAlways	,2			,-12	,12			,1		,1		,0	,prmLimConst	,prmStepConst	,prmEeprom)
+parametres(utcTime		,""	,unixTime					,unixDateFrmt	,chmodAlways	,0x58684680	,0x58684680	,0xFFFFFFFF	,86400	,1728000,0	,prmLimConst	,prmStepConst	,prmNotSave)
+parametres(utcTime2		,""	,unixTime					,unixTimeFrmt	,chmodAlways	,0			,0			,0			,0		,0		,0	,prmLimVariable	,prmStepVariable,prmNotSave)
+parametres(year			,""	,timeStrct.tm_year			,s32Frmt		,chmodAlways	,117		,117		,217		,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
+parametres(mon			,""	,timeStrct.tm_mon			,s32Frmt		,chmodAlways	,1			,1			,12			,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
+parametres(mday			,""	,timeStrct.tm_mday			,s32Frmt		,chmodAlways	,1			,1			,31			,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
+parametres(hour			,""	,timeStrct.tm_hour			,s32Frmt		,chmodAlways	,0			,0			,23			,1		,1		,0	,prmLimConst	,prmStepConst	,prmNotSave)
+parametres(min			,""	,timeStrct.tm_min			,s32Frmt		,chmodAlways	,0			,0			,59			,1		,10		,0	,prmLimConst	,prmStepConst	,prmNotSave)
+parametres(sec			,""	,timeStrct.tm_sec			,s32Frmt		,chmodAlways	,0			,0			,59			,1		,10		,0	,prmLimConst	,prmStepConst	,prmNotSave)
+parametres(timezone		,"" ,fp.fpSet.timezone			,s8Frmt			,chmodAlways	,2			,-12		,12			,1		,1		,0	,prmLimConst	,prmStepConst	,prmEeprom)
 
 //Base Task 0
 parametres(bsSet0u		,""	,bs.set[0].u				,u16Frmt		,chmodAlways	,0			,0		,36.000		,0.010	,1.000	,3	,prmLimConst	,prmStepConst	,prmEeprom)

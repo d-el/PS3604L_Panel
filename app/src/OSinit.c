@@ -26,7 +26,7 @@ void OSinit(void){
 	BaseType_t Result = pdTRUE;
 
 	Result &= xTaskCreate(systemTSK, "systemTSK", SYSTEM_TSK_SZ_STACK, NULL, SYSTEM_TSK_PRIO, NULL);
-	assert(Result == pdTRUE);
+	stopif(Result != pdTRUE, return, "can not create systemTSK");
 	vTaskStartScheduler();
 }
 

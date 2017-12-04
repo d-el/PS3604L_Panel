@@ -28,10 +28,31 @@
 /*!****************************************************************************
  * Typedef
  */
+typedef struct{
+	enum{
+		urlDataTypeHtml,
+		urlDataTypeBin,
+	}type;
+
+	union{
+		const char *html;
+		const void *bin;
+	}data;
+
+	uint32_t	size;
+}urlData_type;
+
+typedef struct{
+	char				*url;
+	urlData_type		(*handler)(void);
+	urlData_type		data;
+}url_type;
 
 /*!****************************************************************************
  * Exported variables
  */
+extern const url_type getUrlTable[];
+extern const uint8_t getUrlNumber;
 
 /*!****************************************************************************
  * Macro functions

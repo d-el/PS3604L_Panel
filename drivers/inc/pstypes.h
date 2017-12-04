@@ -37,7 +37,7 @@ typedef enum {
 	mode_lowCurrentShutdown, 	//!< mode_lowCurrentShutdown
 	mode_Uadj,                  //!< mode_Uadj
 	mode_Iadj,                  //!< mode_Iadj
-	
+
 	mode_raw,
 } psMode_type;
 
@@ -61,7 +61,7 @@ typedef union {
 		uint32_t ovfCurrent :1;
 		uint32_t switchIsON :1;
 		uint32_t modeIlim :1;
-		
+
 		//Аварии
 		uint32_t ovfLinearRegTemper :1;
 		uint32_t errorLinearRegTemperSens :1;
@@ -76,7 +76,7 @@ typedef struct {
 	uint32_t power;          ///< [X_XXX Wt]
 	uint32_t resistens;      ///< [X_XXX Ohm]
 	uint32_t time;           ///< [s]
-	uint32_t capacity;       ///< [X_XXX A/h]
+	uint32_t capacity;       ///< [X_XXX Ah]
 	uint32_t u;              ///< [X_XXXXXX V]
 	uint32_t i;              ///< [X_XXXXXX A]
 	uint16_t adcu;           ///< [LSB]
@@ -88,11 +88,11 @@ typedef struct {
 typedef struct {
 	uint32_t u;              ///< [X_XXXXXX V]
 	uint32_t i;              ///< [X_XXXXXX A]
+	uint32_t time;           ///< [s]
 	uint16_t dacu;           ///< [LSB]
 	uint16_t daci;           ///< [LSB]
-	uint32_t time;           ///< [s]
-	request_type request;
-	psMode_type mode;
+	request_type request 	:8;
+	psMode_type mode 		:8;
 } task_type;
 
 typedef struct {
@@ -102,7 +102,7 @@ typedef struct {
 } transfer_type;
 
 /*!****************************************************************************
- * Extern viriables
+ * External variables
  */
 
 /*!****************************************************************************

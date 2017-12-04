@@ -24,7 +24,6 @@
 #include "key.h"
 #include "enco.h"
 #include "regulatorConnTSK.h"
-#include "wlanTSK.h"
 #include "sysTimeMeas.h"
 
 /******************************************************************************

@@ -20,7 +20,6 @@
 #include "board.h"
 #include "pstypes.h"
 #include "prmSystem.h"
-#include "wlanTSK.h"
 #include "startupTSK.h"
 #include "settingTSK.h"
 #include "cube3dTSK.h"

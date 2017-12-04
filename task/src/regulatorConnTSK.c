@@ -66,7 +66,7 @@ void uartTSK(void *pPrm){
 				/*****************************
 				 * Очередь комманд
 				 */
-				res = xQueueReceive(queueCommand, &fp.tf.task.request, 0);
+				//res = xQueueReceive(queueCommand, &fp.tf.task.request, 0);
 				if(res != pdPASS){
 					//Если из очереди не прочитано ни одного элемента
 					fp.tf.task.request = setNone;

@@ -59,7 +59,7 @@ void l_println(const char *fmt, ...){
  * @param count: number of bytes
  * @return returns the number of bytes actually written
  */
-int _write (int fd, const void *buf, size_t count){
+int _write(int fd, const void *buf, size_t count){
 	if(count > DEBUG_BUF_LEN + 1){
 		return -1;
 	}

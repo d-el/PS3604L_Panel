@@ -58,6 +58,12 @@ void print(const char *fmt, ...);
 		}while(0);
 #endif /* !NDEBUG */
 
+#define stopif(assertion, error_action, ...) {                    	\
+        if (assertion){                                           	\
+        	println(__VA_ARGS__); 									\
+            {error_action;}                  						\
+        } }
+
 /*!****************************************************************************
  * Function declaration
  */
