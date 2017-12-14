@@ -1,9 +1,9 @@
 /*!****************************************************************************
  * @file		display.h
- * @author		d_el - Storozhenko Roman
+ * @author		d_el
  * @version		V1.0
  * @date		17.11.2017
- * @copyright	Copyright (C) 2017 d_el
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
  * 				All rights reserved
  * 				This software may be modified and distributed under the terms
  * 				of the BSD license.  See the LICENSE file for details
@@ -63,7 +63,7 @@ extern const image_type ImageLogo;
  */
 
 /*!****************************************************************************
- * Function prototype
+ * Function declaration
  */
 void disp_setColor(lcd_color_type backgroundColor, lcd_color_type contentColor);
 void disp_setBackgroundColor(lcd_color_type backgroundColor);

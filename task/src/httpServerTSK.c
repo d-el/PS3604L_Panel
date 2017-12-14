@@ -25,7 +25,7 @@
 char		pageData[LEN];
 const char http_200[] 				= "HTTP/1.1 200 OK\r\n";
 const char http_404[] 				= "HTTP/1.1 404 Not Found\r\n";
-const char http_server[] 			= "Server: uC\r\n";
+const char http_server[] 			= "Server: by Storozhenko Roman\r\n";
 const char http_contentTypeHtml[]	= "Content-type: text/html\r\n";
 const char http_connectionClose[] 	= "Connection: close\r\n";
 const char http_contentLength[] 	= "Content-Length: ";

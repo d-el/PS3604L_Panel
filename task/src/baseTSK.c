@@ -70,10 +70,15 @@ void baseTSK(void *pPrm){
 					BeepTime(ui.beep.error.time, ui.beep.error.freq);
 				}
 			}else if(keyState(kOnOff)){
+				uint8_t result;
 				if(fp.tf.state.bit.switchIsON == 0){
-					sendCommand(setSwitchOn);
+					result = sendCommand(setSwitchOn);
 				}else{
-					sendCommand(setSwitchOff);
+					result = sendCommand(setSwitchOff);
+				}
+				if(result != 0){
+					disp_putStr(0, 0, &arial, 0, "Error Connect");
+					vTaskDelay(1000);
 				}
 			}else if(keyState(kUp)){
 				bigstepUp = 1;
@@ -252,48 +257,9 @@ void baseTSK(void *pPrm){
 	}
 }
 
-void reset(struct tm* tm){
-    (*tm) = (const struct tm){0};
-
-    tm->tm_sec = 0;
-    tm->tm_min = 0;
-    tm->tm_hour = 12;
-    tm->tm_mon = 9 - 1;
-    tm->tm_mday = 30;
-    tm->tm_year = 2016 - 1900;
-}
-
-static const char *dst(const int flag)
-{
-    if (flag > 0)
-        return "(>0: is DST)";
-    else
-    if (flag < 0)
-        return "(<0: Unknown if DST)";
-    else
-        return "(=0: not DST)";
-}
-
-static struct tm newtm(const int year, const int month, const int day,
-                       const int hour, const int min, const int sec,
-                       const int isdst)
-{
-    struct tm t = { .tm_year  = year - 1900,
-                    .tm_mon   = month - 1,
-                    .tm_mday  = day,
-                    .tm_hour  = hour,
-                    .tm_min   = min,
-                    .tm_sec   = sec,
-                    .tm_isdst = isdst };
-    return t;
-}
-
 /*!****************************************************************************
  *
  */
-int timezone = 3;
-int daylight = 1;
-
 void printStatusBar(void){
 	static uint8_t	errPrev = 0;
 	static uint8_t	modeIlimPrev = 0;
@@ -357,26 +323,7 @@ void printStatusBar(void){
 		sprintf(str, "%02u.%u \xB0 C", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
-		//
-		/*time_t unixTime;
-		unixTime = time(NULL);
-		localtime_r(&unixTime, &timeStrct);
-		print(str, "Current local time and date: %s", asctime(&timeStrct));
-		print(str);*/
-
-//		//Печать времени
-//		struct tm 	timeStrct;
-//		rtc_getTime(&timeStrct);
-//
-//		//time_t unixTime = 1504260000;
-//
-		//timeStrct.tm_isdst = 2;
-		//unixTime = mktime(&timeStrct);
-		//gmtime_r(&unixTime, &timeStrct);
-
-		_timezone = 2 * 60 * 60;
-		_daylight = 1;
-
+		//Печать времени
 		time_t unixTime = time(NULL);
 		unixTime = unixTime + fp.fpSet.timezone * 60 * 60;
 
@@ -391,90 +338,8 @@ void printStatusBar(void){
 
 		strftime(str, sizeof(str), "%H:%M:%S", &tmUtc);
 		disp_putStr(110, 110, &font6x8, 0, str);
-		//println(str);
 		strftime(str, sizeof(str), "%d.%m.%y", &tmUtc);
 		disp_putStr(110, 120, &font6x8, 0, str);
-//		println(str);
-//		println("");
-
-		//_timezone = timezone * 60 * 60;
-		//_daylight = daylight;
-
-		//struct timezone tz1;
-
-//	    struct tm   tm = { 0 };
-//	    struct tm   *ptm = &tm;
-//
-//	    struct tm   *ptm2 = NULL;
-//
-//	    time_t unixTime = 1504260000; //2017-09-01T10:00:00+00:00
-//
-//	    ptm2 = localtime_r(&unixTime, ptm);
-//
-//	    //strftime(str, sizeof(str), "%d.%m.%y %H:%M:%S", ptm);
-//		//println(str);
-//
-//	    println("%s:\n\t%02d:%02d:%02d   %02d-%02d-%04d\n", "tv", ptm->tm_hour, ptm->tm_min, ptm->tm_sec,
-//	    		ptm->tm_mday, ptm->tm_mon, ptm->tm_year + 1900);
-//
-//	    println("%s:\n\t%02d:%02d:%02d   %02d-%02d-%04d\n", "tv", ptm2->tm_hour, ptm2->tm_min, ptm2->tm_sec,
-//	    		ptm2->tm_mday, ptm2->tm_mon, ptm2->tm_year + 1900);
-
-//	    int secs;
-//
-//	    tm = newtm(2016,9,30, 12,0,0, 0);
-//	        secs = mktime(&tm);
-//
-//	        println(": %04d-%02d-%02d %02d:%02d:%02d %s %lld\n",
-//	               tm.tm_year+1900, tm.tm_mon+1, tm.tm_mday,
-//	               tm.tm_hour, tm.tm_min, tm.tm_sec, dst(tm.tm_isdst), (long long)secs);
-
-	    /*reset(&tm);
-	    tm.tm_isdst = 0;
-	    secs = mktime(&tm);
-	    println("%i\n", secs);
-
-
-	    reset(&tm);
-	    tm.tm_isdst = 1;
-	    secs = mktime(&tm);
-	    println("%i\n", secs);
-
-	    reset(&tm);
-	    tm.tm_isdst = -1;
-	    secs = mktime(&tm);
-	    println("%i\n", secs);*/
-
-		//extern time_zone;
-		//time_zone = 0;
-
-//		//WLAN
-//		static TickType_t xTime;
-//		static uint8_t ledon = 0;
-//		if(wlan.wlanActive != 0){
-//			if(wlan.wlanRxActive != 0){
-//				xTime = xTaskGetTickCount();
-//				//wlan.wlanRxActive = 0;
-//				ledon = 1;
-//			}
-//			if((ledon != 0)&&((xTaskGetTickCount() - xTime) >= 500)){
-//				ledon = 0;
-//			}
-//
-//			if(ledon == 0){
-//				lcd_setColor(black, white);
-//			}else{
-//				lcd_setColor(black, red);
-//			}
-//
-//			sprintf(str, "WLAN");
-//			lcd_putStr(60, 110, &font6x8, 0, str);
-//		}
-//		else{
-//			sprintf(str, "    ");
-//			lcd_putStr(60, 110, &font6x8, 0, str);
-//		}
-
 
 		//LAN
 		static TickType_t xTime;

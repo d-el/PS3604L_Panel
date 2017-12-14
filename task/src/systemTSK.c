@@ -40,8 +40,7 @@ void systemTSK(void *pPrm){
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	ping_init();													// Initialize service ping protocol
 	sntp_init();													// Initialize service SNTP
-	//Result &= xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
-	//Result &= xTaskCreate(wlanTSK, "wlanTSK", WLAN_TSK_SZ_STACK, NULL, WLAN_TSK_PRIO, NULL);
+	Result &= xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	Result &= xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	stopif(Result != pdTRUE, return, "can not create httpServerTSK");
 

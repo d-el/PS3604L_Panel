@@ -666,7 +666,8 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
  */
 void printDateVar(char *string, const time_t unixTime, uint8_t editSectionNumber, uint8_t *selectionPosition, uint8_t *selectionLength){
 	uint32_t	nchars = 0;
-	struct tm	tm;
+	struct tm	tm, tm2;
+	time_t unixTime2;
 
 	gmtime_r(&unixTime, &tm);
 	strftime(string, 16, "%d.%m.%Y", &tm);

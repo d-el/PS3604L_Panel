@@ -453,7 +453,7 @@ const char html_index[] = {
 		"            // Meas\r\n"
 		"            updateTable('.table2', [\r\n"
 		"                {name: 'power', val: x.getUint32(4, true) / 1000.0 + ' Wt'},\r\n"
-		"                {name: 'resistens', val: x.getUint32(8, true) / 1000.0 + ' Ohm'},\r\n"
+		"                {name: 'resistance', val: x.getUint32(8, true) / 1000.0 + ' Ohm'},\r\n"
 		"                {name: 'time', val: x.getUint32(12, true) + ' s'},\r\n"
 		"                {name: 'capacity', val: x.getUint32(16, true) / 1000.0 + ' Ah'},\r\n"
 		"                {name: 'u', val: x.getUint32(20, true) / 1000000.0 + ' V'},\r\n"
@@ -664,10 +664,6 @@ urlData_type handle_statemeastask(void){
 
 	static urlData_type urlData;
 	memcpy(&bin_statemeastask, &fp.tf, sizeof(transfer_type));
-	bin_statemeastask.meas.time = t++;
-	bin_statemeastask.meas.temperatureLin = 266;
-	bin_statemeastask.state.bit.switchIsON ^= 1;
-
 	urlData.data.bin = &bin_statemeastask;
 	urlData.size = sizeof(transfer_type);
 	urlData.type = urlDataTypeBin;

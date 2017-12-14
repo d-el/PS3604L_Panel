@@ -23,15 +23,8 @@ extern void (*__init_array_end[])(void) __attribute__((weak));
 extern void (*__fini_array_start[])(void) __attribute__((weak));
 extern void (*__fini_array_end[])(void) __attribute__((weak));
 
-//extern void _init();
 extern void _fini(void);
 extern uint32_t __get_MSP(void);
-
-/*!****************************************************************************
- */
-/*int _gettimeofday(struct timeval *tv, struct timezone *tz){
- return 0;
- }*/
 
 /*!****************************************************************************
  * @brief 	Increase program data space. Malloc and related functions depend on this
@@ -90,14 +83,16 @@ void __libc_init_array(void){
 	size_t i;
 
 	count = __preinit_array_end - __preinit_array_start;
-	for(i = 0; i < count; i++)
+	for(i = 0; i < count; i++){
 		__preinit_array_start[i]();
+	}
 
 	_init();
 
 	count = __init_array_end - __init_array_start;
-	for(i = 0; i < count; i++)
+	for(i = 0; i < count; i++){
 		__init_array_start[i]();
+	}
 }
 
 /*!****************************************************************************
@@ -109,9 +104,9 @@ void __libc_fini_array(void){
 	size_t i;
 
 	count = __fini_array_end - __fini_array_start;
-	for(i = count; i > 0; i--)
+	for(i = count; i > 0; i--){
 		__fini_array_start[i - 1]();
-
+	}
 	_fini();
 }
 

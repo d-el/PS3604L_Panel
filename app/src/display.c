@@ -1,9 +1,9 @@
 /*!****************************************************************************
  * @file		display.c
- * @author		d_el - Storozhenko Roman
+ * @author		d_el
  * @version		V1.0
  * @date		17.11.2017
- * @copyright	Copyright (C) 2017 d_el
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
  * 				All rights reserved
  * 				This software may be modified and distributed under the terms
  * 				of the BSD license.  See the LICENSE file for details
@@ -160,4 +160,4 @@ void disp_PrintImageMonochrome(uint8_t x, uint8_t y, disp_color_type color, disp
 	}
 }
 
-/******************************* END OF FILE *********** D_EL ****************/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

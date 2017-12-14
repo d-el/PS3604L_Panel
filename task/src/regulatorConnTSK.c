@@ -1,10 +1,13 @@
 ﻿/*!****************************************************************************
- * @file    regulatorConnTSK.c
- * @author  D_EL
- * @version V1.0.0
- * @date    2015-08-10
- * @brief
- * @copyright GNU Public License
+ * @file		regulatorConnTSK.c
+ * @author		d_el
+ * @version		V1.1
+ * @date		13.12.2017
+ * @brief		connect interface with regulator
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -20,7 +23,7 @@ SemaphoreHandle_t 	regulatorConnUartRxSem;
 uartTsk_type 		uartTsk = { .state = uartUndef };
 
 /******************************************************************************
- * Local prototypes for the functions
+ * Local function declaration
  */
 static void uartTskHook(uart_type *puart);
 
@@ -35,24 +38,23 @@ void uartTSK(void *pPrm){
 	uint16_t 	noAnswerPrev = 0;
 
 	vTaskDelay(1000);
-	uart_setCallback(uartTskUse, (uartCallback_type)NULL, uartTskHook);
 
 	// Create a queue
 	queueCommand = xQueueCreate(UART_TSK_QUEUE_COMMAND_LEN, sizeof(request_type));
-	if(queueCommand == NULL)
-		while(1)
-			;
+	assert(queueCommand != NULL);
+
 	// Create Semaphore for UART
 	vSemaphoreCreateBinary(regulatorConnUartRxSem);
-	if(regulatorConnUartRxSem == NULL)
-		while(1)
-			;
+	assert(regulatorConnUartRxSem != NULL);
+
+	uart_setCallback(uartTskUse, (uartCallback_type)NULL, uartTskHook);
+
 	xSemaphoreTake(regulatorConnUartRxSem, portMAX_DELAY);
 
 	while(1){
 		uartTsk.queueLen = uxQueueMessagesWaiting(queueCommand);
 
-		crc = GetCrc(&fp.tf.task, sizeof(task_type));
+		crc = crc16Calc(&crcModBus, &fp.tf.task, sizeof(task_type));
 		memcpy(uartTskUse->pTxBff, &fp.tf.task, sizeof(task_type));
 		*(uint16_t*) (uartTskUse->pTxBff + sizeof(task_type)) = crc;
 		uart_write(uartTskUse, uartTskUse->pTxBff, sizeof(task_type) + sizeof(uint16_t));
@@ -61,13 +63,16 @@ void uartTSK(void *pPrm){
 		res = xSemaphoreTake(regulatorConnUartRxSem, pdMS_TO_TICKS(UART_TSK_MAX_WAIT_ms));
 		if(res == pdTRUE){
 			//Приняли ответ
-			crc = GetCrc(uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type) + sizeof(uint16_t));
+			crc = crc16Calc(&crcModBus, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type) + sizeof(uint16_t));
 			if(crc == 0){
 				/*****************************
-				 * Очередь комманд
+				 * Очередь команд
 				 */
-				//res = xQueueReceive(queueCommand, &fp.tf.task.request, 0);
-				if(res != pdPASS){
+				request_type request;
+				res = xQueueReceive(queueCommand, &request, 0);
+				if(res == pdPASS){
+					fp.tf.task.request = request;
+				}else{
 					//Если из очереди не прочитано ни одного элемента
 					fp.tf.task.request = setNone;
 				}
@@ -108,7 +113,7 @@ uint8_t sendCommand(request_type command){
 		return 1;
 	}
 
-	res = xQueueSend(queueCommand, (void* )&command, 0);
+	res = xQueueSend(queueCommand, (void*)&command, 0);
 	if(res == pdPASS){
 		return 0;
 	}else{
@@ -158,4 +163,4 @@ static void uartTskHook(uart_type *puart){
 	}
 }
 
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

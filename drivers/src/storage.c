@@ -130,7 +130,7 @@ nvMem_state_type nvMem_savePrm(nvMem_partition_type *part){
 		pData += part->data[i].sizeofData;
 	}
 	//CRC
-	*(uint16_t*) pData = GetCrc(pBuf, pData - pBuf);
+	*(uint16_t*) pData = crc16Calc(&crcModBus, pBuf, pData - pBuf);
 	pData += sizeof(uint16_t);
 
 	//Write to memory
@@ -172,7 +172,7 @@ nvMem_state_type nvMem_loadPrm(nvMem_partition_type *part){
 	}
 
 	//Проверить CRC
-	l_crc = GetCrc(pBuf, part->size);
+	l_crc = crc16Calc(&crcModBus, pBuf, part->size);
 
 	if(l_crc == 0){ //CRC OK
 		l_signature = *(uint16_t*) pData;
