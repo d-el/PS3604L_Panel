@@ -12,6 +12,8 @@
 /*!****************************************************************************
  * Include
  */
+#include "stdlib.h"
+#include "display.h"
 #include "graphics.h"
 
 #define swap(a, b) { int16_t t = a; a = b; b = t; }

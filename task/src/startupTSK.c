@@ -10,7 +10,10 @@
 /*!****************************************************************************
  * Include
  */
+#include "ledpwm.h"
+#include "key.h"
 #include "startupTSK.h"
+
 
 /*!****************************************************************************
  * MEMORY
@@ -32,9 +35,6 @@ void startupTSK(void *pPrm){
 		vTaskDelay(pdMS_TO_TICKS(60));
 		LED_OFF();
 
-		//setLcdBrightness(fp.fpSet.lcdLight);
-		//iq_mandelbrot();
-
 		disp_setColor(black, white);
 		disp_fillScreen(black);
 		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, black, white, &ImageLogo);  //Logo
@@ -54,8 +54,11 @@ void startupTSK(void *pPrm){
 		setLcdBrightness(fp.fpSet.lcdLight);
 
 		//Run key process
-		for(uint32_t cnt = 0; cnt < KEY_SAMPLES; cnt++){
+		for(uint32_t cnt = 0; cnt < KEY_SAMPLES * 2; cnt++){
 			keyProc();
+			if(keyState(kMode) != 0){
+				break;
+			}
 		}
 
 		if(keyState(kMode)){

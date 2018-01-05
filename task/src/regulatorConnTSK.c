@@ -13,14 +13,22 @@
 /*!****************************************************************************
  * Include
  */
+#include "string.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "crc.h"
+#include "uart.h"
+#include "systemTSK.h"
 #include "regulatorConnTSK.h"
 
 /*!****************************************************************************
  * MEMORY
  */
-QueueHandle_t 		queueCommand;
-SemaphoreHandle_t 	regulatorConnUartRxSem;
-uartTsk_type 		uartTsk = { .state = uartUndef };
+static QueueHandle_t 		queueCommand;
+static SemaphoreHandle_t 	regulatorConnUartRxSem;
+uartTsk_type 				uartTsk = { .state = uartUndef };
 
 /******************************************************************************
  * Local function declaration
@@ -46,10 +54,9 @@ void uartTSK(void *pPrm){
 	// Create Semaphore for UART
 	vSemaphoreCreateBinary(regulatorConnUartRxSem);
 	assert(regulatorConnUartRxSem != NULL);
+	xSemaphoreTake(regulatorConnUartRxSem, portMAX_DELAY);
 
 	uart_setCallback(uartTskUse, (uartCallback_type)NULL, uartTskHook);
-
-	xSemaphoreTake(regulatorConnUartRxSem, portMAX_DELAY);
 
 	while(1){
 		uartTsk.queueLen = uxQueueMessagesWaiting(queueCommand);
@@ -78,9 +85,6 @@ void uartTSK(void *pPrm){
 				}
 
 				memcpy(&fp.tf.state, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type));
-				if(fp.tf.state.bit.lowInputVoltage != 0){
-					shutdown();
-				}
 				uartTsk.normAnswer++;
 				errPrev = uartTsk.errorAnswer;
 				noAnswerPrev = uartTsk.noAnswer;

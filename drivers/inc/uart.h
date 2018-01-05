@@ -17,9 +17,7 @@
  * Include
  */
 #include "stm32f4xx.h"
-#include "gpio.h"
 #include "stdint.h"
-#include "stdio.h"
 
 /*!****************************************************************************
  * Define
@@ -99,8 +97,8 @@ typedef struct uartStruct{
 	volatile uint32_t			*dmaIfcrRx;			///< DMA interrupt flag clear register Rx
 	uint32_t					dmaIfcrMaskTx;		///< DMA interrupt flag clear register mask Tx
 	uint32_t					dmaIfcrMaskRx;		///< DMA interrupt flag clear register mask Rx
-	void (*txHoock)(struct uartStruct *uart);
-	void (*rxHoock)(struct uartStruct *uart);
+	void (*txHoock)(struct uartStruct *uartx);
+	void (*rxHoock)(struct uartStruct *uartx);
 	volatile uartTxState_type	txState			:8;
 	volatile uartRxState_type	rxState			:8;
 	uartTxState_type			baudRate		:4;
@@ -110,7 +108,7 @@ typedef struct uartStruct{
 	volatile uint16_t			rxCnt;
 } uart_type;
 
-typedef void (*uartCallback_type)(uart_type *uart);
+typedef void (*uartCallback_type)(uart_type *uartx);
 
 /*!****************************************************************************
  * Exported variables

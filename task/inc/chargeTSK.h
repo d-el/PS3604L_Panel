@@ -1,29 +1,17 @@
-﻿
-/******************************************************************************
- * @file			charge.h
+﻿/******************************************************************************
+ * @file		charge.h
  * @author		D_EL - Storozhenko Roman
- * @version      V1.0
+ * @version		V1.0
  * @date
- * @copyright GNU Public License
+ * @copyright	GNU Public License
  */
 #ifndef CHARGE_H
 #define CHARGE_H
 
+/*!****************************************************************************
+ * Include
+ */
 #include "stdio.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "OSinit.h"
-#include "ui.h"
-#include "pstypes.h"
-#include "graphics.h"
-#include "baseTSK.h"
-#include "regulatorConnTSK.h"
-#include "spfd54124b.h"
-#include "key.h"
-#include "enco.h"
-#include "beep.h"
 
 /******************************************************************************
  * User define

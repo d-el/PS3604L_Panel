@@ -13,6 +13,7 @@
 /*!****************************************************************************
  * Include
  */
+#include "stddef.h"
 #include "i2c.h"
 
 /**************************************
@@ -61,15 +62,15 @@ void i2c_init(i2c_type *i2cx){
 		i2cx->pDmaStreamRx	= DMA1_Stream5;
 		i2cx->dmaChannelTx	= 1;
 		i2cx->dmaChannelRx	= 1;
-		speed = I2C1_ClockFreg;
+		i2cx->clockSpeed	= I2C1_ClockFreg;
 
 		/************************************************
 		* IO
 		* PB6, PB8 - clk
 		* PB7, PB9 - sda
 		*/
-		gppin_init(GPIOB, 6, alternateFunctionOpenDrain, pullUp, 0, I2C1_PINAF);
-		gppin_init(GPIOB, 7, alternateFunctionOpenDrain, pullUp, 0, I2C1_PINAF);
+		gppin_init(GPIOB, 8, alternateFunctionOpenDrain, pullUp, 1, I2C1_PINAF);
+		gppin_init(GPIOB, 9, alternateFunctionOpenDrain, pullUp, 1, I2C1_PINAF);
 
 		/************************************************
 		* NVIC
@@ -111,9 +112,6 @@ void i2c_init(i2c_type *i2cx){
 	/************************************************
 	* I2C
 	*/
-	#define I2C_RISE_TIME(__FREQRANGE__, __SPEED__)			   (((__SPEED__) <= 100000U) ? ((__FREQRANGE__) + 1U) : ((((__FREQRANGE__) * 300U) / 1000U) + 1U))
-	#define I2C_SPEED_FAST(__PCLK__, __SPEED__) (((__PCLK__) / ((__SPEED__) * 25U)))
-
 	i2cx->pI2c->CR2 |= I2C_CR2_ITEVTEN;
 	i2cx->pI2c->CR2 |= I2C_CR2_ITERREN;
 	i2cx->pI2c->CR2 |= I2C_CR2_DMAEN;
@@ -122,8 +120,8 @@ void i2c_init(i2c_type *i2cx){
 
 	i2cx->pI2c->CCR	|= I2C_CCR_FS;								   //Fast Mode I2C
 	i2cx->pI2c->CCR	|= I2C_CCR_DUTY;							   //Fast Mode tlow/thigh = 16/9 (see CCR)
-	i2cx->pI2c->CCR	|= I2C_CLOCK / (speed * 25);
-	i2cx->pI2c->TRISE |= I2C_RISE_TIME(I2C_CLOCK / 1000000, speed);
+	i2cx->pI2c->CCR	|= I2C_CLOCK / (i2cx->clockSpeed * 25U);
+	i2cx->pI2c->TRISE |= (I2C_CLOCK / 300000U) + 1U;
 
 	i2cx->pI2c->CR1 |= I2C_CR1_PE;
 
@@ -258,6 +256,9 @@ void I2C1_ER_IRQHandler(void){
 }
 void DMA1_Stream5_IRQHandler(void){			//RX
 	i2c1Sct.state = i2cRxSuccess;
+	if(i2c1Sct.tcHook != NULL){				//Call hook
+		i2c1Sct.tcHook(&i2c1Sct);
+	}
 	DMA1->HIFCR	 =	DMA_HIFCR_CTCIF5;		//Clear flag
 }
 void DMA1_Stream6_IRQHandler(void){			//TX

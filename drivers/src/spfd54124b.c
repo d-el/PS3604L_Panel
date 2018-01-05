@@ -10,7 +10,10 @@
 /*!****************************************************************************
  * Include
  */
+#include "string.h"
+#include "stm32f4xx.h"
 #include "spfd54124b.h"
+#include "gpio.h"
 
 /*!****************************************************************************
  * MEMORY
@@ -28,10 +31,6 @@ void spfd_gotoxy(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1);
  *
  */
 void spfd_spiInit(void){
-	gppin_init(GPIOB, 3, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_SCK
-	gppin_init(GPIOB, 4, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_MISO
-	gppin_init(GPIOB, 5, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_MOSI
-
 	//Максимальная скорость - fPCLK/2
 	RCC->APB1ENR |= RCC_APB1ENR_SPI3EN;		//Clock enable
 	RCC->APB1RSTR |= RCC_APB1RSTR_SPI3RST;	//Reset module
@@ -42,10 +41,14 @@ void spfd_spiInit(void){
 	SPI3->CR1 |= SPI_CR1_SSM;				//Software slave management enabled
 	SPI3->CR1 |= SPI_CR1_SSI;				//Игнорирование NSS входа
 
-	SPI3->CR1 |= SPI_CR1_DFF;		//16-bit data frame format is selected for transmission/reception
-	SPI3->CR1 |= SPI_CR1_LSBFIRST;	//LSB transmitted first
+	SPI3->CR1 |= SPI_CR1_DFF;				//16-bit data frame format is selected for transmission/reception
+	SPI3->CR1 |= SPI_CR1_LSBFIRST;			//LSB transmitted first
 
 	SPI3->CR1 |= SPI_CR1_SPE;				//SPI enable
+
+	gppin_init(GPIOB, 3, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_SCK
+	gppin_init(GPIOB, 4, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_MISO
+	gppin_init(GPIOB, 5, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_MOSI
 }
 
 /*!****************************************************************************
@@ -59,15 +62,29 @@ void spfd_softSpiInit(void){
 /*!****************************************************************************
  *
  */
+static inline void sw_SPIdelay(void){
+	__NOP();
+	__NOP();
+	__NOP();
+}
+/*!****************************************************************************
+ *
+ */
 void sw_SPIsend(uint16_t data){
 	uint32_t mask;
 	for(uint32_t mask = 1 << 8; mask != 0; mask >>= 1){
-		(data & mask) ? _gppin_set(GPIOB, pinm5) : _gppin_reset(GPIOB, pinm5);
-		asm volatile ("nop");
+		if(data & mask){
+			_gppin_set(GPIOB, pinm5);
+		}else{
+			_gppin_reset(GPIOB, pinm5);
+		}
+		sw_SPIdelay();
+
 		_gppin_set(GPIOB, pinm3);
-		asm volatile ("nop");
+		sw_SPIdelay();
+
 		_gppin_reset(GPIOB, pinm3);
-		asm volatile ("nop");
+		sw_SPIdelay();
 	}
 }
 
@@ -77,7 +94,7 @@ void sw_SPIsend(uint16_t data){
 void spfd_lcdCmd(uint8_t data){
     uint16_t buf = data;
     gppin_reset(GP_SSD_CS);;    //формирование уровня cs - LOW
-    buf |= (0<<8);
+    buf |= (0 << 8);
     sw_SPIsend(buf);
     gppin_set(GP_SSD_CS);;    	//формирование уровня cs - HI
 }

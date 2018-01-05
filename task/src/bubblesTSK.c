@@ -9,8 +9,17 @@
 /*!****************************************************************************
  * Include
  */
-#include "bubblesTSK.h"
+#include "FreeRTOS.h"
 #include "task.h"
+#include "graphics.h"
+#include "ui.h"
+#include "display.h"
+#include "beep.h"
+#include "rtc.h"
+#include "enco.h"
+#include "key.h"
+#include "systemTSK.h"
+#include "bubblesTSK.h"
 
 /*!****************************************************************************
  * User define

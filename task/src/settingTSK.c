@@ -10,6 +10,16 @@
 /*!****************************************************************************
  * Include
  */
+#include "FreeRTOS.h"
+#include "pstypes.h"
+#include "rtc.h"
+#include "main.h"
+#include "menuSystem.h"
+#include "enco.h"
+#include "systemTSK.h"
+#include "netif.h"
+#include "ledpwm.h"
+#include "regulatorConnTSK.h"
 #include "settingTSK.h"
 
 /*!****************************************************************************
@@ -25,6 +35,8 @@ void settingTSK(void *pPrm){
 	enSetNtic(0);
 
 	menuEngine(mN_voltmeter);
+	prm_store(SYSEEPADR, prmEepSys);
+	//nvMem_savePrm(&systemSettingRegion);
 	selWindow(baseWindow);
 	while(1){
 		vTaskDelay(pdMS_TO_TICKS(100));

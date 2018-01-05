@@ -10,17 +10,25 @@
 /*!****************************************************************************
  * Include
  */
+#include "lwip/api.h"
+#include "lwip/ip.h"
+#include "stdio.h"
+#include "string.h"
+#include "debugPrint.h"
+#include "htmlPage.h"
 #include "httpServerTSK.h"
 
 /**
  * HTTP_SERVER_DEBUG: Enable debugging for http server
  */
 #define HTTP_DEBUG	0	//1 - ON, 0 - OFF
+#define LEN			1024
 
 /*!****************************************************************************
  * MEMORY
  */
-#define 	LEN 1024
+httpServer_type httpServer;
+
 
 char		pageData[LEN];
 const char http_200[] 				= "HTTP/1.1 200 OK\r\n";
@@ -155,7 +163,8 @@ void httpServerTSK(void *pPrm){
 		if(err != ERR_OK){
 			print("Error %i", err);
 		}
-		fp.state.lanActive = 1;
+
+		httpServer.numberRequest++;
 
 		printdmsg(HTTP_DEBUG, ("Serve connection\n"));
 		printdmsg(HTTP_DEBUG, ("Remote IP address: %s\n", ipaddr_ntoa(&newconn->pcb.ip->remote_ip)));

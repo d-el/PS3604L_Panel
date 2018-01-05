@@ -2,7 +2,7 @@
  * @file		htmlPage.h
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
- * @date		20 сент. 2017 г.
+ * @date		20.09.2017
  * @copyright	GNU Lesser General Public License v3
  * @brief		--
  */
@@ -13,9 +13,6 @@
  * Include
  */
 #include "stdint.h"
-#include "string.h"
-#include "systemTSK.h"
-#include "sysTimeMeas.h"
 
 /*!****************************************************************************
  * Define

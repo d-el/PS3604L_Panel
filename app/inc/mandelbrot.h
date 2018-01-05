@@ -10,7 +10,6 @@
  * Include
  */
 #include "stdint.h"
-#include "display.h"
 #include "IQmathLib.h"
 
 /*!****************************************************************************

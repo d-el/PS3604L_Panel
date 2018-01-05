@@ -15,8 +15,7 @@
  * Include
  */
 #include "stdint.h"
-#include "stdlib.h"
-#include "display.h"
+#include "spfd54124b.h"
 
 /*!****************************************************************************
  * User define

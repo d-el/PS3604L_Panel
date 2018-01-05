@@ -12,15 +12,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "lwip/api.h"
-#include "lwip/ip.h"
-#include "stdio.h"
-#include "string.h"
-#include "debugPrint.h"
-#include "gpio.h"
-#include "uart.h"
-#include "rtc.h"
-#include "htmlPage.h"
+#include "stdint.h"
 
 /*!****************************************************************************
  * Define
@@ -33,10 +25,14 @@
 /*!****************************************************************************
  * Typedef
  */
+typedef struct{
+	uint32_t	numberRequest;
+}httpServer_type;
 
 /*!****************************************************************************
  * Exported variables
  */
+extern httpServer_type httpServer;
 
 /*!****************************************************************************
  * Macro functions

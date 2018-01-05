@@ -15,16 +15,8 @@
 /*!****************************************************************************
  * Include
  */
-#include "string.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "crc.h"
+#include "stdint.h"
 #include "pstypes.h"
-#include "OSinit.h"
-#include "systemTSK.h"
-#include "uart.h"
 
 /*!****************************************************************************
  * Define

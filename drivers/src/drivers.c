@@ -10,9 +10,22 @@
 /*!****************************************************************************
  * Include
  */
-#include "drivers.h"
-
+#include "pvd.h"
+#include "stm32f4x7_eth_bsp.h"
+#include "beep.h"
+#include "spfd54124b.h"
+#include "uart.h"
+#include "i2c.h"
+#include "enco.h"
+#include "clock.h"
+#include "ledpwm.h"
+#include "rtc.h"
+#include "sysTimeMeas.h"
+#include "gpio.h"
+#include "systemTSK.h"
 #include "uniqueDeviceId.h"
+#include "24AAxx.h"
+
 uint8_t macAddress[6];
 void macAddressSet(void){
 	uint32_t mach = makeID(getDid());
@@ -34,7 +47,7 @@ void hardInit(void){
 	ETH_BSP_Config();	//configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();
-	//beep_init();
+	beep_init();
 	ledPwm_init();
 	spfd_init();
 	rtcStatus_type rtcStatus = rtc_init();
@@ -47,6 +60,9 @@ void hardInit(void){
 	uart_init(uart1, BR38400);
 	uart_init(uart3, BR57600);
 	uart_init(uart4, BR115200);
+	i2c_init(i2c1);
+	eep_init();
+
 	//pvd_init();
 	macAddressSet();
 }

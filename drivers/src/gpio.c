@@ -4,12 +4,17 @@
 * @version  V1.0
 * @date     20.07.2016
 * @date     02.08.2016  fix set nAF
-* @brief    gpio driver for stm32F0
+* @brief    gpio driver for stm32F4
 */
 
 /*!****************************************************************************
 * Include
 */
+#include "bitbanding.h"
+#include "board.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 #include "gpio.h"
 
 /*!****************************************************************************
@@ -37,6 +42,8 @@ const pinMode_type   const pinsMode[] = {
 
 /*15*/makepin(GPIOA, 8, 	alternateFunctionPushPull, pullDisable, 0, 0),	//MCO1
 /*16*/makepin(GPIOC, 9, 	alternateFunctionPushPull, pullDisable, 0, 0),	//MCO2
+
+//*17*/makepin(GPIOB, 14, 	outPushPull,	pullDisable,    0,  0),  //LED2
 };
 const uint32_t pinNum = sizeof(pinsMode) / sizeof(pinMode_type);
 
@@ -89,6 +96,8 @@ void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_t
     port->OTYPER        &= ~(1<<npin);
     port->PUPDR         &= ~(GPIO_RESERVED << (2*npin));
     port->AFR[npin / 8] &= ~(GPIO_AFRL_AFSEL0_Msk << (4*(npin % 8)));
+    //Set number alternate function
+    port->AFR[npin / 8] |= nAF << (4*(npin % 8));
 
     //Set pull
     if(pull == pullUp){
@@ -128,9 +137,6 @@ void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_t
             port->OTYPER    |= GPIO_OPEN_DRAIN << npin;
             break;
     }
-
-    //Set number alternate function
-    port->AFR[npin / 8] |= nAF << (4*(npin % 8));
 }
 
 /*************** (C) COPYRIGHT ************** END OF FILE ********* D_EL *****/

@@ -12,16 +12,8 @@
 /*!****************************************************************************
  * Include
  */
-#include "FreeRTOS.h"
-#include "OSinit.h"
-#include "pstypes.h"
-#include "storage.h"
-#include "rtc.h"
-#include "main.h"
+#include "stdint.h"
 #include "menuSystem.h"
-#include "enco.h"
-#include "systemTSK.h"
-#include "netif.h"
 
 /*!****************************************************************************
  * Define

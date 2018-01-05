@@ -17,6 +17,11 @@
  */
 
 /*!****************************************************************************
+ * Local prototypes for the functions
+ */
+extern uint32_t SH_DoCommand(uint32_t n32In_R0, uint32_t n32In_R1, uint32_t *pn32Out_R0);
+
+/*!****************************************************************************
  * @brief  Transmit a null-terminated string on semihosting mode
  * @param  str is the string that to send
  * @return Character to write

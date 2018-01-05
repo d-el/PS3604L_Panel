@@ -11,14 +11,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "math.h"
-#include "ui.h"
-#include "baseTSK.h"
-#include "display.h"
-#include "graphics.h"
-#include "rtc.h"
-#include "beep.h"
-#include "IQmathLib.h"
+#include "stdint.h"
 
 /*!****************************************************************************
  * User define

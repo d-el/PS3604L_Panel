@@ -1,22 +1,8 @@
-/******************************************************************************
-**
-**  File        : STM32F407VETx_FLASH.ld
-**
-**  Abstract    : Linker script for STM32F407VETx Device with
-**                512KByte FLASH, 128KByte RAM
-**
-**                Set heap size, stack size and stack location according
-**                to application requirements.
-**
-**                Set memory bank area and size if external memory is used.
-**
-**  Target      : STMicroelectronics STM32
-**
-**
-**  Distribution: The file is distributed as is, without any warranty
-**                of any kind.
-**
-*/
+/*!****************************************************************************
+ * File			: STM32F407VETx_FLASH.ld
+ * Abstract		: Linker script for STM32F407VETx Device with
+ *					512KByte FLASH, 128KByte RAM
+ */
 
 /* Entry Point */
 ENTRY(Reset_Handler)

@@ -10,7 +10,11 @@
 /*!****************************************************************************
  * Include
  */
+#include "ledpwm.h"
+#include "debugPrint.h"
+#include "regulatorConnTSK.h"
 #include "systemTSK.h"
+#include "baseTSK.h"
 
 /*!****************************************************************************
  * Memory
@@ -25,13 +29,13 @@ struct netif	xnetif; 			///< Network interface structure
 void loadParameters(void);
 void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
 void netSettingUpdate(void);
+void shutdown(void);
 
 /*!****************************************************************************
  * @brief
  */
 void systemTSK(void *pPrm){
 	TickType_t 		xLastWakeTime = xTaskGetTickCount();
-
 	selWindow_type 	selWindowPrev = noneWindow;
 	BaseType_t 		Result = pdTRUE;
 
@@ -47,6 +51,10 @@ void systemTSK(void *pPrm){
 	selWindow(startupWindow);
 
 	while(1){
+		if(fp.tf.state.bit.lowInputVoltage != 0){
+			shutdown();
+		}
+
 		if(selWindowPrev != fp.currentSelWindow){
 			if(windowTskHandle != NULL){
 				vTaskDelete(windowTskHandle);	//Удаляем текущее окно
@@ -80,42 +88,45 @@ void systemTSK(void *pPrm){
 			selWindowPrev = fp.currentSelWindow;
 		}
 
-		/**************************************
+		/*
 		 * Вызов периодических функций
 		 */
 		static uint8_t ledCount = 0;
-		if(ledCount++ == 10){
+		if(ledCount++ == 100){
 			LED_ON();
 			ledCount = 0;
 		}
-		if(ledCount == 1){
+		if(ledCount == 10){
 			LED_OFF();
 		}
-		if((ledCount == 2) && (uartTsk.state == uartConnect)){
+		if((ledCount == 20) && (uartTsk.state == uartConnect)){
 			LED_ON();
 		}
-		if(ledCount == 3){
+		if(ledCount == 30){
 			LED_OFF();
 		}
 
 		/*
 		 * link management
 		 */
-		if(gppin_get(GP_LANnINT) == 0){	//Detect by GPIO
-			ETH_ReadPHYRegister(1, PHY_BSR);
-			if(fp.state.lanLink != 0){
-				netif_set_down(&xnetif);
-				fp.state.lanLink = 0;
+		static uint8_t linkCount = 0;
+		if(linkCount++ == (LINK_DETECT_PERIOD / SYSTEM_TSK_PERIOD)){
+			if(gppin_get(GP_LANnINT) == 0){	//Detect by GPIO
+				ETH_ReadPHYRegister(1, PHY_BSR);
+				if(fp.state.lanLink != 0){
+					netif_set_down(&xnetif);
+					fp.state.lanLink = 0;
+				}
 			}
-		}
-		if(fp.state.lanLink == 0){	//Detect by read status register
-			if(ETH_AutoNegotiation(1, NULL) == ETH_SUCCESS){
-				netif_set_up(&xnetif);	//When the netif is fully configured this function must be called
-				fp.state.lanLink = 1;
+			if(fp.state.lanLink == 0){		//Detect by read status register
+				if(ETH_AutoNegotiation(1, NULL) == ETH_SUCCESS){
+					netif_set_up(&xnetif);	//When the netif is fully configured this function must be called
+					fp.state.lanLink = 1;
+				}
 			}
-		}
 
-		/*************************************/
+			linkCount = 0;
+		}
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));
 	}
 }
@@ -124,27 +135,18 @@ void systemTSK(void *pPrm){
  * @brief	Load parameters from memory
  */
 void loadParameters(void){
-	nvMem_state_type nvMemState;
+	prm_state_type stat;
 
-	prm_loadDefault();
-
-	nvMem_init(&userConfRegion);
-	nvMem_init(&userReservConfRegion);
-	nvMem_init(&systemSettingRegion);
-
-	nvMemState = nvMem_loadPrm(&systemSettingRegion);
-	if(nvMemState != nvMem_ok){
+	stat = prm_load(SYSEEPADR, prmEepSys);
+	if(stat != prm_ok){
+		prm_loadDefault(prmEepSys);
 		fp.state.sysSettingLoadDefault = 1;
 	}
-	nvMemState = nvMem_loadPrm(&userConfRegion);
-	if(nvMemState != nvMem_ok){
-		//Попробуем считать резервную копию
-		nvMemState = nvMem_loadPrm(&userReservConfRegion);
-		if(nvMemState != nvMem_ok){
-			fp.state.userSettingLoadDefault = 1;
-		}
-	}else{
-		nvMem_savePrm(&userReservConfRegion);
+
+	stat = prm_load(USEREEPADR, prmEep);
+	if(stat != prm_ok){
+		prm_loadDefault(prmEep);
+		fp.state.userSettingLoadDefault = 1;
 	}
 }
 
@@ -165,14 +167,17 @@ void selWindow(selWindow_type window){
  */
 void shutdown(void){
 	pvd_disable();
-	vTaskSuspendAll();
 	setLcdBrightness(0);
 	LED_OFF();
-	nvMem_savePrm(&userConfRegion);
+	//nvMem_savePrm(&userConfRegion);
+	prm_store(USEREEPADR, prmEep);
 	spfd_disable();
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
 	LED_ON();
-	//delay_ms(10000);
+	if(windowTskHandle != NULL){
+		vTaskDelete(windowTskHandle);	//Удаляем текущее окно
+	}
+	vTaskDelay(pdMS_TO_TICKS(10000));
 	NVIC_SystemReset();
 }
 

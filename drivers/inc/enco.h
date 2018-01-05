@@ -13,8 +13,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "stm32f4xx.h"
-#include "gpio.h"
+#include "stdint.h"
 #include "prmSystem.h"
 
 /*!****************************************************************************
@@ -25,7 +24,13 @@
  * User typedef
  */
 typedef enum {
-	enNoCharge, enCharge, enNoLim, enLimDown, enLimUp, enTransitionDown, enTransitionUp,
+	enNoCharge,
+	enCharge,
+	enNoLim,
+	enLimDown,
+	enLimUp,
+	enTransitionDown,
+	enTransitionUp,
 } enStatus_type;
 
 typedef struct {

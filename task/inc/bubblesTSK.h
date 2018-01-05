@@ -12,15 +12,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "stdlib.h"
-#include "graphics.h"
-#include "OSinit.h"
-#include "ui.h"
-#include "display.h"
-#include "beep.h"
-#include "rtc.h"
-#include "enco.h"
-#include "systemTSK.h"
+#include "stdint.h"
 
 /*!****************************************************************************
  * User define

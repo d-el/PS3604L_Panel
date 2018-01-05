@@ -10,15 +10,15 @@
 /*!****************************************************************************
  * Include
  */
+#include "string.h"
 #include "rtc.h"
+#include "time.h"
 #include "lwipopts.h"
 #include "lwip/timers.h"
 #include "lwip/udp.h"
 #include "lwip/dns.h"
 #include "lwip/ip_addr.h"
 #include "lwip/pbuf.h"
-#include "string.h"
-#include "time.h"
 #include "debugPrint.h"
 #include "assert.h"
 

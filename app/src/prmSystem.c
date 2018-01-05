@@ -10,9 +10,13 @@
 /*!****************************************************************************
  * Include
  */
+#include "string.h"
+#include "rtc.h"
+#include "crc.h"
+#include "24AAxx.h"
 #include "prmSystem.h"
 #include "systemTSK.h"
-#include "rtc.h"
+#include "baseTSK.h"
 
 prmval_type abc = { .t_u32Frmt = 10000 };
 
@@ -79,6 +83,31 @@ const prmHandle_type prmh[] = {
 const uint16_t prmHandleLen = sizeof(prmh) / sizeof(prmHandle_type);
 #undef parametres
 
+//! Type size table
+static const uint8_t sizePrm[] = {
+	1,	//u8Frmt
+	1,	//s8Frmt
+	2,	//u16Frmt
+	2,	//s16Frmt
+	4,	//u32Frmt
+	4,	//s32Frmt
+	4,	//floatFrmt
+	4,	//unixTimeFrmt
+	4,	//unixDateFrmt
+	4,	//ipAdrFrmt
+};
+
+static uint8_t prmLoadBff[1024];
+
+/*!****************************************************************************
+ * @brief	get parameter size
+ * @param[in]	parameter type
+ * @retval		size in bytes
+ */
+uint8_t prm_getSize(prmType_type type){
+	return sizePrm[type];
+}
+
 /*!****************************************************************************
  * @brief	Write value to parameter
  */
@@ -114,10 +143,98 @@ void prm_setVal(const prmHandle_type *const prmHandle, const prmval_type *const 
 /*!****************************************************************************
  * @brief	Load to all parameters default value
  */
-void prm_loadDefault(void){
+void prm_loadDefault(prmNvSave_type prmNvSave){
 	for(uint32_t iterator = 0; iterator < prmHandleLen; iterator++){
-		prm_setVal(&prmh[iterator], &prmh[iterator].def);
+		if(prmh[iterator].save == prmNvSave){
+			prm_setVal(&prmh[iterator], &prmh[iterator].def);
+		}
 	}
+}
+
+/*!****************************************************************************
+ * @brief	Store all parameters
+ */
+prm_state_type prm_store(void *pMemory, prmNvSave_type prmNvSave){
+	uint16_t signature = 0x2805;
+	uint16_t crc;
+	uint32_t size;
+	uint32_t prmSize;
+	uint8_t *pbuf = &prmLoadBff[0];
+
+	// Copy data to signature
+	memcpy(pbuf, &signature, sizeof(signature));
+	size = sizeof(signature);
+
+	// Copy data to buffer
+	for(uint32_t iterator = 0; iterator < prmHandleLen; iterator++){
+		if(prmh[iterator].save == prmNvSave){
+			memcpy(pbuf + size, prmh[iterator].prm, prm_getSize(prmh[iterator].type));
+			size += prm_getSize(prmh[iterator].type);
+		}
+	}
+
+	// Calculate CRC
+	crc = crc16Calc(&crcModBus, pbuf, size);
+
+	// Copy CRC
+	memcpy(pbuf + size, &crc, sizeof(crc));
+	size += sizeof(crc);
+
+	// Write to memory
+	uint8_t memState = eep_write((uint32_t)pMemory, pbuf, size);
+	if(memState != 0){
+		return prm_writeError;
+	}
+
+	return prm_ok;
+}
+
+/*!****************************************************************************
+ * @brief	Load all parameters
+ */
+prm_state_type prm_load(void *pMemory, prmNvSave_type prmNvSave){
+	uint16_t signature;
+	uint16_t crc;
+	uint16_t size;
+	uint8_t *pbuf = &prmLoadBff[0];
+
+	// Calculate size packet
+	size = sizeof(signature);
+	for(uint32_t iterator = 0; iterator < prmHandleLen; iterator++){
+		if(prmh[iterator].save == prmNvSave){
+			size += prm_getSize(prmh[iterator].type);
+		}
+	}
+	size += sizeof(crc);
+
+	// Read from memory
+	uint8_t memState = eep_read(pbuf, (uint32_t)pMemory, size);
+	if(memState != 0){
+		return prm_readError;
+	}
+
+	// Check signature
+	memcpy(&signature, pbuf, sizeof(signature));
+	if(signature != 0x2805){
+		return prm_signatureError;
+	}
+
+	// Check CRC
+	crc = crc16Calc(&crcModBus, pbuf, size);
+	if(crc != 0){
+		return prm_crcError;
+	}
+
+	// Copy data
+	pbuf += sizeof(signature);
+	for(uint32_t iterator = 0; iterator < prmHandleLen; iterator++){
+		if(prmh[iterator].save == prmNvSave){
+			prm_setVal(&prmh[iterator], (prmval_type*)pbuf);
+			pbuf += prm_getSize(prmh[iterator].type);
+		}
+	}
+
+	return prm_ok;
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

@@ -10,8 +10,22 @@
 /*!****************************************************************************
  * Include
  */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "stddef.h"
+#include "string.h"
+#include "stdlib.h"
+#include "time.h"
+#include "FreeRTOS.h"
 #include "menuSystem.h"
 #include "settingTSK.h"
+#include "ui.h"
+#include "rtc.h"
+#include "display.h"
+#include "graphics.h"
+#include "key.h"
+#include "enco.h"
+#include "beep.h"
 
 /*!****************************************************************************
  * MEMORY
@@ -80,12 +94,12 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 	uint8_t 			bigstepDown = 0;
 	uint8_t 			setDef = 0;
 	uint8_t 			editSection = 0;
-	enStatus_type 		enstatus;
+	enStatus_type 		enstatus = enNoCharge;
 
 	*topMenu = &menuTree[menuItemNumber];
 	*sMenu = *topMenu;
 
-	xLastWakeTime = xTaskGetTickCount();      //Инициализируем xLastWakeTime текущим временем
+	xLastWakeTime = xTaskGetTickCount();
 	disp_setColor(black, white);
 	disp_fillScreen(black);
 	ksSet(15, 5, kUp | kDown);

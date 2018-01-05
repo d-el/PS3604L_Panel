@@ -9,35 +9,47 @@
 /*!****************************************************************************
 * Include
 */
+#include "string.h"
+#include "assert.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
+#include "i2c.h"
 #include "24AAxx.h"
 
 /*!****************************************************************************
 * Memory
 */
 uint8_t eep_tempBff[17];
+static SemaphoreHandle_t i2cSem;
 
 /*!****************************************************************************
 * EEPROM EMU
 */
-/*uint8_t chip[1024];
-void i2c_write(uint8_t adr, uint8_t *p, uint32_t len){
-    uint16_t linear_adr;
 
-    eepAddress_type *ea = (eepAddress_type*)&adr;
-    linear_adr = ((ea->bit.blockSelect * BYTESINPAGE) + *p);
-
-    memcpy(chip + linear_adr, p +1, len);
+/*!****************************************************************************
+* @brief    I2C Callback
+*/
+static void eep_i2cCallback(i2c_type *i2cx){
+	BaseType_t xHigherPriorityTaskWoken;
+	xHigherPriorityTaskWoken = pdFALSE;
+	xSemaphoreGiveFromISR(i2cSem, &xHigherPriorityTaskWoken);
+	if(xHigherPriorityTaskWoken != pdFALSE){
+		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+	}
 }
-void i2c_read(uint8_t adr, uint8_t *p, uint32_t len){
-    uint16_t linear_adr;
 
-    eepAddress_type *ea = (eepAddress_type*)&adr;
-    linear_adr = ((ea->bit.blockSelect * BYTESINPAGE) + *p);
+/*!****************************************************************************
+* @brief    Initialize eeprom memory
+*/
+void eep_init(void){
+	// Create Semaphore for I2C
+	vSemaphoreCreateBinary(i2cSem);
+	assert(i2cSem != NULL);
+	xSemaphoreTake(i2cSem, portMAX_DELAY);
 
-    memcpy(p, chip + linear_adr, len);
-}*/
-
-
+	i2c_setCallback(usei2c, eep_i2cCallback);
+}
 
 /*!****************************************************************************
 * @brief    Write data to eeprom memory
@@ -47,7 +59,8 @@ void i2c_read(uint8_t adr, uint8_t *p, uint32_t len){
 * @retval   none
 */
 eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len){
-	uint16_t eepdelayms = 6;
+	BaseType_t			res;
+	uint16_t			eepdelayms = 6;
     uint8_t             *pData;
     eepAddress_type     eepAdr;
     uint8_t             adrInBlock;
@@ -74,9 +87,9 @@ eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len){
             memcpy(&eep_tempBff[1], pData, len);
 
             i2c_write(usei2c, eep_tempBff, len + 1, eepAdr.all);
-            while(usei2c->state == i2cTxRun);
-            if(usei2c->state != i2cTxSuccess){
-                return eepI2cError;
+            res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
+            if(res != pdTRUE){
+            	return eepI2cError;
             }
             vTaskDelay(eepdelayms);
 
@@ -87,10 +100,10 @@ eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len){
             memcpy(&eep_tempBff[1], pData, canWrite);
 
             i2c_write(usei2c, eep_tempBff, canWrite + 1, eepAdr.all);
-            while(usei2c->state == i2cTxRun);
-            if(usei2c->state != i2cTxSuccess){
-                return eepI2cError;
-            }
+            res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
+			if(res != pdTRUE){
+				return eepI2cError;
+			}
             vTaskDelay(eepdelayms);
 
             len -= canWrite;
@@ -109,6 +122,7 @@ eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len){
 * @retval   none
 */
 eepStatus_type eep_read(void *dst, uint16_t src, uint16_t len){
+	BaseType_t			res;
     eepAddress_type     eepAdr;
     uint8_t             adrInBlock;
 
@@ -120,19 +134,19 @@ eepStatus_type eep_read(void *dst, uint16_t src, uint16_t len){
     eepAdr.bit.rw = eepWrite;
     adrInBlock = src % BYTESINPAGE;
 
-    i2c_write(usei2c, &adrInBlock, 1, eepAdr.all);  //����� len ������
-    while(usei2c->state == i2cTxRun);
-    if(usei2c->state != i2cTxSuccess){
-        return eepI2cError;
-    }
+    i2c_write(usei2c, &adrInBlock, 1, eepAdr.all);
+    res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
+	if(res != pdTRUE){
+		return eepI2cError;
+	}
 
     eepAdr.bit.rw = eepRead;
 
     i2c_read(usei2c, dst, len, eepAdr.all);
-    while(usei2c->state == i2cRxRun);
-    if(usei2c->state != i2cRxSuccess){
-        return eepI2cError;
-    }
+    res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
+	if(res != pdTRUE){
+		return eepI2cError;
+	}
 
     return eepOk;
 }

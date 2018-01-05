@@ -1,12 +1,28 @@
 ﻿/******************************************************************************
- * @file			charge.c
+ * @file		charge.c
  * @author		D_EL - Storozhenko Roman
- * @version      V1.0
+ * @version		V1.0
  * @date
- * @copyright GNU Public License
+ * @copyright	GNU Public License
  */
 
+/*!****************************************************************************
+ * Include
+ */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "ui.h"
+#include "pstypes.h"
+#include "graphics.h"
+#include "display.h"
+#include "key.h"
+#include "enco.h"
+#include "beep.h"
 #include "chargeTSK.h"
+#include "regulatorConnTSK.h"
+#include "systemTSK.h"
 
 /******************************************************************************
  * Memory

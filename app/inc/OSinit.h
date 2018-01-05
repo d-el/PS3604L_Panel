@@ -14,8 +14,8 @@
 #define SYSTEM_TSK_PRIO         7
 #define UART_TSK_PRIO           6
 #define NETIF_TSK_PRIO          5
-#define TCPIP_TSK_PRIO         	4
-#define HTTP_TSK_PRIO          	3
+#define TCPIP_TSK_PRIO          4
+#define HTTP_TSK_PRIO           3
 #define STARTUP_TSK_PRIO        1
 #define BASE_TSK_PRIO           1
 #define CHARG_TSK_PRIO          1
@@ -27,8 +27,8 @@
 #define SYSTEM_TSK_SZ_STACK     256
 #define UART_TSK_SZ_STACK       256
 #define NETIF_SZ_STACK          512
-#define TCPIP_SZ_STACK         	1024
-#define HTTP_TSK_SZ_STACK      	512
+#define TCPIP_SZ_STACK          1024
+#define HTTP_TSK_SZ_STACK       512
 #define STARTUP_TSK_SZ_STACK    256
 #define BASE_TSK_SZ_STACK       256
 #define CHARG_TSK_SZ_STACK      256

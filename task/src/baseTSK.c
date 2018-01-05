@@ -6,6 +6,26 @@
  * @copyright	GNU Lesser General Public License v3
  * @brief		This task is base GUI
  */
+
+/*!****************************************************************************
+ * Include
+ */
+#include "string.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "ui.h"
+#include "pstypes.h"
+#include "rtc.h"
+#include "beep.h"
+#include "key.h"
+#include "enco.h"
+#include "display.h"
+#include "graphics.h"
+#include "regulatorConnTSK.h"
+#include "sysTimeMeas.h"
+#include "systemTSK.h"
 #include "baseTSK.h"
 
 /******************************************************************************
@@ -35,11 +55,10 @@ void baseTSK(void *pPrm){
 	disp_fillScreen(black);
 	//Печать статических символов
 	grf_line(0, 107, 159, 107, halfLightGray);
-	ksSet(30, 10, kUp | kDown);
+	ksSet(30, 5, kUp | kDown);
 	enSetNtic(2);
 
 	while(1){
-		gppin_set(GP_LED3);
 		sysTimeMeasStart(sysTimeBs);
 
 		/**************************************
@@ -249,7 +268,6 @@ void baseTSK(void *pPrm){
 		//Измерение времени выполнения одной итерации задачи
 		sysTimeMeasStop(sysTimeBs);
 		timebs_us = sysTimeMeasGet_us(sysTimeBs);
-		gppin_reset(GP_LED3);
 
 		/*************************************/
 		//vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));                       //Запускать задачу каждые 30ms
@@ -280,8 +298,9 @@ void printStatusBar(void){
 	}
 	ovfCurrent = fp.tf.state.bit.ovfCurrent;
 
-	if((fp.tf.state.bit.errorLinearRegTemperSens != 0) || (fp.tf.state.bit.ovfLinearRegTemper != 0) || (fp.tf.state.bit.reverseVoltage != 0)
-			|| (uartTsk.state == uartNoConnect)){
+	if((fp.tf.state.bit.errorLinearRegTemperSens != 0) || (fp.tf.state.bit.ovfLinearRegTemper != 0)
+			|| (fp.tf.state.bit.reverseVoltage != 0) || (uartTsk.state == uartNoConnect))
+	{
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
 		if(errPrev == 0){
@@ -333,9 +352,6 @@ void printStatusBar(void){
 		struct tm tmLocal;
 		localtime_r(&unixTime, &tmLocal);
 
-		//println("tmUtc.tm_hour %u", tmUtc.tm_hour);
-		//println("tmLocal.tm_hour %u", tmLocal.tm_hour);
-
 		strftime(str, sizeof(str), "%H:%M:%S", &tmUtc);
 		disp_putStr(110, 110, &font6x8, 0, str);
 		strftime(str, sizeof(str), "%d.%m.%y", &tmUtc);
@@ -371,23 +387,5 @@ void printStatusBar(void){
 		errPrev = 0;
 	}
 }
-
-
-
-
-/**************************************
- * Настройка клавиатуры
- */
-/*if(fvarParamNew != 0){
- if(varParam == VAR_VOLT){
- kc.AutoPress = AutoPressON;                                         //Разрешить автонажатие
- }
- if(varParam == VAR_CURR){
- kc.AutoPress = AutoPressON;
- }
- if(varParam == VAR_MODE){
- kc.AutoPress = AutoPressOFF;
- }
- }*/
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

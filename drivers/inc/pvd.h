@@ -12,13 +12,6 @@
 /*!****************************************************************************
  * Include
  */
-#include "stm32f4xx.h"
-#include "ledpwm.h"
-#include "spfd54124b.h"
-#include "storage.h"
-#include "board.h"
-#include "beep.h"
-#include "stdlib.h"
 
 /*!****************************************************************************
  * Define

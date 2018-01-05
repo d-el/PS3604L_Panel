@@ -10,14 +10,11 @@
  * Include
  */
 #include "OSinit.h"
-#include "stm32f4x7_eth.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "timers.h"
 #include "systemTSK.h"
 #include "assert.h"
+#include "debugPrint.h"
 
 /*!****************************************************************************
  * @brief Init operating system

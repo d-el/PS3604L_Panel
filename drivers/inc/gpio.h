@@ -11,12 +11,8 @@
 /*!****************************************************************************
 * Include
 */
-#include "stm32f4xx.h"
-#include "bitbanding.h"
 #include "stdint.h"
-#include "board.h"
-#include "FreeRTOS.h"
-#include "semphr.h"
+#include "stm32f4xx.h"
 
 /*!****************************************************************************
 * User define
@@ -120,8 +116,8 @@ GP_NOT_USED
 */
 #define makepin(port, npin, mode, pull, iniState, nAF)    { port, (1<<npin), npin, mode, iniState, pull, nAF }
 
-#define _gppin_set(port, pinmask)       (*(uint16_t*)(&port->BSRR) = (pinmask))
-#define _gppin_reset(port, pinmask)     (*((uint16_t*)(&port->BSRR) + 1) = (pinmask))
+#define _gppin_set(port, pinmask)       (*(volatile uint16_t*)(&port->BSRR) = (pinmask))
+#define _gppin_reset(port, pinmask)     (*((volatile uint16_t*)(&port->BSRR) + 1) = (pinmask))
 #define _gppin_toggle(port, pinmask)    (port->ODR  ^=(pinmask))
 #define _gppin_get(port, pinmask)       (port->IDR &  (pinmask))
 #define gppin_set(n)                    _gppin_set(pinsMode[n].p, pinsMode[n].mask)
@@ -155,7 +151,7 @@ GP_NOT_USED
 //example: EXTI_INIT(GPIOA, 9, EXTI_MODE_BOTH, 15);
 
 /*!****************************************************************************
-* Extern viriables
+* External variables
 */
 extern pinMode_type   const pinsMode[];
 

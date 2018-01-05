@@ -9,7 +9,17 @@
 /*!****************************************************************************
  * Include
  */
+#include "math.h"
+#include "ui.h"
+#include "display.h"
+#include "graphics.h"
+#include "rtc.h"
+#include "beep.h"
+#include "key.h"
+#include "enco.h"
+#include "IQmathLib.h"
 #include "cube3dTSK.h"
+#include "systemTSK.h"
 
 /*!****************************************************************************
  * User define

@@ -1,5 +1,5 @@
 ﻿/*!****************************************************************************
- * @file    specificMath.h 
+ * @file    specificMath.h
  * @author  Storozhenko Roman - D_EL
  * @version V1.1
  * @date    12-09-2015
@@ -27,7 +27,7 @@
  */
 
 /*!****************************************************************************
- * Extern viriables
+ * External variables
  */
 
 /*!****************************************************************************
@@ -38,6 +38,7 @@
 #define IntToIQ(_intval, _mul) (_iq)(((int64_t)_intval * _IQ(1) + _mul/2) / _mul)
 #define IQ14toInt(_iqval, _mul) (int32_t)(((int64_t)_iqval * _mul + _IQ14(1)/2) / _IQ14(1))
 #define divWithRounding(val, div) (((val) + ((div / 2))) / (div))		/* Divide with rounding */
+
 /*!****************************************************************************
  * Prototypes for the functions
  */

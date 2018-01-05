@@ -17,6 +17,22 @@
 /*!****************************************************************************
  * Define
  */
+/*
+ * - 0000 -----------------------------------
+ * ------------------------------------------
+ * ------ Пользовательские настройки
+ * ------------------------------------------
+ * ------------------------------------------
+ * - 0512 -----------------------------------
+ * ------------------------------------------
+ * ------ Системные данные
+ * ------------------------------------------
+ * ------------------------------------------
+ * - 1023 -----------------------------------
+ */
+#define USEREEPADR		((void*)0)
+#define SYSEEPADR		((void*)512)
+
 #define typeu8Frmt		uint8_t
 #define	types8Frmt		int8_t
 #define	typeu16Frmt		uint16_t
@@ -25,9 +41,9 @@
 #define	types32Frmt		int32_t
 #define	typesfloatFrmt	float
 
-#define	power0			1U
-#define	power1			10U
-#define	power2			100U
+#define	power0			1
+#define	power1			10
+#define	power2			100
 #define	power3			1000U
 #define	power4			10000U
 #define	power5			100000U
@@ -82,7 +98,8 @@ typedef enum {
 
 typedef enum {
 	prmNotSave,
-	prmEeprom,
+	prmEepSys,
+	prmEep,
 } prmNvSave_type;
 
 typedef enum {
@@ -94,6 +111,17 @@ typedef enum {
 	prmStepConst,
 	prmStepVariable,
 } prmStep_type;
+
+typedef enum {
+	prm_ok,
+	prm_addrIsNull,
+	prm_signatureError,
+	prm_crcError,
+	prm_errorSizeMem,
+	prm_writeError,
+	prm_readError,
+	prm_error
+} prm_state_type;
 
 typedef struct {
 	prmval_type		*prm;			//Pointer to parameter
@@ -124,7 +152,9 @@ extern const uint16_t prmHandleLen;
  * Function declaration
  */
 void prm_setVal(const prmHandle_type *const prmHandle, const prmval_type *const prmval);
-void prm_loadDefault(void);
+void prm_loadDefault(prmNvSave_type prmNvSave);
+prm_state_type prm_store(void *pMemory, prmNvSave_type prmNvSave);
+prm_state_type prm_load(void *pMemory, prmNvSave_type prmNvSave);
 
 #endif /* PRMSYSTEM_H */
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

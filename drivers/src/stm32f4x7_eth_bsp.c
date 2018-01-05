@@ -8,8 +8,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4x7_eth.h"
 #include "stm32f4x7_eth_bsp.h"
-#include "main.h"
 #include "gpio.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/

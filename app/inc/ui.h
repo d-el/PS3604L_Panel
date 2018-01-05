@@ -12,7 +12,6 @@
  * Include
  */
 #include "stdint.h"
-#include "spfd54124b.h"
 
 /*!****************************************************************************
  * User define
@@ -59,7 +58,7 @@ typedef struct {
 } ui_type;
 
 /*!****************************************************************************
- * Extern viriables
+ * External variables
  */
 extern ui_type ui;
 

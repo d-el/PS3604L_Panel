@@ -12,9 +12,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "stm32f4xx.h"
-#include "string.h"
-#include "gpio.h"
+#include "stdio.h"
 
 /*!****************************************************************************
  * Define
@@ -41,12 +39,9 @@ typedef enum {
 	halfLightBlue = 0x861F,
 } color_type;
 
-//#define displayOffsetX  2	//Для книжной
-//#define displayOffsetY  1	//Для книжной
+
 #define displayOffsetX  1	//Для альбомной
 #define displayOffsetY  2	//Для альбомной
-//#define SPFD54124B_W 128	//Для книжной
-//#define SPFD54124B_H 160	//Для книжной
 #define SPFD54124B_W 160	//Для альбомной
 #define SPFD54124B_H 128	//Для альбомной
 

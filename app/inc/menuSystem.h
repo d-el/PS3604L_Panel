@@ -13,14 +13,7 @@
  * Include
  */
 #include "stdint.h"
-#include "stddef.h"
 #include "prmSystem.h"
-#include "rtc.h"
-#include "time.h"
-#include "FreeRTOS.h"
-#include "spfd54124b.h"
-#include "key.h"
-#include "ui.h"
 
 /*!****************************************************************************
  * Define

@@ -10,6 +10,7 @@
 /*!****************************************************************************
  * Include
  */
+#include "gpio.h"
 #include "key.h"
 
 /*!****************************************************************************
@@ -22,7 +23,7 @@ key_type key;
  */
 void dInUpdate(key_type *pkey, uint32_t num, uint32_t val){
 	if(val != 0){
-		if(pkey->dInFilterCnt[num] < (KEY_SAMPLES - 1)){
+		if(pkey->dInFilterCnt[num] < KEY_SAMPLES){
 			pkey->dInFilterCnt[num]++;
 		}else{
 			pkey->dInState |= 1U << num;

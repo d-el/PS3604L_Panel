@@ -27,20 +27,19 @@
 #include "chargeTSK.h"
 #include "httpServerTSK.h"
 #include "pvd.h"
-#include "net.h"
 #include "pingService.h"
 #include "sntp.h"
 #include "assert.h"
+#include "stm32f4x7_eth.h"
+#include "ethernetif.h"
+#include "tcpip.h"
 
 /*!****************************************************************************
  * Define
  */
-#define SYSTEM_TSK_PERIOD   (100)		///< [ms]
-#define I_SHORT_CIRCUIT     (40000)   	///< [X_XXXX A]
-#define MAX_VAL_U           (36000)   	///< [X_XXX V]
-#define MAX_VAL_I           (40000)   	///< [X_XXXX A]
-#define U_BIG_STEP          (1000)    	///< [X_XXX V]
-#define I_BIG_STEP          (5000)    	///< [X_XXXX A]
+#define SYSTEM_TSK_PERIOD   (10)		///< [ms]
+#define LINK_DETECT_PERIOD  (500)		///< [ms]
+#define I_SHORT_CIRCUIT     (4000000)	///< [X_XXXXXX A]
 
 /*!****************************************************************************
  * Enumeration
@@ -50,13 +49,13 @@
  * Typedef
  */
 typedef enum {
-	noneWindow,
-	startupWindow,
-	settingWindow,
-	baseWindow,
-	chargerWindow,
-	cube3dWindow,
-	bubblesWindow
+	noneWindow,   //!< noneWindow
+	startupWindow,//!< startupWindow
+	settingWindow,//!< settingWindow
+	baseWindow,   //!< baseWindow
+	chargerWindow,//!< chargerWindow
+	cube3dWindow, //!< cube3dWindow
+	bubblesWindow //!< bubblesWindow
 } selWindow_type;
 
 typedef struct {
@@ -98,7 +97,6 @@ void selWindow(selWindow_type window);
 void systemTSK(void *pPrm);
 void netSettingUpdate(void);
 void selWindow(selWindow_type window);
-void shutdown(void);
 
 #endif //systemTSK_H
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

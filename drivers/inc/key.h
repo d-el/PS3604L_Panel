@@ -13,8 +13,6 @@
  * Include
  */
 #include "stdint.h"
-#include "math.h"
-#include "gpio.h"
 
 /*!****************************************************************************
  * Define

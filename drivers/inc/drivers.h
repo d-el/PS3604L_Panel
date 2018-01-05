@@ -13,21 +13,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "pvd.h"
-#include "stm32f4x7_eth_bsp.h"
-#include "storage.h"
-#include "beep.h"
-#include "spfd54124b.h"
-#include "uart.h"
-#include "i2c.h"
-#include "enco.h"
-#include "clock.h"
-#include "ledpwm.h"
-#include "rtc.h"
-//#include "delay.h"
-#include "sysTimeMeas.h"
-#include "gpio.h"
-#include "systemTSK.h"
+#include "stdint.h"
 
 /*!****************************************************************************
  * Define

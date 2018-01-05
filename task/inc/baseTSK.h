@@ -12,19 +12,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "OSinit.h"
-#include "ui.h"
-#include "pstypes.h"
-#include "rtc.h"
-#include "beep.h"
-#include "key.h"
-#include "enco.h"
-#include "regulatorConnTSK.h"
-#include "sysTimeMeas.h"
+#include "stdint.h"
 
 /******************************************************************************
  * Define
