@@ -15,7 +15,7 @@
 /*!****************************************************************************
  * MEMORY
  */
-ui_type ui = {
+const ui_type ui = {
 	.color = {
 		.cursor = green,
 		.voltage = white,

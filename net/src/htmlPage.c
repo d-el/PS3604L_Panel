@@ -1,4 +1,4 @@
-/*!****************************************************************************
+﻿/*!****************************************************************************
  * @file		htmlPage.c
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
@@ -412,7 +412,7 @@ const char html_index[] = {
 		"\r\n"
 		"    <footer>\r\n"
         "        <div>\r\n"
-		"        ©copyright: 2013-2017 Storozhenko Roman\r\n"
+		"        В©copyright: 2013-2017 Storozhenko Roman\r\n"
         "        </div>\r\n"
 		"    </footer>\r\n"
 		"    <script>\r\n"
@@ -461,7 +461,7 @@ const char html_index[] = {
 		"                {name: 'u', val: x.getUint32(20, true) / 1000000.0 + ' V'},\r\n"
 		"                {name: 'i', val: x.getUint32(24, true) / 1000000.0 + ' A'},\r\n"
 		"                {name: 'uin', val: x.getUint16(32, true) / 1000.0 + ' V'},\r\n"
-		"                {name: 'temperature', val: x.getUint16(34, true) / 10.0 + ' °C'}\r\n"
+		"                {name: 'temperature', val: x.getUint16(34, true) / 10.0 + ' В°C'}\r\n"
 		"            ]);\r\n"
 		"\r\n"
 		"            // Settings\r\n"
@@ -525,7 +525,7 @@ const char js_overall[] = {
 		"            {name: 'u', val: x.getUint32(20, true) / 1000000.0 + ' V'},\r\n"
 		"            {name: 'i', val: x.getUint32(24, true) / 1000000.0 + ' A'},\r\n"
 		"            {name: 'uin', val: x.getUint16(32, true) / 1000.0 + ' V'},\r\n"
-		"            {name: 'temperature', val: x.getUint16(34, true) / 10.0 + ' °C'}\r\n"
+		"            {name: 'temperature', val: x.getUint16(34, true) / 10.0 + ' В°C'}\r\n"
 		"        ]);\r\n"
 		"\r\n"
 		"        // Settings\r\n"
@@ -600,7 +600,7 @@ meas_type bin_meas = {
 	.adcu			= 15,           	///< [LSB]
 	.adci			= 16,          		///< [LSB]
 	.uin			= 38000,           	///< [X_XXX V]
-	.temperatureLin	= 256, 				///< [X_X °С]
+	.temperatureLin	= 256, 				///< [X_X В°РЎ]
 };
 
 transfer_type bin_statemeastask;

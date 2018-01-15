@@ -21,7 +21,7 @@ INCLUDES := \
 	-I system/inc \
 	-I task/inc
 
-LDFILES := -T ldscript/STM32F407VETx_FLASH.ld
+LDFILES	:= -T ldscript/STM32F407VETx_FLASH.ld
 LIBS	:= lib/IQmathLib-cm4.a
 
 CPUFLAGS := \
@@ -92,10 +92,15 @@ ASRCs :=
 
 OBJODIR := $(ODIR)/obj
 
-OBJS := $(CSRCS:%.c=$(OBJODIR)/%.o) \
-        $(CPPSRCS:%.cpp=$(OBJODIR)/%.o) \
-        $(ASRCs:%.s=$(OBJODIR)/%.o) \
-        $(ASRCS:%.S=$(OBJODIR)/%.o)
+OBJS :=	$(CSRCS:%.c=$(OBJODIR)/%.o) \
+		$(CPPSRCS:%.cpp=$(OBJODIR)/%.o) \
+		$(ASRCs:%.s=$(OBJODIR)/%.o) \
+		$(ASRCS:%.S=$(OBJODIR)/%.o)
+
+DEPS :=	$(CSRCS:%.c=$(OBJODIR)/%.d) \
+		$(CPPSRCS:%.cpp=$(OBJODIR)/%.d) \
+		$(ASRCs:%.s=$(OBJODIR)/%.d) \
+		$(ASRCS:%.S=$(OBJODIR)/%.d)
 
 CFLAGS = $(CCFLAGS) $(INCLUDES)
 DFLAGS = $(CCFLAGS) $(INCLUDES)
@@ -103,6 +108,16 @@ DFLAGS = $(CCFLAGS) $(INCLUDES)
 #******************************************************************************
 # Targets
 #
+all: prebuild mainbuild
+
+clean:
+	@rm -rf $(ODIR)
+	@echo ' '
+
+disasm:
+	@$(OBJDUMP) -D $(ODIR)/$(TARGET).elf > $(ODIR)/$(TARGET).S
+	@echo ' '
+
 $(TARGET).elf: $(OBJS)
 	@echo [LD] $@
 	@$(LD) $(LDFLAGS) $(OBJS) $(OBJS1) $(LIBS) -o $(ODIR)/$(TARGET).elf
@@ -121,15 +136,13 @@ mainbuild: $(TARGET).elf $(TARGET).hex
 	@$(SIZE) --format=berkeley "$(ODIR)/$(TARGET).elf"
 	@echo ' '
 
-all: prebuild mainbuild
-
-clean:
-	@rm -rf $(ODIR)
-	@echo ' '
-
-disasm:
-	@$(OBJDUMP) -D $(ODIR)/$(TARGET).elf > $(ODIR)/$(TARGET).S
-	@echo ' '
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),disasm)
+ifdef DEPS
+sinclude $(DEPS)
+endif
+endif
+endif
 
 $(OBJODIR)/%.o: %.c
 	@echo [CC] $<
@@ -156,9 +169,9 @@ $(OBJODIR)/%.o: %.S
 	@$(AS) $(CFLAGS) -MMD -MP -MF $(OBJODIR)/$*.d -MT$@ -c -o $@ $<
 
 
-$(DEPDIR)/%.d: ;
-.PRECIOUS: $(DEPDIR)/%.d
+#$(DEPDIR)/%.d: ;
+#.PRECIOUS: $(DEPDIR)/%.d
 
-ifneq ($(MAKECMDGOALS), clean)
-include $(shell find $(OBJODIR) -maxdepth 8 -type f -name "*.d")
-endif
+#ifneq ($(MAKECMDGOALS), clean)
+#include $(shell find $(OBJODIR) -maxdepth 8 -type f -name "*.d")
+#endif

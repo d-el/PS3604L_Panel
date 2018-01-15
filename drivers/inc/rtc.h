@@ -39,7 +39,6 @@ typedef enum {
  * Exported variables
  */
 extern time_t unixTime;
-extern struct tm timeStrct;
 
 /*!****************************************************************************
  * Macro functions

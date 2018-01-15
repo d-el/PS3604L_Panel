@@ -17,6 +17,14 @@
 /*!****************************************************************************
  * Define
  */
+#define displayOffsetX  1	//Для альбомной
+#define displayOffsetY  2	//Для альбомной
+#define SPFD54124B_W 160	//Для альбомной
+#define SPFD54124B_H 128	//Для альбомной
+
+/*!****************************************************************************
+ * Enumeration
+ */
 typedef enum {
 	sky = 0x54fb,
 	black = 0x0000,
@@ -38,16 +46,6 @@ typedef enum {
 	halfLightGreen = 0xC7F8,
 	halfLightBlue = 0x861F,
 } color_type;
-
-
-#define displayOffsetX  1	//Для альбомной
-#define displayOffsetY  2	//Для альбомной
-#define SPFD54124B_W 160	//Для альбомной
-#define SPFD54124B_H 128	//Для альбомной
-
-/*!****************************************************************************
- * Enumeration
- */
 
 /*!****************************************************************************
  * Typedef
@@ -83,7 +81,7 @@ static inline void spfd_resetBit(uint64_t n){
 /*!****************************************************************************
  *
  */
-static inline void spfd_setPixel(uint16_t x, uint16_t y, uint16_t color){
+static inline void spfd_setPixel(uint16_t x, uint16_t y, lcd_color_type color){
 	//return;
 	uint64_t n = ((y * SPFD54124B_W) + x) * 18;
 
@@ -115,7 +113,7 @@ static inline void spfd_setPixel(uint16_t x, uint16_t y, uint16_t color){
 void spfd_init(void);
 void spfd_disable(void);
 void spfd_contrast(uint8_t data);
-void spfd_setPixel(uint16_t x, uint16_t y, uint16_t color);
+void spfd_setPixel(uint16_t x, uint16_t y, lcd_color_type color);
 
 #endif //spfd54124b_H
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

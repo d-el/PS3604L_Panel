@@ -1,8 +1,8 @@
 ﻿/*!****************************************************************************
  * @file		crc.h
  * @author		Storozhenko Roman
- * @version		V2.0
- * @date		12.12.2017
+ * @version		V2.1
+ * @date		15.01.2018
  * @brief		CRC counting module
  * @copyright	Copyright (C) 2017 Storozhenko Roman
  *				All rights reserved
@@ -45,16 +45,16 @@ typedef struct{
 /*!****************************************************************************
  * Exported variables
  */
-extern crc16Struct_type crcModBus;
-extern crc16Struct_type crcCan;
-extern crc8Struct_type crc1Wire;
+extern const crc16Struct_type crcModBus;
+extern const crc16Struct_type crcCan;
+extern const crc8Struct_type crc1Wire;
 
 /*!****************************************************************************
  * Function declaration
  */
-uint16_t crc16Calc(crc16Struct_type *dat, void *src, uint32_t len);
-uint16_t crc16CalcWithInit(crc16Struct_type *dat, void *src, uint32_t len, uint16_t initVal);
-uint8_t crc8Calc(crc8Struct_type *dat, void *src, uint32_t len);
+uint16_t crc16Calc(const crc16Struct_type *dat, void *src, uint32_t len);
+uint16_t crc16CalcWithInit(const crc16Struct_type *dat, void *src, uint32_t len, uint16_t initVal);
+uint8_t crc8Calc(const crc8Struct_type *dat, void *src, uint32_t len);
 
 #endif	//crc_H
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

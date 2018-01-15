@@ -1,8 +1,8 @@
-/*!****************************************************************************
+﻿/*!****************************************************************************
  * @file		debugPrint.h
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
- * @date		6 окт. 2017 г.
+ * @date		6 РѕРєС‚. 2017 Рі.
  * @copyright	GNU Lesser General Public License v3
  * @brief		--
  */

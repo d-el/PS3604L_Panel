@@ -1,8 +1,8 @@
 ﻿/*!****************************************************************************
  * @file		crc.c
  * @author		Storozhenko Roman
- * @version		V2.0
- * @date		12.12.2017
+ * @version		V2.1
+ * @date		15.01.2018
  * @brief		CRC counting module
  * @copyright	Copyright (C) 2017 Storozhenko Roman
  *				All rights reserved
@@ -22,8 +22,8 @@
  * @param[in] len - number of bytes to calculate
  * @return CRC16 result
  */
-uint16_t crc16Calc(crc16Struct_type *dat, void *src, uint32_t len){
-	uint16_t	*table = dat->table;
+uint16_t crc16Calc(const crc16Struct_type *dat, void *src, uint32_t len){
+	const uint16_t	*table = dat->table;
 	uint16_t	crc = dat->initVal;
 	uint8_t		*pBuf = (uint8_t*)src;
 	uint16_t	tmp;
@@ -46,8 +46,8 @@ uint16_t crc16Calc(crc16Struct_type *dat, void *src, uint32_t len){
  * @param[in] initVal - initial value
  * @return CRC16 result
  */
-uint16_t crc16CalcWithInit(crc16Struct_type *dat, void *src, uint32_t len, uint16_t initVal){
-	uint16_t	*table = dat->table;
+uint16_t crc16CalcWithInit(const crc16Struct_type *dat, void *src, uint32_t len, uint16_t initVal){
+	const uint16_t	*table = dat->table;
 	uint16_t	crc = initVal;
 	uint8_t		*pBuf = (uint8_t*)src;
 	uint16_t	tmp;
@@ -69,8 +69,8 @@ uint16_t crc16CalcWithInit(crc16Struct_type *dat, void *src, uint32_t len, uint1
  * @param[in] len - number of bytes to calculate
  * @return CRC8 result
  */
-uint8_t crc8Calc(crc8Struct_type *dat, void *src, uint32_t len){
-	uint8_t	   *table = dat->table;
+uint8_t crc8Calc(const crc8Struct_type *dat, void *src, uint32_t len){
+	const uint8_t	   *table = dat->table;
 	uint8_t		crc = dat->initVal;
 	uint8_t		*pBuf = (uint8_t*)src;
 
@@ -88,7 +88,7 @@ uint8_t crc8Calc(crc8Struct_type *dat, void *src, uint32_t len){
  * Initial Value:	0xFFFF
  * Final Xor Value:	0x0000
  */
-crc16Struct_type crcModBus = {
+const crc16Struct_type crcModBus = {
 	.table = {
 		0x0000, 0xC0C1, 0xC181, 0x0140, 0xC301, 0x03C0, 0x0280, 0xC241,
 		0xC601, 0x06C0, 0x0780, 0xC741, 0x0500, 0xC5C1, 0xC481, 0x0440,
@@ -134,7 +134,7 @@ crc16Struct_type crcModBus = {
  * Initial Value:	0x0000
  * Final Xor Value:	0x0000
  */
-crc16Struct_type crcCan = {
+const crc16Struct_type crcCan = {
 .table = {
 		0x0000, 0x4599, 0x8B32, 0xCEAB, 0x53FD, 0x1664, 0xD8CF, 0x9D56,
 		0xA7FA, 0xE263, 0x2CC8, 0x6951, 0xF407, 0xB19E, 0x7F35, 0x3AAC,
@@ -179,7 +179,7 @@ crc16Struct_type crcCan = {
  * Initial Value:	0x00
  * Final Xor Value:	0x00
  */
-crc8Struct_type crc1Wire = {
+const crc8Struct_type crc1Wire = {
 	.table = {
 		0x00, 0x31, 0x62, 0x53, 0xC4, 0xF5, 0xA6, 0x97, 0xB9, 0x88, 0xDB, 0xEA, 0x7D, 0x4C, 0x1F, 0x2E,
 		0x43, 0x72, 0x21, 0x10, 0x87, 0xB6, 0xE5, 0xD4, 0xFA, 0xCB, 0x98, 0xA9, 0x3E, 0x0F, 0x5C, 0x6D,

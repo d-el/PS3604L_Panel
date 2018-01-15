@@ -18,7 +18,6 @@
  * MEMORY
  */
 time_t 		unixTime;	//At 00:00 hours, Jan 1, 1970 UTC
-struct tm 	timeStrct;
 
 /*!****************************************************************************
  * @brief

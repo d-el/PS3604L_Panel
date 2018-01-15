@@ -27,6 +27,7 @@
  */
 settingSct_type settingSct;
 uint8_t calibratePoint;
+struct tm 	timeStrct;
 
 /*!****************************************************************************
  * @brief    Setting system task
