@@ -31,7 +31,7 @@ typedef enum {
 	kMode = 	(1 << 0),
 	kView = 	(1 << 1),
 	kOnOff = 	(1 << 2),
-	kNext = 	(1 << 3),
+	kSet = 		(1 << 3),
 	kZero = 	(1 << 4),
 	kUp = 		(1 << 5),
 	kDown = 	(1 << 6),

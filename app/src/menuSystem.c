@@ -157,7 +157,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 			}
 
 			//Next
-			if(keyState(kNext)){
+			if(keyState(kSet)){
 				if((*sMenu) != NULL){
 					if((*sMenu == (*sMenu)->child) && ((*sMenu)->pfUnselect != NULL)){
 						(*sMenu)->pfUnselect(*sMenu);				//Call pfUnselect

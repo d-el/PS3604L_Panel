@@ -59,7 +59,7 @@ void chargeTSK(void *pPrm){
 		 */
 		if(keyProc() != 0){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
-			if(keyState(kNext)){
+			if(keyState(kSet)){
 				varParam++;
 				if(varParam == 4)
 					varParam = 0;

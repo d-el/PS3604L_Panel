@@ -68,7 +68,7 @@ void baseTSK(void *pPrm){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			IdleTime = xTaskGetTickCount();
 
-			if(keyState(kNext)){
+			if(keyState(kSet)){
 				varParam++;
 				if(varParam >= 3){
 					varParam = VAR_VOLT;
