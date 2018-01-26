@@ -15,6 +15,7 @@
  */
 #include "stddef.h"
 #include "i2c.h"
+#include "gpio.h"
 
 /**************************************
  * i2c1 memory
