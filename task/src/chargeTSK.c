@@ -1,9 +1,13 @@
-﻿/******************************************************************************
- * @file		charge.c
- * @author		D_EL - Storozhenko Roman
+﻿/*!****************************************************************************
+ * @file		charge.с
+ * @author		d_el
  * @version		V1.0
- * @date
- * @copyright	GNU Public License
+ * @date		31.01.20187
+ * @brief
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -23,6 +27,7 @@
 #include "chargeTSK.h"
 #include "regulatorConnTSK.h"
 #include "systemTSK.h"
+#include "baseTSK.h"
 
 /******************************************************************************
  * Memory
@@ -48,14 +53,14 @@ void chargeTSK(void *pPrm){
 
 	disp_fillScreen(black);
 
-	//Печать статических символов
+	//Print static element
 	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 10, kUp | kDown);
 	enSetNtic(5);
 
 	while(1){
 		/**************************************
-		 * Обработка кнопок
+		 * Key process
 		 */
 		if(keyProc() != 0){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
@@ -86,7 +91,7 @@ void chargeTSK(void *pPrm){
 
 		if(fp.tf.state.bit.switchIsON == 0){
 			/***************************************
-			 * Вынимаем значение с энкодера
+			 * Encoder process
 			 */
 			sHandle = pHandle + varParam;
 			if(bigstepUp != 0){
@@ -110,7 +115,7 @@ void chargeTSK(void *pPrm){
 		}
 
 		/***************************************
-		 * Задание регулятора
+		 * Task for regulator
 		 */
 		fp.tf.task.u = ch.u * 1000;
 		fp.tf.task.i = ch.i * 1000;
@@ -127,7 +132,7 @@ void chargeTSK(void *pPrm){
 		}
 
 		/**************************************
-		 * Перекладываем измеренные данные
+		 * Copy measure data
 		 */
 		measV = fp.tf.meas.u;
 		if(measV > 99999999){
@@ -139,13 +144,13 @@ void chargeTSK(void *pPrm){
 		}
 
 		/**************************************
-		 * Вывод на дисплей
+		 * Output data to display
 		 */
-		//Ставим прочерк, если режим ch_modeCurrent
+		//Skip time
 		if((ch.mode == ch_modeCurrent) && (varParam == C_TIME)){
-			varParam++;	                                    //Не разрешаем фоновое редактирование TIME
+			varParam++;
 		}
-		//Печать значения напряжения
+		//Print voltage
 		if(fp.tf.state.bit.switchIsON != 0){
 			sprintf(str, "U:        %02u.%03u", measV / 1000000, (measV / 1000) % 1000);
 		}else{
@@ -158,11 +163,11 @@ void chargeTSK(void *pPrm){
 		}
 		disp_putStr(10, 00, &arial, 0, str);
 
-		//Печать значения тока
+		//Print current
 		if(fp.tf.state.bit.switchIsON != 0){
-			sprintf(str, "I:         %01u.%03u A", measI / 1000000, (measI / 1000) % 1000);
+			sprintf(str, "I:          %01u.%03u A", measI / 1000000, (measI / 1000) % 1000);
 		}else{
-			sprintf(str, "I:         %01u.%03u A", ch.i / 1000, ch.i % 1000);
+			sprintf(str, "I:          %01u.%03u A", ch.i / 1000, ch.i % 1000);
 		}
 		if((varParam == C_CURR) && (fp.tf.state.bit.switchIsON == 0)){
 			disp_setColor(black, ui.color.cursor);
@@ -193,7 +198,7 @@ void chargeTSK(void *pPrm){
 		}
 		disp_putStr(10, 40, &arial, 0, str);
 
-		//Печать значения режима
+		//Print Mode
 		if(ch.mode == ch_modeTime){
 			sprintf(str, "Mode: TIME         ");
 		}else{
@@ -206,7 +211,7 @@ void chargeTSK(void *pPrm){
 		}
 		disp_putStr(10, 60, &arial, 0, str);
 
-		//Печать значения емкости
+		//Print Capacity
 		sprintf(str, "C:         %01u.%03u A/h", fp.tf.meas.capacity / 1000, fp.tf.meas.capacity % 1000);
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
@@ -233,4 +238,4 @@ void chargeTSK(void *pPrm){
 	}
 }
 
-/******************* (C) COPYRIGHT ********** END OF FILE ********* D_EL *****/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

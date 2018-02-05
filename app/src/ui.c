@@ -10,7 +10,7 @@
  * Include
  */
 #include "ui.h"
-#include "spfd54124b.h"
+#include "display.h"
 
 /*!****************************************************************************
  * MEMORY

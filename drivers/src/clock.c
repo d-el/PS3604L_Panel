@@ -1,10 +1,13 @@
 ﻿/*!****************************************************************************
  * @file		clock.c
- * @author		d_el - Storozhenko Roman
+ * @author		d_el
  * @version		V1.0
  * @date		17.09.2017
- * @copyright	GNU Lesser General Public License v3
  * @brief		MCU peripheral initialization
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -42,11 +45,12 @@
  * @param  None
  * @retval None
  */
-void clock_init(void){
+clockState_type clock_init(void){
 	/******************************************************************************/
 	/*            PLL (clocked by HSE) used as System clock source                */
 	/******************************************************************************/
 	__IO uint32_t StartUpCounter = 0, HSEStatus = 0;
+	clockState_type state;
 
 	/* Enable HSE */
 	RCC->CR |= ((uint32_t) RCC_CR_HSEON);
@@ -107,14 +111,17 @@ void clock_init(void){
 		while((RCC->CR & RCC_CR_PLLI2SRDY) == 0){
 		}
 
-	}else{ /* If HSE fails to start-up, the application will have wrong clock
-	 configuration. User can add here some code to deal with this error */
+		state = clockOk;
+	}else{ // If HSE fails to start-up, the application will have wrong clock configuration
+		state = clockErorHse;
 	}
 
 	RCC->CFGR |= RCC_CFGR_MCO1_1;	//MCO1 - HSE clock selected
 	RCC->CFGR |= RCC_CFGR_MCO2_0;	//MCO2 - PLLI2S clock selected
 
 	SystemCoreClockUpdate();
+
+	return state;
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

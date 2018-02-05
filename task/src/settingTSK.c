@@ -27,17 +27,14 @@
  */
 settingSct_type settingSct;
 uint8_t calibratePoint;
-struct tm 	timeStrct;
+time_t 		unixTime;	//At 00:00 hours, Jan 1, 1970 UTC
 
 /*!****************************************************************************
  * @brief    Setting system task
  */
 void settingTSK(void *pPrm){
-	enSetNtic(0);
-
 	menuEngine(mN_voltmeter);
 	prm_store(SYSEEPADR, prmEepSys);
-	//nvMem_savePrm(&systemSettingRegion);
 	selWindow(baseWindow);
 	while(1){
 		vTaskDelay(pdMS_TO_TICKS(100));
@@ -47,7 +44,7 @@ void settingTSK(void *pPrm){
 /*!****************************************************************************
  * @brief    setup regulator to mode_raw
  */
-uint32_t PrepareU(const menuItem_type *item){
+itemState_type PrepareU(const menuItem_type *item){
 	static uint32_t pointU[4] = { 10000, 100000, 19000000, 30000000 };
 	calibratePoint = item->flags.bit.pfParamert;
 	fp.tf.task.daci = 4095;
@@ -56,16 +53,16 @@ uint32_t PrepareU(const menuItem_type *item){
 	fp.tf.task.mode = mode_raw;
 	sendCommand(setSwitchOn);
 	if(waitForTf() != 0){
-		return 1;
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}else{
-		return 0;
+		return (itemState_type) {.state = menuItemOk};
 	}
 }
 
 /*!****************************************************************************
  * @brief    setup regulator to mode_raw
  */
-uint32_t PrepareI(const menuItem_type *item){
+itemState_type PrepareI(const menuItem_type *item){
 	static uint32_t pointI[4] = { 10000, 100000, 1500000, 3000000 };
 	calibratePoint = item->flags.bit.pfParamert;
 	fp.tf.task.daci = 0;
@@ -74,89 +71,79 @@ uint32_t PrepareI(const menuItem_type *item){
 	fp.tf.task.mode = mode_raw;
 	sendCommand(setSwitchOn);
 	if(waitForTf() != 0){
-		return 1;
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}else{
-		return 0;
+		return (itemState_type) {.state = menuItemOk};
 	}
 }
 
 /*!****************************************************************************
  * @brief
  */
-uint32_t savePointU(const menuItem_type *item){
+itemState_type savePointU(const menuItem_type *item){
 	sendCommand(setSavePointU0 + calibratePoint);
 	if(waitForTf() != 0){
-		return 1;
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}else{
-		return 0;
+		return (itemState_type) {.state = menuItemOk};
 	}
 }
 
 /*!****************************************************************************
  * @brief
  */
-uint32_t savePointI(const menuItem_type *item){
+itemState_type savePointI(const menuItem_type *item){
 	sendCommand(setSavePointI0 + calibratePoint);
 	if(waitForTf() != 0){
-		return 1;
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}else{
-		return 0;
+		return (itemState_type) {.state = menuItemOk};
 	}
 }
 
 /*!****************************************************************************
  * @brief    setup regulator to mode_off
  */
-uint32_t regSave(const menuItem_type *item){
+itemState_type regSave(const menuItem_type *item){
 	sendCommand(setSaveSettings);
 	fp.tf.task.mode = mode_off;
 	if(waitForTf() != 0){
-		return 1;
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}else{
-		return 0;
+		return (itemState_type) {.state = menuItemOk};
 	}
 }
 
 /*!****************************************************************************
  * @brief    set LCD Bright callback
  */
-uint32_t setBright(const menuItem_type *item){
+itemState_type setBright(const menuItem_type *item){
 	setLcdBrightness(item->prmHandle->prm->t_u16Frmt);
-	return 0;
-}
-
-/*!****************************************************************************
- * @brief    RTC periodic callback
- */
-uint32_t rtcPeriodic(const menuItem_type *item){
-	unixTime = time(NULL);
-	return 0;
+	return (itemState_type) {.state = menuItemOk};
 }
 
 /*!****************************************************************************
  * @brief    RTC select callback
  */
-uint32_t rtcSelectc(const menuItem_type *item){
-	unixTime = time(NULL);
-	gmtime_r(&unixTime, &timeStrct);
-	return 0;
+itemState_type rtcSelect(const menuItem_type *item){
+	unixTime = time(NULL) + 60 * 60 * fp.fpSet.timezone;
+	return (itemState_type) {.state = menuItemOk};
 }
 
 /*!****************************************************************************
- * @brief    RTC change callback
+ * @brief    RTC select callback
  */
-uint32_t rtcCh(const menuItem_type *item){
-	unixTime = mktime(&timeStrct);
-	rtc_setTimeUnix(unixTime);
-	return 0;
+itemState_type rtcUnselect(const menuItem_type *item){
+	rtc_setTimeUnix(unixTime - 60 * 60 * fp.fpSet.timezone);
+	return (itemState_type) {.state = menuItemOk};
 }
 
 /*!****************************************************************************
  * @brief    NET pfUnselect
  */
-uint32_t netUpdate(const menuItem_type *item){
+itemState_type netUpdate(const menuItem_type *item){
 	netSettingUpdate();
-	return 0;
+	return (itemState_type) {.state = menuItemOk};
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

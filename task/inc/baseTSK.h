@@ -19,7 +19,7 @@
  */
 #define NPRESET             3
 #define IDLE_TIME           (180000)       		//Время до заставки [ms]
-#define BASE_TSK_PERIOD     100                  //[ms]
+#define BASE_TSK_PERIOD     20                  //[ms]
 
 /*!****************************************************************************
  * Enumeration

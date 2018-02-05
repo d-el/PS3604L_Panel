@@ -14,14 +14,14 @@
 /*!****************************************************************************
  * Include
  */
-#include "spfd54124b.h"
+#include "st7735.h"
 #include "stdint.h"
 
 /*!****************************************************************************
  * Define
  */
-#define DISP_W	SPFD54124B_W
-#define DISP_H	SPFD54124B_H
+#define DISP_W	ST7735_W
+#define DISP_H	ST7735_H
 
 /*!****************************************************************************
  * Enumeration
@@ -57,6 +57,7 @@ extern const font_type arial;
 extern const font_type dSegBold;
 extern const font_type ico;
 extern const image_type ImageLogo;
+extern const font_type dSegBold8x14;
 
 /*!****************************************************************************
  * Macro functions

@@ -1,10 +1,13 @@
 ﻿/*!****************************************************************************
  * @file		systemTSK.c
- * @author		d_el - Storozhenko Roman
+ * @author		d_el
  * @version		V1.0
  * @date		14.09.2015
- * @copyright	GNU Lesser General Public License v3
  * @brief		System control task
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -169,9 +172,7 @@ void shutdown(void){
 	pvd_disable();
 	setLcdBrightness(0);
 	LED_OFF();
-	//nvMem_savePrm(&userConfRegion);
 	prm_store(USEREEPADR, prmEep);
-	spfd_disable();
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
 	LED_ON();
 	if(windowTskHandle != NULL){
@@ -234,4 +235,4 @@ void netSettingUpdate(void){
 	netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

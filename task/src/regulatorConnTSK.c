@@ -129,18 +129,13 @@ uint8_t sendCommand(request_type command){
  * @brief
  */
 uint8_t waitForTf(void){
-	uint32_t l_normAnswer;
-	uint32_t l_noAnswer;
-	uint32_t l_errorAnswer;
-	uint32_t cnt;
-
-	cnt = 3;	// 3 attempt for failure connect
-	l_normAnswer = uartTsk.normAnswer;
-	l_noAnswer = uartTsk.noAnswer;
-	l_errorAnswer = uartTsk.errorAnswer;
+	uint32_t l_normAnswer = uartTsk.normAnswer;
+	uint32_t l_noAnswer = uartTsk.noAnswer;
+	uint32_t l_errorAnswer = uartTsk.errorAnswer;
+	uint32_t cnt = 3;		// 3 attempt for failure connect
 
 	while(cnt != 0){
-		if((l_normAnswer + 1) >= (uartTsk.normAnswer)){
+		if(l_normAnswer < uartTsk.normAnswer){
 			return 0;
 		}
 		if(l_noAnswer != uartTsk.noAnswer){

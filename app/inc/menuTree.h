@@ -35,8 +35,8 @@ MENU_ITEM(ammeter		,"Ameter"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,N
 		MENU_ITEM(iSetAdcI		,"AdcI"		,"lsb"	,&prmh[Nmeas_adci]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,iSetAdcU	,iSetMEasI	,iPoint1	,iSetAdcI)
 		MENU_ITEM(iSetMEasI		,"Imeas"	,"A"	,&prmh[Nmeas_i]		,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,iSetAdcI	,iSetMEasI	,iPoint1	,iSetMEasI)
 
-/*		  name 				,label		,units	,prmHandle		,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-MENU_ITEM(datetime			,"Clock"	,""		,NULL			,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,ammeter	,lan		,datetime	,mdate)
+/*		  name 			,label		,units	,prmHandle		,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
+MENU_ITEM(datetime		,"Clock"	,""		,NULL			,chmodMenuAlways	,0		,NULL		,rtcSelect	,rtcUnselect,NULL		,ammeter	,lan		,datetime	,mdate)
 	/*		name 		,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 	MENU_ITEM(mdate		,"Date"		,""		,&prmh[NutcTime]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtime		,datetime	,mdate)
 	MENU_ITEM(mtime		,"Time"		,""		,&prmh[NutcTime2]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,mdate		,mtimezone	,datetime	,mtime)

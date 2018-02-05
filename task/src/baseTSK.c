@@ -172,7 +172,7 @@ void baseTSK(void *pPrm){
 			IdleTime = xTaskGetTickCount();
 		}
 		if((xTaskGetTickCount() - IdleTime) >= IDLE_TIME){
-			if((xTaskGetTickCount() % 2) != 0){
+			if((time(NULL) % 2) != 0){
 				selWindow(cube3dWindow);
 			}else{
 				selWindow(bubblesWindow);
@@ -217,7 +217,7 @@ void baseTSK(void *pPrm){
 		}else{
 			strcpy(str, "--.---");
 			disp_putChar(150, 36, &font8x12, ' ');
-			disp_putChar(150, 49, &font8x12, ' ');
+			disp_putChar(150, 49, &font8x12, 'A');
 		}
 		disp_putStr(16, 36, &dSegBold, 6, str);
 
@@ -243,8 +243,12 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.imax);
 		}
-		sprintf(str, "Lim = %2u.%03u A ", bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
+
+		//disp_putStr(16, 70, &arial, 0, "Lim");
+		sprintf(str, "%2u.%03u", bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
 		disp_putStr(16, 70, &arial, 0, str);
+		//disp_putStr(16, 70, &dSegBold8x14, 0, str);
+		disp_putChar(64, 72, &font8x12, 'A');
 
 		//Печать режима по току
 		if(varParam == VAR_MODE){
@@ -270,8 +274,7 @@ void baseTSK(void *pPrm){
 		timebs_us = sysTimeMeasGet_us(sysTimeBs);
 
 		/*************************************/
-		//vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));                       //Запускать задачу каждые 30ms
-		vTaskDelay(pdMS_TO_TICKS(5));
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));
 	}
 }
 
@@ -298,9 +301,10 @@ void printStatusBar(void){
 	}
 	ovfCurrent = fp.tf.state.bit.ovfCurrent;
 
-	if((fp.tf.state.bit.errorLinearRegTemperSens != 0) || (fp.tf.state.bit.ovfLinearRegTemper != 0)
-			|| (fp.tf.state.bit.reverseVoltage != 0) || (uartTsk.state == uartNoConnect))
-	{
+//	if((fp.tf.state.bit.errorLinearRegTemperSens != 0) || (fp.tf.state.bit.ovfLinearRegTemper != 0)
+//			|| (fp.tf.state.bit.reverseVoltage != 0) || (uartTsk.state == uartNoConnect))
+//	{
+	if(0){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
 		if(errPrev == 0){
@@ -339,7 +343,7 @@ void printStatusBar(void){
 		}
 
 		//Печать температуры
-		sprintf(str, "%02u.%u \xB0 C", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
+		sprintf(str, "%02u.%u %cC", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10, 0xb0);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
 		//Печать времени

@@ -11,12 +11,12 @@
  * Include
  */
 #include "string.h"
-#include "rtc.h"
 #include "crc.h"
 #include "24AAxx.h"
 #include "prmSystem.h"
 #include "systemTSK.h"
 #include "baseTSK.h"
+#include "settingTSK.h"
 
 prmval_type abc = { .t_u32Frmt = 10000 };
 

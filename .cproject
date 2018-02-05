@@ -155,12 +155,6 @@
 							<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.2105288120" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
 						</tool>
 					</fileInfo>
-					<fileInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.364184543.2071718901" name="spfd54124b.c" rcbsApplicability="disable" resourcePath="drivers/src/spfd54124b.c" toolsToInvoke="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.4995280.1184453334">
-						<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.4995280.1184453334" name="Cross ARM GNU C Compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.4995280">
-							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otheroptimizations.1346098496" name="Other optimization flags" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.otheroptimizations" useByScannerDiscovery="true" value="-O0" valueType="string"/>
-							<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.326297081" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
-						</tool>
-					</fileInfo>
 					<sourceEntries>
 						<entry excluding="lwip/src/core/ipv6|STM32F4xx_StdPeriph_Driver/src/stm32f4xx_hash.c|stm32f4xx_it.c|STM32F4xx_StdPeriph_Driver/src/stm32f4xx_fsmc.c|STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp.c|CMSIS/Device/ST/STM32F4xx/Source/Templates/arm|STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c|CMSIS/Device/ST/STM32F4xx/Source/Templates/iar|STM32F4xx_StdPeriph_Driver/src/misc.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>

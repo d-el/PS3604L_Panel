@@ -1,10 +1,13 @@
 ﻿/*!****************************************************************************
- * @file		drivers.c
- * @author		d_el - Storozhenko Roman
+ * @file		st7735.с
+ * @author		d_el
  * @version		V1.0
- * @date		05-07-2013
- * @copyright	GNU Lesser General Public License v3
- * @brief		MCU peripheral initialization
+ * @date		05.07.2013
+ * @brief
+ * @copyright	Copyright (C) 2013 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -13,7 +16,7 @@
 #include "pvd.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "beep.h"
-#include "spfd54124b.h"
+#include "st7735.h"
 #include "uart.h"
 #include "i2c.h"
 #include "enco.h"
@@ -41,15 +44,29 @@ void macAddressSet(void){
  * MCU peripheral initialization
  */
 void hardInit(void){
-	clock_init();
+	clockState_type clockState = clock_init();
+	if(clockState == clockOk){
+		fp.state.mainOscillatorError = 0;
+	}else{
+		fp.state.mainOscillatorError = 1;
+	}
 	gpio_init();
-
+	macAddressSet();
 	ETH_BSP_Config();	//configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();
 	beep_init();
 	ledPwm_init();
-	spfd_init();
+
+	//spfd_init();
+	setLcdBrightness(600);
+	//st7735_init();
+
+	// Initialize 1.8" TFT
+	initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
+	//initB();
+	//while(1);
+
 	rtcStatus_type rtcStatus = rtc_init();
 	if((rtcStatus == rtc_Ok)&&(rtcStatus == rtc_wasOn)){
 		fp.state.rtcOscillatorError = 0;
@@ -64,7 +81,7 @@ void hardInit(void){
 	eep_init();
 
 	//pvd_init();
-	macAddressSet();
+
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

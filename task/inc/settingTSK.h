@@ -14,6 +14,7 @@
  */
 #include "stdint.h"
 #include "menuSystem.h"
+#include "time.h"
 
 /*!****************************************************************************
  * Define
@@ -34,6 +35,7 @@ typedef struct {
 /*!****************************************************************************
  * Exported variables
  */
+extern time_t 		unixTime;
 
 /*!****************************************************************************
  * Macro functions
@@ -43,17 +45,15 @@ typedef struct {
  * Function declaration
  */
 void settingTSK(void *pPrm);
-uint32_t PrepareU(const menuItem_type *item);
-uint32_t PrepareI(const menuItem_type *item);
-uint32_t regSave(const menuItem_type *item);
-uint32_t savePointU(const menuItem_type *item);
-uint32_t savePointI(const menuItem_type *item);
-uint32_t setBright(const menuItem_type *item);
-uint32_t rtcPeriodic(const menuItem_type *item);
-uint32_t rtcSelectc(const menuItem_type *item);
-uint32_t rtcUselectc(const menuItem_type *item);
-uint32_t rtcCh(const menuItem_type *item);
-uint32_t netUpdate(const menuItem_type *item);
+itemState_type PrepareU(const menuItem_type *item);
+itemState_type PrepareI(const menuItem_type *item);
+itemState_type regSave(const menuItem_type *item);
+itemState_type savePointU(const menuItem_type *item);
+itemState_type savePointI(const menuItem_type *item);
+itemState_type setBright(const menuItem_type *item);
+itemState_type rtcSelect(const menuItem_type *item);
+itemState_type rtcUnselect(const menuItem_type *item);
+itemState_type netUpdate(const menuItem_type *item);
 
 #endif //settingTSK_H
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

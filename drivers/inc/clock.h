@@ -2,9 +2,12 @@
  * @file		clock.h
  * @author		d_el
  * @version		V1.0
- * @date		09.01.2016
- * @copyright	GNU Lesser General Public License v3
- * @brief		Driver clock system
+ * @date		17.09.2017
+ * @brief		MCU peripheral initialization
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 #ifndef clock_H
 #define clock_H
@@ -20,22 +23,18 @@
 /*!****************************************************************************
  * Enumeration
  */
-typedef enum {
-	useHsi, useHse
-} useGen_type;
 
 /*!****************************************************************************
  * Typedef
  */
-typedef struct {
-	uint32_t currentSysFrec;
-	useGen_type useGen;
-} clock_type;
+typedef enum {
+	clockOk,
+	clockErorHse
+}clockState_type;
 
 /*!****************************************************************************
  * Exported variables
  */
-extern clock_type clockSource;
 
 /*!****************************************************************************
  * Macro functions
@@ -44,8 +43,7 @@ extern clock_type clockSource;
 /*!****************************************************************************
  * Function declaration
  */
-void clock_init(void);
-void Error_Handler(void);
+uint8_t clock_init(void);
 
 #endif //clock_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

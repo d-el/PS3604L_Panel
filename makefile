@@ -71,7 +71,7 @@ SIZE	= $(TOOLCHAIN_PATH)-size
 CSRCS := \
 	$(shell find app -maxdepth 3 -type f -name "*.c") \
 	$(shell find cm4 -maxdepth 7 -type f -name "*.c") \
-	$(shell find drivers -maxdepth 3 -type f -name "*.c") \
+	$(shell find drivers -maxdepth 3 -type f -name "*.c" -not -path "drivers/src/core/src/spfd54124b.c") \
 	$(shell find freertos -maxdepth 3 -type f -name "*.c") \
 	$(shell find lwip -maxdepth 4 -type f -name "*.c" -not -path "lwip/src/core/ipv6*") \
 	$(shell find net -maxdepth 3 -type f -name "*.c") \

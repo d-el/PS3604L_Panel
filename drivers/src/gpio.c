@@ -21,29 +21,28 @@
 * MEMORY
 */
 const pinMode_type   const pinsMode[] = {
-/*0 */makepin(GPIOC, 7, 	digitalInput, 	pullUp, 		0, 0), //bMode
-/*1 */makepin(GPIOA, 10, 	digitalInput, 	pullUp, 		0, 0), //bOnOff
-/*2 */makepin(GPIOA, 9, 	digitalInput, 	pullUp, 		0, 0), //bView
-/*3 */makepin(GPIOC, 8, 	digitalInput, 	pullUp, 		0, 0), //bNext
+/*0 */makepin(GPIOC, 7, 	digitalInput, 	pullUp, 				0, 0), //bMode
+/*1 */makepin(GPIOA, 10, 	digitalInput, 	pullUp, 				0, 0), //bOnOff
+/*2 */makepin(GPIOA, 9, 	digitalInput, 	pullUp, 				0, 0), //bView
+/*3 */makepin(GPIOC, 8, 	digitalInput, 	pullUp, 				0, 0), //bNext
+/*4 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 				0, 0), //bZero
+/*5 */makepin(GPIOD, 2, 	digitalInput, 	pullUp, 				0, 0), //bUp
+/*6 */makepin(GPIOD, 3, 	digitalInput, 	pullUp, 				0, 0), //bDown
 
-/*4 */makepin(GPIOC, 6, 	digitalInput, 	pullUp, 		0, 0), //bZero
-/*5 */makepin(GPIOD, 2, 	digitalInput, 	pullUp, 		0, 0), //bUp
-/*6 */makepin(GPIOD, 3, 	digitalInput, 	pullUp, 		0, 0), //bDown
+/*7 */makepin(GPIOD, 5, 	outPushPull, 	pullDisable, 			0, 1), //LCD_RST
+/*8 */makepin(GPIOD, 6, 	outPushPull, 	pullDisable, 			0, 1), //LCD_CS
+/*9 */makepin(GPIOD, 7, 	outPushPull, 	pullDisable, 			0, 1), //LCD_DC
 
-/*7 */makepin(GPIOD, 12, 	outPushPull,	pullDisable,    0,  0),  //LED0 enco
-/*8 */makepin(GPIOD, 13,	outPushPull,	pullDisable,    0,  0),  //LED1 enco
-/*9 */makepin(GPIOD, 14, 	outPushPull,	pullDisable,    0,  0),  //LED2
-/*10*/makepin(GPIOD, 15, 	outPushPull,	pullDisable,    0,  0),  //LED3
+/*10*/makepin(GPIOD, 0, 	outPushPull, 	pullDisable, 			0, 0), //GP_GP0
+/*11*/makepin(GPIOD, 1, 	outPushPull, 	pullDisable, 			0, 0), //GP_GP1
 
-/*11*/makepin(GPIOB, 0, 	digitalInput, 	pullUp, 		0, 0),	//LANnINT
-/*12*/makepin(GPIOD, 5, 	outPushPull,	pullDisable,    1,  0), //SSD_RES
-/*13*/makepin(GPIOD, 6, 	outPushPull,	pullDisable,    0,  0), //SSD_DC
-/*14*/makepin(GPIOD, 7, 	outPushPull,	pullDisable,    1,  0), //SSD_CS
+/*12*/makepin(GPIOE, 13, 	outPushPull, 	pullDisable, 			0, 0), //LED_GP
 
-/*15*/makepin(GPIOA, 8, 	alternateFunctionPushPull, pullDisable, 0, 0),	//MCO1
-/*16*/makepin(GPIOC, 9, 	alternateFunctionPushPull, pullDisable, 0, 0),	//MCO2
+/*13*/makepin(GPIOB, 0, 	digitalInput, 	pullUp, 				0, 0),	//LANnINT
 
-//*17*/makepin(GPIOB, 14, 	outPushPull,	pullDisable,    0,  0),  //LED2
+/*14*/makepin(GPIOA, 8, 	alternateFunctionPushPull, pullDisable, 0, 0),	//MCO1
+/*15*/makepin(GPIOC, 9, 	alternateFunctionPushPull, pullDisable, 0, 0),	//MCO2
+
 };
 const uint32_t pinNum = sizeof(pinsMode) / sizeof(pinMode_type);
 
@@ -94,46 +93,47 @@ void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_t
     */
     port->MODER         &= ~(0x03 << (2 * npin));
     port->OTYPER        &= ~(1<<npin);
-    port->PUPDR         &= ~(GPIO_RESERVED << (2*npin));
-    port->AFR[npin / 8] &= ~(GPIO_AFRL_AFSEL0_Msk << (4*(npin % 8)));
+    port->PUPDR         &= ~(GPIO_RESERVED << (2 * npin));
+    port->AFR[npin / 8] &= ~(GPIO_AFRL_AFSEL0_Msk << (4 * (npin % 8)));
     //Set number alternate function
-    port->AFR[npin / 8] |= nAF << (4*(npin % 8));
+    port->AFR[npin / 8] |= nAF << (4 * (npin % 8));
 
     //Set pull
     if(pull == pullUp){
-        port->PUPDR |= GPIO_PULL_UP << (2*npin);
+        port->PUPDR |= GPIO_PULL_UP << (2 * npin);
     }else if(pull == pullDown){
-        port->PUPDR |= GPIO_PULL_DOWN << (2*npin);
+        port->PUPDR |= GPIO_PULL_DOWN << (2 * npin);
     }
 
     //Set mode
     switch(mode){
         case analogMode:
-            port->MODER |= GPIO_ANALOG_MODE << (2*npin);
+            port->MODER		|= GPIO_ANALOG_MODE << (2 * npin);
             break;
 
         case digitalInput:
-            port->MODER         &= ~(0x03 << (2 * npin));
+            port->MODER		&= ~(0x03 << (2 * npin));
             break;
 
         case outPushPull:
-            port->MODER |= GPIO_GP_OUT << (2*npin);
-            port->OTYPER |= GPIO_PUSH_PULL << npin;
+            port->MODER		|= GPIO_GP_OUT << (2 * npin);
+            port->OTYPER	|= GPIO_PUSH_PULL << npin;
+            port->OSPEEDR   |= 3 << (2 * npin);   //High speed
             break;
 
         case outOpenDrain:
-            port->MODER     |= GPIO_GP_OUT << (2*npin);
+            port->MODER     |= GPIO_GP_OUT << (2 * npin);
             port->OTYPER    |= GPIO_OPEN_DRAIN << npin;
             break;
 
        case alternateFunctionPushPull:
-            port->MODER     |= GPIO_AF_MODE << (2*npin);
+            port->MODER     |= GPIO_AF_MODE << (2 * npin);
             port->OTYPER    |= GPIO_PUSH_PULL << npin;
-            port->OSPEEDR   |= 3 << (2*npin);   //High speed
+            port->OSPEEDR   |= 3 << (2 * npin);   //High speed
             break;
 
         case alternateFunctionOpenDrain:
-            port->MODER     |= GPIO_AF_MODE << (2*npin);
+            port->MODER     |= GPIO_AF_MODE << (2 * npin);
             port->OTYPER    |= GPIO_OPEN_DRAIN << npin;
             break;
     }

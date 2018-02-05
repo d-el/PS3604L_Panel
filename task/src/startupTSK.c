@@ -41,7 +41,7 @@ void startupTSK(void *pPrm){
 		sprintf(str, "COUNT %u", startCounter);
 		disp_putStr(00, 70, &arial, 0, str);
 		disp_putStr(0, 90, &arial, 0, fwinfoVersion);
-		disp_putStr(0, 110, &arial, 0, "2012 - 2017");
+		disp_putStr(0, 110, &arial, 0, "2012 - 2018");
 
 		if(fp.fpSet.lcdLight < 10){
 			fp.fpSet.lcdLight = 10;
@@ -50,7 +50,7 @@ void startupTSK(void *pPrm){
 			setLcdBrightness(i);
 			vTaskDelay(pdMS_TO_TICKS(3));
 		}
-		vTaskDelay(pdMS_TO_TICKS(300));
+		vTaskDelay(pdMS_TO_TICKS(150));
 		setLcdBrightness(fp.fpSet.lcdLight);
 
 		//Run key process
@@ -60,6 +60,8 @@ void startupTSK(void *pPrm){
 				break;
 			}
 		}
+
+		//iq_mandelbrot();
 
 		if(keyState(kMode)){
 			selWindow(settingWindow);

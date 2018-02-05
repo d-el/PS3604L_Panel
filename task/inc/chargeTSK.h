@@ -1,9 +1,13 @@
-﻿/******************************************************************************
+﻿/*!****************************************************************************
  * @file		charge.h
- * @author		D_EL - Storozhenko Roman
+ * @author		d_el
  * @version		V1.0
- * @date
- * @copyright	GNU Public License
+ * @date		31.01.20187
+ * @brief
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 #ifndef CHARGE_H
 #define CHARGE_H
@@ -14,22 +18,12 @@
 #include "stdio.h"
 
 /******************************************************************************
- * User define
+ * Define
  */
 #define CH_TSK_PERIOD   10      //[ms]
 
-/******************************************************************************
- * User typedef
- */
-typedef struct {
-	uint16_t u;		//[mV]
-	uint16_t i;		//[mA]
-	uint16_t t;		//[minute]
-	uint16_t mode;
-} charge_type;
-
-/******************************************************************************
- * User enum
+/*!****************************************************************************
+ * Enumeration
  */
 enum {
 	C_VOLT = 0,
@@ -43,8 +37,18 @@ enum {
 	ch_modeCurrent = 1,
 };
 
+/*!****************************************************************************
+ * Typedef
+ */
+typedef struct {
+	uint16_t u;		//[mV]
+	uint16_t i;		//[mA]
+	uint16_t t;		//[minute]
+	uint16_t mode;
+} charge_type;
+
 /******************************************************************************
- * Extern viriables
+ * External variables
  */
 extern charge_type ch;
 
@@ -52,10 +56,10 @@ extern charge_type ch;
  * Macro functions
  */
 
-/******************************************************************************
- * Prototypes for the functions
+/*!****************************************************************************
+ * Function declaration
  */
 void chargeTSK(void *pPrm);
 
 #endif //CHARGE_H
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
