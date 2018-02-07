@@ -56,7 +56,7 @@ void baseTSK(void *pPrm){
 	//Печать статических символов
 	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 5, kUp | kDown);
-	enSetNtic(2);
+	enSetNtic(3);
 
 	while(1){
 		sysTimeMeasStart(sysTimeBs);
@@ -285,7 +285,7 @@ void printStatusBar(void){
 	static uint8_t	errPrev = 0;
 	static uint8_t	modeIlimPrev = 0;
 	static uint8_t	ovfCurrent = 0;
-	char 			str[30];
+	static char 			str[30];
 
 	if(modeIlimPrev != fp.tf.state.bit.modeIlim){
 		if(fp.tf.state.bit.modeIlim != 0){
@@ -343,7 +343,7 @@ void printStatusBar(void){
 		}
 
 		//Печать температуры
-		sprintf(str, "%02u.%u %cC", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10, 0xb0);
+		sprintf(str, "%02u.%u\xB0\x43", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
 		//Печать времени
@@ -381,11 +381,11 @@ void printStatusBar(void){
 			}
 
 			sprintf(str, "LAN");
-			disp_putStr(60, 110, &font6x8, 0, str);
+			disp_putStr(69, 110, &font6x8, 0, str);
 		}
 		else{
 			sprintf(str, "    ");
-			disp_putStr(60, 110, &font6x8, 0, str);
+			disp_putStr(69, 110, &font6x8, 0, str);
 		}
 
 		errPrev = 0;

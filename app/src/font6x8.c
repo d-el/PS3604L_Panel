@@ -1037,6 +1037,6 @@ static const char_type font6x8_array[] = {
 	{ 0xb1, &font6x8_0xb1 },
 };
 
-const font_type font6x8 = { 146, font6x8_array };
+const font_type font6x8 = { 177, font6x8_array };
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

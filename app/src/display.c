@@ -86,11 +86,11 @@ void disp_fillRect(int16_t x, int16_t y, int16_t w, int16_t h, disp_color_type c
 void disp_putChar(uint16_t x, uint16_t y, const font_type *font, char c){
 	uint8_t width, height;
 
-	c = c - font->chars[0].n;
-	uint8_t c_width = font->chars[(uint8_t)c].image->w;
-	uint8_t c_height = font->chars[(uint8_t)c].image->h;
+	uint8_t nc = (uint8_t)c - font->chars[0].n;
+	uint8_t c_width = font->chars[nc].image->w;
+	uint8_t c_height = font->chars[nc].image->h;
 
-	uint8_t *pdata = (uint8_t*) font->chars[(uint8_t)c].image->data;
+	const uint8_t *pdata = font->chars[nc].image->data;
 
 	uint8_t mask;
 	uint8_t bytesPerLine = ((c_width - 1) / 8 + 1);
@@ -123,7 +123,7 @@ void disp_putChar(uint16_t x, uint16_t y, const font_type *font, char c){
 void disp_putStr(uint16_t x, uint16_t y, const font_type *font, uint8_t distance, const char *s){
 	while(*s != 0){
 		disp_putChar(x, y, font, *s);
-		x += font->chars[*s - 0x20].image->w + distance;
+		x += font->chars[*(uint8_t*)s - font->chars[0].n].image->w + distance;
 		s++;
 	}
 }
