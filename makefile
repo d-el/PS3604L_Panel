@@ -46,11 +46,9 @@ CCFLAGS := \
 LDFLAGS := \
 	$(CPUFLAGS) \
 	$(LDFILES) \
-	-Werror -Wall -Wextra \
 	-Wl,--gc-sections \
 	-Wl,-Map="$(ODIR)/$(TARGET).map" \
-	-nostartfiles \
-	-Xlinker --gc-sections --specs=nano.specs \
+	-Xlinker --gc-sections --specs=nano.specs
 
 #******************************************************************************
 # Toolchain
@@ -167,11 +165,3 @@ $(OBJODIR)/%.o: %.S
 	@mkdir -p $(dir $@)
 	@$(AS) $(CFLAGS) -M -o $(OBJODIR)/$*.d $<
 	@$(AS) $(CFLAGS) -MMD -MP -MF $(OBJODIR)/$*.d -MT$@ -c -o $@ $<
-
-
-#$(DEPDIR)/%.d: ;
-#.PRECIOUS: $(DEPDIR)/%.d
-
-#ifneq ($(MAKECMDGOALS), clean)
-#include $(shell find $(OBJODIR) -maxdepth 8 -type f -name "*.d")
-#endif
