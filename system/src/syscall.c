@@ -1,10 +1,13 @@
 ﻿/*!****************************************************************************
  * @file		syscall.c
- * @author		d_el - Storozhenko Roman
+ * @author		d_el
  * @version		V1.0
  * @date		02.05.2017
- * @copyright	GNU Lesser General Public License v3
  * @brief		POSIX System Calls
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 
 #include <errno.h>
@@ -32,7 +35,7 @@ extern uint32_t __get_MSP(void);
  * @return	previous heap end value
  */
 __attribute__((weak))
-   caddr_t _sbrk(intptr_t incr){
+caddr_t _sbrk(intptr_t incr){
 	extern size_t _ebss; 							/// Defined by the linker
 	static caddr_t heapEnd = (caddr_t) &_ebss;
 	caddr_t prevHeapEnd = heapEnd;
@@ -52,14 +55,12 @@ __attribute__((weak))
  * @param 	code - exit status
  */
 __attribute__((weak))
-void _exit(int code __attribute__((unused))){
-	while(1){
-		__NOP();
-	}
+void _exit(int code){
+	while(1);
 }
 
 /*!****************************************************************************
- *
+ * @brief	Initialize serial data structure
  */
 __attribute__((weak))
 void _init(void){
@@ -75,7 +76,7 @@ void _fini(void){
 }
 
 /*!****************************************************************************
- * Iterate over all the init routines
+ * @brief	Iterate over all the init routines
  */
 __attribute__((weak))
 void __libc_init_array(void){
@@ -96,7 +97,7 @@ void __libc_init_array(void){
 }
 
 /*!****************************************************************************
- * Run all the cleanup routines
+ * @brief	Run all the cleanup routines
  */
 __attribute__((weak))
 void __libc_fini_array(void){
@@ -111,32 +112,48 @@ void __libc_fini_array(void){
 }
 
 /*!****************************************************************************
- * kill - послать сигнал процессу
+ * @brief	Send a signal. Minimal implementation:
  */
 __attribute__((weak))
 int _kill(int pid, int sig){
 	errno = EINVAL;
-	return (-1);
+	return -1;
 }
 
 /*!****************************************************************************
- * getpid - получить ID текущего процесса
+ * @brief	Process-ID; this is sometimes used to generate strings unlikely to
+ * 			conflict with other processes.
+ * 			Minimal implementation, for a system without processes:
  */
 __attribute__((weak))
-int _getpid(){
+int _getpid(void){
 	return 1;
 }
 
 /*!****************************************************************************
- * write - запись в файл - у нас есть только stderr/stdout
+ * @brief	Write a character to a file. 'libc' subroutines will use this system
+ * 			routine for output to all files, including stdout
+ * @retval	Returns -1 on error or number of bytes sent
  */
 __attribute__((weak))
 int _write(int file, char *ptr, int len){
-	return 0;
+	return -1;
 }
 
 /*!****************************************************************************
- * close - закрытие файла - возвращаем ошибку
+ * @brief	Read a character to a file. 'libc' subroutines will use this system
+ * 			routine for input from all files, including stdin.
+ * 			Returns -1 on error or blocks until the number of characters have
+ * 			been read
+ */
+__attribute__((weak))
+int _read(int file, char *ptr, int len){
+	return -1;
+}
+
+/*!****************************************************************************
+ * @brief	Close a file
+ * @retval	Returns -1 on error or number of bytes sent
  */
 __attribute__((weak))
 int _close(int file){
@@ -144,7 +161,11 @@ int _close(int file){
 }
 
 /*!****************************************************************************
- * fstat - состояние открытого файла
+ * @brief	Status of an open file. For consistency with other minimal
+ * 			implementations in these examples,
+ * 			all files are regarded as character special devices.
+ * 			The sys/stat.h header file required is distributed in the 'include'
+ * 			subdirectory for this C library
  */
 __attribute__((weak))
 int _fstat(int file, struct stat *st){
@@ -153,7 +174,9 @@ int _fstat(int file, struct stat *st){
 }
 
 /*!****************************************************************************
- * isatty - является ли файл терминалом.
+ * @brief	Query whether output stream is a terminal. For consistency with the
+ * 			other
+ * 			minimal implementations:
  */
 __attribute__((weak))
 int _isatty(int file){
@@ -169,19 +192,11 @@ int _isatty(int file){
 }
 
 /*!****************************************************************************
- * lseek - установить позицию в файле
+ * @brief	Set position in a file. Minimal implementation:
  */
 __attribute__((weak))
 int _lseek(int file, int ptr, int dir){
 	return 0;
 }
 
-/*!****************************************************************************
- * read - чтение из файла, у нас пока для чтения есть только stdin
- */
-__attribute__((weak))
-int _read(int file, char *ptr, int len){
-	return -1;
-}
-
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
