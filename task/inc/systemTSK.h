@@ -15,27 +15,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "OSinit.h"
-#include "board.h"
 #include "pstypes.h"
-#include "prmSystem.h"
-#include "startupTSK.h"
-#include "settingTSK.h"
-#include "cube3dTSK.h"
-#include "bubblesTSK.h"
-#include "chargeTSK.h"
-#include "httpServerTSK.h"
-#include "pvd.h"
-#include "pingService.h"
-#include "sntp.h"
-#include "assert.h"
-#include "stm32f4x7_eth.h"
-#include "ethernetif.h"
-#include "tcpip.h"
 
 /*!****************************************************************************
  * Define
@@ -66,7 +46,7 @@ typedef struct {
 	uint32_t 	netmask;
 	uint32_t 	gateway;
 	uint16_t 	lcdLight;		///< [X_X %]
-	uint8_t		timezone;		///< -12 to +12
+	int8_t		timezone;		///< -12 to +12
 } frontPanelSetting_type;
 
 typedef struct {
@@ -103,6 +83,7 @@ void selWindow(selWindow_type window);
 void systemTSK(void *pPrm);
 void netSettingUpdate(void);
 void selWindow(selWindow_type window);
+void timezoneUpdate(void);
 
 #endif //systemTSK_H
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

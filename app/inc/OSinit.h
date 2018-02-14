@@ -24,7 +24,7 @@
 #define BUBLE_TSK_PRIO          1
 
 /*!**** NAME ****************** size [4byte Word] ****************************/
-#define SYSTEM_TSK_SZ_STACK     256
+#define SYSTEM_TSK_SZ_STACK     512
 #define UART_TSK_SZ_STACK       256
 #define NETIF_SZ_STACK          512
 #define TCPIP_SZ_STACK          1024
@@ -32,7 +32,7 @@
 #define STARTUP_TSK_SZ_STACK    256
 #define BASE_TSK_SZ_STACK       256
 #define CHARG_TSK_SZ_STACK      256
-#define SETT_TSK_SZ_STACK       256
+#define SETT_TSK_SZ_STACK       512
 #define CUBE_TSK_SZ_STACK       256
 #define BUBLE_TSK_SZ_STACK      256
 

@@ -10,6 +10,8 @@
  * Include
  */
 #include "math.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include "ui.h"
 #include "display.h"
 #include "graphics.h"
@@ -18,8 +20,8 @@
 #include "key.h"
 #include "enco.h"
 #include "IQmathLib.h"
-#include "cube3dTSK.h"
 #include "systemTSK.h"
+#include "cube3dTSK.h"
 
 /*!****************************************************************************
  * User define
@@ -62,7 +64,7 @@ void cube3dTSK(void *pPrm){
 	_iq angle;                              //Буфер для угла
 	int32_t x1, y1, z1;                           //Координаты точек от центра объекта
 	float f;                                  //Временная переменная
-	char x2d[MESH_COUNT], y2d[MESH_COUNT];   //”Плоские” точки
+	uint8_t x2d[MESH_COUNT], y2d[MESH_COUNT];   //”Плоские” точки
 	pairsOfPoints_type pairsOfPoints[MESH_COUNT];
 
 	uint16_t  old_val_encoder = enGeReg();
@@ -161,10 +163,13 @@ void cube3dTSK(void *pPrm){
 			selWindow(baseWindow);
 		}
 
-		//Печать времени
-		/*rtc_getTime(&timeStrct);
-		strftime(str, sizeof(str), "%H:%M:%S", &timeStrct);
-		lcd_putStr(48, 110, &arial, 0, str);*/
+		//Print time
+		char str[10];
+		struct tm tm;
+		time_t unixTime = time(NULL);
+		localtime_r(&unixTime, &tm);
+		strftime(str, sizeof(str), "%H:%M:%S", &tm);
+		disp_putStr(48, 110, &arial, 0, str);
 
 		vTaskDelay(pdMS_TO_TICKS(40));
 	}

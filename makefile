@@ -113,7 +113,7 @@ clean:
 	@echo ' '
 
 disasm:
-	@$(OBJDUMP) -D $(ODIR)/$(TARGET).elf > $(ODIR)/$(TARGET).S
+	@$(OBJDUMP) -h -S -z $(ODIR)/$(TARGET).elf > $(ODIR)/$(TARGET).S
 	@echo ' '
 
 $(TARGET).elf: $(OBJS)

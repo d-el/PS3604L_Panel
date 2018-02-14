@@ -28,6 +28,10 @@
 #include "systemTSK.h"
 #include "baseTSK.h"
 
+#include "stdio.h"
+#include "stdlib.h"
+#include "debugPrint.h"
+
 /******************************************************************************
  * Memory
  */
@@ -57,6 +61,16 @@ void baseTSK(void *pPrm){
 	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 5, kUp | kDown);
 	enSetNtic(3);
+
+	//putenv("TZ=Etc/GMT-2");	//Нужно вызывать только один раз
+	//tzset();
+//	putenv("TZ=GMT-3");	//Нужно вызывать только один раз
+//	tzset();
+	/*time_t unixTime = 1518301903;//time(NULL);
+	struct tm *m_time;
+	m_time  = localtime(&unixTime);
+	strftime(str, sizeof(str), "%H:%M:%S", m_time);
+	println(str);*/
 
 	while(1){
 		sysTimeMeasStart(sysTimeBs);
@@ -281,6 +295,7 @@ void baseTSK(void *pPrm){
 /*!****************************************************************************
  *
  */
+__tzinfo_type *t __attribute((used));;
 void printStatusBar(void){
 	static uint8_t	errPrev = 0;
 	static uint8_t	modeIlimPrev = 0;
@@ -346,19 +361,13 @@ void printStatusBar(void){
 		sprintf(str, "%02u.%u\xB0\x43", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
-		//Печать времени
+		//Print time
+		struct tm tm;
 		time_t unixTime = time(NULL);
-		unixTime = unixTime + fp.fpSet.timezone * 60 * 60;
-
-		struct tm tmUtc;
-		gmtime_r(&unixTime, &tmUtc);
-
-		struct tm tmLocal;
-		localtime_r(&unixTime, &tmLocal);
-
-		strftime(str, sizeof(str), "%H:%M:%S", &tmUtc);
+		localtime_r(&unixTime, &tm);
+		strftime(str, sizeof(str), "%H:%M:%S", &tm);
 		disp_putStr(110, 110, &font6x8, 0, str);
-		strftime(str, sizeof(str), "%d.%m.%y", &tmUtc);
+		strftime(str, sizeof(str), "%d.%m.%y", &tm);
 		disp_putStr(110, 120, &font6x8, 0, str);
 
 		//LAN

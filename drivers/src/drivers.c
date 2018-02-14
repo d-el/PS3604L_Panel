@@ -30,7 +30,11 @@
 #include "24AAxx.h"
 
 uint8_t macAddress[6];
-void macAddressSet(void){
+
+/*!****************************************************************************
+ * @brief	Generate MAC address from MCU uID
+ */
+void macAddressGen(void){
 	uint32_t mach = makeID(getDid());
 	macAddress[0] = 0x28;
 	macAddress[1] = 0x05;
@@ -51,37 +55,25 @@ void hardInit(void){
 		fp.state.mainOscillatorError = 1;
 	}
 	gpio_init();
-	macAddressSet();
+	macAddressGen();
 	ETH_BSP_Config();	//configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();
 	beep_init();
 	ledPwm_init();
-
-	//spfd_init();
-	setLcdBrightness(600);
-	//st7735_init();
-
-	// Initialize 1.8" TFT
-	initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
-	//initB();
-	//while(1);
-
+	initR(INITR_BLACKTAB);   //Initialize 1.8" TFT - ST7735S chip, black tab
 	rtcStatus_type rtcStatus = rtc_init();
 	if((rtcStatus == rtc_Ok)&&(rtcStatus == rtc_wasOn)){
 		fp.state.rtcOscillatorError = 0;
 	}else{
 		fp.state.rtcOscillatorError = 1;
 	}
-	//i2c_init(i2c2);
 	uart_init(uart1, BR38400);
 	uart_init(uart3, BR57600);
 	uart_init(uart4, BR115200);
 	i2c_init(i2c1);
 	eep_init();
-
 	//pvd_init();
-
 }
 
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

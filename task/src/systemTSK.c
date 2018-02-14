@@ -13,10 +13,25 @@
 /*!****************************************************************************
  * Include
  */
+#include "stdlib.h"
+#include "assert.h"
+#include "prmSystem.h"
+#include "pvd.h"
+#include "board.h"
 #include "ledpwm.h"
+#include "pingService.h"
+#include "sntp.h"
+#include "stm32f4x7_eth.h"
+#include "ethernetif.h"
+#include "tcpip.h"
 #include "debugPrint.h"
 #include "regulatorConnTSK.h"
-#include "systemTSK.h"
+#include "startupTSK.h"
+#include "settingTSK.h"
+#include "cube3dTSK.h"
+#include "bubblesTSK.h"
+#include "chargeTSK.h"
+#include "httpServerTSK.h"
 #include "baseTSK.h"
 
 /*!****************************************************************************
@@ -43,6 +58,7 @@ void systemTSK(void *pPrm){
 	BaseType_t 		Result = pdTRUE;
 
 	loadParameters();												// Load panel settings and user parameters
+	timezoneUpdate();
 	pvd_setSupplyFaultCallBack(shutdown);							// Setup callback for Supply Fault
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	ping_init();													// Initialize service ping protocol
@@ -233,6 +249,25 @@ void netSettingUpdate(void){
 	l_gateway.addr = htonl(fp.fpSet.gateway);
 
 	netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
+}
+
+/*!****************************************************************************
+ */
+__tzinfo_type *tt __attribute((used));;
+void timezoneUpdate(void){
+	char str[8];
+	sprintf(str, "TZ=GMT%i", fp.fpSet.timezone);
+	//setenv("TZ", str, 1);	//Set environment variable
+	//tzset();	//Update time zone
+	//setenv("TZ", "", 1);	//Set environment variable
+	//setenv("TZ", "Etc/GMT-2", 1);	//Set environment variable
+	//putenv("TZ=Etc/GMT-2");
+	//tzset();
+	//tt = __gettzinfo();
+
+	//putenv("TZ=GMT-2");	//Нужно вызывать только один раз
+	putenv(str);
+	tzset();
 }
 
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

@@ -1,10 +1,13 @@
 ﻿/*!****************************************************************************
- * @file		storage.h
- * @author		d_el - Storozhenko Roman
- * @version		V1.0
- * @date		05.12.2015
- * @copyright	GNU Lesser General Public License v3
- * @brief		RTC driver
+ * @file		rtc.h
+ * @author		d_el
+ * @version		V1.1
+ * @date		13.02.2018
+ * @brief		Driver RTC module
+ * @copyright	Copyright (C) 2018 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 #ifndef rtc_H
 #define rtc_H
@@ -18,7 +21,6 @@
 /*!****************************************************************************
  * Define
  */
-#define RTC_LSE_TIMEOUT	(100000000)
 
 /*!****************************************************************************
  * Typedef
@@ -49,8 +51,7 @@ typedef enum {
 rtcStatus_type rtc_init(void);
 rtcStatus_type rtc_setTime(const struct tm *t);
 rtcStatus_type rtc_setTimeUnix(time_t time);
-void rtc_writeToBkp(uint32_t val);
-uint32_t rtc_ReadFromBkp(void);
+rtcStatus_type rtc_setTimeUnixLocal(time_t time);
 
 #endif //rtc_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

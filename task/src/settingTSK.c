@@ -11,6 +11,7 @@
  * Include
  */
 #include "FreeRTOS.h"
+#include "task.h"
 #include "pstypes.h"
 #include "rtc.h"
 #include "main.h"
@@ -126,7 +127,7 @@ itemState_type setBright(const menuItem_type *item){
  * @brief    RTC select callback
  */
 itemState_type rtcSelect(const menuItem_type *item){
-	unixTime = time(NULL) + 60 * 60 * fp.fpSet.timezone;
+	unixTime = time(NULL);
 	return (itemState_type) {.state = menuItemOk};
 }
 
@@ -134,7 +135,8 @@ itemState_type rtcSelect(const menuItem_type *item){
  * @brief    RTC select callback
  */
 itemState_type rtcUnselect(const menuItem_type *item){
-	rtc_setTimeUnix(unixTime - 60 * 60 * fp.fpSet.timezone);
+	timezoneUpdate();
+	rtc_setTimeUnix(unixTime - (60 * fp.fpSet.timezone));
 	return (itemState_type) {.state = menuItemOk};
 }
 

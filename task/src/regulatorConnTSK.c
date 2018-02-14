@@ -14,6 +14,7 @@
  * Include
  */
 #include "string.h"
+#include "assert.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"

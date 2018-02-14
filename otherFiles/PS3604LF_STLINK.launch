@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="ilg.gnuarmeclipse.debug.gdbjtag.openocd.launchConfigurationType">
 <stringAttribute key="bad_container_name" value="/PS3604LF/otherFiles/Panel_JLINK.launch"/>
+<stringAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.PERIPHERALS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&#13;&#10;&lt;peripherals&gt;&#13;&#10;&lt;peripheral name=&quot;RTC&quot;/&gt;&#13;&#10;&lt;/peripherals&gt;&#13;&#10;"/>
 <booleanAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.doContinue" value="false"/>
 <booleanAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.doDebugInRam" value="false"/>
 <booleanAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.doFirstReset" value="true"/>
@@ -16,7 +17,7 @@
 <stringAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.gdbServerExecutable" value="${openocd_path}/${openocd_executable}"/>
 <intAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.gdbServerGdbPortNumber" value="3333"/>
 <stringAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.gdbServerLog" value=""/>
-<stringAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.gdbServerOther" value="-f &quot;${project_loc}/otherFiles/openocd_stm32f4.cfg&quot;"/>
+<stringAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.gdbServerOther" value="-f &quot;${project_loc}\otherFiles\openocd_stm32f4.cfg&quot;"/>
 <intAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.gdbServerTelnetPortNumber" value="4444"/>
 <stringAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.otherInitCommands" value=""/>
 <stringAttribute key="ilg.gnuarmeclipse.debug.gdbjtag.openocd.otherRunCommands" value=""/>
