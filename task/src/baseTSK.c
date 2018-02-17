@@ -28,6 +28,7 @@
 #include "sysTimeMeas.h"
 #include "systemTSK.h"
 #include "baseTSK.h"
+#include "debugPrint.h"
 
 /******************************************************************************
  * Memory
@@ -54,26 +55,16 @@ void baseTSK(void *pPrm){
 
 	disp_setColor(black, red);
 	disp_fillScreen(black);
-	//Печать статических символов
+	//Print static
 	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 5, kUp | kDown);
 	enSetNtic(3);
-
-	//putenv("TZ=Etc/GMT-2");	//Нужно вызывать только один раз
-	//tzset();
-//	putenv("TZ=GMT-3");	//Нужно вызывать только один раз
-//	tzset();
-	/*time_t unixTime = 1518301903;//time(NULL);
-	struct tm *m_time;
-	m_time  = localtime(&unixTime);
-	strftime(str, sizeof(str), "%H:%M:%S", m_time);
-	println(str);*/
 
 	while(1){
 		sysTimeMeasStart(sysTimeBs);
 
 		/**************************************
-		 * Обработка кнопок
+		 * Key process
 		 */
 		if(keyProc() != 0){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
@@ -120,7 +111,7 @@ void baseTSK(void *pPrm){
 		}
 
 		/***************************************
-		 * Вынимаем значение с энкодера
+		 * Encoder process
 		 */
 		sHandle = pHandle + (bs.curPreSet * 3) + varParam;
 		if(bigstepUp != 0){
@@ -143,7 +134,7 @@ void baseTSK(void *pPrm){
 		}
 
 		/***************************************
-		 * Задание регулятора
+		 * Task for regulator
 		 */
 		fp.tf.task.u = bs.set[bs.curPreSet].u * 1000;
 		switch(bs.set[bs.curPreSet].mode){
@@ -165,7 +156,7 @@ void baseTSK(void *pPrm){
 		}
 
 		/**************************************
-		 * Перекладываем измеренные данные
+		 * Copy measure data
 		 */
 		measV = fp.tf.meas.u;
 		if(measV > 99999999){
@@ -177,7 +168,7 @@ void baseTSK(void *pPrm){
 		}
 
 		/**************************************
-		 * Запуск заставки
+		 * SaveScreen
 		 */
 		if(fp.tf.state.bit.switchIsON != 0){
 			IdleTime = xTaskGetTickCount();
@@ -191,9 +182,9 @@ void baseTSK(void *pPrm){
 		}
 
 		/**************************************
-		 * Вывод на дисплей
+		 * Output data to display
 		 */
-		//Печать значения напряжения
+		//Print voltage
 		if(fp.tf.state.bit.switchIsON != 0){
 			sprintf(str, "%02u.%03u", measV / 1000000, (measV / 1000) % 1000);
 		}else{
@@ -207,7 +198,7 @@ void baseTSK(void *pPrm){
 		disp_putStr(16, 0, &dSegBold, 6, str);
 		disp_putChar(150, 18, &font8x12, 'V');
 
-		//Печать значения тока
+		//Print current
 		if(varParam == VAR_CURR){
 			disp_setColor(black, ui.color.cursor);
 		}else{
@@ -232,7 +223,7 @@ void baseTSK(void *pPrm){
 		}
 		disp_putStr(16, 36, &dSegBold, 6, str);
 
-		//Печать текущий набор настроек
+		//Print current settings
 		switch(bs.curPreSet){
 			case 0:
 				grf_fillRect(0, 104, 53, 3, white);
@@ -248,43 +239,41 @@ void baseTSK(void *pPrm){
 				break;
 		}
 
-		//Печать значения Imax
+		//Print limiting value
 		if(varParam == VAR_CURR){
 			disp_setColor(black, ui.color.cursor);
 		}else{
 			disp_setColor(black, ui.color.imax);
 		}
 
-		//disp_putStr(16, 70, &arial, 0, "Lim");
 		sprintf(str, "%2u.%03u", bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
 		disp_putStr(16, 70, &arial, 0, str);
-		//disp_putStr(16, 70, &dSegBold8x14, 0, str);
 		disp_putChar(64, 72, &font8x12, 'A');
 
-		//Печать режима по току
+		//Print mode
 		if(varParam == VAR_MODE){
 			disp_setColor(black, ui.color.cursor);
 		}else{
 			disp_setColor(black, ui.color.mode);
 		}
 		if(bs.set[bs.curPreSet].mode == baseImax){
-			disp_putStr(16, 88, &arial, 0, "I max            ");
+			disp_putStr(16, 88, &arial, 0, "I max       ");
 		}
 		if(bs.set[bs.curPreSet].mode == baseILimitation){
-			disp_putStr(16, 88, &arial, 0, "Limitation     ");
+			disp_putStr(16, 88, &arial, 0, "Limiting    ");
 		}
 		if(bs.set[bs.curPreSet].mode == baseUnprotected){
 			disp_putStr(16, 88, &arial, 0, "Unprotected");
 		}
 
-		//Параметры нагрузки, время
+		//Print status bar
 		printStatusBar();
 
-		//Измерение времени выполнения одной итерации задачи
+		//Measure time
 		sysTimeMeasStop(sysTimeBs);
 		timebs_us = sysTimeMeasGet_us(sysTimeBs);
 
-		/*************************************/
+		//Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));
 	}
 }
@@ -292,7 +281,6 @@ void baseTSK(void *pPrm){
 /*!****************************************************************************
  *
  */
-__tzinfo_type *t __attribute((used));;
 void printStatusBar(void){
 	static uint8_t	errPrev = 0;
 	static uint8_t	modeIlimPrev = 0;
@@ -335,26 +323,26 @@ void printStatusBar(void){
 		}
 
 		errPrev = 1;
-	}else{  //Аварий нету
+	}else{  //Not failure
 		if(errPrev != 0){
 			grf_fillRect(0, 108, 160, 19, black);
 			errPrev = 0;
 		}
 		disp_setColor(black, white);
 
-		//Выходная мощность
+		//Print output power
 		sprintf(str, "%02u.%03u W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
 		disp_putStr(0, 110, &font6x8, 0, str);
 
-		//Сопротивление нагузки
-		if(fp.tf.meas.resistens != 99999){
-			sprintf(str, "%05u  \xB1", fp.tf.meas.resistens);
+		//Print load resistance
+		if(fp.tf.meas.resistance != 99999){
+			sprintf(str, "%05u  \xB1", fp.tf.meas.resistance);
 			disp_putStr(0, 120, &font6x8, 0, str);
 		}else{
 			disp_putStr(0, 120, &font6x8, 0, " ---   \xB1");
 		}
 
-		//Печать температуры
+		//Print regulator temperature
 		sprintf(str, "%02u.%u\xB0\x43", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
@@ -367,7 +355,7 @@ void printStatusBar(void){
 		strftime(str, sizeof(str), "%d.%m.%y", &tm);
 		disp_putStr(110, 120, &font6x8, 0, str);
 
-		//LAN
+		//Print LAN status
 		static TickType_t xTime;
 		static uint8_t ledon = 0;
 		if(fp.state.lanLink != 0){

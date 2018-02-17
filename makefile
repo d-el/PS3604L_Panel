@@ -82,7 +82,7 @@ CPPSRCS :=
 
 #******************************************************************************
 # ASM File (*.S)
-ASRCS := $(shell find system -maxdepth 3 -type f -name "*.S" )
+ASRCS := #$(shell find system -maxdepth 3 -type f -name "*.S" )
 
 #******************************************************************************
 # ASM File (*.s)

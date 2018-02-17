@@ -216,7 +216,7 @@ void chargeTSK(void *pPrm){
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
 
-		//Детект окончания
+		//Detection finish
 		if((chargerIsOn != 0) && (fp.tf.state.bit.switchIsON == 0)){
 			if(keyState(kOnOff)){
 				BeepTime(ui.beep.chargeReady.time, ui.beep.chargeReady.freq);
@@ -231,9 +231,10 @@ void chargeTSK(void *pPrm){
 			chargerIsOn = 1;
 		}
 
+		//Print status bar
 		printStatusBar();
 
-		/*************************************/
+		//Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CH_TSK_PERIOD));
 	}
 }

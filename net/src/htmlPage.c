@@ -622,7 +622,7 @@ const uint8_t bin_favicon[190] = {
 
 meas_type bin_meas = {
 	.power			= 1,           		///< [X_XXX Wt]
-	.resistens		= 2,      			///< [X_XXX Ohm]
+	.resistance		= 2,      			///< [X_XXX Ohm]
 	.time			= 3,           		///< [s]
 	.capacity		= 25456,       		///< [X_XXX A/h]
 	.u				= 22220000,       	///< [X_XXXXXX V]

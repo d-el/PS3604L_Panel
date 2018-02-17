@@ -74,7 +74,7 @@ typedef union {
 
 typedef struct {
 	uint32_t power;          ///< [X_XXX Wt]
-	uint32_t resistens;      ///< [X_XXX Ohm]
+	uint32_t resistance;      ///< [X_XXX Ohm]
 	uint32_t time;           ///< [s]
 	uint32_t capacity;       ///< [X_XXX Ah]
 	uint32_t u;              ///< [X_XXXXXX V]

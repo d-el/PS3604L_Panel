@@ -34,7 +34,7 @@ void l_print(const char *fmt, ...){
 	va_start(va, fmt);
 	vsiprintf(g_buf, fmt, va);
 	va_end(va);
-	SH_SendString(g_buf);	//Send from semihosting
+	sh_sendString(g_buf);	//Send from semihosting
 }
 
 /*!****************************************************************************
@@ -49,7 +49,7 @@ void l_println(const char *fmt, ...){
 	vsiprintf(g_buf, fmt, va);
 	va_end(va);
 	strcat(g_buf, "\n");
-	SH_SendString(g_buf);	//Send from semihosting
+	sh_sendString(g_buf);	//Send from semihosting
 }
 
 /*!****************************************************************************
@@ -66,7 +66,7 @@ int _write(int fd, const void *buf, size_t count){
 	memcpy(g_buf, buf, count);
 	g_buf[count] = 0;
 
-	SH_SendString(g_buf);
+	sh_sendString(g_buf);
 	return count;
 }
 

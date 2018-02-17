@@ -1,22 +1,28 @@
 ﻿/*!****************************************************************************
  * @file		semihosting.h
- * @author		Coocox
+ * @author		d_el
  * @version		V1.0
- * @date		09.10.2011
- * @copyright	GNU Lesser General Public License v3
- * @brief		Semihosting LowLayer GetChar/SendChar Implement
+ * @date		17.02.2018
+ * @brief		Semihosting driver
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
-#ifndef __SIMIHOSTTING_IMPL
-#define __SIMIHOSTTING_IMPL
+#ifndef SEMIHOSTTING
+#define SEMIHOSTTING
 
+/*!****************************************************************************
+ * Include
+ */
 #include "stdint.h"
 
 /*!****************************************************************************
  * Function declaration
  */
-void SH_SendString(const char *str);
-char SH_GetChar(void);
+void sh_sendString(const char *str);
+char sh_getChar(void);
 
 
-#endif
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+#endif //SEMIHOSTTING
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
