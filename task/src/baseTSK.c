@@ -11,6 +11,7 @@
  * Include
  */
 #include "string.h"
+#include "stdio.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -27,10 +28,6 @@
 #include "sysTimeMeas.h"
 #include "systemTSK.h"
 #include "baseTSK.h"
-
-#include "stdio.h"
-#include "stdlib.h"
-#include "debugPrint.h"
 
 /******************************************************************************
  * Memory

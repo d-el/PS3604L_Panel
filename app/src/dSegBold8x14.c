@@ -1,7 +1,6 @@
-
 /*******************************************************************************
 * font
-* filename: D:/Radio/Programm/Графика/lcd-image-converter/doneFont/dSegBold8x14.xml
+* filename: dSegBold8x14
 * name: dSegBold8x14
 * family: DSEG7 Classic
 * size: 14

@@ -106,13 +106,25 @@ DFLAGS = $(CCFLAGS) $(INCLUDES)
 #******************************************************************************
 # Targets
 #
-all: prebuild mainbuild
+all: postbuild
+
+prebuild:
+	@otherFiles/vgen app/src/version.c
+	@echo ' '
+
+mainbuild: prebuild
+	@$(MAKE) --no-print-directory $(TARGET).hex
+
+postbuild: mainbuild
+	@echo 'Print Size:'
+	@$(SIZE) --format=berkeley "$(ODIR)/$(TARGET).elf"
+	@echo ' '
 
 clean:
 	@rm -rf $(ODIR)
 	@echo ' '
 
-disasm:
+disasm: $(TARGET).elf
 	@$(OBJDUMP) -h -S -z $(ODIR)/$(TARGET).elf > $(ODIR)/$(TARGET).S
 	@echo ' '
 
@@ -122,16 +134,8 @@ $(TARGET).elf: $(OBJS)
 	@echo ' '
 	
 $(TARGET).hex: $(TARGET).elf
+	@echo [OBJCOPY] $@
 	@$(OBJCOPY) -O ihex $(ODIR)/$(TARGET).elf $(ODIR)/$(TARGET).hex
-	@echo ' '
-
-prebuild:
-	-wscript.exe otherFiles\versionGen.vbs app\src\version.c app\inc\version.h
-	@echo ' '
-
-mainbuild: $(TARGET).elf $(TARGET).hex
-	@echo 'Print Size:'
-	@$(SIZE) --format=berkeley "$(ODIR)/$(TARGET).elf"
 	@echo ' '
 
 ifneq ($(MAKECMDGOALS),clean)

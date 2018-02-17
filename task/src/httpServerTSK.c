@@ -28,9 +28,7 @@
  * MEMORY
  */
 httpServer_type httpServer;
-
-
-char		pageData[LEN];
+char pageData[LEN];
 const char http_200[] 				= "HTTP/1.1 200 OK\r\n";
 const char http_404[] 				= "HTTP/1.1 404 Not Found\r\n";
 const char http_server[] 			= "Server: by Storozhenko Roman\r\n";

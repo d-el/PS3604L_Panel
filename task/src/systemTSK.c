@@ -108,7 +108,7 @@ void systemTSK(void *pPrm){
 		}
 
 		/*
-		 * Вызов периодических функций
+		 * Led blink
 		 */
 		static uint8_t ledCount = 0;
 		if(ledCount++ == 100){
@@ -126,7 +126,7 @@ void systemTSK(void *pPrm){
 		}
 
 		/*
-		 * link management
+		 * Link management
 		 */
 		static uint8_t linkCount = 0;
 		if(linkCount++ == (LINK_DETECT_PERIOD / SYSTEM_TSK_PERIOD)){
@@ -146,6 +146,12 @@ void systemTSK(void *pPrm){
 
 			linkCount = 0;
 		}
+		static uint32_t linkRequest = 0;
+		if(linkRequest != httpServer.numberRequest){
+			fp.state.lanActive = 1;
+			linkRequest = httpServer.numberRequest;
+		}
+
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));
 	}
 }
@@ -258,14 +264,6 @@ void timezoneUpdate(void){
 	char str[8];
 	sprintf(str, "TZ=GMT%i", fp.fpSet.timezone);
 	//setenv("TZ", str, 1);	//Set environment variable
-	//tzset();	//Update time zone
-	//setenv("TZ", "", 1);	//Set environment variable
-	//setenv("TZ", "Etc/GMT-2", 1);	//Set environment variable
-	//putenv("TZ=Etc/GMT-2");
-	//tzset();
-	//tt = __gettzinfo();
-
-	//putenv("TZ=GMT-2");	//Нужно вызывать только один раз
 	putenv(str);
 	tzset();
 }
