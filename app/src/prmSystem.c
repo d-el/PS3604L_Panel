@@ -20,8 +20,6 @@
 #include "chargeTSK.h"
 #include "startupTSK.h"
 
-prmval_type abc = { .t_u32Frmt = 10000 };
-
 /*!****************************************************************************
  * MEMORY
  */
