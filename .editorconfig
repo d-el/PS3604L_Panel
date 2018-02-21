@@ -4,8 +4,15 @@ root = true
 # for all
 [*]
 charset = utf-8
+indent_style = tab
+indent_size = 4
 
 # for *.c *.h file
-[*.{c,h}, makefile]
+[*.{c,h}]
+indent_style = tab
+indent_size = 4
+
+# for makefile
+[makefile]
 indent_style = tab
 indent_size = 4
