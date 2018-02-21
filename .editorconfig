@@ -6,6 +6,6 @@ root = true
 charset = utf-8
 
 # for *.c *.h file
-[*.{c,h}]
+[*.{c,h}, makefile]
 indent_style = tab
 indent_size = 4
