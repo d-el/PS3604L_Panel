@@ -42,10 +42,10 @@ enum OperationNumber{
 	SEMIHOSTING_SYS_SEEK = 0x0A,
 	SEMIHOSTING_SYS_SYSTEM = 0x12,
 	SEMIHOSTING_SYS_TICKFREQ = 0x31,
-	SEMIHOSTING_SYS_TIME = 0x11,	//Returns the number of seconds since 00:00 January 1, 1970. This is real-world time, regardless of any debug agent configuration, such as RVI or DSTREAM.
+	SEMIHOSTING_SYS_TIME = 0x11,
 	SEMIHOSTING_SYS_TMPNAM = 0x0D,
 	SEMIHOSTING_SYS_WRITE = 0x05,
-	SEMIHOSTING_SYS_WRITEC = 0x03, 	//Writes a character byte, pointed to by R1, to the debug channel. When executed under an ARM debugger, the character appears on the host debugger console.
+	SEMIHOSTING_SYS_WRITEC = 0x03,
 	SEMIHOSTING_SYS_WRITE0 = 0x04,
 
 	// Codes returned by SEMIHOSTING_ReportException
@@ -110,7 +110,9 @@ uint32_t sh_getTime(void){
 	}
 
 	/*
-	 * Reads a byte from the console
+	 * Returns the number of seconds since 00:00 January 1, 1970. This is
+	 * real-world time, regardless of any debug agent configuration, such as
+	 * RVI or DSTREAM.
 	 */
 	char c = sh_callHost(SEMIHOSTING_SYS_TIME, NULL);
 	return c;
