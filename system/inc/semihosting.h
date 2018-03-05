@@ -22,7 +22,7 @@
  */
 void sh_sendString(const char *str);
 char sh_getChar(void);
-
+uint32_t sh_getTime(void);
 
 #endif //SEMIHOSTTING
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

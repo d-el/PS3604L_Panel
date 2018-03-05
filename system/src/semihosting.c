@@ -13,13 +13,14 @@
 /*!****************************************************************************
  * Include
  */
+#include "stm32f4xx.h"
 #include "stddef.h"
 #include "debugCore.h"
 
 /*!****************************************************************************
  * Enumeration
  */
-// Semihosting operations.
+// Semihosting operations
 enum OperationNumber{
 	// Regular operations
 	SEMIHOSTING_EnterSVC = 0x17,
@@ -41,10 +42,10 @@ enum OperationNumber{
 	SEMIHOSTING_SYS_SEEK = 0x0A,
 	SEMIHOSTING_SYS_SYSTEM = 0x12,
 	SEMIHOSTING_SYS_TICKFREQ = 0x31,
-	SEMIHOSTING_SYS_TIME = 0x11,
+	SEMIHOSTING_SYS_TIME = 0x11,	//Returns the number of seconds since 00:00 January 1, 1970. This is real-world time, regardless of any debug agent configuration, such as RVI or DSTREAM.
 	SEMIHOSTING_SYS_TMPNAM = 0x0D,
 	SEMIHOSTING_SYS_WRITE = 0x05,
-	SEMIHOSTING_SYS_WRITEC = 0x03,
+	SEMIHOSTING_SYS_WRITEC = 0x03, 	//Writes a character byte, pointed to by R1, to the debug channel. When executed under an ARM debugger, the character appears on the host debugger console.
 	SEMIHOSTING_SYS_WRITE0 = 0x04,
 
 	// Codes returned by SEMIHOSTING_ReportException
@@ -53,29 +54,17 @@ enum OperationNumber{
 };
 
 /*!****************************************************************************
- *
+ * @param[in] reason R0
+ * @param[in] arg0 R1
+ * @return R0
  */
 __attribute__((noinline))
-int sh_callHost(int reason, const void* argin, void* argout){
-	__asm volatile(
-	"	BKPT 0xAB		\n"      		/* Wait ICE or HardFault */
-	"					\n"				/* ICE will step over BKPT directly */
-	"					\n"				/* HardFault will step BKPT and the next line */
-	"	B _SH_ICE       \n"
-	"_SH_HardFault:     \n"       		/* Captured by HardFault */
-	"	MOVS   R0, #0   \n"          	/* Set return value to 0 */
-	"	BX LR           \n"             /* Return */
-	"_SH_ICE:           \n"             /* Captured by ICE */
-	"					\n"				/* Save return value */
-	"	CMP R2, #0      \n"
-	"	BEQ _SH_End     \n"
-	"	STR R0, [R2]    \n"             /* Save the return value to *pn32Out_R0 */
-	"_SH_End:           \n"
-	"	MOVS R0, #1     \n"          	/* Set return value to 1 */
-	"	BX LR           \n"          	/* Return */
-	);
-
-	return 1;
+int sh_callHost(int reason, const void* arg0){
+	/* Wait ICEe
+	 */
+	__BKPT(0xAB);
+	register int r0 asm("r0");
+	return r0;
 }
 
 /*!****************************************************************************
@@ -88,28 +77,43 @@ void sh_sendString(const char *str){
 		return;
 	}
 
-	sh_callHost(SEMIHOSTING_SYS_WRITE0, str, NULL);
+	/* Writes a null-terminated string to the debug channel. When executed under
+	 * an ARM debugger, the characters appear on the host debugger console.
+	 * On entry, R1 contains a pointer to the first byte of the string.
+	 */
+	sh_callHost(SEMIHOSTING_SYS_WRITE0, str);
 }
 
 /*!****************************************************************************
  * @brief  Read a char on semihosting mode
- * @param  None
  * @return Character that have read
  */
-char sh_getChar(){
-	uint32_t nRet;
-
+char sh_getChar(void){
 	if(coreIsInDebugMode() == 0){
-		return -1;
+		return 0;
 	}
 
-	while(sh_callHost(0x101, NULL, &nRet) != 0){
-		if(nRet != 0){
-			sh_callHost(0x07, NULL, &nRet);
-			return (char) nRet;
-		}
+	/*
+	 * Reads a byte from the console
+	 */
+	char c = sh_callHost(SEMIHOSTING_SYS_READC, NULL);
+	return c;
+}
+
+/*!****************************************************************************
+ * @brief  Read a time
+ * @return Returns the number of seconds since 00:00 January 1, 1970
+ */
+uint32_t sh_getTime(void){
+	if(coreIsInDebugMode() == 0){
+		return 0;
 	}
-	return 0;
+
+	/*
+	 * Reads a byte from the console
+	 */
+	char c = sh_callHost(SEMIHOSTING_SYS_TIME, NULL);
+	return c;
 }
 
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
