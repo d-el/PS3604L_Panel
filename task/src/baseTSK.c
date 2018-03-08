@@ -29,6 +29,7 @@
 #include "systemTSK.h"
 #include "baseTSK.h"
 #include "debugPrint.h"
+#include "semihosting.h"
 
 /******************************************************************************
  * Memory

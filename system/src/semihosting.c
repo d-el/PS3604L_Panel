@@ -58,8 +58,7 @@ enum OperationNumber{
  * @param[in] arg0 R1
  * @return R0
  */
-__attribute__((noinline))
-int sh_callHost(int reason, const void* arg0){
+int32_t sh_callHost(uint32_t reason, const void* arg0){
 	/* Wait ICEe
 	 */
 	__BKPT(0xAB);
