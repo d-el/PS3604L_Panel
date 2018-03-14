@@ -10,6 +10,7 @@
 /*!****************************************************************************
  * Include
  */
+#include "printp.h"
 #include "string.h"
 #include "stdio.h"
 #include "FreeRTOS.h"
@@ -28,7 +29,6 @@
 #include "sysTimeMeas.h"
 #include "systemTSK.h"
 #include "baseTSK.h"
-#include "debugPrint.h"
 #include "semihosting.h"
 
 /******************************************************************************

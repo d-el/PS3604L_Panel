@@ -58,6 +58,7 @@ enum OperationNumber{
  * @param[in] arg0 R1
  * @return R0
  */
+__attribute__ ((noinline))
 int32_t sh_callHost(uint32_t reason, const void* arg0){
 	/* Wait ICEe
 	 */
@@ -113,8 +114,8 @@ uint32_t sh_getTime(void){
 	 * real-world time, regardless of any debug agent configuration, such as
 	 * RVI or DSTREAM.
 	 */
-	char c = sh_callHost(SEMIHOSTING_SYS_TIME, NULL);
-	return c;
+	uint32_t t = sh_callHost(SEMIHOSTING_SYS_TIME, NULL);
+	return t;
 }
 
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

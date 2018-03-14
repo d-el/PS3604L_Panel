@@ -9,12 +9,12 @@
 /*!****************************************************************************
  * Include
  */
+#include <printp.h>
 #include "OSinit.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "systemTSK.h"
 #include "assert.h"
-#include "debugPrint.h"
 
 /*!****************************************************************************
  * @brief Init operating system

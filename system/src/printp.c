@@ -1,10 +1,13 @@
 ﻿/*!****************************************************************************
- * @file		debugPrint.c
- * @author		d_el - Storozhenko Roman
+ * @file		printp.c
+ * @author		d_el
  * @version		V1.0
- * @date		06.10.2017
- * @copyright	GNU Lesser General Public License v3
- * @brief		--
+ * @date		06.12.2017
+ * @brief		System control task
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -27,28 +30,11 @@ static char g_buf[DEBUG_BUF_LEN];
  * @brief    print debug message, printf format
  */
 void l_print(const char *fmt, ...){
-	if(coreIsInDebugMode() == 0){
-		return;
-	}
 	va_list va;
 	va_start(va, fmt);
 	vsiprintf(g_buf, fmt, va);
 	va_end(va);
-	sh_sendString(g_buf);	//Send from semihosting
-}
 
-/*!****************************************************************************
- * @brief    print debug message, printf format
- */
-void l_println(const char *fmt, ...){
-	if(coreIsInDebugMode() == 0){
-		return;
-	}
-	va_list va;
-	va_start(va, fmt);
-	vsiprintf(g_buf, fmt, va);
-	va_end(va);
-	strcat(g_buf, "\n");
 	sh_sendString(g_buf);	//Send from semihosting
 }
 
@@ -63,6 +49,7 @@ int _write(int fd, const void *buf, size_t count){
 	if(count > DEBUG_BUF_LEN + 1){
 		return -1;
 	}
+
 	memcpy(g_buf, buf, count);
 	g_buf[count] = 0;
 

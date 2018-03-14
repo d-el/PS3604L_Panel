@@ -10,9 +10,9 @@
 /*!****************************************************************************
  * Include
  */
+#include <printp.h>
 #include "stdint.h"
 #include "stm32f4xx.h"
-#include "debugPrint.h"
 
 /*!****************************************************************************
  * Memory
@@ -55,36 +55,36 @@ void hardFaultHandlerC(unsigned int * stackedContextPtr){
 	stacked_pc = stackedContextPtr[6];
 	stacked_psr = stackedContextPtr[7];
 
-	print("\n\n[GAME OVER]\n");
-	print("R0 = 0x%008X\n", stacked_r0);
-	print("R1 = 0x%008X\n", stacked_r1);
-	print("R2 = 0x%008X\n", stacked_r2);
-	print("R3 = 0x%008X\n", stacked_r3);
-	print("R12 = 0x%08X\n", stacked_r12);
-	print("LR [R14] = 0x%08X  subroutine call return address\n", stacked_lr);
-	print("PC [R15] = 0x%08X  program counter\n", stacked_pc);
-	print("PSR = 0x%08X\n", stacked_psr);
+	printp("\n\n[GAME OVER]\n");
+	printp("R0 = 0x%008X\n", stacked_r0);
+	printp("R1 = 0x%008X\n", stacked_r1);
+	printp("R2 = 0x%008X\n", stacked_r2);
+	printp("R3 = 0x%008X\n", stacked_r3);
+	printp("R12 = 0x%08X\n", stacked_r12);
+	printp("LR [R14] = 0x%08X  subroutine call return address\n", stacked_lr);
+	printp("PC [R15] = 0x%08X  program counter\n", stacked_pc);
+	printp("PSR = 0x%08X\n", stacked_psr);
 
 	// Configurable Fault Status Register
 	// Consists of MMSR, BFSR and UFSR
-	print("CFSR = 0x%08X\n", SCB->CFSR);
+	printp("CFSR = 0x%08X\n", SCB->CFSR);
 
 	// Hard Fault Status Register
-	print("HFSR = 0x%08X\n", SCB->HFSR);
+	printp("HFSR = 0x%08X\n", SCB->HFSR);
 
 	// Debug Fault Status Register
-	print("DFSR = 0x%08X\n", SCB->DFSR);
+	printp("DFSR = 0x%08X\n", SCB->DFSR);
 
 	// Auxiliary Fault Status Register
-	print("AFSR = 0x%08X\n", SCB->AFSR);
+	printp("AFSR = 0x%08X\n", SCB->AFSR);
 
 	// Read the Fault Address Registers. These may not contain valid values.
 	// Check BFARVALID/MMARVALID to see if they are valid values
 	// MemManage Fault Address Register
-	print("MMFAR = 0x%08X\n", SCB->MMFAR);
+	printp("MMFAR = 0x%08X\n", SCB->MMFAR);
 
 	// Bus Fault Address Register
-	print("BFAR = 0x%08X\n", SCB->BFAR);
+	printp("BFAR = 0x%08X\n", SCB->BFAR);
 
 	asm("BKPT #1");
 	while(1)

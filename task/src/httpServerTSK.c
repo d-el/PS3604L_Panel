@@ -10,11 +10,11 @@
 /*!****************************************************************************
  * Include
  */
+#include <printp.h>
 #include "lwip/api.h"
 #include "lwip/ip.h"
 #include "stdio.h"
 #include "string.h"
-#include "debugPrint.h"
 #include "htmlPage.h"
 #include "httpServerTSK.h"
 
@@ -114,10 +114,10 @@ void http_server_serve(struct netconn *conn){
 		}
 
 		else if(httpStrcmp(buf, "POST /")){
-			printdmsg(HTTP_DEBUG, ("POST /"));
+			report(HTTP_DEBUG, ("POST /"));
 		}
 
-		//printdmsg(HTTP_DEBUG, ("Transmit page data to client, length %u bytes\n", strlen(pageData)));
+		//report(HTTP_DEBUG, ("Transmit page data to client, length %u bytes\n", strlen(pageData)));
 		//netconn_write(conn, pageData, strlen(pageData), NETCONN_NOCOPY);
 	}
 
@@ -151,24 +151,24 @@ void httpServerTSK(void *pPrm){
 	err = netconn_bind(conn, NULL, 80);
 	stopif(err != ERR_OK, httpServerError(), "can not bind netconn");
 
-	printdmsg(HTTP_DEBUG, ("Put the connection into LISTEN state\n"));
+	report(HTTP_DEBUG, ("Put the connection into LISTEN state\n"));
 	netconn_listen(conn);
 
 	while(1){
-		printdmsg(HTTP_DEBUG, ("Accept any icoming connection\n"));
+		report(HTTP_DEBUG, ("Accept any icoming connection\n"));
 		err = netconn_accept(conn, &newconn);
 
 		if(err != ERR_OK){
-			print("Error %i", err);
+			printp("Error %i", err);
 		}
 
 		httpServer.numberRequest++;
 
-		printdmsg(HTTP_DEBUG, ("Serve connection\n"));
-		printdmsg(HTTP_DEBUG, ("Remote IP address: %s\n", ipaddr_ntoa(&newconn->pcb.ip->remote_ip)));
+		report(HTTP_DEBUG, ("Serve connection\n"));
+		report(HTTP_DEBUG, ("Remote IP address: %s\n", ipaddr_ntoa(&newconn->pcb.ip->remote_ip)));
 		http_server_serve(newconn);
 
-		printdmsg(HTTP_DEBUG, ("Delete connection\n\n"));
+		report(HTTP_DEBUG, ("Delete connection\n\n"));
 		netconn_delete(newconn);
 	}
 }

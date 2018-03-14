@@ -13,6 +13,7 @@
 /*!****************************************************************************
  * Include
  */
+#include "printp.h"
 #include "stdlib.h"
 #include "assert.h"
 #include "prmSystem.h"
@@ -24,7 +25,6 @@
 #include "stm32f4x7_eth.h"
 #include "ethernetif.h"
 #include "tcpip.h"
-#include "debugPrint.h"
 #include "regulatorConnTSK.h"
 #include "startupTSK.h"
 #include "settingTSK.h"
@@ -55,7 +55,9 @@ void shutdown(void);
 void systemTSK(void *pPrm){
 	TickType_t 		xLastWakeTime = xTaskGetTickCount();
 	selWindow_type 	selWindowPrev = noneWindow;
-	BaseType_t 		Result = pdTRUE;
+	BaseType_t 		osres = pdTRUE;
+
+	printp("Started systemTSK\n");
 
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate();
@@ -63,10 +65,12 @@ void systemTSK(void *pPrm){
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	ping_init();													// Initialize service ping protocol
 	sntp_init();													// Initialize service SNTP
-	Result &= xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
-	Result &= xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
-	stopif(Result != pdTRUE, return, "can not create httpServerTSK");
-
+	osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
+	printp("Started uartTSK\n");
+	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
+	printp("Started httpServerTSK\n");
 	selWindow(startupWindow);
 
 	while(1){
@@ -76,6 +80,8 @@ void systemTSK(void *pPrm){
 
 		if(selWindowPrev != fp.currentSelWindow){
 			if(windowTskHandle != NULL){
+				assert(osres == pdTRUE);	//Fail windowTskHandle
+				printp("Stopped %s\n", pcTaskGetName(windowTskHandle));
 				vTaskDelete(windowTskHandle);	//Удаляем текущее окно
 			}
 
@@ -83,27 +89,28 @@ void systemTSK(void *pPrm){
 				case noneWindow:
 					break;
 				case startupWindow:
-					Result = xTaskCreate(startupTSK, "startupTSK", STARTUP_TSK_SZ_STACK, NULL, STARTUP_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(startupTSK, "startupTSK", STARTUP_TSK_SZ_STACK, NULL, STARTUP_TSK_PRIO, &windowTskHandle);
 					break;
 				case settingWindow:
-					Result = xTaskCreate(settingTSK, "settingTSK", SETT_TSK_SZ_STACK, NULL, SETT_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(settingTSK, "settingTSK", SETT_TSK_SZ_STACK, NULL, SETT_TSK_PRIO, &windowTskHandle);
 					break;
 				case baseWindow:
-					Result = xTaskCreate(baseTSK, "baseTSK", BASE_TSK_SZ_STACK, NULL, BASE_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(baseTSK, "baseTSK", BASE_TSK_SZ_STACK, NULL, BASE_TSK_PRIO, &windowTskHandle);
 					break;
 				case chargerWindow:
-					Result = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
 					break;
 				case cube3dWindow:
-					Result = xTaskCreate(cube3dTSK, "cube3dTSK", CUBE_TSK_SZ_STACK, NULL, CUBE_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(cube3dTSK, "cube3dTSK", CUBE_TSK_SZ_STACK, NULL, CUBE_TSK_PRIO, &windowTskHandle);
 					break;
 				case bubblesWindow:
-					Result = xTaskCreate(bubblesTSK, "bubblesTSK", BUBLE_TSK_SZ_STACK, NULL, BUBLE_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(bubblesTSK, "bubblesTSK", BUBLE_TSK_SZ_STACK, NULL, BUBLE_TSK_PRIO, &windowTskHandle);
 					break;
 				default:
 					assert(!"Fail selector");
 			}
-			assert(Result == pdTRUE);	//Fail windowTskHandle
+			assert(osres == pdTRUE);	//Fail windowTskHandle
+			printp("Started %s\n", pcTaskGetName(windowTskHandle));
 			selWindowPrev = fp.currentSelWindow;
 		}
 
@@ -263,7 +270,6 @@ __tzinfo_type *tt __attribute((used));;
 void timezoneUpdate(void){
 	char str[8];
 	sprintf(str, "TZ=GMT%i", fp.fpSet.timezone);
-	//setenv("TZ", str, 1);	//Set environment variable
 	putenv(str);
 	tzset();
 }
