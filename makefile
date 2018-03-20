@@ -28,8 +28,6 @@ CPUFLAGS := \
 	-mcpu=cortex-m4 -mthumb \
 	-mfloat-abi=hard \
 	-mfpu=fpv4-sp-d16 \
-	-ffunction-sections \
-	-fdata-sections \
 	-DSTM32F407xx
 
 CCFLAGS := \
@@ -37,6 +35,8 @@ CCFLAGS := \
 	-std=gnu11 \
 	-g3 -O2 \
 	-fmessage-length=0 \
+	-ffunction-sections \
+	-fdata-sections \
 	-fsigned-char \
 	-fsingle-precision-constant \
 	-Wfloat-equal \
@@ -46,8 +46,8 @@ CCFLAGS := \
 LDFLAGS := \
 	$(CPUFLAGS) \
 	$(LDFILES) \
-	-Wl,--gc-sections \
 	-Wl,-Map="$(ODIR)/$(TARGET).map" \
+	-Wl,--gc-sections \
 	-Xlinker --gc-sections --specs=nano.specs
 
 #******************************************************************************

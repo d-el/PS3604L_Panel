@@ -48,7 +48,7 @@
 <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="build\PS3604LF.elf"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="PS3604LF"/>
 <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="true"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.364184543"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="org.eclipse.cdt.core.default.config.48664687"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/PS3604LF"/>
 </listAttribute>
