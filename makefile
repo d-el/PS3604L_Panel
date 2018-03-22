@@ -48,7 +48,8 @@ LDFLAGS := \
 	$(LDFILES) \
 	-Wl,-Map="$(ODIR)/$(TARGET).map" \
 	-Wl,--gc-sections \
-	-Xlinker --gc-sections --specs=nano.specs
+	-Xlinker --gc-sections --specs=nano.specs \
+	-Wl,--print-memory-usage
 
 #******************************************************************************
 # Toolchain

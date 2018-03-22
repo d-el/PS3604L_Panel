@@ -20,11 +20,13 @@ extern uint32_t _estack;				///Highest address of the user mode stack
 extern uint32_t _sdata;  				///RAM data start
 extern uint32_t _edata;  				///RAM data end
 extern uint32_t _sidata; 				///ROM data start
+extern uint32_t _siccmdata;				///ROM ccmdata start
+extern uint32_t _sccmdata;				///CCMRAM ccmdata start
+extern uint32_t _eccmdata;				///CCMRAM ccmdata end
 extern uint32_t _sbss;   				///RAM bss start
 extern uint32_t _ebss;  				///RAM bss end
-extern uint32_t _sccmrambss;   			///CCMRAM bss start
-extern uint32_t _eccmrambss;  			///CCMRAM bss end
-
+extern uint32_t _sccmbss;   			///CCMRAM bss start
+extern uint32_t _eccmbss;  				///CCMRAM bss end
 
 typedef void(*intVector_type)(void);	///Interrupt service routine typezz
 
@@ -67,8 +69,10 @@ void __initializeData(uint32_t *dataStart, uint32_t *dataEnd, uint32_t *src){
  */
 void Reset_Handler(void){
 	__initializeData(&_sdata, &_edata, &_sidata);	//.data
-	__initializeBss(&_sbss, &_ebss);				//.bss
-	__initializeBss(&_sccmrambss, &_eccmrambss);	//.ccmrambss
+	__initializeData(&_sccmdata, &_eccmdata, &_siccmdata);	//.ccmdata
+	__initializeBss(&_sbss, &_ebss);	//.bss
+	__initializeBss(&_sccmbss, &_eccmbss);	//.ccmbss
+
 	__libc_init_array();
 
 	SystemInit();

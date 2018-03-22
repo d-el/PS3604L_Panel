@@ -58,6 +58,8 @@ void systemTSK(void *pPrm){
 	BaseType_t 		osres = pdTRUE;
 
 	printp("Started systemTSK\n");
+	uint32_t test_variable;
+	test_variable = 5; // <<----- CPU stops after this line
 
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate();

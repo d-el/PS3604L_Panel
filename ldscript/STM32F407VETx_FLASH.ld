@@ -16,9 +16,9 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-    RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 128K
-    CCMRAM (rw)     : ORIGIN = 0x10000000, LENGTH = 64K
     FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 512K
+    CCMRAM (rw)     : ORIGIN = 0x10000000, LENGTH = 64K
+    RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 128K
 }
 
 /* Define output sections */
@@ -101,6 +101,20 @@ SECTIONS
     _edata = .;        /* define a global symbol at data end */
   } >RAM AT> FLASH
   
+  /* used by the startup to initialize ccmdata */
+  _siccmdata = LOADADDR(.ccmdata);
+  
+  /* The program code and other data goes into CCM RAM */
+  .ccmdata : 
+  {
+    . = ALIGN(4);
+    _sccmdata = .;
+    *(.ccmdata) 
+    *(.ccmdata*)
+    . = ALIGN(4);
+    _eccmdata = .;
+  } >CCMRAM AT> FLASH
+  
   /* Uninitialized data section */
   . = ALIGN(4);
   .bss :
@@ -116,16 +130,16 @@ SECTIONS
     _ebss = .;         /* define a global symbol at bss end */
     __bss_end__ = _ebss;
   } >RAM
-
-    /* Uninitialized data section on CCM RAM */
+  
+  /* Uninitialized data section on CCM RAM */
   .ccmrambss : 
   {
     . = ALIGN(4);
-    _sccmrambss = .;
-    *(.ccmrambss) 
-    *(.ccmrambss*)
+    _sccmbss = .;
+    *(.ccmbss) 
+    *(.ccmbss*)
     . = ALIGN(4);
-    _eccmrambss = .;
+    _eccmbss = .;
   } >CCMRAM
   
   /* User_heap_stack section, used to check that there is enough RAM left */
