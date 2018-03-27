@@ -30,7 +30,6 @@
 void main(void){
 	hardInit();
 	OSinit();
-	ram_f();
 	while(1);
 }
 
