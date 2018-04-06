@@ -4,9 +4,9 @@
  * @version		V1.0
  * @date		17.11.2017
  * @copyright	Copyright (C) 2017 d_el
- * 				All rights reserved
- * 				This software may be modified and distributed under the terms
- * 				of the BSD license.  See the LICENSE file for details
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license. See the LICENSE file for details
  */
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
@@ -20,8 +20,8 @@
 /*!****************************************************************************
  * User define
  */
-#define GRF_DISP_W   DISP_W
-#define GRF_DISP_H   DISP_H
+#define GRF_DISP_W	 DISP_W
+#define GRF_DISP_H	 DISP_H
 
 /*!****************************************************************************
  * Enumeration

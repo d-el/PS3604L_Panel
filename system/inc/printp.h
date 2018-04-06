@@ -27,6 +27,11 @@
 /*!****************************************************************************
  * Typedef
  */
+typedef enum{
+	stdOut_semihost,
+	stdOut_rtt,
+	stdOut_uart,
+}stdOutInterface_type;
 
 /*!****************************************************************************
  * Exported variables
@@ -67,6 +72,7 @@
 /*!****************************************************************************
  * Function declaration
  */
+void print_init(stdOutInterface_type stdoi);
 void l_print(const char *fmt, ...);
 
 #endif //printp_H

@@ -1,6 +1,6 @@
 ﻿/*!****************************************************************************
- * @file    mandelbrot.h
- * @author  Storozhenko Roman - D_EL
+ * @file	mandelbrot.h
+ * @author	Storozhenko Roman - D_EL
  * @version V1.0.0
  */
 #ifndef mandelbrot_H
@@ -23,5 +23,5 @@
  */
 void iq_mandel(_iq cx, _iq cy, _iq scale);
 
-#endif  //mandelbrot_H
+#endif	//mandelbrot_H
 /******************* (C) COPYRIGHT ***************** END OF FILE ********* D_EL *****/

@@ -66,15 +66,15 @@ typedef enum {
  * Typedef
  */
 typedef union {
-	uint8_t 	t_u8Frmt;
-	int8_t 		t_s8Frmt;
-	uint16_t 	t_u16Frmt;
-	int16_t 	t_s16Frmt;
-	uint32_t 	t_u32Frmt;
-	int32_t 	t_s32Frmt;
-	float 		t_floatFrmt;
-	uint32_t 	t_unixTimeFrmt;
-	uint32_t 	t_unixDateFrmt;
+	uint8_t		t_u8Frmt;
+	int8_t		t_s8Frmt;
+	uint16_t	t_u16Frmt;
+	int16_t		t_s16Frmt;
+	uint32_t	t_u32Frmt;
+	int32_t		t_s32Frmt;
+	float		t_floatFrmt;
+	uint32_t	t_unixTimeFrmt;
+	uint32_t	t_unixDateFrmt;
 	uint32_t	t_ipAdrFrmt;
 } prmval_type;
 
@@ -130,10 +130,10 @@ typedef struct {
 	prmval_type		*max;
 	prmval_type		*step;
 	prmval_type		bigstep;
-	prmType_type	type 	:4;
-	prmChmod_type	chmod 	:2;
-	uint8_t			power 	:4;
-	prmNvSave_type	save 	:2;
+	prmType_type	type	:4;
+	prmChmod_type	chmod	:2;
+	uint8_t			power	:4;
+	prmNvSave_type	save	:2;
 	prmLim_type		limType :1;
 	prmStep_type	stepType:1;
 } prmHandle_type;

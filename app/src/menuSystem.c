@@ -33,17 +33,17 @@
  */
 #define MENU_ITEM(_name, _label, _units, _prmHandle, _chmod, _pfPrm, _pfChanges, _pfSelect, _pfUnselect, _pfPeriod, _previous, _next, _parent, _child) \
 {														\
-	.label 					= _label,					\
-	.units 					= _units,					\
-	.prmHandle 				= _prmHandle,				\
-	.flags.bit.chmod 		= _chmod,					\
+	.label					= _label,					\
+	.units					= _units,					\
+	.prmHandle				= _prmHandle,				\
+	.flags.bit.chmod		= _chmod,					\
 	.flags.bit.pfParamert	= _pfPrm,					\
-	.pfChanges 				= _pfChanges,				\
+	.pfChanges				= _pfChanges,				\
 	.pfSelect				= _pfSelect,				\
-	.pfUnselect				= _pfUnselect, 				\
-	.pfPeriod				= _pfPeriod, 				\
+	.pfUnselect				= _pfUnselect,				\
+	.pfPeriod				= _pfPeriod,				\
 	.previous				= &menuTree[mN_##_previous],\
-	.next 					= &menuTree[mN_##_next],	\
+	.next					= &menuTree[mN_##_next],	\
 	.parent					= &menuTree[mN_##_parent],	\
 	.child					= &menuTree[mN_##_child],	\
 },
@@ -91,20 +91,20 @@ void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, ui
 
 /*!****************************************************************************
  * @brief
- * @param 	startMenuItem	- starting menu item
+ * @param	startMenuItem	- starting menu item
  */
 void menuEngine(menuItemNumber_type menuItemNumber){
-	TickType_t 			xLastWakeTime;              //Вемя ОС
+	TickType_t			xLastWakeTime;				//Вемя ОС
 
 	const menuItem_type **topMenu = selectedTopMenuPath;
 	const menuItem_type **sMenu = selectedMenuPath;
 	const menuItem_type *sMenuPrev = NULL;
 
-	uint8_t 			bigstepUp = 0;
-	uint8_t 			bigstepDown = 0;
-	uint8_t 			setDef = 0;
-	uint8_t 			editSection = 0;
-	enStatus_type 		enstatus = enNoCharge;
+	uint8_t				bigstepUp = 0;
+	uint8_t				bigstepDown = 0;
+	uint8_t				setDef = 0;
+	uint8_t				editSection = 0;
+	enStatus_type		enstatus = enNoCharge;
 
 	*topMenu = &menuTree[menuItemNumber];
 	*sMenu = *topMenu;
@@ -222,13 +222,13 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 						if(item->flags.bit.chmod == chmodMenuAlways){
 							if(item->prmHandle != NULL){
 								if(item->prmHandle->chmod == chmodAlways){
-									*sMenu = item; 			//Available select
+									*sMenu = item;			//Available select
 									callSelect(*sMenu);
 								}
 								break;
 							}
 							else{
-								*sMenu = item; 				//Available select
+								*sMenu = item;				//Available select
 								callSelect(*sMenu);
 								break;
 							}
@@ -746,7 +746,7 @@ void printTimeVar(char *string, const time_t unixTime, uint8_t editSectionNumber
  * @param [in] isSelected: item selected flag
  */
 void outItemString(char *label, char *value, uint8_t itemNumber, uint8_t isSelected){
-	char 	string[MENU_SCREEN_W / MENU_CHAR_W + 1];
+	char	string[MENU_SCREEN_W / MENU_CHAR_W + 1];
 	uint8_t	labelLen = strlen(label);
 	uint8_t	valLen = strlen(value);
 
@@ -775,7 +775,7 @@ void outItemString(char *label, char *value, uint8_t itemNumber, uint8_t isSelec
  * @param [in] selectionLength
  */
 void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, uint8_t isSelected, uint8_t selectionPosition, uint8_t selectionLength){
-	char 	string[MENU_SCREEN_W / MENU_CHAR_W + 1];
+	char	string[MENU_SCREEN_W / MENU_CHAR_W + 1];
 	uint8_t poschars = 0;
 
 	grf_line(0, itemNumber * MENU_Y_DISTANCE + MENU_Y_DISTANCE - 1,

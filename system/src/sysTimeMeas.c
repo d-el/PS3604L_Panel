@@ -1,10 +1,13 @@
 ﻿/*!****************************************************************************
  * @file		sysTimeMeas.c
- * @author		d_el - Storozhenko Roman
+ * @author		d_el
  * @version		V1.0
  * @date		01.08.2017
- * @copyright	GNU Lesser General Public License v3
  * @brief		Time meter on DWT cycle counter
+ * @copyright	Copyright (C) 2017 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -22,6 +25,7 @@ sysTimeStruct_type sysTimeStruct;
  */
 void sysTimeMeasEnable(void){
 	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;	//Enable the CYCCNT
+	DWT->CYCCNT = 0;
 }
 
 /*!****************************************************************************
@@ -42,36 +46,21 @@ uint32_t sysTimeMeasGet_cycles(sysTimeNumber_type n){
 }
 
 /*!****************************************************************************
- * @brief		Get time in ms
- * @param[in] 	n - number measurement
+ * @brief		Convert cycles to ms
+ * @param[in] 	cycles - time in counter cycles
  * @return		time in milliseconds
  */
-uint32_t sysTimeMeasGet_ms(sysTimeNumber_type n){
-	uint32_t delta = sysTimeStruct.stop[n] - sysTimeStruct.start[n];
-	uint32_t time = (delta * 1000ULL) / CORE_FREQUENCY;
-	return time;
+uint32_t sysTimeMeasTo_ms(uint32_t cycles){
+	return  (cycles * 1000ULL) / CORE_FREQUENCY;
 }
 
 /*!****************************************************************************
- * @brief		Get time in us
- * @param[in] 	n - number measurement
+ * @brief		Convert cycles to us
+ * @param[in] 	cycles - time in counter cycles
  * @return		time in microseconds
  */
-uint64_t sysTimeMeasGet_us(sysTimeNumber_type n){
-	uint32_t delta = sysTimeStruct.stop[n] - sysTimeStruct.start[n];
-	uint64_t time = (delta * 1000000ULL) / CORE_FREQUENCY;
-	return time;
-}
-
-/*!****************************************************************************
- * @brief		Get time in ns
- * @param[in] 	n - number measurement
- * @return		time in nanoseconds
- */
-uint64_t sysTimeMeasGet_ns(sysTimeNumber_type n){
-	uint32_t delta = sysTimeStruct.stop[n] - sysTimeStruct.start[n];
-	uint64_t time = (delta * 1000000000ULL) / CORE_FREQUENCY;
-	return time;
+uint64_t sysTimeMeasTo_us(uint32_t cycles){
+	return  (cycles * 1000000ULL) / CORE_FREQUENCY;
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

@@ -1,8 +1,8 @@
 ﻿/*!****************************************************************************
- * @file    specificMath.c
- * @author  Storozhenko Roman - D_EL
- * @version V1.1
- * @date    12-09-2015
+ * @file		specificMath.c
+ * @author		Storozhenko Roman - D_EL
+ * @version	V1.1
+ * @date		12-09-2015
  * @brief
  */
 

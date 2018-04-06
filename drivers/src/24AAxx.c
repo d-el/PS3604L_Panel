@@ -1,10 +1,14 @@
 ﻿/*!****************************************************************************
-* @file    24AAxx.c
-* @author  d_el
-* @version V1.0
-* @date    21.12.2015, by d_el
-* @brief   Driver for eeprom memory 24AA04, 24AA08
-*/
+ * @file		24AAxx.c
+ * @author		d_el
+ * @version		V1.0
+ * @date		21.12.2015
+ * @brief		Driver for eeprom memory 24AA04, 24AA08
+ * @copyright	Copyright (C) 2013 Storozhenko Roman
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license. See the LICENSE file for details
+ */
 
 /*!****************************************************************************
 * Include
@@ -28,7 +32,7 @@ static SemaphoreHandle_t i2cSem;
 */
 
 /*!****************************************************************************
-* @brief    I2C Callback
+* @brief	I2C Callback
 */
 static void eep_i2cCallback(i2c_type *i2cx){
 	BaseType_t xHigherPriorityTaskWoken;
@@ -40,7 +44,7 @@ static void eep_i2cCallback(i2c_type *i2cx){
 }
 
 /*!****************************************************************************
-* @brief    Initialize eeprom memory
+* @brief	Initialize eeprom memory
 */
 void eep_init(void){
 	// Create Semaphore for I2C
@@ -52,103 +56,103 @@ void eep_init(void){
 }
 
 /*!****************************************************************************
-* @brief    Write data to eeprom memory
-* @param    dst - linear address (0 - 1024 for 24AA08)
-*           *src - source buffer
-*           len - number bytes of read
-* @retval   none
+* @brief	Write data to eeprom memory
+* @param	dst - linear address (0 - 1024 for 24AA08)
+*			*src - source buffer
+*			len - number bytes of read
+* @retval	none
 */
 eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len){
 	BaseType_t			res;
 	uint16_t			eepdelayms = 6;
-    uint8_t             *pData;
-    eepAddress_type     eepAdr;
-    uint8_t             adrInBlock;
-    uint16_t            canWrite;
+	uint8_t				*pData;
+	eepAddress_type		eepAdr;
+	uint8_t				adrInBlock;
+	uint16_t			canWrite;
 
-    if(len == 0){
-        return eepOtherError;
-    }
-    pData = (uint8_t*)src;
-    eepAdr.bit.controlCode = CONTROLCODE;
-    eepAdr.bit.rw = eepWrite;
+	if(len == 0){
+		return eepOtherError;
+	}
+	pData = (uint8_t*)src;
+	eepAdr.bit.controlCode = CONTROLCODE;
+	eepAdr.bit.rw = eepWrite;
 
-    while(len > 0){
-        eepAdr.bit.blockSelect = dst / BYTESINPAGE;
-        adrInBlock = dst % BYTESINPAGE;
+	while(len > 0){
+		eepAdr.bit.blockSelect = dst / BYTESINPAGE;
+		adrInBlock = dst % BYTESINPAGE;
 
-        canWrite = (BYTESINPAGE - adrInBlock);
-        if(canWrite >= BYTESINBLOCK){
-            canWrite = BYTESINBLOCK;
-        }
+		canWrite = (BYTESINPAGE - adrInBlock);
+		if(canWrite >= BYTESINBLOCK){
+			canWrite = BYTESINBLOCK;
+		}
 
-        if(len <= canWrite){
-            eep_tempBff[0] = adrInBlock;
-            memcpy(&eep_tempBff[1], pData, len);
+		if(len <= canWrite){
+			eep_tempBff[0] = adrInBlock;
+			memcpy(&eep_tempBff[1], pData, len);
 
-            i2c_write(usei2c, eep_tempBff, len + 1, eepAdr.all);
-            res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
-            if(res != pdTRUE){
-            	return eepI2cError;
-            }
-            vTaskDelay(eepdelayms);
-
-            len -= len;
-        }
-        else{
-            eep_tempBff[0] = adrInBlock;
-            memcpy(&eep_tempBff[1], pData, canWrite);
-
-            i2c_write(usei2c, eep_tempBff, canWrite + 1, eepAdr.all);
-            res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
+			i2c_write(usei2c, eep_tempBff, len + 1, eepAdr.all);
+			res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
 			if(res != pdTRUE){
 				return eepI2cError;
 			}
-            vTaskDelay(eepdelayms);
+			vTaskDelay(eepdelayms);
 
-            len -= canWrite;
-            dst += canWrite;
-            pData += canWrite;
-        }
-    }
-    return eepOk;
+			len -= len;
+		}
+		else{
+			eep_tempBff[0] = adrInBlock;
+			memcpy(&eep_tempBff[1], pData, canWrite);
+
+			i2c_write(usei2c, eep_tempBff, canWrite + 1, eepAdr.all);
+			res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
+			if(res != pdTRUE){
+				return eepI2cError;
+			}
+			vTaskDelay(eepdelayms);
+
+			len -= canWrite;
+			dst += canWrite;
+			pData += canWrite;
+		}
+	}
+	return eepOk;
 }
 
 /*!****************************************************************************
-* @brief    Read data from eeprom memory
-* @param    *dst - destination buffer
-*           src - linear address (0 - 1024 for 24AA08)
-*           len - number bytes of read
-* @retval   none
+* @brief	Read data from eeprom memory
+* @param	*dst - destination buffer
+*			src - linear address (0 - 1024 for 24AA08)
+*			len - number bytes of read
+* @retval	none
 */
 eepStatus_type eep_read(void *dst, uint16_t src, uint16_t len){
 	BaseType_t			res;
-    eepAddress_type     eepAdr;
-    uint8_t             adrInBlock;
+	eepAddress_type		eepAdr;
+	uint8_t				adrInBlock;
 
-    if(len == 0){
-        return eepOtherError;
-    }
-    eepAdr.bit.controlCode = CONTROLCODE;
-    eepAdr.bit.blockSelect = src / BYTESINPAGE;
-    eepAdr.bit.rw = eepWrite;
-    adrInBlock = src % BYTESINPAGE;
+	if(len == 0){
+		return eepOtherError;
+	}
+	eepAdr.bit.controlCode = CONTROLCODE;
+	eepAdr.bit.blockSelect = src / BYTESINPAGE;
+	eepAdr.bit.rw = eepWrite;
+	adrInBlock = src % BYTESINPAGE;
 
-    i2c_write(usei2c, &adrInBlock, 1, eepAdr.all);
-    res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
+	i2c_write(usei2c, &adrInBlock, 1, eepAdr.all);
+	res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
 	if(res != pdTRUE){
 		return eepI2cError;
 	}
 
-    eepAdr.bit.rw = eepRead;
+	eepAdr.bit.rw = eepRead;
 
-    i2c_read(usei2c, dst, len, eepAdr.all);
-    res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
+	i2c_read(usei2c, dst, len, eepAdr.all);
+	res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
 	if(res != pdTRUE){
 		return eepI2cError;
 	}
 
-    return eepOk;
+	return eepOk;
 }
 
-/***************** (C) COPYRIGHT ************** END OF FILE ******** d_el ****/
+/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

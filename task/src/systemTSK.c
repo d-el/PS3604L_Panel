@@ -33,6 +33,7 @@
 #include "chargeTSK.h"
 #include "httpServerTSK.h"
 #include "baseTSK.h"
+#include "monitorTSK.h"
 
 /*!****************************************************************************
  * Memory
@@ -57,21 +58,27 @@ void systemTSK(void *pPrm){
 	selWindow_type 	selWindowPrev = noneWindow;
 	BaseType_t 		osres = pdTRUE;
 
+	print_init(stdOut_uart);
+	printp("\n\n===============================================================================\n");
 	printp("Started systemTSK\n");
-	uint32_t test_variable;
-	test_variable = 5; // <<----- CPU stops after this line
 
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate();
 	pvd_setSupplyFaultCallBack(shutdown);							// Setup callback for Supply Fault
+
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
-	ping_init();													// Initialize service ping protocol
-	sntp_init();													// Initialize service SNTP
+	//ping_init();													// Initialize service ping protocol
+	//sntp_init();													// Initialize service SNTP
+
 	osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	printp("Started uartTSK\n");
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
+
+	osres = xTaskCreate(monitorTSK, "monitorTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
+
 	printp("Started httpServerTSK\n");
 	selWindow(startupWindow);
 

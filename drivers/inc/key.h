@@ -17,8 +17,8 @@
 /*!****************************************************************************
  * Define
  */
-#define KEY_NUM             ( 7 )
-#define KEY_SAMPLES         ( 2 )
+#define KEY_NUM				( 7 )
+#define KEY_SAMPLES			( 2 )
 
 /*!****************************************************************************
  * Enumeration
@@ -28,13 +28,13 @@
  * Typedef
  */
 typedef enum {
-	kMode = 	(1 << 0),
-	kView = 	(1 << 1),
-	kOnOff = 	(1 << 2),
-	kSet = 		(1 << 3),
-	kZero = 	(1 << 4),
-	kUp = 		(1 << 5),
-	kDown = 	(1 << 6),
+	kMode =		(1 << 0),
+	kView =		(1 << 1),
+	kOnOff =	(1 << 2),
+	kSet =		(1 << 3),
+	kZero =		(1 << 4),
+	kUp =		(1 << 5),
+	kDown =		(1 << 6),
 } kKey_type;
 
 typedef struct {

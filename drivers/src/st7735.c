@@ -7,7 +7,7 @@
  * @copyright	Copyright (C) 2017 Storozhenko Roman
  *				All rights reserved
  *				This software may be modified and distributed under the terms
- *				of the BSD license.	 See the LICENSE file for details
+ *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -21,9 +21,9 @@
  * Define
  */
 // for 1.44 and mini
-#define ST7735_TFTWIDTH_128  128
+#define ST7735_TFTWIDTH_128	 128
 // for mini
-#define ST7735_TFTWIDTH_80   80
+#define ST7735_TFTWIDTH_80	 80
 // for 1.44" display
 #define ST7735_TFTHEIGHT_128 128
 // for 1.8" and mini display
@@ -33,7 +33,7 @@
  * Enumeration
  */
 enum lcdCommands{
-	ST7735_NOP     = 0x00,
+	ST7735_NOP	   = 0x00,
 	ST7735_SWRESET = 0x01,
 	ST7735_RDDID   = 0x04,
 	ST7735_RDDST   = 0x09,
@@ -111,64 +111,64 @@ const uint8_t Bcmd[] = {
 
 	ST7735_SWRESET,	0, 50,	// 1: Software reset
 
-	ST7735_SLPOUT, 0, 255, 	// 2: Out of sleep mode
+	ST7735_SLPOUT, 0, 255,	// 2: Out of sleep mode
 
-	ST7735_COLMOD, 1, 10, 	// 3: Set color mode
+	ST7735_COLMOD, 1, 10,	// 3: Set color mode
 	0x05,					//		16-bit color
 
-	ST7735_FRMCTR1, 3, 10, 	// 4: Frame rate control
-	0x00,               	//     	fastest refresh
-	0x06,               	//     	6 lines front porch
-	0x03,               	//     	3 lines back porch
+	ST7735_FRMCTR1, 3, 10,	// 4: Frame rate control
+	0x00,					//		fastest refresh
+	0x06,					//		6 lines front porch
+	0x03,					//		3 lines back porch
 
 	ST7735_MADCTL, 1, 0,	// 5: Memory access ctrl (directions)
-	0x08,               	//		Row addr/col addr, bottom to top refresh
+	0x08,					//		Row addr/col addr, bottom to top refresh
 
-	ST7735_DISSET5, 2, 0, 	// 6: Display settings #5
-	0x15,               	//     	1 clk cycle nonoverlap, 2 cycle gate
-							//     	rise, 3 cycle osc equalize
-	0x02,					//     	Fix on VTL
+	ST7735_DISSET5, 2, 0,	// 6: Display settings #5
+	0x15,					//		1 clk cycle nonoverlap, 2 cycle gate
+							//		rise, 3 cycle osc equalize
+	0x02,					//		Fix on VTL
 
-	ST7735_INVCTR, 1, 0, 	// 7: Display inversion control
-	0x0,                	//     	Line inversion
+	ST7735_INVCTR, 1, 0,	// 7: Display inversion control
+	0x0,					//		Line inversion
 
-	ST7735_PWCTR1, 2, 10, 	// 8: Power control
-	0x02,               	//     	GVDD = 4.7V
-	0x70,               	//     	1.0uA
+	ST7735_PWCTR1, 2, 10,	// 8: Power control
+	0x02,					//		GVDD = 4.7V
+	0x70,					//		1.0uA
 
-	ST7735_PWCTR2, 1, 0, 	//  9: Power control
-	0x05,               	//     	VGH = 14.7V, VGL = -7.35V
+	ST7735_PWCTR2, 1, 0,	//	9: Power control
+	0x05,					//		VGH = 14.7V, VGL = -7.35V
 
-	ST7735_PWCTR3, 2, 0, 	// 10: Power control
-	0x01,               	//     	Opamp current small
-	0x02,               	//     	Boost frequency
+	ST7735_PWCTR3, 2, 0,	// 10: Power control
+	0x01,					//		Opamp current small
+	0x02,					//		Boost frequency
 
-	ST7735_VMCTR1, 2, 10, 	// 11: Power control
-	0x3C,               	//     	VCOMH = 4V
-	0x38,               	//     	VCOML = -1.1V
+	ST7735_VMCTR1, 2, 10,	// 11: Power control
+	0x3C,					//		VCOMH = 4V
+	0x38,					//		VCOML = -1.1V
 
-	ST7735_PWCTR6, 2, 0, 	// 12: Power control,
+	ST7735_PWCTR6, 2, 0,	// 12: Power control,
 	0x11,
 	0x15,
 
-	ST7735_GMCTRP1, 16, 0, 	// 13: Magical unicorn dust
-	0x09, 0x16, 0x09, 0x20, 	// (seriously though, not sure what
-	0x21, 0x1B, 0x13, 0x19, 	// these config values represent)
+	ST7735_GMCTRP1, 16, 0,	// 13: Magical unicorn dust
+	0x09, 0x16, 0x09, 0x20,		// (seriously though, not sure what
+	0x21, 0x1B, 0x13, 0x19,		// these config values represent)
 	0x17, 0x15, 0x1E, 0x2B, 0x04, 0x05, 0x02, 0x0E,
 
 	ST7735_GMCTRN1, 16, 10, // 14: Sparkles and rainbows
 	0x0B, 0x14, 0x08, 0x1E, // (ditto)
 	0x22, 0x1D, 0x18, 0x1E, 0x1B, 0x1A, 0x24, 0x2B, 0x06, 0x06, 0x02, 0x0F,
 
-	ST7735_CASET, 4, 0, 	// 15: Column addr set
-	0x00, 0x02,				// 		XSTART = 2
-	0x00, 0x81,				//     	XEND = 129
+	ST7735_CASET, 4, 0,		// 15: Column addr set
+	0x00, 0x02,				//		XSTART = 2
+	0x00, 0x81,				//		XEND = 129
 
-	ST7735_RASET, 4, 0,  	// 16: Row addr set, 4 args, no delay:
-	0x00, 0x02,             //     XSTART = 1
-	0x00, 0x81,             //     XEND = 160
+	ST7735_RASET, 4, 0,		// 16: Row addr set, 4 args, no delay:
+	0x00, 0x02,				//	   XSTART = 1
+	0x00, 0x81,				//	   XEND = 160
 
-	ST7735_NORON, 0, 10, 	// 17: Normal display on
+	ST7735_NORON, 0, 10,	// 17: Normal display on
 
 	ST7735_DISPON, 0, 255	// 18: Main screen turn on
 };
@@ -177,108 +177,108 @@ const uint8_t Bcmd[] = {
 const uint8_t Rcmd1[] = {
 	15,	// 15 commands in list
 
-	ST7735_SWRESET, 0, 150,  // 1: Software reset
+	ST7735_SWRESET, 0, 150,	 // 1: Software reset
 
-	ST7735_SLPOUT, 0, 255,  // 2: Out of sleep mode
+	ST7735_SLPOUT, 0, 255,	// 2: Out of sleep mode
 
-	ST7735_FRMCTR1, 3, 0,  	// 3: Frame rate ctrl - normal mode
-	0x01, 0x2C, 0x2D,       //     Rate = fosc/(1x2+40) * (LINE+2C+2D)
+	ST7735_FRMCTR1, 3, 0,	// 3: Frame rate ctrl - normal mode
+	0x01, 0x2C, 0x2D,		//	   Rate = fosc/(1x2+40) * (LINE+2C+2D)
 
-	ST7735_FRMCTR2, 3, 0,  	// 4: Frame rate control - idle mode
-	0x01, 0x2C, 0x2D,       //     Rate = fosc/(1x2+40) * (LINE+2C+2D)
+	ST7735_FRMCTR2, 3, 0,	// 4: Frame rate control - idle mode
+	0x01, 0x2C, 0x2D,		//	   Rate = fosc/(1x2+40) * (LINE+2C+2D)
 
-	ST7735_FRMCTR3, 6, 0,   // 5: Frame rate ctrl - partial mode
-	0x01, 0x2C, 0x2D,       //     Dot inversion mode
-	0x01, 0x2C, 0x2D,       //     Line inversion mode
+	ST7735_FRMCTR3, 6, 0,	// 5: Frame rate ctrl - partial mode
+	0x01, 0x2C, 0x2D,		//	   Dot inversion mode
+	0x01, 0x2C, 0x2D,		//	   Line inversion mode
 
-	ST7735_INVCTR, 1, 0,  	// 6: Display inversion ctrl
-	0x07,                   //     No inversion
+	ST7735_INVCTR, 1, 0,	// 6: Display inversion ctrl
+	0x07,					//	   No inversion
 
-	ST7735_PWCTR1, 3, 0,  	// 7: Power control
-	0xA2, 0x02,                   //     -4.6V
-	0x84,                   //     AUTO mode
+	ST7735_PWCTR1, 3, 0,	// 7: Power control
+	0xA2, 0x02,					  //	 -4.6V
+	0x84,					//	   AUTO mode
 
-	ST7735_PWCTR2, 1, 0,  	// 8: Power control
-	0xC5,                   //     VGH25 = 2.4C VGSEL = -10 VGH = 3 * AVDD
+	ST7735_PWCTR2, 1, 0,	// 8: Power control
+	0xC5,					//	   VGH25 = 2.4C VGSEL = -10 VGH = 3 * AVDD
 
-	ST7735_PWCTR3, 2, 0,  	// 9: Power control
-	0x0A,                   //     Opamp current small
-	0x00,                   //     Boost frequency
+	ST7735_PWCTR3, 2, 0,	// 9: Power control
+	0x0A,					//	   Opamp current small
+	0x00,					//	   Boost frequency
 
-	ST7735_PWCTR4, 2, 0,  	// 10: Power control
-	0x8A,                   //     BCLK/2, Opamp current small & Medium low
+	ST7735_PWCTR4, 2, 0,	// 10: Power control
+	0x8A,					//	   BCLK/2, Opamp current small & Medium low
 	0x2A,
 
-	ST7735_PWCTR5, 2, 0,  	// 11: Power control
+	ST7735_PWCTR5, 2, 0,	// 11: Power control
 	0x8A, 0xEE,
 
-	ST7735_VMCTR1, 1, 0,  	// 12: Power control
+	ST7735_VMCTR1, 1, 0,	// 12: Power control
 	0x0E,
 
-	ST7735_INVOFF, 0, 0,  	// 13: Don't invert display
+	ST7735_INVOFF, 0, 0,	// 13: Don't invert display
 
-	ST7735_MADCTL, 1, 0,  	// 14: Memory access control (directions)
-	0xC8,                   //     row addr/col addr, bottom to top refresh
+	ST7735_MADCTL, 1, 0,	// 14: Memory access control (directions)
+	0xC8,					//	   row addr/col addr, bottom to top refresh
 
-	ST7735_COLMOD, 1, 0,  	// 15: set color mode
-	0x05                  	//     16-bit color
+	ST7735_COLMOD, 1, 0,	// 15: set color mode
+	0x05					//	   16-bit color
 };
 
 /// Initialization for 7735R, part 2 (green tab only)
 const uint8_t Rcmd2green[] = {
-	2,	//  2 commands in list
+	2,	//	2 commands in list
 
-	ST7735_CASET, 4, 0,  	// 1: Column addr set
-	0x00, 0x02,             //     XSTART = 0
-	0x00, 0x7F + 0x02,    	//     XEND = 127
+	ST7735_CASET, 4, 0,		// 1: Column addr set
+	0x00, 0x02,				//	   XSTART = 0
+	0x00, 0x7F + 0x02,		//	   XEND = 127
 
-	ST7735_RASET, 4, 0,  	// 2: Row addr set
-	0x00, 0x01,             //     XSTART = 0
-	0x00, 0x9F + 0x01       //     XEND = 159
+	ST7735_RASET, 4, 0,		// 2: Row addr set
+	0x00, 0x01,				//	   XSTART = 0
+	0x00, 0x9F + 0x01		//	   XEND = 159
 };
 
 /// Initialization for 7735R, part 2 (red tab only)
 const uint8_t Rcmd2red[] = {
-	2, 	//  2 commands in list
+	2,	//	2 commands in list
 
-	ST7735_CASET, 4, 0,  	// 1: Column addr set
-	0x00, 0x00,             //     XSTART = 0
-	0x00, 0x7F,             //     XEND = 127
+	ST7735_CASET, 4, 0,		// 1: Column addr set
+	0x00, 0x00,				//	   XSTART = 0
+	0x00, 0x7F,				//	   XEND = 127
 
-	ST7735_RASET, 4, 0,  	// 2: Row addr set
-	0x00, 0x00,             //     XSTART = 0
-	0x00, 0x9F            	//     XEND = 159
+	ST7735_RASET, 4, 0,		// 2: Row addr set
+	0x00, 0x00,				//	   XSTART = 0
+	0x00, 0x9F				//	   XEND = 159
 };
 
 /// Initialization for 7735R, part 2 (green 1.44 tab)
 const uint8_t Rcmd2green144[] = {
-	2,	//  2 commands in list
+	2,	//	2 commands in list
 
-	ST7735_CASET, 4, 0,  	// 1: Column addr set
-	0x00, 0x00,             //     XSTART = 0
-	0x00, 0x7F,             //     XEND = 127
+	ST7735_CASET, 4, 0,		// 1: Column addr set
+	0x00, 0x00,				//	   XSTART = 0
+	0x00, 0x7F,				//	   XEND = 127
 
-	ST7735_RASET, 4, 0,  	// 2: Row addr set
-	0x00, 0x00,             //     XSTART = 0
-	0x00, 0x7F            	//     XEND = 127
+	ST7735_RASET, 4, 0,		// 2: Row addr set
+	0x00, 0x00,				//	   XSTART = 0
+	0x00, 0x7F				//	   XEND = 127
 };
 
 /// Initialization for 7735R, part 2 (mini 160x80)
 const uint8_t Rcmd2green160x80[] = {
-	2,	//  2 commands in list
+	2,	//	2 commands in list
 
-	ST7735_CASET, 4, 0,  	// 1: Column addr set
-	0x00, 0x00,             //     XSTART = 0
-	0x00, 0x7F,             //     XEND = 79
+	ST7735_CASET, 4, 0,		// 1: Column addr set
+	0x00, 0x00,				//	   XSTART = 0
+	0x00, 0x7F,				//	   XEND = 79
 
-	ST7735_RASET, 4, 0, 	// 2: Row addr set
-	0x00, 0x00,             //     XSTART = 0
-	0x00, 0x9F            	//     XEND = 159
+	ST7735_RASET, 4, 0,		// 2: Row addr set
+	0x00, 0x00,				//	   XSTART = 0
+	0x00, 0x9F				//	   XEND = 159
 };
 
 /// Initialization for 7735R, part 3 (red or green tab)
 const uint8_t Rcmd3[] = {
-	4,	//  4 commands in list
+	4,	//	4 commands in list
 
 	ST7735_GMCTRP1, 16, 0,	// 1: Magical unicorn dust,
 	0x02, 0x1c, 0x07, 0x12, 0x37, 0x32, 0x29, 0x2d, 0x29, 0x25, 0x2B, 0x39, 0x00, 0x01, 0x03, 0x10,
@@ -286,9 +286,9 @@ const uint8_t Rcmd3[] = {
 	ST7735_GMCTRN1, 16, 0,	// 2: Sparkles and rainbows
 	0x03, 0x1d, 0x07, 0x06, 0x2E, 0x2C, 0x29, 0x2D, 0x2E, 0x2E, 0x37, 0x3F, 0x00, 0x00, 0x02, 0x10,
 
-	ST7735_NORON, 0, 10, 	// 3: Normal display on
+	ST7735_NORON, 0, 10,	// 3: Normal display on
 
-	ST7735_DISPON, 0, 100, 	// 4: Main screen turn on
+	ST7735_DISPON, 0, 100,	// 4: Main screen turn on
 };
 
 /*!****************************************************************************
@@ -325,21 +325,21 @@ void initSpiDMA(void){
 	DMA_Stream_TypeDef *pDmaStreamTx = DMA1_Stream7;
 
 	RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
-    pDmaStreamTx->CR 	= 0;
-    pDmaStreamTx->CR 	|= (uint32_t)((dmaChannelTx & 0x03) << 25);     //Channel selection
-    pDmaStreamTx->CR 	|= DMA_SxCR_PL_1;                               //Priority level High
-    pDmaStreamTx->CR 	|= DMA_SxCR_MSIZE_0;                            //Memory data size half-word (16-bit)
-    pDmaStreamTx->CR 	|= DMA_SxCR_PSIZE_0;                            //Memory data size half-word (16-bit)
-    pDmaStreamTx->CR 	|= DMA_SxCR_MINC;                               //Memory increment mode enabled
-    pDmaStreamTx->CR 	&= ~DMA_SxCR_PINC;                              //Peripheral increment mode disabled
-    pDmaStreamTx->CR 	|= DMA_SxCR_CIRC;                        		//Circular mode enable
-    pDmaStreamTx->CR 	|= DMA_SxCR_DIR_0;                              //Direction Memory-to-peripheral
-    pDmaStreamTx->NDTR   = sizeof(videoBff) / 2;              			//Number of data
-    pDmaStreamTx->PAR    = (uint32_t)&LCD_SPI->DR;                		//Peripheral address
-    pDmaStreamTx->M0AR   = (uint32_t)&videoBff[0];                      //Memory address
+	pDmaStreamTx->CR	= 0;
+	pDmaStreamTx->CR	|= (uint32_t)((dmaChannelTx & 0x03) << 25);		//Channel selection
+	pDmaStreamTx->CR	|= DMA_SxCR_PL_1;								//Priority level High
+	pDmaStreamTx->CR	|= DMA_SxCR_MSIZE_0;							//Memory data size half-word (16-bit)
+	pDmaStreamTx->CR	|= DMA_SxCR_PSIZE_0;							//Memory data size half-word (16-bit)
+	pDmaStreamTx->CR	|= DMA_SxCR_MINC;								//Memory increment mode enabled
+	pDmaStreamTx->CR	&= ~DMA_SxCR_PINC;								//Peripheral increment mode disabled
+	pDmaStreamTx->CR	|= DMA_SxCR_CIRC;								//Circular mode enable
+	pDmaStreamTx->CR	|= DMA_SxCR_DIR_0;								//Direction Memory-to-peripheral
+	pDmaStreamTx->NDTR	 = sizeof(videoBff) / 2;						//Number of data
+	pDmaStreamTx->PAR	 = (uint32_t)&LCD_SPI->DR;						//Peripheral address
+	pDmaStreamTx->M0AR	 = (uint32_t)&videoBff[0];						//Memory address
 
-    gppin_set(GP_LCD_DC);
-    LCD_SPI->CR1 |= SPI_CR1_DFF;				//16-bit data frame format is selected for transmission/reception
+	gppin_set(GP_LCD_DC);
+	LCD_SPI->CR1 |= SPI_CR1_DFF;				//16-bit data frame format is selected for transmission/reception
 	LCD_SPI->CR2 |= SPI_CR2_TXDMAEN;
 	DMA1_Stream7->CR |= DMA_SxCR_EN;
 }
@@ -424,15 +424,15 @@ void lcdDelay(uint64_t delay){
 void st7735_setAddressWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1){
 	st7735_lcdCmd(ST7735_CASET);	// column addr set
 	st7735_lcdDat(0x00);
-	st7735_lcdDat(x0 + xstart);   	// XSTART
+	st7735_lcdDat(x0 + xstart);		// XSTART
 	st7735_lcdDat(0x00);
-	st7735_lcdDat(x1 + xstart);   	// XEND
+	st7735_lcdDat(x1 + xstart);		// XEND
 
 	st7735_lcdCmd(ST7735_RASET);	// row addr set
 	st7735_lcdDat(0x00);
-	st7735_lcdDat(y0 + ystart);    	// YSTART
+	st7735_lcdDat(y0 + ystart);		// YSTART
 	st7735_lcdDat(0x00);
-	st7735_lcdDat(y1 + ystart);    	// YEND
+	st7735_lcdDat(y1 + ystart);		// YEND
 
 	st7735_lcdCmd(ST7735_RAMWR);	// write to RAM
 }
@@ -442,13 +442,13 @@ void st7735_setAddressWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1){
  * a series of LCD commands stored in PROGMEM byte array.
  */
 void commandList(const uint8_t *addr){
-	uint8_t  numCommands, numArgs;
+	uint8_t	 numCommands, numArgs;
 	uint16_t ms;
 
-	numCommands = *addr++;   				// Number of commands to follow
+	numCommands = *addr++;					// Number of commands to follow
 	while(numCommands--){					// For each command...
-		st7735_lcdCmd(*addr++); 			// Read, issue command
-		numArgs		= *addr++;    			// Number of args to follow
+		st7735_lcdCmd(*addr++);				// Read, issue command
+		numArgs		= *addr++;				// Number of args to follow
 		ms			= *addr++;				// Read post-command delay time (ms)
 		while(numArgs--){					// For each argument...
 			st7735_lcdDat(*addr++);			// Read, issue argument
@@ -521,7 +521,7 @@ void setRotation(uint8_t m){
 				st7735_lcdDat(MADCTL_MY | MADCTL_MV | MADCTL_BGR);
 			}
 
-			if (tabcolor == INITR_144GREENTAB)  {
+			if (tabcolor == INITR_144GREENTAB)	{
 				width = ST7735_TFTHEIGHT_128;
 				height = ST7735_TFTWIDTH_128;
 			} else if (tabcolor == INITR_MINI160x80)  {
@@ -563,7 +563,7 @@ void setRotation(uint8_t m){
 				st7735_lcdDat(MADCTL_MX | MADCTL_MV | MADCTL_BGR);
 			}
 
-			if (tabcolor == INITR_144GREENTAB)  {
+			if (tabcolor == INITR_144GREENTAB)	{
 				width = ST7735_TFTHEIGHT_128;
 				height = ST7735_TFTWIDTH_128;
 			} else if (tabcolor == INITR_MINI160x80)  {

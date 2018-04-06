@@ -272,7 +272,7 @@ void baseTSK(void *pPrm){
 
 		//Measure time
 		sysTimeMeasStop(sysTimeBs);
-		timebs_us = sysTimeMeasGet_us(sysTimeBs);
+		timebs_us = sysTimeMeasTo_us(sysTimeMeasGet_cycles(sysTimeBs));
 
 		//Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));

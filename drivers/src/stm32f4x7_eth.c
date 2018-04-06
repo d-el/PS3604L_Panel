@@ -1,11 +1,11 @@
 ﻿/**
  ******************************************************************************
- * @file    stm32f4x7_eth.c
- * @author  MCD Application Team
- * @version V1.0.0
- * @date    14-October-2011
- * @brief   This file is the low level driver for STM32F407xx/417xx Ethernet Controller.
- *          This driver does not include low level functions for PTP time-stamp.
+ * @file		stm32f4x7_eth.c
+ * @author		MCD Application Team
+ * @version		V1.0.0
+ * @date		14-October-2011
+ * @brief		This file is the low level driver for STM32F407xx/417xx Ethernet Controller.
+ *				This driver does not include low level functions for PTP time-stamp.
  ******************************************************************************
  * @attention
  *
@@ -22,12 +22,12 @@
 /**
  ******************************************************************************
  * <h2><center>&copy; Portions COPYRIGHT 2012 Embest Tech. Co., Ltd.</center></h2>
- * @file    stm32f4x7_eth.c
- * @author  CMP Team
+ * @file	stm32f4x7_eth.c
+ * @author	CMP Team
  * @version V1.0.0
- * @date    28-December-2012
- * @brief   This file is the low level driver for STM32F407xx/417xx Ethernet Controller.
- *          This driver does not include low level functions for PTP time-stamp.
+ * @date	28-December-2012
+ * @brief	This file is the low level driver for STM32F407xx/417xx Ethernet Controller.
+ *			This driver does not include low level functions for PTP time-stamp.
  ******************************************************************************
  * @attention
  *
@@ -74,7 +74,7 @@
  * @{
  */
 
-#if defined   (__CC_ARM) /*!< ARM Compiler */
+#if defined	  (__CC_ARM) /*!< ARM Compiler */
 __align(4)
 ETH_DMADESCTypeDef DMARxDscrTab[ETH_RXBUFNB];/* Ethernet Rx DMA Descriptor */
 __align(4)
@@ -151,7 +151,7 @@ static void ETH_Delay(__IO uint32_t nCount){
 #endif /* USE_Delay*/
 
 /******************************************************************************/
-/*                           Global ETH MAC/DMA functions                     */
+/*							 Global ETH MAC/DMA functions					  */
 /******************************************************************************/
 
 /**
@@ -172,7 +172,7 @@ void ETH_DeInit(void){
  */
 void ETH_StructInit(ETH_InitTypeDef* ETH_InitStruct){
 	/* ETH_InitStruct members default value */
-	/*------------------------   MAC Configuration   ---------------------------*/
+	/*------------------------	 MAC Configuration	 ---------------------------*/
 
 	/* PHY Auto-negotiation enabled */
 	ETH_InitStruct->ETH_AutoNegotiation = ETH_AutoNegotiation_Enable;
@@ -232,7 +232,7 @@ void ETH_StructInit(ETH_InitTypeDef* ETH_InitStruct){
 	ETH_InitStruct->ETH_VLANTagComparison = ETH_VLANTagComparison_16Bit;
 	ETH_InitStruct->ETH_VLANTagIdentifier = 0x0;
 
-	/*---------------------- DMA Configuration   -------------------------------*/
+	/*---------------------- DMA Configuration -------------------------------*/
 
 	/* Drops frames with with TCP/IP checksum errors */
 	ETH_InitStruct->ETH_DropTCPIPChecksumErrorFrame = ETH_DropTCPIPChecksumErrorFrame_Disable;
@@ -268,12 +268,12 @@ void ETH_StructInit(ETH_InitTypeDef* ETH_InitStruct){
 
 /**
  * @brief  Initializes the ETHERNET peripheral according to the specified
- *   parameters in the ETH_InitStruct .
+ *	 parameters in the ETH_InitStruct .
  * @param ETH_InitStruct: pointer to a ETH_InitTypeDef structure that contains
- *   the configuration information for the specified ETHERNET peripheral.
+ *	 the configuration information for the specified ETHERNET peripheral.
  * @param PHYAddress: external PHY address
  * @retval ETH_ERROR: Ethernet initialization failed
- *         ETH_SUCCESS: Ethernet successfully initialized
+ *		   ETH_SUCCESS: Ethernet successfully initialized
  */
 uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress){
 	uint32_t RegValue = 0, tmpreg = 0;
@@ -504,7 +504,7 @@ uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress){
  * @brief Configure MAC from current LAN configuration
  * @param arg: out current LAN configuration
  * @retval ETH_ERROR: MAC Auto Negotiation failed
- *         ETH_SUCCESS: MAC Auto Negotiation initialized
+ *		   ETH_SUCCESS: MAC Auto Negotiation initialized
  */
 uint32_t ETH_AutoNegotiation(uint16_t PHYAddress, ETH_ConnectTypeDef *arg){
 	ETH_ConnectTypeDef conn;
@@ -578,7 +578,7 @@ void ETH_Start(void){
 /**
  * @brief  Enables or disables the MAC transmission.
  * @param  NewState: new state of the MAC transmission.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MACTransmissionCmd(FunctionalState NewState){
@@ -597,7 +597,7 @@ void ETH_MACTransmissionCmd(FunctionalState NewState){
 /**
  * @brief  Enables or disables the MAC reception.
  * @param  NewState: new state of the MAC reception.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MACReceptionCmd(FunctionalState NewState){
@@ -642,7 +642,7 @@ void ETH_InitiatePauseControlFrame(void){
 /**
  * @brief  Enables or disables the MAC BackPressure operation activation (Half-duplex only).
  * @param  NewState: new state of the MAC BackPressure operation activation.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_BackPressureActivationCmd(FunctionalState NewState){
@@ -663,12 +663,12 @@ void ETH_BackPressureActivationCmd(FunctionalState NewState){
 /**
  * @brief  Checks whether the specified ETHERNET MAC flag is set or not.
  * @param  ETH_MAC_FLAG: specifies the flag to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_MAC_FLAG_TST  : Time stamp trigger flag
- *     @arg ETH_MAC_FLAG_MMCT : MMC transmit flag
- *     @arg ETH_MAC_FLAG_MMCR : MMC receive flag
- *     @arg ETH_MAC_FLAG_MMC  : MMC flag
- *     @arg ETH_MAC_FLAG_PMT  : PMT flag
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MAC_FLAG_TST  : Time stamp trigger flag
+ *	   @arg ETH_MAC_FLAG_MMCT : MMC transmit flag
+ *	   @arg ETH_MAC_FLAG_MMCR : MMC receive flag
+ *	   @arg ETH_MAC_FLAG_MMC  : MMC flag
+ *	   @arg ETH_MAC_FLAG_PMT  : PMT flag
  * @retval The new state of ETHERNET MAC flag (SET or RESET).
  */
 FlagStatus ETH_GetMACFlagStatus(uint32_t ETH_MAC_FLAG){
@@ -686,12 +686,12 @@ FlagStatus ETH_GetMACFlagStatus(uint32_t ETH_MAC_FLAG){
 /**
  * @brief  Checks whether the specified ETHERNET MAC interrupt has occurred or not.
  * @param  ETH_MAC_IT: specifies the interrupt source to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_MAC_IT_TST   : Time stamp trigger interrupt
- *     @arg ETH_MAC_IT_MMCT : MMC transmit interrupt
- *     @arg ETH_MAC_IT_MMCR : MMC receive interrupt
- *     @arg ETH_MAC_IT_MMC  : MMC interrupt
- *     @arg ETH_MAC_IT_PMT  : PMT interrupt
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MAC_IT_TST	 : Time stamp trigger interrupt
+ *	   @arg ETH_MAC_IT_MMCT : MMC transmit interrupt
+ *	   @arg ETH_MAC_IT_MMCR : MMC receive interrupt
+ *	   @arg ETH_MAC_IT_MMC	: MMC interrupt
+ *	   @arg ETH_MAC_IT_PMT	: PMT interrupt
  * @retval The new state of ETHERNET MAC interrupt (SET or RESET).
  */
 ITStatus ETH_GetMACITStatus(uint32_t ETH_MAC_IT){
@@ -709,12 +709,12 @@ ITStatus ETH_GetMACITStatus(uint32_t ETH_MAC_IT){
 /**
  * @brief  Enables or disables the specified ETHERNET MAC interrupts.
  * @param  ETH_MAC_IT: specifies the ETHERNET MAC interrupt sources to be
- *   enabled or disabled.
- *   This parameter can be any combination of the following values:
- *     @arg ETH_MAC_IT_TST : Time stamp trigger interrupt
- *     @arg ETH_MAC_IT_PMT : PMT interrupt
+ *	 enabled or disabled.
+ *	 This parameter can be any combination of the following values:
+ *	   @arg ETH_MAC_IT_TST : Time stamp trigger interrupt
+ *	   @arg ETH_MAC_IT_PMT : PMT interrupt
  * @param  NewState: new state of the specified ETHERNET MAC interrupts.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MACITConfig(uint32_t ETH_MAC_IT, FunctionalState NewState){
@@ -734,11 +734,11 @@ void ETH_MACITConfig(uint32_t ETH_MAC_IT, FunctionalState NewState){
 /**
  * @brief  Configures the selected MAC address.
  * @param  MacAddr: The MAC address to configure.
- *   This parameter can be one of the following values:
- *     @arg ETH_MAC_Address0 : MAC Address0
- *     @arg ETH_MAC_Address1 : MAC Address1
- *     @arg ETH_MAC_Address2 : MAC Address2
- *     @arg ETH_MAC_Address3 : MAC Address3
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MAC_Address0 : MAC Address0
+ *	   @arg ETH_MAC_Address1 : MAC Address1
+ *	   @arg ETH_MAC_Address2 : MAC Address2
+ *	   @arg ETH_MAC_Address3 : MAC Address3
  * @param  Addr: Pointer on MAC address buffer data (6 bytes).
  * @retval None
  */
@@ -761,11 +761,11 @@ void ETH_MACAddressConfig(uint32_t MacAddr, uint8_t *Addr){
 /**
  * @brief  Get the selected MAC address.
  * @param  MacAddr: The MAC address to return.
- *   This parameter can be one of the following values:
- *     @arg ETH_MAC_Address0 : MAC Address0
- *     @arg ETH_MAC_Address1 : MAC Address1
- *     @arg ETH_MAC_Address2 : MAC Address2
- *     @arg ETH_MAC_Address3 : MAC Address3
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MAC_Address0 : MAC Address0
+ *	   @arg ETH_MAC_Address1 : MAC Address1
+ *	   @arg ETH_MAC_Address2 : MAC Address2
+ *	   @arg ETH_MAC_Address3 : MAC Address3
  * @param  Addr: Pointer on MAC address buffer data (6 bytes).
  * @retval None
  */
@@ -791,14 +791,14 @@ void ETH_GetMACAddress(uint32_t MacAddr, uint8_t *Addr){
 
 /**
  * @brief  Enables or disables the Address filter module uses the specified
- *   ETHERNET MAC address for perfect filtering
+ *	 ETHERNET MAC address for perfect filtering
  * @param  MacAddr: specifies the ETHERNET MAC address to be used for perfect filtering.
- *   This parameter can be one of the following values:
- *     @arg ETH_MAC_Address1 : MAC Address1
- *     @arg ETH_MAC_Address2 : MAC Address2
- *     @arg ETH_MAC_Address3 : MAC Address3
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MAC_Address1 : MAC Address1
+ *	   @arg ETH_MAC_Address2 : MAC Address2
+ *	   @arg ETH_MAC_Address3 : MAC Address3
  * @param  NewState: new state of the specified ETHERNET MAC address use.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MACAddressPerfectFilterCmd(uint32_t MacAddr, FunctionalState NewState){
@@ -818,16 +818,16 @@ void ETH_MACAddressPerfectFilterCmd(uint32_t MacAddr, FunctionalState NewState){
 /**
  * @brief  Set the filter type for the specified ETHERNET MAC address
  * @param  MacAddr: specifies the ETHERNET MAC address
- *   This parameter can be one of the following values:
- *     @arg ETH_MAC_Address1 : MAC Address1
- *     @arg ETH_MAC_Address2 : MAC Address2
- *     @arg ETH_MAC_Address3 : MAC Address3
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MAC_Address1 : MAC Address1
+ *	   @arg ETH_MAC_Address2 : MAC Address2
+ *	   @arg ETH_MAC_Address3 : MAC Address3
  * @param  Filter: specifies the used frame received field for comparison
- *   This parameter can be one of the following values:
- *     @arg ETH_MAC_AddressFilter_SA : MAC Address is used to compare with the
- *                                     SA fields of the received frame.
- *     @arg ETH_MAC_AddressFilter_DA : MAC Address is used to compare with the
- *                                     DA fields of the received frame.
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MAC_AddressFilter_SA : MAC Address is used to compare with the
+ *									   SA fields of the received frame.
+ *	   @arg ETH_MAC_AddressFilter_DA : MAC Address is used to compare with the
+ *									   DA fields of the received frame.
  * @retval None
  */
 void ETH_MACAddressFilterConfig(uint32_t MacAddr, uint32_t Filter){
@@ -849,18 +849,18 @@ void ETH_MACAddressFilterConfig(uint32_t MacAddr, uint32_t Filter){
 /**
  * @brief  Set the filter type for the specified ETHERNET MAC address
  * @param  MacAddr: specifies the ETHERNET MAC address
- *   This parameter can be one of the following values:
- *     @arg ETH_MAC_Address1 : MAC Address1
- *     @arg ETH_MAC_Address2 : MAC Address2
- *     @arg ETH_MAC_Address3 : MAC Address3
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MAC_Address1 : MAC Address1
+ *	   @arg ETH_MAC_Address2 : MAC Address2
+ *	   @arg ETH_MAC_Address3 : MAC Address3
  * @param  MaskByte: specifies the used address bytes for comparison
- *   This parameter can be any combination of the following values:
- *     @arg ETH_MAC_AddressMask_Byte6 : Mask MAC Address high reg bits [15:8].
- *     @arg ETH_MAC_AddressMask_Byte5 : Mask MAC Address high reg bits [7:0].
- *     @arg ETH_MAC_AddressMask_Byte4 : Mask MAC Address low reg bits [31:24].
- *     @arg ETH_MAC_AddressMask_Byte3 : Mask MAC Address low reg bits [23:16].
- *     @arg ETH_MAC_AddressMask_Byte2 : Mask MAC Address low reg bits [15:8].
- *     @arg ETH_MAC_AddressMask_Byte1 : Mask MAC Address low reg bits [7:0].
+ *	 This parameter can be any combination of the following values:
+ *	   @arg ETH_MAC_AddressMask_Byte6 : Mask MAC Address high reg bits [15:8].
+ *	   @arg ETH_MAC_AddressMask_Byte5 : Mask MAC Address high reg bits [7:0].
+ *	   @arg ETH_MAC_AddressMask_Byte4 : Mask MAC Address low reg bits [31:24].
+ *	   @arg ETH_MAC_AddressMask_Byte3 : Mask MAC Address low reg bits [23:16].
+ *	   @arg ETH_MAC_AddressMask_Byte2 : Mask MAC Address low reg bits [15:8].
+ *	   @arg ETH_MAC_AddressMask_Byte1 : Mask MAC Address low reg bits [7:0].
  * @retval None
  */
 void ETH_MACAddressMaskBytesFilterConfig(uint32_t MacAddr, uint32_t MaskByte){
@@ -875,7 +875,7 @@ void ETH_MACAddressMaskBytesFilterConfig(uint32_t MacAddr, uint32_t MaskByte){
 }
 
 /******************************************************************************/
-/*                           DMA Descriptors functions                        */
+/*							 DMA Descriptors functions						  */
 /******************************************************************************/
 
 /**
@@ -913,8 +913,8 @@ FrameTypeDef ETH_Get_Received_Frame(void){
 
 /**
  * @brief  This function should be called when a frame is received using DMA
- *         Receive interrupt, it allows scanning of Rx descriptors to get the
- *         the receive frame (should be used with interrupt mode only)
+ *		   Receive interrupt, it allows scanning of Rx descriptors to get the
+ *		   the receive frame (should be used with interrupt mode only)
  * @param  None
  * @retval Structure of type FrameTypeDef
  */
@@ -1159,32 +1159,32 @@ void ETH_DMATxDescChainInit(ETH_DMADESCTypeDef *DMATxDescTab, uint8_t* TxBuff, u
  * @brief  Checks whether the specified ETHERNET DMA Tx Desc flag is set or not.
  * @param  DMATxDesc: pointer on a DMA Tx descriptor
  * @param  ETH_DMATxDescFlag: specifies the flag to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_DMATxDesc_OWN : OWN bit: descriptor is owned by DMA engine
- *     @arg ETH_DMATxDesc_IC  : Interrupt on completion
- *     @arg ETH_DMATxDesc_LS  : Last Segment
- *     @arg ETH_DMATxDesc_FS  : First Segment
- *     @arg ETH_DMATxDesc_DC  : Disable CRC
- *     @arg ETH_DMATxDesc_DP  : Disable Pad
- *     @arg ETH_DMATxDesc_TTSE: Transmit Time Stamp Enable
- *     @arg ETH_DMATxDesc_CIC : Checksum insertion control
- *     @arg ETH_DMATxDesc_TER : Transmit End of Ring
- *     @arg ETH_DMATxDesc_TCH : Second Address Chained
- *     @arg ETH_DMATxDesc_TTSS: Tx Time Stamp Status
- *     @arg ETH_DMATxDesc_IHE : IP Header Error
- *     @arg ETH_DMATxDesc_ES  : Error summary
- *     @arg ETH_DMATxDesc_JT  : Jabber Timeout
- *     @arg ETH_DMATxDesc_FF  : Frame Flushed: DMA/MTL flushed the frame due to SW flush
- *     @arg ETH_DMATxDesc_PCE : Payload Checksum Error
- *     @arg ETH_DMATxDesc_LCA : Loss of Carrier: carrier lost during transmission
- *     @arg ETH_DMATxDesc_NC  : No Carrier: no carrier signal from the transceiver
- *     @arg ETH_DMATxDesc_LCO : Late Collision: transmission aborted due to collision
- *     @arg ETH_DMATxDesc_EC  : Excessive Collision: transmission aborted after 16 collisions
- *     @arg ETH_DMATxDesc_VF  : VLAN Frame
- *     @arg ETH_DMATxDesc_CC  : Collision Count
- *     @arg ETH_DMATxDesc_ED  : Excessive Deferral
- *     @arg ETH_DMATxDesc_UF  : Underflow Error: late data arrival from the memory
- *     @arg ETH_DMATxDesc_DB  : Deferred Bit
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_DMATxDesc_OWN : OWN bit: descriptor is owned by DMA engine
+ *	   @arg ETH_DMATxDesc_IC  : Interrupt on completion
+ *	   @arg ETH_DMATxDesc_LS  : Last Segment
+ *	   @arg ETH_DMATxDesc_FS  : First Segment
+ *	   @arg ETH_DMATxDesc_DC  : Disable CRC
+ *	   @arg ETH_DMATxDesc_DP  : Disable Pad
+ *	   @arg ETH_DMATxDesc_TTSE: Transmit Time Stamp Enable
+ *	   @arg ETH_DMATxDesc_CIC : Checksum insertion control
+ *	   @arg ETH_DMATxDesc_TER : Transmit End of Ring
+ *	   @arg ETH_DMATxDesc_TCH : Second Address Chained
+ *	   @arg ETH_DMATxDesc_TTSS: Tx Time Stamp Status
+ *	   @arg ETH_DMATxDesc_IHE : IP Header Error
+ *	   @arg ETH_DMATxDesc_ES  : Error summary
+ *	   @arg ETH_DMATxDesc_JT  : Jabber Timeout
+ *	   @arg ETH_DMATxDesc_FF  : Frame Flushed: DMA/MTL flushed the frame due to SW flush
+ *	   @arg ETH_DMATxDesc_PCE : Payload Checksum Error
+ *	   @arg ETH_DMATxDesc_LCA : Loss of Carrier: carrier lost during transmission
+ *	   @arg ETH_DMATxDesc_NC  : No Carrier: no carrier signal from the transceiver
+ *	   @arg ETH_DMATxDesc_LCO : Late Collision: transmission aborted due to collision
+ *	   @arg ETH_DMATxDesc_EC  : Excessive Collision: transmission aborted after 16 collisions
+ *	   @arg ETH_DMATxDesc_VF  : VLAN Frame
+ *	   @arg ETH_DMATxDesc_CC  : Collision Count
+ *	   @arg ETH_DMATxDesc_ED  : Excessive Deferral
+ *	   @arg ETH_DMATxDesc_UF  : Underflow Error: late data arrival from the memory
+ *	   @arg ETH_DMATxDesc_DB  : Deferred Bit
  * @retval The new state of ETH_DMATxDescFlag (SET or RESET).
  */
 FlagStatus ETH_GetDMATxDescFlagStatus(ETH_DMADESCTypeDef *DMATxDesc, uint32_t ETH_DMATxDescFlag){
@@ -1224,7 +1224,7 @@ void ETH_SetDMATxDescOwnBit(ETH_DMADESCTypeDef *DMATxDesc){
  * @brief  Enables or disables the specified DMA Tx Desc Transmit interrupt.
  * @param  DMATxDesc: Pointer on a Tx desc
  * @param  NewState: new state of the DMA Tx Desc transmit interrupt.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_DMATxDescTransmitITConfig(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState){
@@ -1244,9 +1244,9 @@ void ETH_DMATxDescTransmitITConfig(ETH_DMADESCTypeDef *DMATxDesc, FunctionalStat
  * @brief  configure Tx descriptor as last or first segment
  * @param  DMATxDesc: Pointer on a Tx desc
  * @param  DMATxDesc_FrameSegment: specifies is the actual Tx desc contain last or first segment.
- *   This parameter can be one of the following values:
- *     @arg ETH_DMATxDesc_LastSegment  : actual Tx desc contain last segment
- *     @arg ETH_DMATxDesc_FirstSegment : actual Tx desc contain first segment
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_DMATxDesc_LastSegment  : actual Tx desc contain last segment
+ *	   @arg ETH_DMATxDesc_FirstSegment : actual Tx desc contain first segment
  * @retval None
  */
 void ETH_DMATxDescFrameSegmentConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t DMATxDesc_FrameSegment){
@@ -1261,11 +1261,11 @@ void ETH_DMATxDescFrameSegmentConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t DMA
  * @brief  Selects the specified ETHERNET DMA Tx Desc Checksum Insertion.
  * @param  DMATxDesc: pointer on a DMA Tx descriptor
  * @param  DMATxDesc_Checksum: specifies is the DMA Tx desc checksum insertion.
- *   This parameter can be one of the following values:
- *     @arg ETH_DMATxDesc_ChecksumByPass : Checksum bypass
- *     @arg ETH_DMATxDesc_ChecksumIPV4Header : IPv4 header checksum
- *     @arg ETH_DMATxDesc_ChecksumTCPUDPICMPSegment : TCP/UDP/ICMP checksum. Pseudo header checksum is assumed to be present
- *     @arg ETH_DMATxDesc_ChecksumTCPUDPICMPFull : TCP/UDP/ICMP checksum fully in hardware including pseudo header
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_DMATxDesc_ChecksumByPass : Checksum bypass
+ *	   @arg ETH_DMATxDesc_ChecksumIPV4Header : IPv4 header checksum
+ *	   @arg ETH_DMATxDesc_ChecksumTCPUDPICMPSegment : TCP/UDP/ICMP checksum. Pseudo header checksum is assumed to be present
+ *	   @arg ETH_DMATxDesc_ChecksumTCPUDPICMPFull : TCP/UDP/ICMP checksum fully in hardware including pseudo header
  * @retval None
  */
 void ETH_DMATxDescChecksumInsertionConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t DMATxDesc_Checksum){
@@ -1280,7 +1280,7 @@ void ETH_DMATxDescChecksumInsertionConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_
  * @brief  Enables or disables the DMA Tx Desc CRC.
  * @param  DMATxDesc: pointer on a DMA Tx descriptor
  * @param  NewState: new state of the specified DMA Tx Desc CRC.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_DMATxDescCRCCmd(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState){
@@ -1300,7 +1300,7 @@ void ETH_DMATxDescCRCCmd(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState
  * @brief  Enables or disables the DMA Tx Desc second address chained.
  * @param  DMATxDesc: pointer on a DMA Tx descriptor
  * @param  NewState: new state of the specified DMA Tx Desc second address chained.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_DMATxDescSecondAddressChainedCmd(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState){
@@ -1320,7 +1320,7 @@ void ETH_DMATxDescSecondAddressChainedCmd(ETH_DMADESCTypeDef *DMATxDesc, Functio
  * @brief  Enables or disables the DMA Tx Desc padding for frame shorter than 64 bytes.
  * @param  DMATxDesc: pointer on a DMA Tx descriptor
  * @param  NewState: new state of the specified DMA Tx Desc padding for frame shorter than 64 bytes.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_DMATxDescShortFramePaddingCmd(ETH_DMADESCTypeDef *DMATxDesc, FunctionalState NewState){
@@ -1356,25 +1356,25 @@ void ETH_DMATxDescBufferSizeConfig(ETH_DMADESCTypeDef *DMATxDesc, uint32_t Buffe
  * @brief  Checks whether the specified ETHERNET Rx Desc flag is set or not.
  * @param  DMARxDesc: pointer on a DMA Rx descriptor
  * @param  ETH_DMARxDescFlag: specifies the flag to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_DMARxDesc_OWN:         OWN bit: descriptor is owned by DMA engine
- *     @arg ETH_DMARxDesc_AFM:         DA Filter Fail for the rx frame
- *     @arg ETH_DMARxDesc_ES:          Error summary
- *     @arg ETH_DMARxDesc_DE:          Descriptor error: no more descriptors for receive frame
- *     @arg ETH_DMARxDesc_SAF:         SA Filter Fail for the received frame
- *     @arg ETH_DMARxDesc_LE:          Frame size not matching with length field
- *     @arg ETH_DMARxDesc_OE:          Overflow Error: Frame was damaged due to buffer overflow
- *     @arg ETH_DMARxDesc_VLAN:        VLAN Tag: received frame is a VLAN frame
- *     @arg ETH_DMARxDesc_FS:          First descriptor of the frame
- *     @arg ETH_DMARxDesc_LS:          Last descriptor of the frame
- *     @arg ETH_DMARxDesc_IPV4HCE:     IPC Checksum Error/Giant Frame: Rx Ipv4 header checksum error
- *     @arg ETH_DMARxDesc_LC:          Late collision occurred during reception
- *     @arg ETH_DMARxDesc_FT:          Frame type - Ethernet, otherwise 802.3
- *     @arg ETH_DMARxDesc_RWT:         Receive Watchdog Timeout: watchdog timer expired during reception
- *     @arg ETH_DMARxDesc_RE:          Receive error: error reported by MII interface
- *     @arg ETH_DMARxDesc_DE:          Dribble bit error: frame contains non int multiple of 8 bits
- *     @arg ETH_DMARxDesc_CE:          CRC error
- *     @arg ETH_DMARxDesc_MAMPCE:      Rx MAC Address/Payload Checksum Error: Rx MAC address matched/ Rx Payload Checksum Error
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_DMARxDesc_OWN:		   OWN bit: descriptor is owned by DMA engine
+ *	   @arg ETH_DMARxDesc_AFM:		   DA Filter Fail for the rx frame
+ *	   @arg ETH_DMARxDesc_ES:		   Error summary
+ *	   @arg ETH_DMARxDesc_DE:		   Descriptor error: no more descriptors for receive frame
+ *	   @arg ETH_DMARxDesc_SAF:		   SA Filter Fail for the received frame
+ *	   @arg ETH_DMARxDesc_LE:		   Frame size not matching with length field
+ *	   @arg ETH_DMARxDesc_OE:		   Overflow Error: Frame was damaged due to buffer overflow
+ *	   @arg ETH_DMARxDesc_VLAN:		   VLAN Tag: received frame is a VLAN frame
+ *	   @arg ETH_DMARxDesc_FS:		   First descriptor of the frame
+ *	   @arg ETH_DMARxDesc_LS:		   Last descriptor of the frame
+ *	   @arg ETH_DMARxDesc_IPV4HCE:	   IPC Checksum Error/Giant Frame: Rx Ipv4 header checksum error
+ *	   @arg ETH_DMARxDesc_LC:		   Late collision occurred during reception
+ *	   @arg ETH_DMARxDesc_FT:		   Frame type - Ethernet, otherwise 802.3
+ *	   @arg ETH_DMARxDesc_RWT:		   Receive Watchdog Timeout: watchdog timer expired during reception
+ *	   @arg ETH_DMARxDesc_RE:		   Receive error: error reported by MII interface
+ *	   @arg ETH_DMARxDesc_DE:		   Dribble bit error: frame contains non int multiple of 8 bits
+ *	   @arg ETH_DMARxDesc_CE:		   CRC error
+ *	   @arg ETH_DMARxDesc_MAMPCE:	   Rx MAC Address/Payload Checksum Error: Rx MAC address matched/ Rx Payload Checksum Error
  * @retval The new state of ETH_DMARxDescFlag (SET or RESET).
  */
 FlagStatus ETH_GetDMARxDescFlagStatus(ETH_DMADESCTypeDef *DMARxDesc, uint32_t ETH_DMARxDescFlag){
@@ -1394,16 +1394,16 @@ FlagStatus ETH_GetDMARxDescFlagStatus(ETH_DMADESCTypeDef *DMARxDesc, uint32_t ET
  * @brief  Checks whether the specified ETHERNET PTP Rx Desc extended flag is set or not.
  * @param  DMAPTPRxDesc: pointer on a DMA PTP Rx descriptor
  * @param  ETH_DMAPTPRxDescFlag: specifies the extended flag to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_DMAPTPRxDesc_PTPV:   PTP version
- *     @arg ETH_DMAPTPRxDesc_PTPFT:  PTP frame type
- *     @arg ETH_DMAPTPRxDesc_PTPMT:  PTP message type
- *     @arg ETH_DMAPTPRxDesc_IPV6PR: IPv6 packet received
- *     @arg ETH_DMAPTPRxDesc_IPV4PR: IPv4 packet received
- *     @arg ETH_DMAPTPRxDesc_IPCB:   IP checksum bypassed
- *     @arg ETH_DMAPTPRxDesc_IPPE:   IP payload error
- *     @arg ETH_DMAPTPRxDesc_IPHE:   IP header error
- *     @arg ETH_DMAPTPRxDesc_IPPT:   IP payload type
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_DMAPTPRxDesc_PTPV:	 PTP version
+ *	   @arg ETH_DMAPTPRxDesc_PTPFT:	 PTP frame type
+ *	   @arg ETH_DMAPTPRxDesc_PTPMT:	 PTP message type
+ *	   @arg ETH_DMAPTPRxDesc_IPV6PR: IPv6 packet received
+ *	   @arg ETH_DMAPTPRxDesc_IPV4PR: IPv4 packet received
+ *	   @arg ETH_DMAPTPRxDesc_IPCB:	 IP checksum bypassed
+ *	   @arg ETH_DMAPTPRxDesc_IPPE:	 IP payload error
+ *	   @arg ETH_DMAPTPRxDesc_IPHE:	 IP header error
+ *	   @arg ETH_DMAPTPRxDesc_IPPT:	 IP payload type
  * @retval The new state of ETH_DMAPTPRxDescExtendedFlag (SET or RESET).
  */
 FlagStatus ETH_GetDMAPTPRxDescExtendedFlagStatus(ETH_DMADESCTypeDef *DMAPTPRxDesc, uint32_t ETH_DMAPTPRxDescExtendedFlag){
@@ -1445,7 +1445,7 @@ uint32_t ETH_GetDMARxDescFrameLength(ETH_DMADESCTypeDef *DMARxDesc){
  * @brief  Enables or disables the specified DMA Rx Desc receive interrupt.
  * @param  DMARxDesc: Pointer on a Rx desc
  * @param  NewState: new state of the specified DMA Rx Desc interrupt.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_DMARxDescReceiveITConfig(ETH_DMADESCTypeDef *DMARxDesc, FunctionalState NewState){
@@ -1465,9 +1465,9 @@ void ETH_DMARxDescReceiveITConfig(ETH_DMADESCTypeDef *DMARxDesc, FunctionalState
  * @brief  Returns the specified ETHERNET DMA Rx Desc buffer size.
  * @param  DMARxDesc: pointer on a DMA Rx descriptor
  * @param  DMARxDesc_Buffer: specifies the DMA Rx Desc buffer.
- *   This parameter can be any one of the following values:
- *     @arg ETH_DMARxDesc_Buffer1 : DMA Rx Desc Buffer1
- *     @arg ETH_DMARxDesc_Buffer2 : DMA Rx Desc Buffer2
+ *	 This parameter can be any one of the following values:
+ *	   @arg ETH_DMARxDesc_Buffer1 : DMA Rx Desc Buffer1
+ *	   @arg ETH_DMARxDesc_Buffer2 : DMA Rx Desc Buffer2
  * @retval The Receive descriptor frame length.
  */
 uint32_t ETH_GetDMARxDescBufferSize(ETH_DMADESCTypeDef *DMARxDesc, uint32_t DMARxDesc_Buffer){
@@ -1504,7 +1504,7 @@ uint32_t ETH_GetRxPktSize(ETH_DMADESCTypeDef *DMARxDesc){
 /**
  * @brief  Enables or disables the Enhanced descriptor structure.
  * @param  NewState: new state of the Enhanced descriptor structure.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_EnhancedDescriptorCmd(FunctionalState NewState){
@@ -1522,7 +1522,7 @@ void ETH_EnhancedDescriptorCmd(FunctionalState NewState){
 #endif /* USE_ENHANCED_DMA_DESCRIPTORS */
 
 /******************************************************************************/
-/*                           DMA functions                                    */
+/*							 DMA functions									  */
 /******************************************************************************/
 /**
  * @brief  Resets all MAC subsystem internal registers and logic.
@@ -1553,28 +1553,28 @@ FlagStatus ETH_GetSoftwareResetStatus(void){
 /**
  * @brief  Checks whether the specified ETHERNET DMA flag is set or not.
  * @param  ETH_DMA_FLAG: specifies the flag to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_DMA_FLAG_TST : Time-stamp trigger flag
- *     @arg ETH_DMA_FLAG_PMT : PMT flag
- *     @arg ETH_DMA_FLAG_MMC : MMC flag
- *     @arg ETH_DMA_FLAG_DataTransferError : Error bits 0-data buffer, 1-desc. access
- *     @arg ETH_DMA_FLAG_ReadWriteError    : Error bits 0-write trnsf, 1-read transfr
- *     @arg ETH_DMA_FLAG_AccessError       : Error bits 0-Rx DMA, 1-Tx DMA
- *     @arg ETH_DMA_FLAG_NIS : Normal interrupt summary flag
- *     @arg ETH_DMA_FLAG_AIS : Abnormal interrupt summary flag
- *     @arg ETH_DMA_FLAG_ER  : Early receive flag
- *     @arg ETH_DMA_FLAG_FBE : Fatal bus error flag
- *     @arg ETH_DMA_FLAG_ET  : Early transmit flag
- *     @arg ETH_DMA_FLAG_RWT : Receive watchdog timeout flag
- *     @arg ETH_DMA_FLAG_RPS : Receive process stopped flag
- *     @arg ETH_DMA_FLAG_RBU : Receive buffer unavailable flag
- *     @arg ETH_DMA_FLAG_R   : Receive flag
- *     @arg ETH_DMA_FLAG_TU  : Underflow flag
- *     @arg ETH_DMA_FLAG_RO  : Overflow flag
- *     @arg ETH_DMA_FLAG_TJT : Transmit jabber timeout flag
- *     @arg ETH_DMA_FLAG_TBU : Transmit buffer unavailable flag
- *     @arg ETH_DMA_FLAG_TPS : Transmit process stopped flag
- *     @arg ETH_DMA_FLAG_T   : Transmit flag
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_DMA_FLAG_TST : Time-stamp trigger flag
+ *	   @arg ETH_DMA_FLAG_PMT : PMT flag
+ *	   @arg ETH_DMA_FLAG_MMC : MMC flag
+ *	   @arg ETH_DMA_FLAG_DataTransferError : Error bits 0-data buffer, 1-desc. access
+ *	   @arg ETH_DMA_FLAG_ReadWriteError	   : Error bits 0-write trnsf, 1-read transfr
+ *	   @arg ETH_DMA_FLAG_AccessError	   : Error bits 0-Rx DMA, 1-Tx DMA
+ *	   @arg ETH_DMA_FLAG_NIS : Normal interrupt summary flag
+ *	   @arg ETH_DMA_FLAG_AIS : Abnormal interrupt summary flag
+ *	   @arg ETH_DMA_FLAG_ER	 : Early receive flag
+ *	   @arg ETH_DMA_FLAG_FBE : Fatal bus error flag
+ *	   @arg ETH_DMA_FLAG_ET	 : Early transmit flag
+ *	   @arg ETH_DMA_FLAG_RWT : Receive watchdog timeout flag
+ *	   @arg ETH_DMA_FLAG_RPS : Receive process stopped flag
+ *	   @arg ETH_DMA_FLAG_RBU : Receive buffer unavailable flag
+ *	   @arg ETH_DMA_FLAG_R	 : Receive flag
+ *	   @arg ETH_DMA_FLAG_TU	 : Underflow flag
+ *	   @arg ETH_DMA_FLAG_RO	 : Overflow flag
+ *	   @arg ETH_DMA_FLAG_TJT : Transmit jabber timeout flag
+ *	   @arg ETH_DMA_FLAG_TBU : Transmit buffer unavailable flag
+ *	   @arg ETH_DMA_FLAG_TPS : Transmit process stopped flag
+ *	   @arg ETH_DMA_FLAG_T	 : Transmit flag
  * @retval The new state of ETH_DMA_FLAG (SET or RESET).
  */
 FlagStatus ETH_GetDMAFlagStatus(uint32_t ETH_DMA_FLAG){
@@ -1592,22 +1592,22 @@ FlagStatus ETH_GetDMAFlagStatus(uint32_t ETH_DMA_FLAG){
 /**
  * @brief  Clears the ETHERNETпїЅs DMA pending flag.
  * @param  ETH_DMA_FLAG: specifies the flag to clear.
- *   This parameter can be any combination of the following values:
- *     @arg ETH_DMA_FLAG_NIS : Normal interrupt summary flag
- *     @arg ETH_DMA_FLAG_AIS : Abnormal interrupt summary flag
- *     @arg ETH_DMA_FLAG_ER  : Early receive flag
- *     @arg ETH_DMA_FLAG_FBE : Fatal bus error flag
- *     @arg ETH_DMA_FLAG_ETI : Early transmit flag
- *     @arg ETH_DMA_FLAG_RWT : Receive watchdog timeout flag
- *     @arg ETH_DMA_FLAG_RPS : Receive process stopped flag
- *     @arg ETH_DMA_FLAG_RBU : Receive buffer unavailable flag
- *     @arg ETH_DMA_FLAG_R   : Receive flag
- *     @arg ETH_DMA_FLAG_TU  : Transmit Underflow flag
- *     @arg ETH_DMA_FLAG_RO  : Receive Overflow flag
- *     @arg ETH_DMA_FLAG_TJT : Transmit jabber timeout flag
- *     @arg ETH_DMA_FLAG_TBU : Transmit buffer unavailable flag
- *     @arg ETH_DMA_FLAG_TPS : Transmit process stopped flag
- *     @arg ETH_DMA_FLAG_T   : Transmit flag
+ *	 This parameter can be any combination of the following values:
+ *	   @arg ETH_DMA_FLAG_NIS : Normal interrupt summary flag
+ *	   @arg ETH_DMA_FLAG_AIS : Abnormal interrupt summary flag
+ *	   @arg ETH_DMA_FLAG_ER	 : Early receive flag
+ *	   @arg ETH_DMA_FLAG_FBE : Fatal bus error flag
+ *	   @arg ETH_DMA_FLAG_ETI : Early transmit flag
+ *	   @arg ETH_DMA_FLAG_RWT : Receive watchdog timeout flag
+ *	   @arg ETH_DMA_FLAG_RPS : Receive process stopped flag
+ *	   @arg ETH_DMA_FLAG_RBU : Receive buffer unavailable flag
+ *	   @arg ETH_DMA_FLAG_R	 : Receive flag
+ *	   @arg ETH_DMA_FLAG_TU	 : Transmit Underflow flag
+ *	   @arg ETH_DMA_FLAG_RO	 : Receive Overflow flag
+ *	   @arg ETH_DMA_FLAG_TJT : Transmit jabber timeout flag
+ *	   @arg ETH_DMA_FLAG_TBU : Transmit buffer unavailable flag
+ *	   @arg ETH_DMA_FLAG_TPS : Transmit process stopped flag
+ *	   @arg ETH_DMA_FLAG_T	 : Transmit flag
  * @retval None
  */
 void ETH_DMAClearFlag(uint32_t ETH_DMA_FLAG){
@@ -1621,25 +1621,25 @@ void ETH_DMAClearFlag(uint32_t ETH_DMA_FLAG){
 /**
  * @brief  Enables or disables the specified ETHERNET DMA interrupts.
  * @param  ETH_DMA_IT: specifies the ETHERNET DMA interrupt sources to be
- *   enabled or disabled.
- *   This parameter can be any combination of the following values:
- *     @arg ETH_DMA_IT_NIS : Normal interrupt summary
- *     @arg ETH_DMA_IT_AIS : Abnormal interrupt summary
- *     @arg ETH_DMA_IT_ER  : Early receive interrupt
- *     @arg ETH_DMA_IT_FBE : Fatal bus error interrupt
- *     @arg ETH_DMA_IT_ET  : Early transmit interrupt
- *     @arg ETH_DMA_IT_RWT : Receive watchdog timeout interrupt
- *     @arg ETH_DMA_IT_RPS : Receive process stopped interrupt
- *     @arg ETH_DMA_IT_RBU : Receive buffer unavailable interrupt
- *     @arg ETH_DMA_IT_R   : Receive interrupt
- *     @arg ETH_DMA_IT_TU  : Underflow interrupt
- *     @arg ETH_DMA_IT_RO  : Overflow interrupt
- *     @arg ETH_DMA_IT_TJT : Transmit jabber timeout interrupt
- *     @arg ETH_DMA_IT_TBU : Transmit buffer unavailable interrupt
- *     @arg ETH_DMA_IT_TPS : Transmit process stopped interrupt
- *     @arg ETH_DMA_IT_T   : Transmit interrupt
+ *	 enabled or disabled.
+ *	 This parameter can be any combination of the following values:
+ *	   @arg ETH_DMA_IT_NIS : Normal interrupt summary
+ *	   @arg ETH_DMA_IT_AIS : Abnormal interrupt summary
+ *	   @arg ETH_DMA_IT_ER  : Early receive interrupt
+ *	   @arg ETH_DMA_IT_FBE : Fatal bus error interrupt
+ *	   @arg ETH_DMA_IT_ET  : Early transmit interrupt
+ *	   @arg ETH_DMA_IT_RWT : Receive watchdog timeout interrupt
+ *	   @arg ETH_DMA_IT_RPS : Receive process stopped interrupt
+ *	   @arg ETH_DMA_IT_RBU : Receive buffer unavailable interrupt
+ *	   @arg ETH_DMA_IT_R   : Receive interrupt
+ *	   @arg ETH_DMA_IT_TU  : Underflow interrupt
+ *	   @arg ETH_DMA_IT_RO  : Overflow interrupt
+ *	   @arg ETH_DMA_IT_TJT : Transmit jabber timeout interrupt
+ *	   @arg ETH_DMA_IT_TBU : Transmit buffer unavailable interrupt
+ *	   @arg ETH_DMA_IT_TPS : Transmit process stopped interrupt
+ *	   @arg ETH_DMA_IT_T   : Transmit interrupt
  * @param  NewState: new state of the specified ETHERNET DMA interrupts.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_DMAITConfig(uint32_t ETH_DMA_IT, FunctionalState NewState){
@@ -1659,25 +1659,25 @@ void ETH_DMAITConfig(uint32_t ETH_DMA_IT, FunctionalState NewState){
 /**
  * @brief  Checks whether the specified ETHERNET DMA interrupt has occurred or not.
  * @param  ETH_DMA_IT: specifies the interrupt source to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_DMA_IT_TST : Time-stamp trigger interrupt
- *     @arg ETH_DMA_IT_PMT : PMT interrupt
- *     @arg ETH_DMA_IT_MMC : MMC interrupt
- *     @arg ETH_DMA_IT_NIS : Normal interrupt summary
- *     @arg ETH_DMA_IT_AIS : Abnormal interrupt summary
- *     @arg ETH_DMA_IT_ER  : Early receive interrupt
- *     @arg ETH_DMA_IT_FBE : Fatal bus error interrupt
- *     @arg ETH_DMA_IT_ET  : Early transmit interrupt
- *     @arg ETH_DMA_IT_RWT : Receive watchdog timeout interrupt
- *     @arg ETH_DMA_IT_RPS : Receive process stopped interrupt
- *     @arg ETH_DMA_IT_RBU : Receive buffer unavailable interrupt
- *     @arg ETH_DMA_IT_R   : Receive interrupt
- *     @arg ETH_DMA_IT_TU  : Underflow interrupt
- *     @arg ETH_DMA_IT_RO  : Overflow interrupt
- *     @arg ETH_DMA_IT_TJT : Transmit jabber timeout interrupt
- *     @arg ETH_DMA_IT_TBU : Transmit buffer unavailable interrupt
- *     @arg ETH_DMA_IT_TPS : Transmit process stopped interrupt
- *     @arg ETH_DMA_IT_T   : Transmit interrupt
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_DMA_IT_TST : Time-stamp trigger interrupt
+ *	   @arg ETH_DMA_IT_PMT : PMT interrupt
+ *	   @arg ETH_DMA_IT_MMC : MMC interrupt
+ *	   @arg ETH_DMA_IT_NIS : Normal interrupt summary
+ *	   @arg ETH_DMA_IT_AIS : Abnormal interrupt summary
+ *	   @arg ETH_DMA_IT_ER  : Early receive interrupt
+ *	   @arg ETH_DMA_IT_FBE : Fatal bus error interrupt
+ *	   @arg ETH_DMA_IT_ET  : Early transmit interrupt
+ *	   @arg ETH_DMA_IT_RWT : Receive watchdog timeout interrupt
+ *	   @arg ETH_DMA_IT_RPS : Receive process stopped interrupt
+ *	   @arg ETH_DMA_IT_RBU : Receive buffer unavailable interrupt
+ *	   @arg ETH_DMA_IT_R   : Receive interrupt
+ *	   @arg ETH_DMA_IT_TU  : Underflow interrupt
+ *	   @arg ETH_DMA_IT_RO  : Overflow interrupt
+ *	   @arg ETH_DMA_IT_TJT : Transmit jabber timeout interrupt
+ *	   @arg ETH_DMA_IT_TBU : Transmit buffer unavailable interrupt
+ *	   @arg ETH_DMA_IT_TPS : Transmit process stopped interrupt
+ *	   @arg ETH_DMA_IT_T   : Transmit interrupt
  * @retval The new state of ETH_DMA_IT (SET or RESET).
  */
 ITStatus ETH_GetDMAITStatus(uint32_t ETH_DMA_IT){
@@ -1695,22 +1695,22 @@ ITStatus ETH_GetDMAITStatus(uint32_t ETH_DMA_IT){
 /**
  * @brief  Clears the ETHERNETпїЅs DMA IT pending bit.
  * @param  ETH_DMA_IT: specifies the interrupt pending bit to clear.
- *   This parameter can be any combination of the following values:
- *     @arg ETH_DMA_IT_NIS : Normal interrupt summary
- *     @arg ETH_DMA_IT_AIS : Abnormal interrupt summary
- *     @arg ETH_DMA_IT_ER  : Early receive interrupt
- *     @arg ETH_DMA_IT_FBE : Fatal bus error interrupt
- *     @arg ETH_DMA_IT_ETI : Early transmit interrupt
- *     @arg ETH_DMA_IT_RWT : Receive watchdog timeout interrupt
- *     @arg ETH_DMA_IT_RPS : Receive process stopped interrupt
- *     @arg ETH_DMA_IT_RBU : Receive buffer unavailable interrupt
- *     @arg ETH_DMA_IT_R   : Receive interrupt
- *     @arg ETH_DMA_IT_TU  : Transmit Underflow interrupt
- *     @arg ETH_DMA_IT_RO  : Receive Overflow interrupt
- *     @arg ETH_DMA_IT_TJT : Transmit jabber timeout interrupt
- *     @arg ETH_DMA_IT_TBU : Transmit buffer unavailable interrupt
- *     @arg ETH_DMA_IT_TPS : Transmit process stopped interrupt
- *     @arg ETH_DMA_IT_T   : Transmit interrupt
+ *	 This parameter can be any combination of the following values:
+ *	   @arg ETH_DMA_IT_NIS : Normal interrupt summary
+ *	   @arg ETH_DMA_IT_AIS : Abnormal interrupt summary
+ *	   @arg ETH_DMA_IT_ER  : Early receive interrupt
+ *	   @arg ETH_DMA_IT_FBE : Fatal bus error interrupt
+ *	   @arg ETH_DMA_IT_ETI : Early transmit interrupt
+ *	   @arg ETH_DMA_IT_RWT : Receive watchdog timeout interrupt
+ *	   @arg ETH_DMA_IT_RPS : Receive process stopped interrupt
+ *	   @arg ETH_DMA_IT_RBU : Receive buffer unavailable interrupt
+ *	   @arg ETH_DMA_IT_R   : Receive interrupt
+ *	   @arg ETH_DMA_IT_TU  : Transmit Underflow interrupt
+ *	   @arg ETH_DMA_IT_RO  : Receive Overflow interrupt
+ *	   @arg ETH_DMA_IT_TJT : Transmit jabber timeout interrupt
+ *	   @arg ETH_DMA_IT_TBU : Transmit buffer unavailable interrupt
+ *	   @arg ETH_DMA_IT_TPS : Transmit process stopped interrupt
+ *	   @arg ETH_DMA_IT_T   : Transmit interrupt
  * @retval None
  */
 void ETH_DMAClearITPendingBit(uint32_t ETH_DMA_IT){
@@ -1725,13 +1725,13 @@ void ETH_DMAClearITPendingBit(uint32_t ETH_DMA_IT){
  * @brief  Returns the ETHERNET DMA Transmit Process State.
  * @param  None
  * @retval The new ETHERNET DMA Transmit Process State:
- *   This can be one of the following values:
- *     - ETH_DMA_TransmitProcess_Stopped   : Stopped - Reset or Stop Tx Command issued
- *     - ETH_DMA_TransmitProcess_Fetching  : Running - fetching the Tx descriptor
- *     - ETH_DMA_TransmitProcess_Waiting   : Running - waiting for status
- *     - ETH_DMA_TransmitProcess_Reading   : Running - reading the data from host memory
- *     - ETH_DMA_TransmitProcess_Suspended : Suspended - Tx Descriptor unavailable
- *     - ETH_DMA_TransmitProcess_Closing   : Running - closing Rx descriptor
+ *	 This can be one of the following values:
+ *	   - ETH_DMA_TransmitProcess_Stopped   : Stopped - Reset or Stop Tx Command issued
+ *	   - ETH_DMA_TransmitProcess_Fetching  : Running - fetching the Tx descriptor
+ *	   - ETH_DMA_TransmitProcess_Waiting   : Running - waiting for status
+ *	   - ETH_DMA_TransmitProcess_Reading   : Running - reading the data from host memory
+ *	   - ETH_DMA_TransmitProcess_Suspended : Suspended - Tx Descriptor unavailable
+ *	   - ETH_DMA_TransmitProcess_Closing   : Running - closing Rx descriptor
  */
 uint32_t ETH_GetTransmitProcessState(void){
 	return ((uint32_t) (ETH->DMASR & ETH_DMASR_TS));
@@ -1741,13 +1741,13 @@ uint32_t ETH_GetTransmitProcessState(void){
  * @brief  Returns the ETHERNET DMA Receive Process State.
  * @param  None
  * @retval The new ETHERNET DMA Receive Process State:
- *   This can be one of the following values:
- *     - ETH_DMA_ReceiveProcess_Stopped   : Stopped - Reset or Stop Rx Command issued
- *     - ETH_DMA_ReceiveProcess_Fetching  : Running - fetching the Rx descriptor
- *     - ETH_DMA_ReceiveProcess_Waiting   : Running - waiting for packet
- *     - ETH_DMA_ReceiveProcess_Suspended : Suspended - Rx Descriptor unavailable
- *     - ETH_DMA_ReceiveProcess_Closing   : Running - closing descriptor
- *     - ETH_DMA_ReceiveProcess_Queuing   : Running - queuing the receive frame into host memory
+ *	 This can be one of the following values:
+ *	   - ETH_DMA_ReceiveProcess_Stopped	  : Stopped - Reset or Stop Rx Command issued
+ *	   - ETH_DMA_ReceiveProcess_Fetching  : Running - fetching the Rx descriptor
+ *	   - ETH_DMA_ReceiveProcess_Waiting	  : Running - waiting for packet
+ *	   - ETH_DMA_ReceiveProcess_Suspended : Suspended - Rx Descriptor unavailable
+ *	   - ETH_DMA_ReceiveProcess_Closing	  : Running - closing descriptor
+ *	   - ETH_DMA_ReceiveProcess_Queuing	  : Running - queuing the receive frame into host memory
  */
 uint32_t ETH_GetReceiveProcessState(void){
 	return ((uint32_t) (ETH->DMASR & ETH_DMASR_RS));
@@ -1781,7 +1781,7 @@ FlagStatus ETH_GetFlushTransmitFIFOStatus(void){
 /**
  * @brief  Enables or disables the DMA transmission.
  * @param  NewState: new state of the DMA transmission.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_DMATransmissionCmd(FunctionalState NewState){
@@ -1800,7 +1800,7 @@ void ETH_DMATransmissionCmd(FunctionalState NewState){
 /**
  * @brief  Enables or disables the DMA reception.
  * @param  NewState: new state of the DMA reception.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_DMAReceptionCmd(FunctionalState NewState){
@@ -1819,9 +1819,9 @@ void ETH_DMAReceptionCmd(FunctionalState NewState){
 /**
  * @brief  Checks whether the specified ETHERNET DMA overflow flag is set or not.
  * @param  ETH_DMA_Overflow: specifies the DMA overflow flag to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_DMA_Overflow_RxFIFOCounter : Overflow for FIFO Overflows Counter
- *     @arg ETH_DMA_Overflow_MissedFrameCounter : Overflow for Buffer Unavailable Missed Frame Counter
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_DMA_Overflow_RxFIFOCounter : Overflow for FIFO Overflows Counter
+ *	   @arg ETH_DMA_Overflow_MissedFrameCounter : Overflow for Buffer Unavailable Missed Frame Counter
  * @retval The new state of ETHERNET DMA overflow Flag (SET or RESET).
  */
 FlagStatus ETH_GetDMAOverflowStatus(uint32_t ETH_DMA_Overflow){
@@ -1893,7 +1893,7 @@ uint32_t ETH_GetCurrentRxBufferAddress(void){
 
 /**
  * @brief  Resumes the DMA Transmission by writing to the DmaTxPollDemand register
- *   (the data written could be anything). This forces  the DMA to resume transmission.
+ *	 (the data written could be anything). This forces	the DMA to resume transmission.
  * @param  None
  * @retval None.
  */
@@ -1903,7 +1903,7 @@ void ETH_ResumeDMATransmission(void){
 
 /**
  * @brief  Resumes the DMA Transmission by writing to the DmaRxPollDemand register
- *   (the data written could be anything). This forces the DMA to resume reception.
+ *	 (the data written could be anything). This forces the DMA to resume reception.
  * @param  None
  * @retval None.
  */
@@ -1922,21 +1922,21 @@ void ETH_SetReceiveWatchdogTimer(uint8_t Value){
 }
 
 /******************************************************************************/
-/*                                PHY functions                               */
+/*								  PHY functions								  */
 /******************************************************************************/
 
 /**
  * @brief  Read a PHY register
  * @param PHYAddress: PHY device address, is the index of one of supported 32 PHY devices.
- *   This parameter can be one of the following values: 0,..,31
+ *	 This parameter can be one of the following values: 0,..,31
  * @param PHYReg: PHY register address, is the index of one of the 32 PHY register.
- *   This parameter can be one of the following values:
- *     @arg PHY_BCR: Transceiver Basic Control Register
- *     @arg PHY_BSR: Transceiver Basic Status Register
- *     @arg PHY_SR : Transceiver Status Register
- *     @arg More PHY register could be read depending on the used PHY
+ *	 This parameter can be one of the following values:
+ *	   @arg PHY_BCR: Transceiver Basic Control Register
+ *	   @arg PHY_BSR: Transceiver Basic Status Register
+ *	   @arg PHY_SR : Transceiver Status Register
+ *	   @arg More PHY register could be read depending on the used PHY
  * @retval ETH_ERROR: in case of timeout
- *         MAC MIIDR register value: Data read from the selected PHY register (correct read )
+ *		   MAC MIIDR register value: Data read from the selected PHY register (correct read )
  */
 uint16_t ETH_ReadPHYRegister(uint16_t PHYAddress, uint16_t PHYReg){
 	uint32_t tmpreg = 0;
@@ -1973,14 +1973,14 @@ uint16_t ETH_ReadPHYRegister(uint16_t PHYAddress, uint16_t PHYReg){
 /**
  * @brief  Write to a PHY register
  * @param PHYAddress: PHY device address, is the index of one of supported 32 PHY devices.
- *   This parameter can be one of the following values: 0,..,31
+ *	 This parameter can be one of the following values: 0,..,31
  * @param PHYReg: PHY register address, is the index of one of the 32 PHY register.
- *   This parameter can be one of the following values:
- *     @arg PHY_BCR    : Transceiver Control Register
- *     @arg More PHY register could be written depending on the used PHY
+ *	 This parameter can be one of the following values:
+ *	   @arg PHY_BCR	   : Transceiver Control Register
+ *	   @arg More PHY register could be written depending on the used PHY
  * @param  PHYValue: the value to write
  * @retval ETH_ERROR: in case of timeout
- *         ETH_SUCCESS: for correct write
+ *		   ETH_SUCCESS: for correct write
  */
 uint32_t ETH_WritePHYRegister(uint16_t PHYAddress, uint16_t PHYReg, uint16_t PHYValue){
 	uint32_t tmpreg = 0;
@@ -2019,12 +2019,12 @@ uint32_t ETH_WritePHYRegister(uint16_t PHYAddress, uint16_t PHYReg, uint16_t PHY
 /**
  * @brief  Enables or disables the PHY loopBack mode.
  * @Note: Don't be confused with ETH_MACLoopBackCmd function which enables internal
- *  loopback at MII level
+ *	loopback at MII level
  * @param  PHYAddress: PHY device address, is the index of one of supported 32 PHY devices.
  * @param  NewState: new state of the PHY loopBack mode.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval ETH_ERROR: in case of bad PHY configuration
- *         ETH_SUCCESS: for correct PHY configuration
+ *		   ETH_SUCCESS: for correct PHY configuration
  */
 uint32_t ETH_PHYLoopBackCmd(uint16_t PHYAddress, FunctionalState NewState){
 	uint16_t tmpreg = 0;
@@ -2052,7 +2052,7 @@ uint32_t ETH_PHYLoopBackCmd(uint16_t PHYAddress, FunctionalState NewState){
 }
 
 /******************************************************************************/
-/*                           Power Management(PMT) functions                  */
+/*							 Power Management(PMT) functions				  */
 /******************************************************************************/
 /**
  * @brief  Reset Wakeup frame filter register pointer.
@@ -2081,9 +2081,9 @@ void ETH_SetWakeUpFrameFilterRegister(uint32_t *Buffer){
 
 /**
  * @brief  Enables or disables any unicast packet filtered by the MAC address
- *   recognition to be a wake-up frame.
+ *	 recognition to be a wake-up frame.
  * @param  NewState: new state of the MAC Global Unicast Wake-Up.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_GlobalUnicastWakeUpCmd(FunctionalState NewState){
@@ -2102,10 +2102,10 @@ void ETH_GlobalUnicastWakeUpCmd(FunctionalState NewState){
 /**
  * @brief  Checks whether the specified ETHERNET PMT flag is set or not.
  * @param  ETH_PMT_FLAG: specifies the flag to check.
- *   This parameter can be one of the following values:
- *     @arg ETH_PMT_FLAG_WUFFRPR : Wake-Up Frame Filter Register Pointer Reset
- *     @arg ETH_PMT_FLAG_WUFR    : Wake-Up Frame Received
- *     @arg ETH_PMT_FLAG_MPR     : Magic Packet Received
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_PMT_FLAG_WUFFRPR : Wake-Up Frame Filter Register Pointer Reset
+ *	   @arg ETH_PMT_FLAG_WUFR	 : Wake-Up Frame Received
+ *	   @arg ETH_PMT_FLAG_MPR	 : Magic Packet Received
  * @retval The new state of ETHERNET PMT Flag (SET or RESET).
  */
 FlagStatus ETH_GetPMTFlagStatus(uint32_t ETH_PMT_FLAG){
@@ -2124,7 +2124,7 @@ FlagStatus ETH_GetPMTFlagStatus(uint32_t ETH_PMT_FLAG){
 /**
  * @brief  Enables or disables the MAC Wake-Up Frame Detection.
  * @param  NewState: new state of the MAC Wake-Up Frame Detection.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_WakeUpFrameDetectionCmd(FunctionalState NewState){
@@ -2143,7 +2143,7 @@ void ETH_WakeUpFrameDetectionCmd(FunctionalState NewState){
 /**
  * @brief  Enables or disables the MAC Magic Packet Detection.
  * @param  NewState: new state of the MAC Magic Packet Detection.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MagicPacketDetectionCmd(FunctionalState NewState){
@@ -2162,7 +2162,7 @@ void ETH_MagicPacketDetectionCmd(FunctionalState NewState){
 /**
  * @brief  Enables or disables the MAC Power Down.
  * @param  NewState: new state of the MAC Power Down.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_PowerDownCmd(FunctionalState NewState){
@@ -2180,7 +2180,7 @@ void ETH_PowerDownCmd(FunctionalState NewState){
 }
 
 /******************************************************************************/
-/*                              MMC functions                                 */
+/*								MMC functions								  */
 /******************************************************************************/
 /**
  * @brief  Preset and Initialize the MMC counters to almost-full value: 0xFFFF_FFF0 (full - 16)
@@ -2207,7 +2207,7 @@ void ETH_MMCCounterHalfPreset(void){
 /**
  * @brief  Enables or disables the MMC Counter Freeze.
  * @param  NewState: new state of the MMC Counter Freeze.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MMCCounterFreezeCmd(FunctionalState NewState){
@@ -2226,7 +2226,7 @@ void ETH_MMCCounterFreezeCmd(FunctionalState NewState){
 /**
  * @brief  Enables or disables the MMC Reset On Read.
  * @param  NewState: new state of the MMC Reset On Read.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MMCResetOnReadCmd(FunctionalState NewState){
@@ -2245,7 +2245,7 @@ void ETH_MMCResetOnReadCmd(FunctionalState NewState){
 /**
  * @brief  Enables or disables the MMC Counter Stop Rollover.
  * @param  NewState: new state of the MMC Counter Stop Rollover.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MMCCounterRolloverCmd(FunctionalState NewState){
@@ -2274,16 +2274,16 @@ void ETH_MMCCountersReset(void){
 /**
  * @brief  Enables or disables the specified ETHERNET MMC interrupts.
  * @param  ETH_MMC_IT: specifies the ETHERNET MMC interrupt sources to be enabled or disabled.
- *   This parameter can be any combination of Tx interrupt or
- *   any combination of Rx interrupt (but not both)of the following values:
- *     @arg ETH_MMC_IT_TGF   : When Tx good frame counter reaches half the maximum value
- *     @arg ETH_MMC_IT_TGFMSC: When Tx good multi col counter reaches half the maximum value
- *     @arg ETH_MMC_IT_TGFSC : When Tx good single col counter reaches half the maximum value
- *     @arg ETH_MMC_IT_RGUF  : When Rx good unicast frames counter reaches half the maximum value
- *     @arg ETH_MMC_IT_RFAE  : When Rx alignment error counter reaches half the maximum value
- *     @arg ETH_MMC_IT_RFCE  : When Rx crc error counter reaches half the maximum value
+ *	 This parameter can be any combination of Tx interrupt or
+ *	 any combination of Rx interrupt (but not both)of the following values:
+ *	   @arg ETH_MMC_IT_TGF	 : When Tx good frame counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_TGFMSC: When Tx good multi col counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_TGFSC : When Tx good single col counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_RGUF	 : When Rx good unicast frames counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_RFAE	 : When Rx alignment error counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_RFCE	 : When Rx crc error counter reaches half the maximum value
  * @param  NewState: new state of the specified ETHERNET MMC interrupts.
- *   This parameter can be: ENABLE or DISABLE.
+ *	 This parameter can be: ENABLE or DISABLE.
  * @retval None
  */
 void ETH_MMCITConfig(uint32_t ETH_MMC_IT, FunctionalState NewState){
@@ -2318,13 +2318,13 @@ void ETH_MMCITConfig(uint32_t ETH_MMC_IT, FunctionalState NewState){
 /**
  * @brief  Checks whether the specified ETHERNET MMC IT is set or not.
  * @param  ETH_MMC_IT: specifies the ETHERNET MMC interrupt.
- *   This parameter can be one of the following values:
- *     @arg ETH_MMC_IT_TxFCGC: When Tx good frame counter reaches half the maximum value
- *     @arg ETH_MMC_IT_TxMCGC: When Tx good multi col counter reaches half the maximum value
- *     @arg ETH_MMC_IT_TxSCGC: When Tx good single col counter reaches half the maximum value
- *     @arg ETH_MMC_IT_RxUGFC: When Rx good unicast frames counter reaches half the maximum value
- *     @arg ETH_MMC_IT_RxAEC : When Rx alignment error counter reaches half the maximum value
- *     @arg ETH_MMC_IT_RxCEC : When Rx crc error counter reaches half the maximum value
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MMC_IT_TxFCGC: When Tx good frame counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_TxMCGC: When Tx good multi col counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_TxSCGC: When Tx good single col counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_RxUGFC: When Rx good unicast frames counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_RxAEC : When Rx alignment error counter reaches half the maximum value
+ *	   @arg ETH_MMC_IT_RxCEC : When Rx crc error counter reaches half the maximum value
  * @retval The value of ETHERNET MMC IT (SET or RESET).
  */
 ITStatus ETH_GetMMCITStatus(uint32_t ETH_MMC_IT){
@@ -2356,18 +2356,18 @@ ITStatus ETH_GetMMCITStatus(uint32_t ETH_MMC_IT){
 /**
  * @brief  Get the specified ETHERNET MMC register value.
  * @param  ETH_MMCReg: specifies the ETHERNET MMC register.
- *   This parameter can be one of the following values:
- *     @arg ETH_MMCCR      : MMC CR register
- *     @arg ETH_MMCRIR     : MMC RIR register
- *     @arg ETH_MMCTIR     : MMC TIR register
- *     @arg ETH_MMCRIMR    : MMC RIMR register
- *     @arg ETH_MMCTIMR    : MMC TIMR register
- *     @arg ETH_MMCTGFSCCR : MMC TGFSCCR register
- *     @arg ETH_MMCTGFMSCCR: MMC TGFMSCCR register
- *     @arg ETH_MMCTGFCR   : MMC TGFCR register
- *     @arg ETH_MMCRFCECR  : MMC RFCECR register
- *     @arg ETH_MMCRFAECR  : MMC RFAECR register
- *     @arg ETH_MMCRGUFCR  : MMC RGUFCRregister
+ *	 This parameter can be one of the following values:
+ *	   @arg ETH_MMCCR	   : MMC CR register
+ *	   @arg ETH_MMCRIR	   : MMC RIR register
+ *	   @arg ETH_MMCTIR	   : MMC TIR register
+ *	   @arg ETH_MMCRIMR	   : MMC RIMR register
+ *	   @arg ETH_MMCTIMR	   : MMC TIMR register
+ *	   @arg ETH_MMCTGFSCCR : MMC TGFSCCR register
+ *	   @arg ETH_MMCTGFMSCCR: MMC TGFMSCCR register
+ *	   @arg ETH_MMCTGFCR   : MMC TGFCR register
+ *	   @arg ETH_MMCRFCECR  : MMC RFCECR register
+ *	   @arg ETH_MMCRFAECR  : MMC RFAECR register
+ *	   @arg ETH_MMCRGUFCR  : MMC RGUFCRregister
  * @retval The value of ETHERNET MMC Register value.
  */
 uint32_t ETH_GetMMCRegister(uint32_t ETH_MMCReg){

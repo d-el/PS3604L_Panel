@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
 FILE="$1"
 if [ ! -f $FILE ]; then
-   echo "File $FILE does not exist"
-   set -e
-   exit 1
+    echo "File $FILE does not exist"
+    set -e
+    exit 1
 fi
 
 sed -i 's/^\(.*fwinfoBuild.*= \)\([0-9]\+\);/echo "\1$((\2+1));"/ge' $FILE

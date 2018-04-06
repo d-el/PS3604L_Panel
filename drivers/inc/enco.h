@@ -1,11 +1,11 @@
 ﻿/*!****************************************************************************
- * @file    enco.h
- * @author  Storozhenko Roman - D_EL
- * @version V2.3
- * @date    13.05.2015
- * @date    14.11.2016   fix "temp > enco.top"
- * @brief   Средства работы с энкодером
- * @copyright GNU Public License
+ * @file		enco.h
+ * @author		Storozhenko Roman - D_EL
+ * @version		V2.3
+ * @date		13.05.2015
+ * @date		14.11.2016 fix "temp > enco.top"
+ * @brief		Средства работы с энкодером
+ * @copyright	GNU Public License
  */
 #ifndef ENCO_H
 #define ENCO_H

@@ -7,7 +7,7 @@
  * @copyright	Copyright (C) 2017 Storozhenko Roman
  *				All rights reserved
  *				This software may be modified and distributed under the terms
- *				of the BSD license.	 See the LICENSE file for details
+ *				of the BSD license. See the LICENSE file for details
  */
 
 #ifndef UART_H
@@ -65,7 +65,7 @@
  * Typedef
  */
 typedef enum {
-	BR9600,  //!< BR9600
+	BR9600,	 //!< BR9600
 	BR38400, //!< BR38400
 	BR57600, //!< BR57600
 	BR115200,//!< BR115200
@@ -138,7 +138,7 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate);
 void uart_deinit(uart_type *uartx);
 void uart_setBaud(uart_type *uartx, uartBaudRate_type baudRate);
 void uart_setCallback(uart_type *uartx, uartCallback_type txHoock, uartCallback_type rxHoock);
-void uart_write(uart_type *uartx, void *src, uint16_t len);
+void uart_write(uart_type *uartx, void const *src, uint16_t len);
 void uart_read(uart_type *uartx, void *dst, uint16_t len);
 void uart_stopRead(uart_type *uartStruct);
 

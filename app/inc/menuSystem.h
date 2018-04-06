@@ -18,7 +18,7 @@
 /*!****************************************************************************
  * Define
  */
-#define MENU_PERIOD   20	//[ms]
+#define MENU_PERIOD	  20	//[ms]
 
 /*!****************************************************************************
  * User enum
@@ -69,10 +69,10 @@ typedef struct menuItem{
 	itemState_type (*pfUnselect)(const struct menuItem*);	/**< Pointer to the optional menu-specific unselect callback of this menu item */
 	itemState_type (*pfPeriod)(const struct menuItem*);		/**< Pointer to the optional menu-specific periodic callback of this menu item */
 
-	const struct menuItem *next; 		/**< Pointer to the next menu item of this menu item */
-	const struct menuItem *previous; 	/**< Pointer to the previous menu item of this menu item */
-	const struct menuItem *parent; 		/**< Pointer to the parent menu item of this menu item */
-	const struct menuItem *child; 		/**< Pointer to the child menu item of this menu item */
+	const struct menuItem *next;		/**< Pointer to the next menu item of this menu item */
+	const struct menuItem *previous;	/**< Pointer to the previous menu item of this menu item */
+	const struct menuItem *parent;		/**< Pointer to the parent menu item of this menu item */
+	const struct menuItem *child;		/**< Pointer to the child menu item of this menu item */
 
 	menuFlags_type flags;
 } menuItem_type;

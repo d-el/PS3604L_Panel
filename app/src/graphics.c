@@ -4,9 +4,9 @@
  * @version		V1.0
  * @date		17.11.2017
  * @copyright	Copyright (C) 2017 d_el
- * 				All rights reserved
- * 				This software may be modified and distributed under the terms
- * 				of the BSD license.  See the LICENSE file for details
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -278,13 +278,13 @@ void grf_fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2
 	int32_t sa = 0, sb = 0;
 
 	// For upper part of triangle, find scanline crossings for segments
-	// 0-1 and 0-2.  If y1=y2 (flat-bottomed triangle), the scanline y1
+	// 0-1 and 0-2.	 If y1=y2 (flat-bottomed triangle), the scanline y1
 	// is included here (and second loop will be skipped, avoiding a /0
 	// error there), otherwise scanline y1 is skipped here and handled
 	// in the second loop...which also avoids a /0 error here if y0=y1
 	// (flat-topped triangle).
 	if(y1 == y2)
-		last = y1;   // Include y1 scanline
+		last = y1;	 // Include y1 scanline
 	else
 		last = y1 - 1; // Skip it
 
@@ -303,7 +303,7 @@ void grf_fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2
 	}
 
 	// For lower part of triangle, find scanline crossings for segments
-	// 0-2 and 1-2.  This loop is skipped if y1=y2.
+	// 0-2 and 1-2.	 This loop is skipped if y1=y2.
 	sa = dx12 * (y - y1);
 	sb = dx02 * (y - y0);
 	for(; y <= y2; y++){

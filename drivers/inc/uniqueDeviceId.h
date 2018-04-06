@@ -4,7 +4,6 @@
  * @version		V1.0
  * @date		26.06.2017
  * @copyright	GNU Lesser General Public License v3
- * @brief		--
  */
 #ifndef uniqueDeviceId_H
 #define uniqueDeviceId_H
@@ -17,7 +16,7 @@
 /*!****************************************************************************
  * Define
  */
-#define UNIQDEVID_BASE  0x1FFF7A10
+#define UNIQDEVID_BASE	0x1FFF7A10
 
 /*!****************************************************************************
  * Enumeration

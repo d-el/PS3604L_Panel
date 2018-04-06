@@ -4,7 +4,6 @@
  * @version		V1.0
  * @date		26.07.2017
  * @copyright	GNU Lesser General Public License v3
- * @brief		--
  */
 
 /*!****************************************************************************
@@ -39,9 +38,9 @@ uint8_t checkUniqDevId(void){
 
 	for(uint8_t i = 0; i < registerIdNum; i++){
 		uint32_t fId = registerId[i];
-	    if(tId == fId){
-	        return 0;
-	    }
+		if(tId == fId){
+			return 0;
+		}
 	}
 	return 1;
 }

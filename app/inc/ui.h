@@ -1,9 +1,9 @@
 ﻿/*!****************************************************************************
- * @file    ui.h
- * @author  d_el
- * @version V1.0
- * @date    20.12.2015, by d_el
- * @brief   user interface
+ * @file		ui.h
+ * @author		d_el
+ * @version		V1.0
+ * @date		20.12.2015, by d_el
+ * @brief		user interface
  */
 #ifndef ui_H
 #define ui_H

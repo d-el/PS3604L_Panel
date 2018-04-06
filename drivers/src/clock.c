@@ -7,7 +7,7 @@
  * @copyright	Copyright (C) 2017 Storozhenko Roman
  *				All rights reserved
  *				This software may be modified and distributed under the terms
- *				of the BSD license.	 See the LICENSE file for details
+ *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -16,9 +16,9 @@
 #include "stm32f4xx.h"
 #include "clock.h"
 
-#define HSI_VALUE 			16000000	///< HSI VALUE [Hz]
+#define HSI_VALUE			16000000	///< HSI VALUE [Hz]
 //-----------------------------------------------------------------------------
-#define HSE_VALUE 			24000000	///< HSE VALUE [Hz]
+#define HSE_VALUE			24000000	///< HSE VALUE [Hz]
 //-----------------------------------------------------------------------------
 #define HSE_STARTUP_TIMEOUT 1000000
 //-----------------------------------------------------------------------------
@@ -39,15 +39,15 @@
 
 /**
  * @brief  Configures the System clock source, PLL Multiplier and Divider factors,
- *         AHB/APBx prescalers and Flash settings
+ *		   AHB/APBx prescalers and Flash settings
  * @Note   This function should be called only once the RCC clock configuration
- *         is reset to the default reset state (done in SystemInit() function).
+ *		   is reset to the default reset state (done in SystemInit() function).
  * @param  None
  * @retval None
  */
 clockState_type clock_init(void){
 	/******************************************************************************/
-	/*            PLL (clocked by HSE) used as System clock source                */
+	/*			  PLL (clocked by HSE) used as System clock source				  */
 	/******************************************************************************/
 	__IO uint32_t StartUpCounter = 0, HSEStatus = 0;
 	clockState_type state;

@@ -19,12 +19,36 @@
 #include "stdio.h"
 #include "string.h"
 #include "semihosting.h"
+#include "uart.h"
+#include "printp.h"
 
 /*!****************************************************************************
  * MEMORY
  */
 #define DEBUG_BUF_LEN	64
+static int fdstdout;
 static char g_buf[DEBUG_BUF_LEN];
+
+/*!****************************************************************************
+ * Local prototypes for the functions
+ */
+int _write(int fd, const void *buf, size_t count);
+
+/*!****************************************************************************
+ * @brief
+ */
+void print_init(stdOutInterface_type stdoi){
+	switch(stdoi){
+		case stdOut_semihost:
+			break;
+		case stdOut_rtt:
+			break;
+		case stdOut_uart:
+			break;
+	}
+
+	fdstdout = stdoi;
+}
 
 /*!****************************************************************************
  * @brief    print debug message, printf format
@@ -34,8 +58,7 @@ void l_print(const char *fmt, ...){
 	va_start(va, fmt);
 	vsiprintf(g_buf, fmt, va);
 	va_end(va);
-
-	sh_sendString(g_buf);	//Send from semihosting
+	_write(fdstdout, g_buf, strlen(g_buf));
 }
 
 /*!****************************************************************************
@@ -46,14 +69,25 @@ void l_print(const char *fmt, ...){
  * @return returns the number of bytes actually written
  */
 int _write(int fd, const void *buf, size_t count){
-	if(count > DEBUG_BUF_LEN + 1){
-		return -1;
+	switch(fd){
+		case stdOut_semihost:
+			if(count > DEBUG_BUF_LEN + 1){
+				return -1;
+			}
+			memcpy(g_buf, buf, count);
+			g_buf[count] = 0;
+			sh_sendString(g_buf);
+			break;
+		case stdOut_rtt:
+			break;
+		case stdOut_uart:
+			uart_write(uart4, buf, count);
+			while(uart4->txState == uartTxRun);
+			break;
+		default:
+			return -1;
 	}
 
-	memcpy(g_buf, buf, count);
-	g_buf[count] = 0;
-
-	sh_sendString(g_buf);
 	return count;
 }
 

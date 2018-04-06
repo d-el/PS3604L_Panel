@@ -1,9 +1,9 @@
 ﻿/*!****************************************************************************
- * @file    stm32f4x7_eth_bsp.c
- * @author  MCD Application Team
- * @version V1.0.0
- * @date    31-October-2011
- * @brief   STM32F4x7 Ethernet hardware configuration.
+ * @file		stm32f4x7_eth_bsp.c
+ * @author		MCD Application Team
+ * @version		V1.0.0
+ * @date		31-October-2011
+ * @brief		STM32F4x7 Ethernet hardware configuration.
  */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4x7_eth.h"
@@ -76,11 +76,11 @@ static void ETH_MACDMA_Config(void){
 	ETH_StructInit(&ETH_InitStructure);
 
 	/* Fill ETH_InitStructure parametrs */
-	/*------------------------   MAC   -----------------------------------*/
+	/*------------------------	 MAC   -----------------------------------*/
 	ETH_InitStructure.ETH_AutoNegotiation = ETH_AutoNegotiation_Enable;
 	//ETH_InitStructure.ETH_AutoNegotiation = ETH_AutoNegotiation_Disable;
-	//  ETH_InitStructure.ETH_Speed = ETH_Speed_10M;
-	//  ETH_InitStructure.ETH_Mode = ETH_Mode_FullDuplex;
+	//	ETH_InitStructure.ETH_Speed = ETH_Speed_10M;
+	//	ETH_InitStructure.ETH_Mode = ETH_Mode_FullDuplex;
 
 	ETH_InitStructure.ETH_LoopbackMode = ETH_LoopbackMode_Disable;
 	ETH_InitStructure.ETH_RetryTransmission = ETH_RetryTransmission_Disable;
@@ -94,7 +94,7 @@ static void ETH_MACDMA_Config(void){
 	ETH_InitStructure.ETH_ChecksumOffload = ETH_ChecksumOffload_Enable;
 #endif
 
-	/*------------------------   DMA   -----------------------------------*/
+	/*------------------------	 DMA   -----------------------------------*/
 
 	/* When we use the Checksum offload feature, we need to enable the Store and Forward mode:
 	 the store and forward guarantee that a whole frame is stored in the FIFO, so the MAC can insert/verify the checksum,
@@ -134,17 +134,17 @@ void ETH_GPIO_Config(void){
 	SYSCFG->PMC |= SYSCFG_PMC_MII_RMII_SEL;	//RMII PHY interface is selected
 
 	/* Ethernet pins configuration ************************************************/
-	gppin_init(GPIOA, 2, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_MDIO --------------> PA2
-	gppin_init(GPIOC, 1, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_MDC ---------------> PC1
-	gppin_init(GPIOA, 1, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_RMII_REF_CLK-------> PA1
-	gppin_init(GPIOA, 7, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_RMII_CRS_DV -------> PA7
-	gppin_init(GPIOB, 10, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_MII_RX_ER   -------> PB10
-	gppin_init(GPIOC, 4, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_RMII_RXD0   -------> PC4
-	gppin_init(GPIOC, 5, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_RMII_RXD1   -------> PC5
-	gppin_init(GPIOB, 11, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_RMII_TX_EN  -------> PB11
-	gppin_init(GPIOB, 12, alternateFunctionPushPull, pullDisable, 0, 11);  	//ETH_RMII_TXD0   -------> PB12
-	gppin_init(GPIOB, 13, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD1   -------> PB13
-	gppin_init(GPIOE, 2, outPushPull, pullDisable, 0, 0);  					//ETH_RST_PIN     -------> PE2
+	gppin_init(GPIOA, 2, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_MDIO --------------> PA2
+	gppin_init(GPIOC, 1, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_MDC ---------------> PC1
+	gppin_init(GPIOA, 1, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_REF_CLK-------> PA1
+	gppin_init(GPIOA, 7, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_CRS_DV -------> PA7
+	gppin_init(GPIOB, 10, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_MII_RX_ER	  -------> PB10
+	gppin_init(GPIOC, 4, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_RXD0	  -------> PC4
+	gppin_init(GPIOC, 5, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_RXD1	  -------> PC5
+	gppin_init(GPIOB, 11, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TX_EN  -------> PB11
+	gppin_init(GPIOB, 12, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD0	  -------> PB12
+	gppin_init(GPIOB, 13, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD1	  -------> PB13
+	gppin_init(GPIOE, 2, outPushPull, pullDisable, 0, 0);					//ETH_RST_PIN	  -------> PE2
 
 	//_gppin_reset(GPIOE, 1 << 2);
 	for(i = 0; i < 20000; i++)

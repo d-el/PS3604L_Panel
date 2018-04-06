@@ -16,10 +16,10 @@
 /*!****************************************************************************
  * Define
  */
-#define F_BEEP              ( 4000 )
-#define BEEP_IRQ_Priority   ( 15 )
-#define BEEP_TIM            ( TIM12 )
-#define TIME_B_TIM          ( TIM7 )
+#define F_BEEP				( 4000 )
+#define BEEP_IRQ_Priority	( 15 )
+#define BEEP_TIM			( TIM12 )
+#define TIME_B_TIM			( TIM7 )
 
 /*!****************************************************************************
  * Enumeration
@@ -36,7 +36,7 @@
 /*!****************************************************************************
  * Macro functions
  */
-#define	beepSetFreq(freq)   BEEP_TIM->ARR = SYSTEM_FREQUENCY / (freq) / 2;
+#define	beepSetFreq(freq)	BEEP_TIM->ARR = SYSTEM_FREQUENCY / (freq) / 2;
 
 /*!****************************************************************************
  * Function declaration

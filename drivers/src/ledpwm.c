@@ -1,10 +1,10 @@
 ﻿/*!****************************************************************************
- * @file	ledpwm.c
- * @author	d_el
- * @version V1.0
- * @date	27.12.2015, by d_el
- * @brief	pwm for lcd led
- * @copyright GNU Public License
+ * @file		ledpwm.c
+ * @author		d_el
+ * @version		V1.0
+ * @date		27.12.2015, by d_el
+ * @brief		pwm for lcd led
+ * @copyright	GNU Public License
  */
 
 /*!****************************************************************************

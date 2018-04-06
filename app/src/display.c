@@ -4,9 +4,9 @@
  * @version		V1.0
  * @date		17.11.2017
  * @copyright	Copyright (C) 2017 Storozhenko Roman
- * 				All rights reserved
- * 				This software may be modified and distributed under the terms
- * 				of the BSD license.  See the LICENSE file for details
+ *				All rights reserved
+ *				This software may be modified and distributed under the terms
+ *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -18,8 +18,8 @@
 /*!****************************************************************************
  * MEMORY
  */
-disp_color_type 	uiBackgroundColor;
-disp_color_type 	uiContentColor;
+disp_color_type		uiBackgroundColor;
+disp_color_type		uiContentColor;
 
 /*!****************************************************************************
  *

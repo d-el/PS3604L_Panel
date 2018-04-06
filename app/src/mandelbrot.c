@@ -15,11 +15,11 @@
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /*!****************************************************************************
@@ -36,7 +36,7 @@ void iq_mandel(_iq, _iq, _iq);
 static int iq_iterate(_iq, _iq);
 
 /*!****************************************************************************
- *  Main mandelbrot calculation
+ *	Main mandelbrot calculation
  */
 static int iq_iterate(_iq px, _iq py){
 	int it = 0;

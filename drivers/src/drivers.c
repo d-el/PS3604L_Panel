@@ -7,7 +7,7 @@
  * @copyright	Copyright (C) 2013 Storozhenko Roman
  *				All rights reserved
  *				This software may be modified and distributed under the terms
- *				of the BSD license.	 See the LICENSE file for details
+ *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -61,7 +61,7 @@ void hardInit(void){
 	enco_init();
 	beep_init();
 	ledPwm_init();
-	initR(INITR_BLACKTAB);   //Initialize 1.8" TFT - ST7735S chip, black tab
+	initR(INITR_BLACKTAB);	 //Initialize 1.8" TFT - ST7735S chip, black tab
 	rtcStatus_type rtcStatus = rtc_init();
 	if((rtcStatus == rtc_Ok)&&(rtcStatus == rtc_wasOn)){
 		fp.state.rtcOscillatorError = 0;

@@ -7,7 +7,7 @@
  * @copyright	Copyright (C) 2017 Storozhenko Roman
  *				All rights reserved
  *				This software may be modified and distributed under the terms
- *				of the BSD license.	 See the LICENSE file for details
+ *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -199,9 +199,9 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
 		/************************************************
 		 * IO
 		 */
-		gppin_init(GPIOC, 10, alternateFunctionPushPull, pullDisable, 0, UART3_PINAFTX);		//PC10 USART4_TX
+		gppin_init(GPIOC, 10, alternateFunctionPushPull, pullDisable, 0, UART4_PINAFTX);		//PC10 USART4_TX
 		#if(UART1_HALFDUPLEX == 0)
-		gppin_init(GPIOC, 11, alternateFunctionPushPull, pullUp, 0, UART3_PINAFRX);				//PC11 USART4_RX
+		gppin_init(GPIOC, 11, alternateFunctionPushPull, pullUp, 0, UART4_PINAFRX);				//PC11 USART4_RX
 		#else
 		uartx->halfDuplex = 1;
 		#endif
@@ -312,7 +312,7 @@ void uart_setCallback(uart_type *uartx, uartCallback_type txHoock, uartCallback_
 /*!****************************************************************************
  * @brief
  */
-void uart_write(uart_type *uartx, void *src, uint16_t len){
+void uart_write(uart_type *uartx, void const *src, uint16_t len){
 	uartx->pDmaStreamTx->CR		&= ~DMA_SxCR_EN;									//Channel disabled
 	uartx->pDmaStreamTx->M0AR	= (uint32_t)src;									//Memory address
 	uartx->pDmaStreamTx->NDTR	= len;												//Number of data
