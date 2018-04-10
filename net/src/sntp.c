@@ -27,9 +27,15 @@
  */
 
 /**
- * SNTP_DEBUG: Enable debugging for SNTP
+ * SNTP_DEBUG_LEVEL: Enable debugging for SNTP
  */
-#define SNTP_DEBUG                  1	//1 - ON, 0 - OFF
+#define SNTP_DEBUG_LEVEL	2	//0 - No printed
+								//1 - Error
+								//2 - Sync time
+								//3 - All
+#define SNTP_DEBUG_ERR		(SNTP_DEBUG_LEVEL >= 1)
+#define SNTP_DEBUG_TIME		(SNTP_DEBUG_LEVEL >= 2)
+#define SNTP_DEBUG_ALL		(SNTP_DEBUG_LEVEL >= 3)
 
 /**
  * SNTP_SINGLESYNC: Enable single sync
@@ -147,10 +153,12 @@ static void sntp_process(u32_t *receive_timestamp){
 	 */
 	time_t t = (ntohl(receive_timestamp[0]) - DIFF_SEC_1900_1970);
 
+	#if SNTP_DEBUG_TIME
 	rtc_setTimeUnix(t);
 	char str[32];
 	ctime_r(&t, str);
-	report(SNTP_DEBUG, (str));
+	report(SNTP_DEBUG_TIME, "[SNTP] Sync time: %s", str);
+	#endif
 }
 
 /**
@@ -177,7 +185,7 @@ static void sntp_try_next_server(void* arg){
 		if(sntp_current_server >= sntp_num_servers){
 			sntp_current_server = 0;
 		}
-		report(SNTP_DEBUG, "[SNTP] sntp_try_next_server: Sending request to server %"U16_F"\n",
+		report(SNTP_DEBUG_ALL, "[SNTP] sntp_try_next_server: Sending request to server %"U16_F"\n",
 						(u16_t)sntp_current_server);
 		/* instantly send a request to the next server */
 		sntp_request(NULL);
@@ -213,17 +221,17 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t 
 				if(stratum == SNTP_STRATUM_KOD){
 					/* Kiss-of-death packet. Use another server or increase UPDATE_DELAY. */
 					err = SNTP_ERR_KOD;
-					report(SNTP_DEBUG, ("[SNTP] sntp_recv: Received Kiss-of-Death\n"));
+					report(SNTP_DEBUG_ALL, ("[SNTP] sntp_recv: Received Kiss-of-Death\n"));
 				}else{
 					/* correct answer */
 					err = ERR_OK;
 					pbuf_copy_partial(p, &receive_timestamp, SNTP_RECEIVE_TIME_SIZE * 4, SNTP_OFFSET_RECEIVE_TIME);
 				}
 			}else{
-				report(SNTP_DEBUG, "[SNTP] sntp_recv: Invalid mode in response: %"U16_F"\n", (u16_t)mode);
+				report(SNTP_DEBUG_ERR, "[SNTP] sntp_recv: Invalid mode in response: %"U16_F"\n", (u16_t)mode);
 			}
 		}else{
-			report(SNTP_DEBUG, "[SNTP] sntp_recv: Invalid packet length: %"U16_F"\n", p->tot_len);
+			report(SNTP_DEBUG_ERR, "[SNTP] sntp_recv: Invalid packet length: %"U16_F"\n", p->tot_len);
 		}
 	}
 	pbuf_free(p);
@@ -236,7 +244,7 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t 
 	#else
 		/* Set up timeout for next request */
 		sys_timeout((u32_t) SNTP_UPDATE_DELAY, sntp_request, NULL);
-		report(SNTP_DEBUG, ("[SNTP] sntp_recv: Scheduled next time request: %u ms\n", (u32_t) SNTP_UPDATE_DELAY));
+		report(SNTP_DEBUG_ALL, "[SNTP] sntp_recv: Scheduled next time request: %u ms\n", (u32_t)SNTP_UPDATE_DELAY);
 	#endif
 	}else if(err == SNTP_ERR_KOD){
 		/* Kiss-of-death packet. Use another server or increase UPDATE_DELAY. */
@@ -279,12 +287,12 @@ static void sntp_dns_found(const char* hostname, ip_addr_t *ipaddr, void *arg){
 
 	if(ipaddr != NULL){
 		/* Address resolved, send request */
-		report(SNTP_DEBUG, ("[SNTP] sntp_dns_found: Server address resolved, sending request\n"));
-		report(SNTP_DEBUG, ("[SNTP] sntp_server_address: %s\n", ipaddr_ntoa(ipaddr)));
+		report(SNTP_DEBUG_ALL, ("[SNTP] sntp_dns_found: Server address resolved, sending request\n"));
+		report(SNTP_DEBUG_ALL, ("[SNTP] sntp_server_address: %s\n", ipaddr_ntoa(ipaddr)));
 		sntp_send_request(ipaddr);
 	}else{
 		/* DNS resolving failed -> try another server */
-		report(SNTP_DEBUG, ("[SNTP] sntp_dns_found: Failed to resolve server address resolved, trying next server\n"));
+		report(SNTP_DEBUG_ALL, ("[SNTP] sntp_dns_found: Failed to resolve server address resolved, trying next server\n"));
 		sntp_try_next_server(NULL);
 	}
 }
@@ -301,17 +309,17 @@ static void sntp_request(void *arg){
 	LWIP_UNUSED_ARG(arg);
 
 	/* initialize SNTP server address */
-	report(SNTP_DEBUG, "[SNTP] dns_gethostbyname, number server: %u, url: %s\n", sntp_current_server, sntp_server_addresses[sntp_current_server]);
+	report(SNTP_DEBUG_ALL, "[SNTP] dns_gethostbyname, number server: %u, url: %s\n", sntp_current_server, sntp_server_addresses[sntp_current_server]);
 	err = dns_gethostbyname(sntp_server_addresses[sntp_current_server], &sntp_server_address, sntp_dns_found, NULL);
 
 	if(err == ERR_INPROGRESS){
 		/* DNS request sent, wait for sntp_dns_found being called */
-		report(SNTP_DEBUG, "[SNTP] sntp_request: Waiting for server address to be resolved.\n");
+		report(SNTP_DEBUG_ALL, "[SNTP] sntp_request: Waiting for server address to be resolved\n");
 		return;
 	}
 
 	if(err == ERR_OK){
-		report(SNTP_DEBUG, "[SNTP] sntp_server_address: %s\n", ipaddr_ntoa(&sntp_server_address));
+		report(SNTP_DEBUG_ALL, "[SNTP] sntp_server_address: %s\n", ipaddr_ntoa(&sntp_server_address));
 		sntp_send_request(&sntp_server_address);
 	}else{
 		/* address conversion failed, try another server */

@@ -43,7 +43,7 @@
  * MEM_SIZE: the size of the heap memory. If the application will send
  * a lot of data that needs to be copied, this should be set high
  */
-#define MEM_SIZE                (5 * 1024)
+#define MEM_SIZE                (1 * 1024)
 
 /*!****************************************************************************
  * MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
@@ -218,10 +218,10 @@
 /*!****************************************************************************
  * OS options
  */
-#define TCPIP_MBOX_SIZE                 5
-#define DEFAULT_UDP_RECVMBOX_SIZE       2000
-#define DEFAULT_TCP_RECVMBOX_SIZE       2000
-#define DEFAULT_ACCEPTMBOX_SIZE         2000
+#define TCPIP_MBOX_SIZE                 2
+#define DEFAULT_UDP_RECVMBOX_SIZE       256
+#define DEFAULT_TCP_RECVMBOX_SIZE       256
+#define DEFAULT_ACCEPTMBOX_SIZE         256
 
 /// tcpip_thread
 #define TCPIP_THREAD_STACKSIZE          TCPIP_SZ_STACK

@@ -34,7 +34,7 @@
  * linking) to your LDFLAGS; same with all the other symbols you need.
  */
 __attribute((used)) const int uxTopUsedPriority = configMAX_PRIORITIES - 1;
-uint32_t monitorPeriod = pdMS_TO_TICKS(1000);
+uint32_t monitorPeriod = pdMS_TO_TICKS(10000);
 
 /*!****************************************************************************
  * @brief
@@ -73,6 +73,8 @@ void monitorTSK(void *pPrm){
 	uint8_t maxTask = 10;
 	uint32_t taskTimePrev[maxTask];
 	memset(taskTimePrev, 0, sizeof(taskTimePrev));
+
+	printp("%u\n", uxTopUsedPriority);
 
 	while(1){
 		printp("\n---------- OS Monitor ------------\n");
@@ -119,6 +121,22 @@ void monitorTSK(void *pPrm){
 
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(monitorPeriod));
 	}
+}
+
+/*!****************************************************************************
+ *
+ */
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName){
+	printp("[OS] Stack Overflow on %s\n", pcTaskName);
+	while(1);
+}
+
+/*!****************************************************************************
+ *
+ */
+void vApplicationMallocFailedHook(void){
+	printp("[OS] Malloc Failed\n");
+	while(1);
 }
 
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

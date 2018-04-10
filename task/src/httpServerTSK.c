@@ -20,10 +20,17 @@
 #include "httpServerTSK.h"
 
 /**
- * HTTP_SERVER_DEBUG: Enable debugging for http server
+ * HTTP_DEBUG_LEVEL: Enable debugging for http server
  */
-#define HTTP_DEBUG	1	//1 - ON, 0 - OFF
-#define LEN			1024
+#define HTTP_DEBUG_LEVEL	2	//0 - No printed
+								//1 - Error
+								//2 - Connected IP Address
+								//3 - All
+#define HTTP_DEBUG_ERR		(HTTP_DEBUG_LEVEL >= 1)
+#define HTTP_DEBUG_IP		(HTTP_DEBUG_LEVEL >= 2)
+#define HTTP_DEBUG_ALL		(HTTP_DEBUG_LEVEL >= 3)
+
+#define LEN					1024
 
 /*!****************************************************************************
  * MEMORY
@@ -115,10 +122,10 @@ void http_server_serve(struct netconn *conn){
 		}
 
 		else if(httpStrcmp(buf, "POST /")){
-			report(HTTP_DEBUG, ("[HTTP] POST /"));
+			report(HTTP_DEBUG_ALL, ("[HTTP] POST /"));
 		}
 
-		report(HTTP_DEBUG, "[HTTP] Transmit page data to client, length %u bytes\n", strlen(pageData));
+		report(HTTP_DEBUG_ALL, "[HTTP] Transmit page data to client, length %u bytes\n", strlen(pageData));
 	}
 
 	/* Close the connection (server closes in HTTP) */
@@ -144,24 +151,24 @@ void httpServerTSK(void *pPrm){
 	err = netconn_bind(conn, NULL, 80);
 	assert(err == ERR_OK);
 
-	report(HTTP_DEBUG, "[HTTP] Put the connection into LISTEN state\n");
+	report(HTTP_DEBUG_ALL, "[HTTP] Put the connection into LISTEN state\n");
 	netconn_listen(conn);
 
 	while(1){
-		report(HTTP_DEBUG, "[HTTP] Accept any icoming connection\n");
+		report(HTTP_DEBUG_ALL, "[HTTP] Accept any icoming connection\n");
 		err = netconn_accept(conn, &newconn);
 
 		if(err != ERR_OK){
-			report(HTTP_DEBUG, "[HTTP] Error %i", err);
+			report(HTTP_DEBUG_ERR, "[HTTP] Error %i", err);
 		}
 
 		httpServer.numberRequest++;
 
-		report(HTTP_DEBUG, "[HTTP] Serve connection\n");
-		report(HTTP_DEBUG, "[HTTP] Remote IP address: %s\n", ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
+		report(HTTP_DEBUG_ALL, "[HTTP] Serve connection\n");
+		report(HTTP_DEBUG_IP, "[HTTP] Remote IP address: %s\n", ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
 		http_server_serve(newconn);
 
-		report(HTTP_DEBUG, "[HTTP] Delete connection\n\n");
+		report(HTTP_DEBUG_ALL, "[HTTP] Delete connection\n");
 		netconn_delete(newconn);
 	}
 }

@@ -25,16 +25,16 @@
 
 /*!**** NAME ****************** size [4byte Word] ****************************/
 #define SYSTEM_TSK_SZ_STACK		512
-#define UART_TSK_SZ_STACK		256
-#define NETIF_SZ_STACK			1024
-#define TCPIP_SZ_STACK			1024
+#define UART_TSK_SZ_STACK		512
+#define NETIF_SZ_STACK			512
+#define TCPIP_SZ_STACK			512
 #define HTTP_TSK_SZ_STACK		512
-#define STARTUP_TSK_SZ_STACK	256
-#define BASE_TSK_SZ_STACK		256
-#define CHARG_TSK_SZ_STACK		256
+#define STARTUP_TSK_SZ_STACK	512
+#define BASE_TSK_SZ_STACK		512
+#define CHARG_TSK_SZ_STACK		512
 #define SETT_TSK_SZ_STACK		512
-#define CUBE_TSK_SZ_STACK		256
-#define BUBLE_TSK_SZ_STACK		256
+#define CUBE_TSK_SZ_STACK		512
+#define BUBLE_TSK_SZ_STACK		512
 
 
 /*!****************************************************************************

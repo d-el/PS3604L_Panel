@@ -50,6 +50,15 @@ void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gat
 void netSettingUpdate(void);
 void shutdown(void);
 
+/**
+ * SYS_DEBUG_LEVEL: Enable debugging for system task
+ */
+#define SYS_DEBUG_LEVEL	2	//0 - No printed
+							//1 - Error
+							//2 - All
+#define SYS_DEBUG_ERR		(SYS_DEBUG_LEVEL >= 1)
+#define SYS_DEBUG_ALL		(SYS_DEBUG_LEVEL >= 2)
+
 /*!****************************************************************************
  * @brief
  */
@@ -59,27 +68,27 @@ void systemTSK(void *pPrm){
 	BaseType_t 		osres = pdTRUE;
 
 	print_init(stdOut_uart);
-	printp("\n\n===============================================================================\n");
-	printp("Started systemTSK\n");
+	report(SYS_DEBUG_ERR, "\n\n===============================================================================\n");
+	report(SYS_DEBUG_ALL, "[SYS] Started systemTSK\n");
 
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate();
 	pvd_setSupplyFaultCallBack(shutdown);							// Setup callback for Supply Fault
 
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
-	//ping_init();													// Initialize service ping protocol
-	//sntp_init();													// Initialize service SNTP
+	ping_init();													// Initialize service ping protocol
+	sntp_init();													// Initialize service SNTP
 
 	osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
-	printp("Started uartTSK\n");
+	report(SYS_DEBUG_ALL, "[SYS] Started uartTSK\n");
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 
-	osres = xTaskCreate(monitorTSK, "monitorTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
-	assert(osres == pdTRUE);
+	//osres = xTaskCreate(monitorTSK, "monitorTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
+	//assert(osres == pdTRUE);
 
-	printp("Started httpServerTSK\n");
+	report(SYS_DEBUG_ALL, "[SYS] Started httpServerTSK\n");
 	selWindow(startupWindow);
 
 	while(1){
@@ -90,7 +99,7 @@ void systemTSK(void *pPrm){
 		if(selWindowPrev != fp.currentSelWindow){
 			if(windowTskHandle != NULL){
 				assert(osres == pdTRUE);	//Fail windowTskHandle
-				printp("Stopped %s\n", pcTaskGetName(windowTskHandle));
+				report(SYS_DEBUG_ALL, "[SYS] Stopped %s\n", pcTaskGetName(windowTskHandle));
 				vTaskDelete(windowTskHandle);	//Удаляем текущее окно
 			}
 
@@ -119,7 +128,7 @@ void systemTSK(void *pPrm){
 					assert(!"Fail selector");
 			}
 			assert(osres == pdTRUE);	//Fail windowTskHandle
-			printp("Started %s\n", pcTaskGetName(windowTskHandle));
+			report(SYS_DEBUG_ALL, "[SYS] Started %s\n", pcTaskGetName(windowTskHandle));
 			selWindowPrev = fp.currentSelWindow;
 		}
 
@@ -149,12 +158,14 @@ void systemTSK(void *pPrm){
 			if(gppin_get(GP_LANnINT) == 0){	//Detect by GPIO
 				ETH_ReadPHYRegister(1, PHY_BSR);
 				if(fp.state.lanLink != 0){
+					report(SYS_DEBUG_ALL, "[SYS] LAN link Down\n");
 					netif_set_down(&xnetif);
 					fp.state.lanLink = 0;
 				}
 			}
 			if(fp.state.lanLink == 0){		//Detect by read status register
 				if(ETH_AutoNegotiation(1, NULL) == ETH_SUCCESS){
+					report(SYS_DEBUG_ALL, "[SYS] LAN link Up\n");
 					netif_set_up(&xnetif);	//When the netif is fully configured this function must be called
 					fp.state.lanLink = 1;
 				}

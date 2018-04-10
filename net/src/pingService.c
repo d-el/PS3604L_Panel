@@ -16,6 +16,7 @@
 #include "lwip/raw.h"
 #include "lwip/icmp.h"
 #include "assert.h"
+#include "printp.h"
 
 /*!****************************************************************************
  * MEMORY

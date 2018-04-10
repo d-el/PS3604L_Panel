@@ -96,7 +96,8 @@ LDFLAGS := \
 	-Wl,-Map="$(ODIR)/$(TARGET).map" \
 	-Wl,--gc-sections \
 	-Xlinker --gc-sections --specs=nano.specs \
-	-Wl,--print-memory-usage
+	-Wl,--print-memory-usage \
+	-Wl,--undefined=uxTopUsedPriority
 
 #******************************************************************************
 # C File
