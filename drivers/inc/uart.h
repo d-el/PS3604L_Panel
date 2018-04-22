@@ -65,11 +65,15 @@
  * Typedef
  */
 typedef enum {
-	BR9600,	 //!< BR9600
-	BR38400, //!< BR38400
-	BR57600, //!< BR57600
-	BR115200,//!< BR115200
-	BR_NUMBER//!< BR_NUMBER
+	BR9600,
+	BR38400,
+	BR57600,
+	BR115200,
+	BR230400,
+	BR250K,
+	BR500K,
+	BR1M,
+	BR_NUMBER
 } uartBaudRate_type;
 
 typedef enum {

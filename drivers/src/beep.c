@@ -87,8 +87,9 @@ void beep_init(void){
 	TIME_B_TIM->EGR = TIM_EGR_UG;								//Update event generate
 	TIME_B_TIM->SR	= ~TIM_SR_UIF;								//Clear UIF flag
 
+	#define TIM_BEEP_InterruptPrior	15
 	NVIC_EnableIRQ(TIM7_IRQn);
-	NVIC_SetPriority(TIM7_IRQn, 15);
+	NVIC_SetPriority(TIM7_IRQn, TIM_BEEP_InterruptPrior);
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

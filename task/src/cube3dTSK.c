@@ -1,8 +1,8 @@
 ﻿/*!****************************************************************************
- * @file    cube3d.c
+ * @file	cube3d.c
  * @author
  * @version V1.0
- * @date    31-October-2013
+ * @date	31.10.2013
  * @brief
  */
 
@@ -26,11 +26,11 @@
 /*!****************************************************************************
  * User define
  */
-#define CUBE_SIZE   33      //Длина ребра / 2
-#define DOTS_COUNT  8       //Всего вершин
-#define MESH_COUNT  12      //Количество ребер
-#define LCD_X_SIZE  160     //Разрешение по горизонтали
-#define LCD_Y_SIZE  100		//Разрешение по вертикали
+#define CUBE_SIZE	33		//Длина ребра / 2
+#define DOTS_COUNT	8		//Всего вершин
+#define MESH_COUNT	12		//Количество ребер
+#define LCD_X_SIZE	160		//Разрешение по горизонтали
+#define LCD_Y_SIZE	100		//Разрешение по вертикали
 
 /*!****************************************************************************
  * MEMORY
@@ -39,7 +39,7 @@ uint16_t colors[12] = {	//Цвета граней
 		red, green, blue, red, green, blue, red, green, blue, red, green, blue, };
 
 /** Массивы содержат номера начальных (s1) и конечных (f1) точек,
- *  по ним соединяем все и рисуем ребра(сетку)
+ *	по ним соединяем все и рисуем ребра(сетку)
  */
 const uint8_t s1[MESH_COUNT] = { 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7 };
 const uint8_t f1[MESH_COUNT] = { 1, 2, 3, 0, 4, 5, 6, 7, 5, 6, 7, 4 };
@@ -53,7 +53,7 @@ const uint8_t f1[MESH_COUNT] = { 1, 2, 3, 0, 4, 5, 6, 7, 5, 6, 7, 4 };
  */
 void cube3dTSK(void *pPrm){
 	/** углы поворота по осям, от 0 до 63 включительно,
-	 *  это полный оборот на 360
+	 *	это полный оборот на 360
 	 */
 	_iq dir_x = 0;
 	_iq dir_y = 0;
@@ -61,10 +61,10 @@ void cube3dTSK(void *pPrm){
 	//точки, лучше поменять на long
 	int32_t Xa[DOTS_COUNT], Ya[DOTS_COUNT], Za[DOTS_COUNT];
 	uint8_t i;
-	_iq angle;                              //Буфер для угла
-	int32_t x1, y1, z1;                           //Координаты точек от центра объекта
-	float f;                                  //Временная переменная
-	uint8_t x2d[MESH_COUNT], y2d[MESH_COUNT];   //”Плоские” точки
+	_iq angle;									//Буфер для угла
+	int32_t x1, y1, z1;							//Координаты точек от центра объекта
+	float f;									//Временная переменная
+	uint8_t x2d[MESH_COUNT], y2d[MESH_COUNT];	//”Плоские” точки
 	pairsOfPoints_type pairsOfPoints[MESH_COUNT];
 
 	uint16_t  old_val_encoder = enGeReg();
@@ -126,7 +126,7 @@ void cube3dTSK(void *pPrm){
 
 		//Трансформация координат вершин в экранные
 		for(i = 0; i < DOTS_COUNT; i++){
-			//1000 и 1200 определяют расстояние от  объекта до камеры и
+			//1000 и 1200 определяют расстояние от	объекта до камеры и
 			f = 1000 / (1100 - (float) Za[i]);
 			// рисуем объект с центром в по-центре экрана
 			x2d[i] = (uint8_t) ((f * (float) Xa[i]) + LCD_X_SIZE / 2);
@@ -135,7 +135,7 @@ void cube3dTSK(void *pPrm){
 
 		//Рисуем ребра/сетку
 		for(i = 0; i < MESH_COUNT; i++){
-			grf_line(pairsOfPoints[i].x1, pairsOfPoints[i].y1,       //Рисуем линию черным цветом
+			grf_line(pairsOfPoints[i].x1, pairsOfPoints[i].y1,		 //Рисуем линию черным цветом
 					pairsOfPoints[i].x2, pairsOfPoints[i].y2, black);
 
 			pairsOfPoints[i].x1 = x2d[s1[i]];
@@ -143,7 +143,7 @@ void cube3dTSK(void *pPrm){
 			pairsOfPoints[i].x2 = x2d[f1[i]];
 			pairsOfPoints[i].y2 = y2d[f1[i]];
 
-			grf_line(pairsOfPoints[i].x1, pairsOfPoints[i].y1,       //Рисуем линию
+			grf_line(pairsOfPoints[i].x1, pairsOfPoints[i].y1,		 //Рисуем линию
 					pairsOfPoints[i].x2, pairsOfPoints[i].y2, colors[i]);
 		}
 

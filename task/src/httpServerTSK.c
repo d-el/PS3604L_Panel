@@ -37,14 +37,18 @@
  */
 httpServer_type httpServer;
 char pageData[LEN];
-const char http_200[] 				= "HTTP/1.1 200 OK\r\n";
-const char http_404[] 				= "HTTP/1.1 404 Not Found\r\n";
-const char http_server[] 			= "Server: by Storozhenko Roman\r\n";
-const char http_contentTypeHtml[]	= "Content-type: text/html\r\n";
-const char http_connectionClose[] 	= "Connection: close\r\n";
-const char http_contentLength[] 	= "Content-Length: ";
-const char http_lineBreak[] 		= "\r\n";
-const char http_headerEnd[] 		= "\r\n\r\n";
+const char http_200[] 				= "HTTP/1.1 200 OK\n";
+const char http_404[] 				= "HTTP/1.1 404 Not Found\n";
+const char http_server[] 			= "Server: by Storozhenko Roman\n";
+const char http_connectionClose[] 	= "Connection: close\n";
+const char http_headerEnd[] 		= "\n";
+const char *http_contentType[urlDataTypeNumber] = {
+	[urlDataType_html]	= "Content-type: text/html\n",
+	[urlDataType_css]	= "Content-type: text/css\n",
+	[urlDataType_bin]	= "Content-type: text/plain\n",
+	[urlDataType_js]	= "Content-type: application/x-javascript\n",
+	[urlDataType_ico]	= "Content-type: image/vnd.microsoft.icon\n"
+};
 
 /*!****************************************************************************
  *
@@ -66,9 +70,12 @@ void http_server_serve(struct netconn *conn){
 	char *data = pageData;
 
 	res = netconn_recv(conn, &inbuf);
-
-	if(res == ERR_OK){
+	if(res != ERR_OK){
+		report(HTTP_DEBUG_ERR, "[HTTP] Error in netconn_recv, %d\n", res);
+	}
+	else{ //res == ERR_OK
 		netbuf_data(inbuf, (void**)&buf, &buflen);
+		report(HTTP_DEBUG_ALL, "[HTTP] netbuf_data: 0x%x (%u)\n", buf, buflen);
 
 		if(httpStrcmp(buf, "GET /")){
 			const url_type *url = NULL;
@@ -86,31 +93,32 @@ void http_server_serve(struct netconn *conn){
 					urlData = url->data;
 				}
 
-				if(urlData.type == urlDataTypeHtml){
-					strcpy(data, http_200);
-					strcat(data, http_server);
-					strcat(data, http_connectionClose);
-					strcat(data, http_contentTypeHtml);
-					strcat(data, http_headerEnd);
-					netconn_write(conn, data, strlen(data), NETCONN_NOCOPY);
-					uint32_t size;
-					if(urlData.size != 0){
-						size = urlData.size;
-					}else{
-						size = strlen(urlData.data.html);
-					}
-					netconn_write(conn, urlData.data.html, size, NETCONN_NOCOPY);;
+				strcpy(data, http_200);
+				strcat(data, http_server);
+				strcat(data, http_connectionClose);
+				strcat(data, http_contentType[urlData.type]);
+				strcat(data, http_headerEnd);
+				uint32_t size = strlen(data);
+				netconn_write(conn, data, size, NETCONN_NOCOPY);
+				report(HTTP_DEBUG_ALL, "[HTTP] netconn_write (%u)\n", size);
+
+				if(urlData.size != 0){
+					size = urlData.size;
 				}else{
-					netconn_write(conn, urlData.data.bin, urlData.size, NETCONN_NOCOPY);
+					size = strlen(urlData.data.html);
 				}
+				netconn_write(conn, urlData.data.html, size, NETCONN_NOCOPY);
+				report(HTTP_DEBUG_ALL, "[HTTP] netconn_write (%u)\n", size);
 			}else{
 				strcpy(data, http_404);
 				strcat(data, http_server);
 				strcat(data, http_connectionClose);
-				strcat(data, http_contentTypeHtml);
+				strcat(data, http_contentType[getUrlTable[getUrlNumber - 1].data.type]);
 				strcat(data, http_headerEnd);
-				netconn_write(conn, data, strlen(data), NETCONN_NOCOPY);
-				uint32_t size;
+				uint32_t size = strlen(data);
+				netconn_write(conn, data, size, NETCONN_NOCOPY);
+				report(HTTP_DEBUG_ALL, "[HTTP] netconn_write (%u)\n", size);
+
 				if(getUrlTable[getUrlNumber - 1].data.size != 0){
 					size = getUrlTable[getUrlNumber - 1].data.size;
 				}else{
@@ -118,14 +126,13 @@ void http_server_serve(struct netconn *conn){
 				}
 
 				netconn_write(conn, getUrlTable[getUrlNumber - 1].data.data.html, size, NETCONN_NOCOPY);
+				report(HTTP_DEBUG_ALL, "[HTTP] netconn_write (%u)\n", size);
 			}
 		}
 
-		else if(httpStrcmp(buf, "POST /")){
-			report(HTTP_DEBUG_ALL, ("[HTTP] POST /"));
+		else if(httpStrcmp(buf, "POST /\n")){
+			report(HTTP_DEBUG_ALL, "[HTTP] POST /\n");
 		}
-
-		report(HTTP_DEBUG_ALL, "[HTTP] Transmit page data to client, length %u bytes\n", strlen(pageData));
 	}
 
 	/* Close the connection (server closes in HTTP) */
@@ -159,17 +166,16 @@ void httpServerTSK(void *pPrm){
 		err = netconn_accept(conn, &newconn);
 
 		if(err != ERR_OK){
-			report(HTTP_DEBUG_ERR, "[HTTP] Error %i", err);
+			report(HTTP_DEBUG_ERR, "[HTTP] Error %i\n", err);
 		}
+		else{
+			httpServer.numberRequest++;
+			report(HTTP_DEBUG_IP, "[HTTP] Connection %u, Remote IP address: %s\n", httpServer.numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
+			http_server_serve(newconn);
 
-		httpServer.numberRequest++;
-
-		report(HTTP_DEBUG_ALL, "[HTTP] Serve connection\n");
-		report(HTTP_DEBUG_IP, "[HTTP] Remote IP address: %s\n", ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
-		http_server_serve(newconn);
-
-		report(HTTP_DEBUG_ALL, "[HTTP] Delete connection\n");
-		netconn_delete(newconn);
+			report(HTTP_DEBUG_ALL, "[HTTP] Delete connection\n");
+			netconn_delete(newconn);
+		}
 	}
 }
 

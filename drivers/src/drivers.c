@@ -70,7 +70,7 @@ void hardInit(void){
 	}
 	uart_init(uart1, BR38400);
 	uart_init(uart3, BR57600);
-	uart_init(uart4, BR115200);
+	uart_init(uart4, BR1M);	//Debug out
 	i2c_init(i2c1);
 	eep_init();
 	//pvd_init();

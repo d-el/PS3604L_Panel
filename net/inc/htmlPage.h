@@ -27,8 +27,12 @@
  */
 typedef struct{
 	enum{
-		urlDataTypeHtml,
-		urlDataTypeBin,
+		urlDataType_html,
+		urlDataType_css,
+		urlDataType_bin,
+		urlDataType_js,
+		urlDataType_ico,
+		urlDataTypeNumber
 	}type;
 
 	union{

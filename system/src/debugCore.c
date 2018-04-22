@@ -55,6 +55,8 @@ void hardFaultHandlerC(unsigned int * stackedContextPtr){
 	stacked_pc = stackedContextPtr[6];
 	stacked_psr = stackedContextPtr[7];
 
+	print_init(stdOut_semihost);
+
 	printp("\n\n[GAME OVER]\n");
 	printp("R0 = 0x%008X\n", stacked_r0);
 	printp("R1 = 0x%008X\n", stacked_r1);

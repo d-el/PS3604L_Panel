@@ -13,6 +13,8 @@
 /*!****************************************************************************
  * Include
  */
+#include "FreeRTOS.h"
+#include "task.h"
 #include "stdint.h"
 #include "debugCore.h"
 #include "stdarg.h"
@@ -81,8 +83,10 @@ int _write(int fd, const void *buf, size_t count){
 		case stdOut_rtt:
 			break;
 		case stdOut_uart:
+			//vTaskSuspendAll();
 			uart_write(uart4, buf, count);
 			while(uart4->txState == uartTxRun);
+			//xTaskResumeAll();
 			break;
 		default:
 			return -1;

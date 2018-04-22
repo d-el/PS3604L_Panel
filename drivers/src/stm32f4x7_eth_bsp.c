@@ -164,7 +164,7 @@ void ETH_NVIC_Config(void){
 	//NVIC_SetPriorityGrouping(4);
 
 	/* Enable the Ethernet global Interrupt */
-	#define ETH_InterruptPrior	14
+	#define ETH_InterruptPrior	15
 	NVIC_EnableIRQ(ETH_IRQn);
 	NVIC_SetPriority(ETH_IRQn, ETH_InterruptPrior);
 }

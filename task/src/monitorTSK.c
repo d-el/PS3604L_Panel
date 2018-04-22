@@ -34,7 +34,7 @@
  * linking) to your LDFLAGS; same with all the other symbols you need.
  */
 __attribute((used)) const int uxTopUsedPriority = configMAX_PRIORITIES - 1;
-uint32_t monitorPeriod = pdMS_TO_TICKS(10000);
+uint32_t monitorPeriod = pdMS_TO_TICKS(1000);
 
 /*!****************************************************************************
  * @brief
@@ -59,7 +59,21 @@ unsigned long vGetTimerForRunTimeStats(void){
 /*!****************************************************************************
  * @brief
  */
+void stats_display(void);
 void monitorTSK(void *pPrm){
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+
+	while(1){
+		printp("\n---------- lwIP Monitor ------------\n");
+		//stats_display();
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(monitorPeriod));
+	}
+}
+
+/*!****************************************************************************
+ * @brief
+ */
+void monitorTSK2(void *pPrm){
 		static const char *stateToChar[] = {
 		"Running",		/* A task is querying the state of itself, so must be running. */
 		"Ready",		/* The task being queried is in a read or pending ready list. */

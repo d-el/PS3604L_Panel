@@ -2,7 +2,7 @@
  * @file    cube3d.c
  * @author
  * @version V1.0
- * @date    31-October-2013
+ * @date    31.10.2013
  * @brief
  */
 #ifndef CUBE3D_H

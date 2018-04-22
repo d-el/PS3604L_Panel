@@ -15,7 +15,7 @@
 #include "rtc.h"
 #include "time.h"
 #include "lwipopts.h"
-#include "lwip/timers.h"
+#include "lwip/timeouts.h"
 #include "lwip/udp.h"
 #include "lwip/dns.h"
 #include "lwip/ip_addr.h"
@@ -29,7 +29,7 @@
 /**
  * SNTP_DEBUG_LEVEL: Enable debugging for SNTP
  */
-#define SNTP_DEBUG_LEVEL	2	//0 - No printed
+#define SNTP_DEBUG_LEVEL	3	//0 - No printed
 								//1 - Error
 								//2 - Sync time
 								//3 - All
@@ -195,7 +195,7 @@ static void sntp_try_next_server(void* arg){
 }
 
 /** UDP recv callback for the sntp pcb */
-static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t *addr, u16_t port){
+static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port){
 	u8_t mode;
 	u8_t stratum;
 	u32_t receive_timestamp[SNTP_RECEIVE_TIME_SIZE];
@@ -259,12 +259,12 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, ip_addr_t 
  *
  * @param server_addr resolved IP address of the SNTP server
  */
-static void sntp_send_request(ip_addr_t *server_addr){
+static void sntp_send_request(const ip_addr_t *server_addr){
 	struct pbuf* p;
 	p = pbuf_alloc(PBUF_TRANSPORT, SNTP_MSG_LEN, PBUF_RAM);
 	if(p != NULL){
 		struct sntp_msg *sntpmsg = (struct sntp_msg *) p->payload;
-		//debug("sntp_send_request: Sending request to server\n");
+		report(SNTP_DEBUG_ALL, "sntp_send_request: Sending request to server\n");
 		/* initialize request message */
 		sntp_initialize_request(sntpmsg);
 		/* send request */
@@ -272,7 +272,7 @@ static void sntp_send_request(ip_addr_t *server_addr){
 		/* set up receive timeout: try next server or retry on timeout */
 		sys_timeout((u32_t) SNTP_RECV_TIMEOUT, sntp_try_next_server, NULL);
 	}else{
-		//debug("sntp_send_request: Out of memory, trying again in %u ms\n", SNTP_RETRY_TIMEOUT);
+		report(SNTP_DEBUG_ALL, "sntp_send_request: Out of memory, trying again in %u ms\n", SNTP_RETRY_TIMEOUT);
 		/* out of memory: set up a timer to send a retry */
 		sys_timeout(SNTP_RETRY_TIMEOUT, sntp_request, NULL);
 	}
@@ -281,7 +281,7 @@ static void sntp_send_request(ip_addr_t *server_addr){
 /**
  * DNS found callback when using DNS names as server address.
  */
-static void sntp_dns_found(const char* hostname, ip_addr_t *ipaddr, void *arg){
+static void sntp_dns_found(const char* hostname, const ip_addr_t *ipaddr, void *arg){
 	LWIP_UNUSED_ARG(hostname);
 	LWIP_UNUSED_ARG(arg);
 

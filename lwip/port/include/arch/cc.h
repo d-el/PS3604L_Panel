@@ -34,23 +34,23 @@
 
 #include "cpu.h"
 
-typedef unsigned   char    u8_t;
-typedef signed     char    s8_t;
-typedef unsigned   short   u16_t;
-typedef signed     short   s16_t;
-typedef unsigned   long    u32_t;
-typedef signed     long    s32_t;
-typedef u32_t mem_ptr_t;
+//typedef unsigned   char    u8_t;
+//typedef signed     char    s8_t;
+//typedef unsigned   short   u16_t;
+//typedef signed     short   s16_t;
+//typedef unsigned   long    u32_t;
+//typedef signed     long    s32_t;
+//typedef u32_t mem_ptr_t;
 typedef int sys_prot_t;
 
-
-#define U16_F "hu"
-#define S16_F "d"
-#define X16_F "hx"
-#define U32_F "u"
-#define S32_F "d"
-#define X32_F "x"
-#define SZT_F "uz"
+//
+//#define U16_F "hu"
+//#define S16_F "d"
+//#define X16_F "hx"
+//#define U32_F "u"
+//#define S32_F "d"
+//#define X32_F "x"
+//#define SZT_F "uz"
 
 
 
@@ -88,6 +88,22 @@ typedef int sys_prot_t;
 
 #endif
 
-#define LWIP_PLATFORM_ASSERT(x) do { if(!(x)) while(1); } while(0)
+/* Plaform specific diagnostic output */
+#include "assert.h"
+#include "printp.h"
+#include "stdint.h"
+#include "stdlib.h"
+
+#define LWIP_PLATFORM_ASSERT(x) do {printp("%s %d: %s\n", __FILE__, __LINE__, x);} while(0)
+#define LWIP_PLATFORM_DIAG(x)   do {printp x;} while(0)
+
+#define LWIP_RAND get_random_value
+static inline uint32_t get_random_value(void){
+       uint32_t num;
+       uint8_t seed_value = 17;
+       srand(seed_value);
+       num = rand();
+       return num;
+}
 
 #endif /* __CC_H__ */

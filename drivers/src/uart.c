@@ -56,6 +56,10 @@ uint16_t usartBaudRateDiv[] = {
 	uartMakeBrr(38400),
 	uartMakeBrr(57600),
 	uartMakeBrr(115200),
+	uartMakeBrr(230400),
+	uartMakeBrr(250000),
+	uartMakeBrr(500000),
+	uartMakeBrr(1000000),
 };
 
 /*!****************************************************************************

@@ -1,7 +1,7 @@
 ﻿/*!****************************************************************************
  * @file		syscall.c
  * @author		d_el
- * @version		V1.0
+ * @version		V1.1
  * @date		02.05.2017
  * @brief		POSIX System Calls
  * @copyright	Copyright (C) 2017 Storozhenko Roman
@@ -116,7 +116,7 @@ void __libc_fini_array(void){
  */
 __attribute__((weak))
 int _kill(int pid, int sig){
-	errno = EINVAL;
+	errno = ENOSYS;
 	return -1;
 }
 
@@ -127,7 +127,27 @@ int _kill(int pid, int sig){
  */
 __attribute__((weak))
 int _getpid(void){
+	errno = ENOSYS;
 	return 1;
+}
+
+/*!****************************************************************************
+ * @brief	Open a file. A minimal implementation without file system
+ * @retval	Returns -1 on error or number of bytes sent
+ */
+int _open (const char *name, int flags, int mode){
+	errno = ENOSYS;
+	return -1;
+}
+
+/*!****************************************************************************
+ * @brief	Close a file
+ * @retval	Returns -1 on error or number of bytes sent
+ */
+__attribute__((weak))
+int _close(int file){
+	errno = ENOSYS;
+	return -1;
 }
 
 /*!****************************************************************************
@@ -137,6 +157,7 @@ int _getpid(void){
  */
 __attribute__((weak))
 int _write(int file, char *ptr, int len){
+	errno = ENOSYS;
 	return -1;
 }
 
@@ -148,15 +169,16 @@ int _write(int file, char *ptr, int len){
  */
 __attribute__((weak))
 int _read(int file, char *ptr, int len){
+	errno = ENOSYS;
 	return -1;
 }
 
 /*!****************************************************************************
- * @brief	Close a file
- * @retval	Returns -1 on error or number of bytes sent
+ * @brief	Set position in a file. Minimal implementation:
  */
 __attribute__((weak))
-int _close(int file){
+int _lseek(int file, int ptr, int dir){
+	errno = ENOSYS;
 	return -1;
 }
 
@@ -189,14 +211,6 @@ int _isatty(int file){
 			errno = EBADF;
 			return 0;
 	}
-}
-
-/*!****************************************************************************
- * @brief	Set position in a file. Minimal implementation:
- */
-__attribute__((weak))
-int _lseek(int file, int ptr, int dir){
-	return 0;
 }
 
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

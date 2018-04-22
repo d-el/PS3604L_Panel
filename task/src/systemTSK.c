@@ -25,6 +25,7 @@
 #include "stm32f4x7_eth.h"
 #include "ethernetif.h"
 #include "tcpip.h"
+#include "lwip/dns.h"
 #include "regulatorConnTSK.h"
 #include "startupTSK.h"
 #include "settingTSK.h"
@@ -53,11 +54,17 @@ void shutdown(void);
 /**
  * SYS_DEBUG_LEVEL: Enable debugging for system task
  */
-#define SYS_DEBUG_LEVEL	2	//0 - No printed
+#define SYS_DEBUG_LEVEL	0	//0 - No printed
 							//1 - Error
 							//2 - All
 #define SYS_DEBUG_ERR		(SYS_DEBUG_LEVEL >= 1)
 #define SYS_DEBUG_ALL		(SYS_DEBUG_LEVEL >= 2)
+
+ip_addr_t ipaddr2;
+static void sntp_dns_found(const char* hostname, const ip_addr_t *ipaddr, void *arg){
+	report(1, "DNS hostname: %s\n", hostname);
+	report(1, "DNS IP address: %s\n", ipaddr_ntoa(ipaddr));
+}
 
 /*!****************************************************************************
  * @brief
@@ -82,13 +89,15 @@ void systemTSK(void *pPrm){
 	osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	report(SYS_DEBUG_ALL, "[SYS] Started uartTSK\n");
+
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
-
-	//osres = xTaskCreate(monitorTSK, "monitorTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
-	//assert(osres == pdTRUE);
-
 	report(SYS_DEBUG_ALL, "[SYS] Started httpServerTSK\n");
+
+	//osres = xTaskCreate(monitorTSK, "monitorTSK", configMINIMAL_STACK_SIZE, NULL, UART_TSK_PRIO, NULL);
+	//assert(osres == pdTRUE);
+	//report(SYS_DEBUG_ALL, "[SYS] Started monitorTSK\n");
+
 	selWindow(startupWindow);
 
 	while(1){
@@ -158,15 +167,17 @@ void systemTSK(void *pPrm){
 			if(gppin_get(GP_LANnINT) == 0){	//Detect by GPIO
 				ETH_ReadPHYRegister(1, PHY_BSR);
 				if(fp.state.lanLink != 0){
-					report(SYS_DEBUG_ALL, "[SYS] LAN link Down\n");
+					netif_set_link_down(&xnetif);
 					netif_set_down(&xnetif);
+					report(SYS_DEBUG_ALL, "[SYS] LAN link Down\n");
 					fp.state.lanLink = 0;
 				}
 			}
 			if(fp.state.lanLink == 0){		//Detect by read status register
 				if(ETH_AutoNegotiation(1, NULL) == ETH_SUCCESS){
-					report(SYS_DEBUG_ALL, "[SYS] LAN link Up\n");
+					netif_set_link_up(&xnetif);
 					netif_set_up(&xnetif);	//When the netif is fully configured this function must be called
+					report(SYS_DEBUG_ALL, "[SYS] LAN link Up\n");
 					fp.state.lanLink = 1;
 				}
 			}
@@ -262,6 +273,15 @@ void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gat
 
 	/*  Registers the default network interface. */
 	netif_set_default(&xnetif);
+
+	/*
+	 * Set DNS server address
+	 */
+	ip_addr_t ipaddrs;
+	IP4_ADDR(&ipaddrs, 8, 8, 8, 8);
+	dns_setserver(0, &ipaddrs);
+	IP4_ADDR(&ipaddrs, 1, 1, 1, 1);
+	dns_setserver(1, &ipaddrs);
 
 	/*
 	 * Далее производится детектирование Link и Negotiation, перенастройка

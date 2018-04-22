@@ -68,9 +68,6 @@ void gpio_init(void){
 /*!****************************************************************************
 *
 */
-#define GPIO_AFRL_AFSEL0_Pos				 (0U)
-#define GPIO_AFRL_AFSEL0_Msk				 (0xFU << GPIO_AFRL_AFSEL0_Pos)	   /*!< 0x0000000F */
-#define GPIO_AFRL_AFSEL0					 GPIO_AFRL_AFSEL0_Msk
 void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_type pull, uint8_t iniState, uint8_t nAF){
 	//Clock enable
 		 if(port == GPIOA)	 RCC->AHB1ENR	 |= RCC_AHB1ENR_GPIOAEN;

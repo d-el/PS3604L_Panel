@@ -15,6 +15,7 @@
 #include "lwipopts.h"
 #include "lwip/raw.h"
 #include "lwip/icmp.h"
+#include "lwip/prot/ip.h"
 #include "assert.h"
 #include "printp.h"
 
@@ -26,7 +27,7 @@
 static struct raw_pcb 	*ping_pcb;
 
 /* Ping using the raw ip */
-static u8_t pingRecv(void *arg, struct raw_pcb *pcb, struct pbuf *p, ip_addr_t *addr){
+static u8_t pingRecv(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_addr_t *addr){
 	struct icmp_echo_hdr *iecho;
 	assert(p != NULL);
 

@@ -1,9 +1,8 @@
-﻿/**
-  ******************************************************************************
+﻿/******************************************************************************
   * @file    lwipopts.h
   * @author  Storozhenko Roman
   * @version V1.0
-  * @date    31-October-2011
+  * @date    22.04.2018
   * @brief   lwIP Options Configuration.
   *          This file is based on Utilities\lwip_v1.3.2\src\include\lwip\opt.h
   *          and contains the lwIP configuration for the STM32F4x7 demonstration.
@@ -13,6 +12,7 @@
 #define __LWIPOPTS_H__
 
 #include "OSinit.h"
+#include <sys/errno.h>
 
 /*!****************************************************************************
  * SYS_LIGHTWEIGHT_PROT==1: if you want inter-task protection for certain
@@ -24,6 +24,16 @@
 #define IP_REASSEMBLY           0
 #define IP_FRAG                 0
 #define ARP_QUEUEING            0
+
+/**
+ * LWIP_TCPIP_CORE_LOCKING_INPUT: when LWIP_TCPIP_CORE_LOCKING is enabled,
+ * this lets tcpip_input() grab the mutex for input packets as well,
+ * instead of allocating a message and passing it to tcpip_thread.
+ *
+ * ATTENTION: this does not work when tcpip_input() is called from
+ * interrupt context!
+ */
+#define LWIP_TCPIP_CORE_LOCKING_INPUT   1
 
 /*!****************************************************************************
  * NO_SYS==1: Provides VERY minimal functionality. Otherwise,
@@ -43,32 +53,38 @@
  * MEM_SIZE: the size of the heap memory. If the application will send
  * a lot of data that needs to be copied, this should be set high
  */
-#define MEM_SIZE                (1 * 1024)
+#define MEM_SIZE                1024
 
 /*!****************************************************************************
  * MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
  * sends a lot of data out of ROM (or other static memory), this
  * should be set high
  */
-#define MEMP_NUM_PBUF           100
+#define MEMP_NUM_PBUF           16
 
 /**
  * MEMP_NUM_NETBUF: the number of struct netbufs.
  * (only needed if you use the sequential API, like api_lib.c)
  */
-#define MEMP_NUM_NETBUF			4
+#define MEMP_NUM_NETBUF			1
 
 /**
  * MEMP_NUM_NETCONN: the number of struct netconns.
  * (only needed if you use the sequential API, like api_lib.c)
  */
-#define MEMP_NUM_NETCONN		4
+#define MEMP_NUM_NETCONN		6
+
+/**
+ * MEMP_NUM_RAW_PCB: Number of raw connection PCBs
+ * (requires the LWIP_RAW option)
+ */
+#define MEMP_NUM_RAW_PCB        2
 
 /*!****************************************************************************
  * MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
  * per active UDP "connection"
  */
-#define MEMP_NUM_UDP_PCB        6
+#define MEMP_NUM_UDP_PCB        2
 
 /*!****************************************************************************
  * MEMP_NUM_TCP_PCB: the number of simulatenously active TCP connections
@@ -78,34 +94,38 @@
 /*!****************************************************************************
  *  MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP connections
  */
-#define MEMP_NUM_TCP_PCB_LISTEN 5
+#define MEMP_NUM_TCP_PCB_LISTEN 1
 
 /*!****************************************************************************
  * MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP segments
  */
-#define MEMP_NUM_TCP_SEG        20
+#define MEMP_NUM_TCP_SEG        16
 
 /*!****************************************************************************
  * MEMP_NUM_SYS_TIMEOUT: the number of simulateously active timeouts
  */
-#define MEMP_NUM_SYS_TIMEOUT    10
+#define MEMP_NUM_SYS_TIMEOUT    6
 
 /*!****************************************************************************
  * Pbuf options
  * PBUF_POOL_SIZE: the number of buffers in the pbuf pool
  */
-#define PBUF_POOL_SIZE          12
+#define PBUF_POOL_SIZE          15
 
 /*!****************************************************************************
  * PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool
  */
-#define PBUF_POOL_BUFSIZE       512
+#define PBUF_POOL_BUFSIZE       256
 
 /*!****************************************************************************
  * TCP options
  */
 #define LWIP_TCP                1
-#define TCP_TTL                 255
+
+/**
+ * TCP_TTL: Default Time-To-Live value
+ */
+#define TCP_TTL                 64
 
 /*!****************************************************************************
  * Controls if TCP should queue segments that arrive out of
@@ -121,7 +141,7 @@
 /*!****************************************************************************
  * TCP sender buffer space (bytes)
  */
-#define TCP_SND_BUF             (5 * TCP_MSS)
+#define TCP_SND_BUF             (4 * TCP_MSS)
 
 /*!****************************************************************************
  * TCP_SND_QUEUELEN: TCP sender buffer space (pbufs). This must be at least
@@ -151,14 +171,7 @@
  * UDP options
  */
 #define LWIP_UDP                1
-#define UDP_TTL                 255
-
-/*!****************************************************************************
- * Statistics options
- */
-#define LWIP_STATS 				0
-#define LWIP_PROVIDE_ERRNO 		1
-
+#define UDP_TTL                 64
 
 /*!****************************************************************************
  * Checksum options
@@ -203,6 +216,19 @@
  */
 #define LWIP_NETCONN                    1
 
+/**
+ * MEMP_NUM_TCPIP_MSG_API: the number of struct tcpip_msg, which are used
+ * for callback/timeout API communication.
+ * (only needed if you use tcpip.c)
+ */
+#define MEMP_NUM_TCPIP_MSG_API          1
+
+/**
+ * MEMP_NUM_TCPIP_MSG_INPKT: the number of struct tcpip_msg, which are used
+ * for incoming packets.
+ * (only needed if you use tcpip.c)
+ */
+#define MEMP_NUM_TCPIP_MSG_INPKT        6
 
 /*!****************************************************************************
  * Socket options
@@ -210,18 +236,80 @@
  */
 #define LWIP_SOCKET                     0
 
+/**
+ * LWIP_RAW==1: Enable application layer to hook into the IP layer itself.
+ */
+#define LWIP_RAW                        1
+
+/**
+ * LWIP_DNS==1: Turn on DNS module. UDP must be available for DNS
+ * transport.
+ */
+#define LWIP_DNS                        1
+
 /*!****************************************************************************
  * DEBUG options
  */
-//#define LWIP_DEBUG
+//#define LWIP_DEBUG						0
+//#define LWIP_DBG_TYPES_ON				LWIP_DBG_TRACE
+//#define LWIP_DBG_MIN_LEVEL              LWIP_DBG_LEVEL_ALL
+
+#define ETHARP_DEBUG                    LWIP_DBG_ON
+#define NETIF_DEBUG                     LWIP_DBG_ON
+#define PBUF_DEBUG                      LWIP_DBG_ON
+#define API_LIB_DEBUG                   LWIP_DBG_ON
+#define API_MSG_DEBUG                   LWIP_DBG_ON
+#define SOCKETS_DEBUG                   LWIP_DBG_ON
+#define ICMP_DEBUG                      LWIP_DBG_ON
+#define IGMP_DEBUG                      LWIP_DBG_ON
+#define INET_DEBUG                      LWIP_DBG_ON
+#define IP_DEBUG                        LWIP_DBG_ON
+#define IP_REASS_DEBUG                  LWIP_DBG_ON
+#define RAW_DEBUG                       LWIP_DBG_ON
+#define MEM_DEBUG                       LWIP_DBG_ON
+#define MEMP_DEBUG                      LWIP_DBG_ON
+#define SYS_DEBUG                       LWIP_DBG_ON
+#define TIMERS_DEBUG                    LWIP_DBG_ON
+#define TCP_DEBUG                       LWIP_DBG_ON
+#define TCP_INPUT_DEBUG                 LWIP_DBG_ON
+#define TCP_FR_DEBUG                    LWIP_DBG_ON
+#define TCP_RTO_DEBUG                   LWIP_DBG_ON
+#define TCP_CWND_DEBUG                  LWIP_DBG_ON
+#define TCP_WND_DEBUG                   LWIP_DBG_ON
+#define TCP_OUTPUT_DEBUG                LWIP_DBG_ON
+#define TCP_RST_DEBUG                   LWIP_DBG_ON
+#define TCP_QLEN_DEBUG                  LWIP_DBG_ON
+#define UDP_DEBUG                       LWIP_DBG_ON
+#define TCPIP_DEBUG                     LWIP_DBG_ON
+#define SLIP_DEBUG                      LWIP_DBG_ON
+#define DHCP_DEBUG                      LWIP_DBG_ON
+#define AUTOIP_DEBUG                    LWIP_DBG_ON
+#define DNS_DEBUG                       LWIP_DBG_ON
+#define IP6_DEBUG                       LWIP_DBG_ON
+
+/*!****************************************************************************
+ * Statistics options
+ */
+#define LWIP_STATS_DISPLAY      		0
+#define LWIP_STATS 						1
+#define LINK_STATS              		1
+#define IP_STATS                		1
+#define IPFRAG_STATS            		1
+#define ICMP_STATS              		1
+#define IGMP_STATS              		1
+#define UDP_STATS               		1
+#define TCP_STATS               		1
+#define MEM_STATS               		1
+#define MEMP_STATS              		1
+#define SYS_STATS               		1
 
 /*!****************************************************************************
  * OS options
  */
-#define TCPIP_MBOX_SIZE                 2
-#define DEFAULT_UDP_RECVMBOX_SIZE       256
-#define DEFAULT_TCP_RECVMBOX_SIZE       256
-#define DEFAULT_ACCEPTMBOX_SIZE         256
+#define TCPIP_MBOX_SIZE                 512
+#define DEFAULT_UDP_RECVMBOX_SIZE       512
+#define DEFAULT_TCP_RECVMBOX_SIZE       512
+#define DEFAULT_ACCEPTMBOX_SIZE         512
 
 /// tcpip_thread
 #define TCPIP_THREAD_STACKSIZE          TCPIP_SZ_STACK

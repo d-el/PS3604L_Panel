@@ -53,7 +53,7 @@ void bubblesTSK(void *pPrm){
 		physics();
 		moveball();
 
-		//Выходим если нажата кновка или повернут энкодер
+		//Выходим если нажата кнопка или повернут энкодер
 		if((keyProc() != 0) || (old_val_encoder != enGeReg())){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			selWindow(baseWindow);

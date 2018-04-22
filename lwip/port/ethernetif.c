@@ -51,7 +51,7 @@
 #include "netif/etharp.h"
 #include "err.h"
 #include "ethernetif.h"
-#include "lwip/timers.h"
+#include "lwip/timeouts.h"
 #include "board.h"
 #include "stm32f4x7_eth.h"
 #include "string.h"
@@ -60,11 +60,11 @@
 #define netifMTU                                (1500)
 #define netifGUARD_BLOCK_TIME					( 250 )
 /* The time to block waiting for input. */
-#define emacBLOCK_TIME_WAITING_FOR_INPUT		( ( TickType_t ) 100 )
+#define emacBLOCK_TIME_WAITING_FOR_INPUT		pdMS_TO_TICKS(100)
 
 /* Define those to better describe your network interface. */
-#define IFNAME0 's'
-#define IFNAME1 't'
+#define IFNAME0 'e'
+#define IFNAME1 '0'
 
 
 static struct netif *s_pxNetIf = NULL;

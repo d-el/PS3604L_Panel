@@ -246,7 +246,6 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.imax);
 		}
-
 		sprintf(str, "%2u.%03u", bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
 		disp_putStr(16, 70, &arial, 0, str);
 		disp_putChar(64, 72, &font8x12, 'A');
@@ -258,10 +257,10 @@ void baseTSK(void *pPrm){
 			disp_setColor(black, ui.color.mode);
 		}
 		if(bs.set[bs.curPreSet].mode == baseImax){
-			disp_putStr(16, 88, &arial, 0, "I max       ");
+			disp_putStr(16, 88, &arial, 0, "I max            ");
 		}
 		if(bs.set[bs.curPreSet].mode == baseILimitation){
-			disp_putStr(16, 88, &arial, 0, "Limiting    ");
+			disp_putStr(16, 88, &arial, 0, "Limiting        ");
 		}
 		if(bs.set[bs.curPreSet].mode == baseUnprotected){
 			disp_putStr(16, 88, &arial, 0, "Unprotected");

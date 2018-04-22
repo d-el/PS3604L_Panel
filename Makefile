@@ -59,10 +59,9 @@ INCLUDES := \
 	-I drivers/inc \
 	-I freertos/inc \
 	-I lib/inc \
+	-I lwip/src/include/lwip \
 	-I lwip/src/include \
 	-I lwip/port/include \
-	-I lwip/src/include/ipv4 \
-	-I lwip/src/include/lwip \
 	-I lwip/port \
 	-I net/inc \
 	-I system/inc \
