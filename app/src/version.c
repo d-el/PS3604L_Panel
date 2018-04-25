@@ -7,11 +7,11 @@
 
 const uint32_t fwinfoMajor    = 2;
 const uint32_t fwinfoMinor    = 1;
-const uint32_t fwinfoRevision = 0;
-const uint32_t fwinfoBuild    = 3626;
+const uint32_t fwinfoRevision = 1;
+const uint32_t fwinfoBuild    = 3691;
 
-const char fwinfoVersion[] = {"2.1.0.3626"};
-const char fwinfoDate[] = {"2018-04-22"};
-const char fwinfoTime[] = {"22:34:47"};
+const char fwinfoVersion[] = {"2.1.1.3691"};
+const char fwinfoDate[] = {"2018-04-25"};
+const char fwinfoTime[] = {"23:50:23"};
 
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

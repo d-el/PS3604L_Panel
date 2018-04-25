@@ -60,12 +60,6 @@ void shutdown(void);
 #define SYS_DEBUG_ERR		(SYS_DEBUG_LEVEL >= 1)
 #define SYS_DEBUG_ALL		(SYS_DEBUG_LEVEL >= 2)
 
-ip_addr_t ipaddr2;
-static void sntp_dns_found(const char* hostname, const ip_addr_t *ipaddr, void *arg){
-	report(1, "DNS hostname: %s\n", hostname);
-	report(1, "DNS IP address: %s\n", ipaddr_ntoa(ipaddr));
-}
-
 /*!****************************************************************************
  * @brief
  */
@@ -75,6 +69,7 @@ void systemTSK(void *pPrm){
 	BaseType_t 		osres = pdTRUE;
 
 	print_init(stdOut_uart);
+
 	report(SYS_DEBUG_ERR, "\n\n===============================================================================\n");
 	report(SYS_DEBUG_ALL, "[SYS] Started systemTSK\n");
 
@@ -94,9 +89,11 @@ void systemTSK(void *pPrm){
 	assert(osres == pdTRUE);
 	report(SYS_DEBUG_ALL, "[SYS] Started httpServerTSK\n");
 
-	//osres = xTaskCreate(monitorTSK, "monitorTSK", configMINIMAL_STACK_SIZE, NULL, UART_TSK_PRIO, NULL);
-	//assert(osres == pdTRUE);
-	//report(SYS_DEBUG_ALL, "[SYS] Started monitorTSK\n");
+	/*
+	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
+	report(SYS_DEBUG_ALL, "[SYS] Started monitorTSK\n");
+	*/
 
 	selWindow(startupWindow);
 

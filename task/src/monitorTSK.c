@@ -33,7 +33,7 @@
  * ``-Wl,--undefined=uxTopUsedPriority'' when using gcc for final
  * linking) to your LDFLAGS; same with all the other symbols you need.
  */
-__attribute((used)) const int uxTopUsedPriority = configMAX_PRIORITIES - 1;
+__attribute__((used)) const int uxTopUsedPriority = configMAX_PRIORITIES - 1;
 uint32_t monitorPeriod = pdMS_TO_TICKS(1000);
 
 /*!****************************************************************************
@@ -48,10 +48,11 @@ void vConfigureTimerForRunTimeStats(void){
  */
 unsigned long vGetTimerForRunTimeStats(void){
 	static uint32_t counter = 0;
-	static uint32_t dwtcycnt = 0;
+	static uint32_t oldcnt = 0;
+	uint32_t cnt = sysTimeMeasGetCnt();
 
-	counter += ((DWT->CYCCNT - dwtcycnt) * 1000ULL) / CORE_FREQUENCY;
-	dwtcycnt = DWT->CYCCNT;
+	counter += sysTimeMeasTo_ms(cnt - oldcnt);
+	oldcnt = cnt;
 
 	return counter;
 }
@@ -59,21 +60,7 @@ unsigned long vGetTimerForRunTimeStats(void){
 /*!****************************************************************************
  * @brief
  */
-void stats_display(void);
 void monitorTSK(void *pPrm){
-	TickType_t xLastWakeTime = xTaskGetTickCount();
-
-	while(1){
-		printp("\n---------- lwIP Monitor ------------\n");
-		//stats_display();
-		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(monitorPeriod));
-	}
-}
-
-/*!****************************************************************************
- * @brief
- */
-void monitorTSK2(void *pPrm){
 		static const char *stateToChar[] = {
 		"Running",		/* A task is querying the state of itself, so must be running. */
 		"Ready",		/* The task being queried is in a read or pending ready list. */
@@ -87,8 +74,6 @@ void monitorTSK2(void *pPrm){
 	uint8_t maxTask = 10;
 	uint32_t taskTimePrev[maxTask];
 	memset(taskTimePrev, 0, sizeof(taskTimePrev));
-
-	printp("%u\n", uxTopUsedPriority);
 
 	while(1){
 		printp("\n---------- OS Monitor ------------\n");

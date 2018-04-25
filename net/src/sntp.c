@@ -29,7 +29,7 @@
 /**
  * SNTP_DEBUG_LEVEL: Enable debugging for SNTP
  */
-#define SNTP_DEBUG_LEVEL	3	//0 - No printed
+#define SNTP_DEBUG_LEVEL	0	//0 - No printed
 								//1 - Error
 								//2 - Sync time
 								//3 - All

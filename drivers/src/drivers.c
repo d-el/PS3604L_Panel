@@ -25,6 +25,7 @@
 #include "rtc.h"
 #include "sysTimeMeas.h"
 #include "gpio.h"
+#include "rng.h"
 #include "systemTSK.h"
 #include "uniqueDeviceId.h"
 #include "24AAxx.h"
@@ -56,7 +57,7 @@ void hardInit(void){
 	}
 	gpio_init();
 	macAddressGen();
-	ETH_BSP_Config();	//configure Ethernet (GPIOs, clocks, MAC, DMA)
+	ETH_BSP_Config();	//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();
 	beep_init();
@@ -70,9 +71,11 @@ void hardInit(void){
 	}
 	uart_init(uart1, BR38400);
 	uart_init(uart3, BR57600);
-	uart_init(uart4, BR1M);	//Debug out
+	uart_init(uart4, BR1M);		//Debug out
 	i2c_init(i2c1);
+	rng_init();
 	eep_init();
+
 	//pvd_init();
 }
 

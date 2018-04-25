@@ -22,11 +22,11 @@
 /*!****************************************************************************
  * MEMORY
  */
+static struct raw_pcb 	*ping_raw_pcb;
 
-/* ping variables */
-static struct raw_pcb 	*ping_pcb;
-
-/* Ping using the raw ip */
+/*!****************************************************************************
+ * @brief	Ping using the raw ip
+ */
 static u8_t pingRecv(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_addr_t *addr){
 	struct icmp_echo_hdr *iecho;
 	assert(p != NULL);
@@ -39,22 +39,21 @@ static u8_t pingRecv(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_ad
 		#ifndef CHECKSUM_BY_HARDWARE
 		inet_chksum(iecho, p->len);
 		#endif
-		raw_sendto(ping_pcb, p, addr);
-
-		pbuf_free(p);
+		raw_sendto(ping_raw_pcb, p, addr);
 	}
 
-	return 0; /* don't eat the packet */
+	pbuf_free(p);
+	return 1; /* Eat the packet. See description raw_recv */
 }
 
 /*!****************************************************************************
- * @brief
+ * @brief	Initialization receive ICMP from any IP
  */
 void ping_init(void){
-	ping_pcb = raw_new(IP_PROTO_ICMP);
-	assert(ping_pcb != NULL);
-	raw_recv(ping_pcb, pingRecv, NULL);
-	raw_bind(ping_pcb, IP_ADDR_ANY);
+	ping_raw_pcb = raw_new(IP_PROTO_ICMP);
+	assert(ping_raw_pcb != NULL);
+	raw_recv(ping_raw_pcb, pingRecv, NULL);
+	raw_bind(ping_raw_pcb, IP_ADDR_ANY);
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

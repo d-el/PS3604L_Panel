@@ -22,7 +22,7 @@
 /**
  * HTTP_DEBUG_LEVEL: Enable debugging for http server
  */
-#define HTTP_DEBUG_LEVEL	2	//0 - No printed
+#define HTTP_DEBUG_LEVEL	0	//0 - No printed
 								//1 - Error
 								//2 - Connected IP Address
 								//3 - All

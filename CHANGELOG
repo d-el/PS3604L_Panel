@@ -1,0 +1,18 @@
+HISTORY
+
+(git master)
+
+  * [Enter new changes just after this line - do not remove this line]
+
+(STABLE-2.1.1)
+
+  ++ Bugfixes:
+
+  2018-04-25:
+  * pingService.c: fix bug: raw pcb recv callback altered pbuf payload pointer without eating packet
+                            pbuf_free: p->ref > 0
+
+  * cc.h: applied a new generation of random numbers
+  
+  2018-04-24:
+  * rand.c, rand.h: added hardware random number generator driver
