@@ -152,12 +152,13 @@ static void sntp_process(u32_t *receive_timestamp){
 	 * @todo: if MSB is 1, SNTP time is 2036-based!
 	 */
 	time_t t = (ntohl(receive_timestamp[0]) - DIFF_SEC_1900_1970);
+	rtc_setTimeUnix(t);
 
 	#if SNTP_DEBUG_TIME
 	rtc_setTimeUnix(t);
 	char str[32];
 	ctime_r(&t, str);
-	report(SNTP_DEBUG_TIME, "[SNTP] Sync time: %s", str);
+	report(SNTP_DEBUG_TIME, "[SNTP] Sync time: %s\n", str);
 	#endif
 }
 

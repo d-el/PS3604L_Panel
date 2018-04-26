@@ -36,7 +36,7 @@ static u8_t pingRecv(void *arg, struct raw_pcb *pcb, struct pbuf *p, const ip_ad
 		ICMPH_TYPE_SET(iecho, ICMP_ER);
 		ICMPH_CODE_SET(iecho, 0);
 		iecho->chksum = 0;
-		#ifndef CHECKSUM_BY_HARDWARE
+		#if HECKSUM_CHECK_ICMP
 		inet_chksum(iecho, p->len);
 		#endif
 		raw_sendto(ping_raw_pcb, p, addr);

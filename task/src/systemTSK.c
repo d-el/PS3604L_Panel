@@ -78,7 +78,6 @@ void systemTSK(void *pPrm){
 	pvd_setSupplyFaultCallBack(shutdown);							// Setup callback for Supply Fault
 
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
-	ping_init();													// Initialize service ping protocol
 	sntp_init();													// Initialize service SNTP
 
 	osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
