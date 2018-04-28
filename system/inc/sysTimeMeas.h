@@ -80,8 +80,8 @@ static inline void sysTimeMeasStop(sysTimeNumber_type n){
 void sysTimeMeasEnable(void);
 void sysTimeMeasDisable(void);
 uint32_t sysTimeMeasGet_cycles(sysTimeNumber_type n);
-uint32_t sysTimeMeasTo_ms(uint32_t cycles);
-uint64_t sysTimeMeasTo_us(uint32_t cycles);
+uint64_t sysTimeMeasTo_ms(uint64_t cycles);
+uint64_t sysTimeMeasTo_us(uint64_t cycles);
 
 #endif //sysTimeMeas_H
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

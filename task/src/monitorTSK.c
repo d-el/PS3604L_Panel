@@ -47,16 +47,17 @@ void vConfigureTimerForRunTimeStats(void){
  * @brief
  */
 unsigned long vGetTimerForRunTimeStats(void){
-	static uint32_t counter = 0;
+	static uint64_t counter = 0;
 	static uint32_t oldcnt = 0;
 	uint32_t cnt = sysTimeMeasGetCnt();
 
-	counter += sysTimeMeasTo_ms(cnt - oldcnt);
+	counter += sysTimeMeasTo_us(cnt - oldcnt);
 	oldcnt = cnt;
 
+	// Return time in us
 	return counter;
 }
-
+uint32_t load;
 /*!****************************************************************************
  * @brief
  */
@@ -86,18 +87,18 @@ void monitorTSK(void *pPrm){
 
 			taskCount = uxTaskGetSystemState(buffer, taskCount, &totalRuntime);
 
-			uint32_t allTaskTime = 0;
-			uint32_t idleTaskTime = 0;
+			uint32_t allTaskPeriodTime = 0;
+			uint32_t idleTaskPeriodTime = 0;
 			for (UBaseType_t task = 0; task < taskCount; task++){
-				allTaskTime += buffer[task].ulRunTimeCounter - taskTimePrev[task];
+				allTaskPeriodTime += buffer[task].ulRunTimeCounter - taskTimePrev[task];
 
 				if(buffer[task].uxCurrentPriority == 0){
-					idleTaskTime = buffer[task].ulRunTimeCounter - taskTimePrev[task];
+					idleTaskPeriodTime = buffer[task].ulRunTimeCounter - taskTimePrev[task];
 				}
 
 				taskTimePrev[task] = buffer[task].ulRunTimeCounter;
 
-				printp("[OS] %20s: %9s, %u, %6u, %u\n",
+				printp("[OS] %20s: %9s, %u, %6u, %u us\n",
 				buffer[task].pcTaskName,
 				stateToChar[buffer[task].eCurrentState],
 				buffer[task].uxCurrentPriority,
@@ -106,14 +107,16 @@ void monitorTSK(void *pPrm){
 			}
 
 			printp("[OS] Current Heap Free Size: %u\n", xPortGetFreeHeapSize());
-			printp("[OS] Total RunTime: %u ms\n", totalRuntime);
+			printp("[OS] Total RunTime: %u us\n", totalRuntime);
 			printp("[OS] System Uptime: %u ms\n", xTaskGetTickCount() * portTICK_PERIOD_MS);
 
-			printp("[OS] All task period time:  %u ms\n", allTaskTime);
-			printp("[OS] Idle task period time: %u ms\n", idleTaskTime);
+			printp("[OS] All task PeriodTime:  %u us\n", allTaskPeriodTime);
+			printp("[OS] Idle task PeriodTime: %u us\n", idleTaskPeriodTime);
 
-			if(allTaskTime >= idleTaskTime){
-				uint32_t load = ((allTaskTime - idleTaskTime) * 100000) / allTaskTime;
+
+			if(allTaskPeriodTime >= idleTaskPeriodTime){
+				uint64_t effectiveTaskPeriodTime = allTaskPeriodTime - idleTaskPeriodTime;
+				load = (effectiveTaskPeriodTime * 100000) / allTaskPeriodTime;
 				printp("[OS] OS load: %u.%03u %%\n", load / 1000, load % 1000);
 			}
 		}

@@ -39,7 +39,13 @@ void startupTSK(void *pPrm){
 		disp_setColor(black, white);
 		disp_fillScreen(black);
 		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, black, white, &ImageLogo);  //Logo
-		sprintf(str, "COUNT %u", startCounter);
+
+		if(fp.state.sysSettingLoadDefault == 0){
+			sprintf(str, "COUNT %u", startCounter);
+		}else{
+			sprintf(str, "COUNT -");
+		}
+
 		disp_putStr(00, 70, &arial, 0, str);
 		disp_putStr(0, 90, &arial, 0, fwinfoVersion);
 		disp_putStr(0, 110, &arial, 0, "2012 - 2018");
@@ -62,14 +68,7 @@ void startupTSK(void *pPrm){
 			}
 		}
 
-		//iq_mandelbrot();
-
-		if(keyState(kMode)){
-			selWindow(settingWindow);
-		}else{
-			selWindow(baseWindow);
-		}
-
+		//Show default settings load message
 		if((fp.state.sysSettingLoadDefault != 0)||((fp.state.userSettingLoadDefault != 0))){
 			disp_fillScreen(black);
 			if(fp.state.sysSettingLoadDefault != 0){
@@ -84,6 +83,12 @@ void startupTSK(void *pPrm){
 				vTaskDelay(pdMS_TO_TICKS(10));
 			}
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
+		}
+
+		if(keyState(kMode)){
+			selWindow(settingWindow);
+		}else{
+			selWindow(baseWindow);
 		}
 	}
 }

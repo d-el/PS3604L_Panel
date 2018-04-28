@@ -10,7 +10,7 @@
 /*!****************************************************************************
  * Include
  */
-#include <printp.h>
+#include "printp.h"
 #include "stdint.h"
 #include "stm32f4xx.h"
 
@@ -67,6 +67,9 @@ void hardFaultHandlerC(unsigned int * stackedContextPtr){
 	printp("PC [R15] = 0x%08X  program counter\n", stacked_pc);
 	printp("PSR = 0x%08X\n", stacked_psr);
 
+	// System Handler Control and State Register
+	printp("SHCSR = 0x%08X\n", SCB->SHCSR);
+
 	// Configurable Fault Status Register
 	// Consists of MMSR, BFSR and UFSR
 	printp("CFSR = 0x%08X\n", SCB->CFSR);
@@ -77,9 +80,6 @@ void hardFaultHandlerC(unsigned int * stackedContextPtr){
 	// Debug Fault Status Register
 	printp("DFSR = 0x%08X\n", SCB->DFSR);
 
-	// Auxiliary Fault Status Register
-	printp("AFSR = 0x%08X\n", SCB->AFSR);
-
 	// Read the Fault Address Registers. These may not contain valid values.
 	// Check BFARVALID/MMARVALID to see if they are valid values
 	// MemManage Fault Address Register
@@ -87,6 +87,9 @@ void hardFaultHandlerC(unsigned int * stackedContextPtr){
 
 	// Bus Fault Address Register
 	printp("BFAR = 0x%08X\n", SCB->BFAR);
+
+	// Auxiliary Fault Status Register
+	printp("AFSR = 0x%08X\n", SCB->AFSR);
 
 	asm("BKPT #1");
 	while(1)

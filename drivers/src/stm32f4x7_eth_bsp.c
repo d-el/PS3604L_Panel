@@ -144,14 +144,10 @@ void ETH_GPIO_Config(void){
 	gppin_init(GPIOB, 11, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TX_EN  -------> PB11
 	gppin_init(GPIOB, 12, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD0	  -------> PB12
 	gppin_init(GPIOB, 13, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD1	  -------> PB13
-	gppin_init(GPIOE, 2, outPushPull, pullDisable, 0, 0);					//ETH_RST_PIN	  -------> PE2
+	gppin_init(GPIOC, 2, outPushPull, pullDisable, 0, 0);					//ETH_RST_PIN	  -------> PC2
 
-	//_gppin_reset(GPIOE, 1 << 2);
-	for(i = 0; i < 20000; i++)
-		;
-	//_gppin_set(GPIOE, 1 << 2);
-	for(i = 0; i < 20000; i++)
-		;
+	for(i = 0; i < 2000; i++);
+	_gppin_set(GPIOC, pinm2);
 }
 
 /**
@@ -160,9 +156,6 @@ void ETH_GPIO_Config(void){
  * @retval None
  */
 void ETH_NVIC_Config(void){
-	/* 2 bit for pre-emption priority, 2 bits for subpriority */
-	//NVIC_SetPriorityGrouping(4);
-
 	/* Enable the Ethernet global Interrupt */
 	#define ETH_InterruptPrior	15
 	NVIC_EnableIRQ(ETH_IRQn);

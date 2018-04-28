@@ -50,7 +50,7 @@ uint32_t sysTimeMeasGet_cycles(sysTimeNumber_type n){
  * @param[in] 	cycles - time in counter cycles
  * @return		time in milliseconds
  */
-uint32_t sysTimeMeasTo_ms(uint32_t cycles){
+uint64_t sysTimeMeasTo_ms(uint64_t cycles){
 	return  (cycles * 1000ULL) / CORE_FREQUENCY;
 }
 
@@ -59,7 +59,7 @@ uint32_t sysTimeMeasTo_ms(uint32_t cycles){
  * @param[in] 	cycles - time in counter cycles
  * @return		time in microseconds
  */
-uint64_t sysTimeMeasTo_us(uint32_t cycles){
+uint64_t sysTimeMeasTo_us(uint64_t cycles){
 	return  (cycles * 1000000ULL) / CORE_FREQUENCY;
 }
 

@@ -155,7 +155,6 @@ static void sntp_process(u32_t *receive_timestamp){
 	rtc_setTimeUnix(t);
 
 	#if SNTP_DEBUG_TIME
-	rtc_setTimeUnix(t);
 	char str[32];
 	ctime_r(&t, str);
 	report(SNTP_DEBUG_TIME, "[SNTP] Sync time: %s\n", str);

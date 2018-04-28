@@ -4,12 +4,30 @@ HISTORY
 
   * [Enter new changes just after this line - do not remove this line]
   
+(STABLE-2.1.3)
+
+  ++ Bugfixes:
+  
+  2018-04-28:
+  * gpio.c: remap gpio
+  * stm32f4x7_eth_bsp.c: added reset PHY
+  * startupTSK.c: fix bug with show default settings load message
+  
+  ++ New features:
+  
+  2018-04-28:
+  * sysTimeMeas.c: incresized converter resolution to 64 bit
+  * monitorTSK.c: change  the report format to microseconds output
+
+  2018-04-27:
+  * debugCore.c: added print SHCSR
+  
 (STABLE-2.1.2)
 
   ++ Bugfixes:
   
   2018-04-26:
-   * sntp.c: fix bug: dous not set time if SNTP_DEBUG_LEVEL < 2
+  * sntp.c: fix bug: dous not set time if SNTP_DEBUG_LEVEL < 2
   
   ++ New features:
   

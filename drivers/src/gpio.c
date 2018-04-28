@@ -24,24 +24,24 @@
 * MEMORY
 */
 const pinMode_type	 const pinsMode[] = {
-/*0 */makepin(GPIOC, 7,		digitalInput,	pullUp,					0, 0), //bMode
-/*1 */makepin(GPIOA, 10,	digitalInput,	pullUp,					0, 0), //bOnOff
-/*2 */makepin(GPIOA, 9,		digitalInput,	pullUp,					0, 0), //bView
-/*3 */makepin(GPIOC, 8,		digitalInput,	pullUp,					0, 0), //bNext
+/*0 */makepin(GPIOE, 5,		digitalInput,	pullUp,					0, 0), //bMode
+/*1 */makepin(GPIOE, 2,		digitalInput,	pullUp,					0, 0), //bOnOff
+/*2 */makepin(GPIOE, 4,		digitalInput,	pullUp,					0, 0), //bView
+/*3 */makepin(GPIOE, 3,		digitalInput,	pullUp,					0, 0), //bNext
 /*4 */makepin(GPIOC, 6,		digitalInput,	pullUp,					0, 0), //bZero
-/*5 */makepin(GPIOD, 2,		digitalInput,	pullUp,					0, 0), //bUp
-/*6 */makepin(GPIOD, 3,		digitalInput,	pullUp,					0, 0), //bDown
+/*5 */makepin(GPIOD, 15,	digitalInput,	pullUp,					0, 0), //bUp
+/*6 */makepin(GPIOD, 14,	digitalInput,	pullUp,					0, 0), //bDown
 
 /*7 */makepin(GPIOD, 5,		outPushPull,	pullDisable,			0, 1), //LCD_RST
 /*8 */makepin(GPIOD, 6,		outPushPull,	pullDisable,			0, 1), //LCD_CS
 /*9 */makepin(GPIOD, 7,		outPushPull,	pullDisable,			0, 1), //LCD_DC
 
-/*10*/makepin(GPIOD, 0,		outPushPull,	pullDisable,			0, 0), //GP_GP0
-/*11*/makepin(GPIOD, 1,		outPushPull,	pullDisable,			0, 0), //GP_GP1
+/*10*/makepin(GPIOD, 10,	digitalInput,	pullUp,					0, 0), //GP_GP0
+/*11*/makepin(GPIOD, 11,	digitalInput,	pullUp,					0, 0), //GP_GP1
 
 /*12*/makepin(GPIOE, 13,	outPushPull,	pullDisable,			0, 0), //LED_GP
 
-/*13*/makepin(GPIOB, 0,		digitalInput,	pullUp,					0, 0),	//LANnINT
+/*13*/makepin(GPIOC, 3,		digitalInput,	pullUp,					0, 0),	//LANnINT
 
 /*14*/makepin(GPIOA, 8,		alternateFunctionPushPull, pullDisable, 0, 0),	//MCO1
 /*15*/makepin(GPIOC, 9,		alternateFunctionPushPull, pullDisable, 0, 0),	//MCO2

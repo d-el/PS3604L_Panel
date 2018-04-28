@@ -20,7 +20,6 @@
 #include "pvd.h"
 #include "board.h"
 #include "ledpwm.h"
-#include "pingService.h"
 #include "sntp.h"
 #include "stm32f4x7_eth.h"
 #include "ethernetif.h"
@@ -88,11 +87,11 @@ void systemTSK(void *pPrm){
 	assert(osres == pdTRUE);
 	report(SYS_DEBUG_ALL, "[SYS] Started httpServerTSK\n");
 
-	/*
+
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	report(SYS_DEBUG_ALL, "[SYS] Started monitorTSK\n");
-	*/
+
 
 	selWindow(startupWindow);
 
