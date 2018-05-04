@@ -53,7 +53,7 @@ void shutdown(void);
 /**
  * SYS_DEBUG_LEVEL: Enable debugging for system task
  */
-#define SYS_DEBUG_LEVEL	0	//0 - No printed
+#define SYS_DEBUG_LEVEL	2	//0 - No printed
 							//1 - Error
 							//2 - All
 #define SYS_DEBUG_ERR		(SYS_DEBUG_LEVEL >= 1)
@@ -69,7 +69,7 @@ void systemTSK(void *pPrm){
 
 	print_init(stdOut_uart);
 
-	report(SYS_DEBUG_ERR, "\n\n===============================================================================\n");
+	report(SYS_DEBUG_ALL, "\n------------- [SYS] --------------\n");
 	report(SYS_DEBUG_ALL, "[SYS] Started systemTSK\n");
 
 	loadParameters();												// Load panel settings and user parameters
@@ -87,11 +87,11 @@ void systemTSK(void *pPrm){
 	assert(osres == pdTRUE);
 	report(SYS_DEBUG_ALL, "[SYS] Started httpServerTSK\n");
 
-
+	/*
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	report(SYS_DEBUG_ALL, "[SYS] Started monitorTSK\n");
-
+ 	 */
 
 	selWindow(startupWindow);
 
@@ -196,13 +196,19 @@ void loadParameters(void){
 	prm_state_type stat;
 
 	stat = prm_load(SYSEEPADR, prmEepSys);
-	if(stat != prm_ok){
+	if(stat == prm_ok){
+		report(SYS_DEBUG_ALL, "[SYS] System settings load ok\n");
+	}else{
+		report(SYS_DEBUG_ERR, "[SYS] System settings load error: %u\n", stat);
 		prm_loadDefault(prmEepSys);
 		fp.state.sysSettingLoadDefault = 1;
 	}
 
 	stat = prm_load(USEREEPADR, prmEep);
-	if(stat != prm_ok){
+	if(stat == prm_ok){
+		report(SYS_DEBUG_ALL, "[SYS] User settings load ok\n");
+	}else{
+		report(SYS_DEBUG_ERR, "[SYS] User settings load error: %u\n", stat);
 		prm_loadDefault(prmEep);
 		fp.state.userSettingLoadDefault = 1;
 	}
@@ -227,7 +233,15 @@ void shutdown(void){
 	pvd_disable();
 	setLcdBrightness(0);
 	LED_OFF();
-	prm_store(USEREEPADR, prmEep);
+
+	prm_state_type stat;
+	stat = prm_store(USEREEPADR, prmEep);
+	if(stat == prm_ok){
+		report(SYS_DEBUG_ALL, "[SYS] System settings store ok\n");
+	}else{
+		report(SYS_DEBUG_ERR, "[SYS] System settings store error: %u\n", stat);
+	}
+
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
 	LED_ON();
 	if(windowTskHandle != NULL){
@@ -303,7 +317,7 @@ void netSettingUpdate(void){
  */
 __tzinfo_type *tt __attribute((used));;
 void timezoneUpdate(void){
-	char str[8];
+	char str[10];
 	sprintf(str, "TZ=GMT%i", fp.fpSet.timezone);
 	putenv(str);
 	tzset();

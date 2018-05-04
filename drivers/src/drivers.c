@@ -75,8 +75,7 @@ void hardInit(void){
 	i2c_init(i2c1);
 	rng_init();
 	eep_init();
-
-	//pvd_init();
+	pvd_init();
 }
 
 /***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/

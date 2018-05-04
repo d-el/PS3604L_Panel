@@ -11,6 +11,7 @@
 * Include
 */
 #include "stm32f4xx.h"
+#include "stddef.h"
 #include "pvd.h"
 
 /*!****************************************************************************
@@ -19,7 +20,7 @@
 static suplyFaultCallBack_type suplyFaultCallBack;
 
 /*!****************************************************************************
-* @brief	Инициализация PVD с прерыванием
+* @brief	PVD initialization
 */
 void pvd_init(void){
 	RCC->APB1ENR	|= RCC_APB1ENR_PWREN;				//Power interface clock enable
@@ -38,7 +39,7 @@ void pvd_init(void){
 }
 
 /*!****************************************************************************
-* @brief	Инициализация PVD с прерыванием
+* @brief	PVD disable
 */
 void pvd_disable(void){
 	PWR->CR			&= ~PWR_CR_PVDE;					//Power voltage detector disable
@@ -56,10 +57,13 @@ void pvd_setSupplyFaultCallBack(suplyFaultCallBack_type callBack){
 }
 
 /*!****************************************************************************
-* @brief	Обработчик прерывания PVD
+* @brief	PVD IRQ handler
 */
 void PVD_IRQHandler(void){
-	suplyFaultCallBack();
+	if(suplyFaultCallBack != NULL){
+		suplyFaultCallBack();
+	}
+	EXTI->PR = EXTI_PR_PR16;	//Pending bit
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/
