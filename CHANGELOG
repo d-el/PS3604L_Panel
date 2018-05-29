@@ -4,7 +4,13 @@ HISTORY
 
   * [Enter new changes just after this line - do not remove this line]
   
-  
+(STABLE-2.1.5)
+
+  ++ New features:
+   2018-05-27:
+   * plog.c, plog.h: new log utils from esp32
+   * menuSystem.c : fix bug - read from null parameter descriptor
+    
 (STABLE-2.1.4)
 
   ++ New features:

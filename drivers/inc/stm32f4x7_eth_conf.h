@@ -49,9 +49,11 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
+#include "assert.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
+#define assert_param assert
 
 /* Uncomment the line below when using time stamping and/or IPv4 checksum offload */
 #define USE_ENHANCED_DMA_DESCRIPTORS
@@ -83,13 +85,20 @@
 
 /* PHY configuration section **************************************************/
 /* PHY Reset delay */
-#define PHY_RESET_DELAY		((uint32_t)0x00000FFF)
+#define PHY_RESET_DELAY			((uint32_t)0x00000FFF)
 /* PHY Configuration delay */
-#define PHY_CONFIG_DELAY	((uint32_t)0x00000FFF)
+#define PHY_CONFIG_DELAY		((uint32_t)0x00000FFF)
+
+/* INTERRUPT SOURCE FLAG REGISTER */
+#define PHY_ISFR				((uint16_t)29)
+
+/* PHY Special Control/Status Register */
+#define PHY_IMR					((uint16_t)30)
+#define PHY_ISFR_LINK_DOWN_MASK	(0x0010)
 
 /* The PHY status register value change from a PHY to another, so the user have
    to update this value depending on the used external PHY */
-#define PHY_SR				((uint16_t)31) /* Value for DP83848 PHY */
+#define PHY_SR					((uint16_t)31) /* Value for LAN8720 PHY */
 
 /* The Speed and Duplex mask values change from a PHY to another, so the user
    have to update this value depending on the used external PHY */
@@ -98,13 +107,6 @@
 #define PHY_10M_FULL					(0x14)
 #define PHY_100BTX_HALF					(0x08)
 #define PHY_100BTX_FULL					(0x18)
-
-/* INTERRUPT SOURCE FLAG REGISTER */
-#define PHY_ISFR						((uint16_t)29)
-
-/* INTERRUPT SOURCE FLAG REGISTER */
-#define PHY_IMR							((uint16_t)30)
-#define PHY_ISFR_LINK_DOWN_MASK			(0x0010)
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */

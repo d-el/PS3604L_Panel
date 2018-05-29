@@ -71,10 +71,11 @@ typedef int sys_prot_t;
 /* Plaform specific diagnostic output */
 #include "assert.h"
 #include "printp.h"
+#include "plog.h"
 #include "rng.h"
 
-#define LWIP_PLATFORM_ASSERT(x) do {printp("%s %d: %s\n", __FILE__, __LINE__, x);} while(0)
-#define LWIP_PLATFORM_DIAG(x)   do {printp x;} while(0)
+#define LWIP_PLATFORM_ASSERT(x) //do {P_LOGE("LWIP", "%s %d: %s\n", __FILE__, __LINE__, x);} while(0)
+#define LWIP_PLATFORM_DIAG(x)   //do {P_LOGD("", x);} while(0)
 #define LWIP_RAND rng_get
 
 #endif /* __CC_H__ */

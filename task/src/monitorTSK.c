@@ -17,12 +17,15 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "portable.h"
-#include "printp.h"
+#include "plog.h"
 #include "sysTimeMeas.h"
 
 /*!****************************************************************************
  * MEMORY
  */
+#define LOG_LOCAL_LEVEL P_LOG_ERROR
+static char *logTag = "MONITOR TSK";
+
 /*
  * Since at least FreeRTOS V7.5.3 uxTopUsedPriority is no longer
  * present in the kernel, so it has to be supplied by other means for
@@ -77,8 +80,6 @@ void monitorTSK(void *pPrm){
 	memset(taskTimePrev, 0, sizeof(taskTimePrev));
 
 	while(1){
-		printp("\n---------- OS Monitor ------------\n");
-
 		UBaseType_t taskCount = uxTaskGetNumberOfTasks();
 
 		if(taskCount <= maxTask){
@@ -98,7 +99,7 @@ void monitorTSK(void *pPrm){
 
 				taskTimePrev[task] = buffer[task].ulRunTimeCounter;
 
-				printp("[OS] %20s: %9s, %u, %6u, %u us\n",
+				P_LOGI(logTag, "%20s: %9s, %u, %6u, %u us\n",
 				buffer[task].pcTaskName,
 				stateToChar[buffer[task].eCurrentState],
 				buffer[task].uxCurrentPriority,
@@ -106,18 +107,18 @@ void monitorTSK(void *pPrm){
 				buffer[task].ulRunTimeCounter);
 			}
 
-			printp("[OS] Current Heap Free Size: %u\n", xPortGetFreeHeapSize());
-			printp("[OS] Total RunTime: %u us\n", totalRuntime);
-			printp("[OS] System Uptime: %u ms\n", xTaskGetTickCount() * portTICK_PERIOD_MS);
+			P_LOGI(logTag, "Current Heap Free Size: %u\n", xPortGetFreeHeapSize());
+			P_LOGI(logTag, "Total RunTime: %u us\n", totalRuntime);
+			P_LOGI(logTag, "System Uptime: %u ms\n", xTaskGetTickCount() * portTICK_PERIOD_MS);
 
-			printp("[OS] All task PeriodTime:  %u us\n", allTaskPeriodTime);
-			printp("[OS] Idle task PeriodTime: %u us\n", idleTaskPeriodTime);
+			P_LOGI(logTag, "All task PeriodTime:  %u us\n", allTaskPeriodTime);
+			P_LOGI(logTag, "Idle task PeriodTime: %u us\n", idleTaskPeriodTime);
 
 
 			if(allTaskPeriodTime >= idleTaskPeriodTime){
 				uint64_t effectiveTaskPeriodTime = allTaskPeriodTime - idleTaskPeriodTime;
 				load = (effectiveTaskPeriodTime * 100000) / allTaskPeriodTime;
-				printp("[OS] OS load: %u.%03u %%\n", load / 1000, load % 1000);
+				P_LOGI(logTag, "OS load: %u.%03u %%\n", load / 1000, load % 1000);
 			}
 		}
 
@@ -129,7 +130,7 @@ void monitorTSK(void *pPrm){
  *
  */
 void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName){
-	printp("[OS] Stack Overflow on %s\n", pcTaskName);
+	P_LOGE(logTag, "Stack Overflow on %s\n", pcTaskName);
 	while(1);
 }
 
@@ -137,7 +138,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName){
  *
  */
 void vApplicationMallocFailedHook(void){
-	printp("[OS] Malloc Failed\n");
+	P_LOGE(logTag, "Malloc Failed\n");
 	while(1);
 }
 

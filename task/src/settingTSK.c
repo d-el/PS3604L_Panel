@@ -127,7 +127,8 @@ itemState_type setBright(const menuItem_type *item){
  * @brief    RTC select callback
  */
 itemState_type rtcSelect(const menuItem_type *item){
-	unixTime = time(NULL);
+	unixTime = time(NULL) + (3600 * fp.fpSet.timezone);
+
 	return (itemState_type) {.state = menuItemOk};
 }
 
@@ -136,7 +137,7 @@ itemState_type rtcSelect(const menuItem_type *item){
  */
 itemState_type rtcUnselect(const menuItem_type *item){
 	timezoneUpdate();
-	rtc_setTimeUnix(unixTime - (60 * fp.fpSet.timezone));
+	rtc_setTimeUnix(unixTime - (3600 * fp.fpSet.timezone));
 	return (itemState_type) {.state = menuItemOk};
 }
 

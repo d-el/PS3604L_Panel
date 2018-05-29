@@ -56,22 +56,22 @@ void hardInit(void){
 		fp.state.mainOscillatorError = 1;
 	}
 	gpio_init();
+	uart_init(uart1, BR38400);
+	uart_init(uart3, BR57600);
+	uart_init(uart4, BR1M);		//Debug out
 	macAddressGen();
-	ETH_BSP_Config();	//Configure Ethernet (GPIOs, clocks, MAC, DMA)
+	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();
 	beep_init();
 	ledPwm_init();
-	initR(INITR_BLACKTAB);	 //Initialize 1.8" TFT - ST7735S chip, black tab
+	initR(INITR_BLACKTAB);	 	//Initialize 1.8" TFT - ST7735S chip, black tab
 	rtcStatus_type rtcStatus = rtc_init();
 	if((rtcStatus == rtc_Ok)&&(rtcStatus == rtc_wasOn)){
 		fp.state.rtcOscillatorError = 0;
 	}else{
 		fp.state.rtcOscillatorError = 1;
 	}
-	uart_init(uart1, BR38400);
-	uart_init(uart3, BR57600);
-	uart_init(uart4, BR1M);		//Debug out
 	i2c_init(i2c1);
 	rng_init();
 	eep_init();

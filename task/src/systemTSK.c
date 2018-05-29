@@ -34,6 +34,7 @@
 #include "httpServerTSK.h"
 #include "baseTSK.h"
 #include "monitorTSK.h"
+#include "plog.h"
 
 /*!****************************************************************************
  * Memory
@@ -45,6 +46,7 @@ struct netif	xnetif; 			///< Network interface structure
 /*!****************************************************************************
  * Local prototypes for the functions
  */
+int _write(int fd, const void *buf, size_t count);
 void loadParameters(void);
 void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
 void netSettingUpdate(void);
@@ -53,6 +55,9 @@ void shutdown(void);
 /**
  * SYS_DEBUG_LEVEL: Enable debugging for system task
  */
+static char *logTag = "SYS";
+#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
+
 #define SYS_DEBUG_LEVEL	2	//0 - No printed
 							//1 - Error
 							//2 - All
@@ -69,8 +74,13 @@ void systemTSK(void *pPrm){
 
 	print_init(stdOut_uart);
 
-	report(SYS_DEBUG_ALL, "\n------------- [SYS] --------------\n");
-	report(SYS_DEBUG_ALL, "[SYS] Started systemTSK\n");
+	//Init log system
+	plog_setVprintf(vprintf);
+	plog_setWrite(_write);
+	plog_setTimestamp(xTaskGetTickCount);
+	plog_setWriteFd(stdOut_uart);
+
+	P_LOGI(logTag, "Started systemTSK");
 
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate();
@@ -81,11 +91,11 @@ void systemTSK(void *pPrm){
 
 	osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
-	report(SYS_DEBUG_ALL, "[SYS] Started uartTSK\n");
+	P_LOGI(logTag, "Started uartTSK");
 
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
-	report(SYS_DEBUG_ALL, "[SYS] Started httpServerTSK\n");
+	P_LOGI(logTag, "Started httpServerTSK");
 
 	/*
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);
@@ -103,7 +113,7 @@ void systemTSK(void *pPrm){
 		if(selWindowPrev != fp.currentSelWindow){
 			if(windowTskHandle != NULL){
 				assert(osres == pdTRUE);	//Fail windowTskHandle
-				report(SYS_DEBUG_ALL, "[SYS] Stopped %s\n", pcTaskGetName(windowTskHandle));
+				P_LOGI(logTag, "Stopped %s", pcTaskGetName(windowTskHandle));
 				vTaskDelete(windowTskHandle);	//Удаляем текущее окно
 			}
 
@@ -132,7 +142,7 @@ void systemTSK(void *pPrm){
 					assert(!"Fail selector");
 			}
 			assert(osres == pdTRUE);	//Fail windowTskHandle
-			report(SYS_DEBUG_ALL, "[SYS] Started %s\n", pcTaskGetName(windowTskHandle));
+			P_LOGI(logTag, "Started %s", pcTaskGetName(windowTskHandle));
 			selWindowPrev = fp.currentSelWindow;
 		}
 
@@ -164,7 +174,7 @@ void systemTSK(void *pPrm){
 				if(fp.state.lanLink != 0){
 					netif_set_link_down(&xnetif);
 					netif_set_down(&xnetif);
-					report(SYS_DEBUG_ALL, "[SYS] LAN link Down\n");
+					P_LOGI(logTag, "LAN link Down");
 					fp.state.lanLink = 0;
 				}
 			}
@@ -172,7 +182,7 @@ void systemTSK(void *pPrm){
 				if(ETH_AutoNegotiation(1, NULL) == ETH_SUCCESS){
 					netif_set_link_up(&xnetif);
 					netif_set_up(&xnetif);	//When the netif is fully configured this function must be called
-					report(SYS_DEBUG_ALL, "[SYS] LAN link Up\n");
+					P_LOGI(logTag, "LAN link Up");
 					fp.state.lanLink = 1;
 				}
 			}
@@ -197,18 +207,18 @@ void loadParameters(void){
 
 	stat = prm_load(SYSEEPADR, prmEepSys);
 	if(stat == prm_ok){
-		report(SYS_DEBUG_ALL, "[SYS] System settings load ok\n");
+		P_LOGI(logTag, "System settings load ok");
 	}else{
-		report(SYS_DEBUG_ERR, "[SYS] System settings load error: %u\n", stat);
+		P_LOGE(logTag, "System settings load error: %u", stat);
 		prm_loadDefault(prmEepSys);
 		fp.state.sysSettingLoadDefault = 1;
 	}
 
 	stat = prm_load(USEREEPADR, prmEep);
 	if(stat == prm_ok){
-		report(SYS_DEBUG_ALL, "[SYS] User settings load ok\n");
+		P_LOGI(logTag, "User settings load ok");
 	}else{
-		report(SYS_DEBUG_ERR, "[SYS] User settings load error: %u\n", stat);
+		P_LOGE(logTag, "User settings load error: %u", stat);
 		prm_loadDefault(prmEep);
 		fp.state.userSettingLoadDefault = 1;
 	}
@@ -237,9 +247,9 @@ void shutdown(void){
 	prm_state_type stat;
 	stat = prm_store(USEREEPADR, prmEep);
 	if(stat == prm_ok){
-		report(SYS_DEBUG_ALL, "[SYS] System settings store ok\n");
+		P_LOGI(logTag, "System settings store ok");
 	}else{
-		report(SYS_DEBUG_ERR, "[SYS] System settings store error: %u\n", stat);
+		P_LOGE(logTag, "System settings store error: %u", stat);
 	}
 
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
@@ -315,10 +325,9 @@ void netSettingUpdate(void){
 
 /*!****************************************************************************
  */
-__tzinfo_type *tt __attribute((used));;
 void timezoneUpdate(void){
 	char str[10];
-	sprintf(str, "TZ=GMT%i", fp.fpSet.timezone);
+	sprintf(str, "TZ=GMT%i", -fp.fpSet.timezone);
 	putenv(str);
 	tzset();
 }

@@ -9,7 +9,6 @@
 /*!****************************************************************************
  * Include
  */
-#include "printp.h"
 #include "OSinit.h"
 #include "FreeRTOS.h"
 #include "task.h"
@@ -23,7 +22,7 @@ void OSinit(void){
 	BaseType_t Result = pdTRUE;
 
 	Result &= xTaskCreate(systemTSK, "systemTSK", SYSTEM_TSK_SZ_STACK, NULL, SYSTEM_TSK_PRIO, NULL);
-	stopif(Result != pdTRUE, return, "can not create systemTSK");
+	assert(Result == pdTRUE);
 	vTaskStartScheduler();
 }
 

@@ -65,7 +65,8 @@ INCLUDES := \
 	-I lwip/port \
 	-I net/inc \
 	-I system/inc \
-	-I task/inc
+	-I task/inc \
+	-I utils/inc
 
 LDFILES	:= -T ldscript/STM32F407VETx_FLASH.ld
 LIBS	:= lib/IQmathLib-cm4.a
@@ -108,7 +109,8 @@ CSRCS := \
 	$(shell find lwip -maxdepth 4 -path lwip/src/core/ipv6 -prune -o -type f -name '*.c' -print) \
 	$(shell find net -maxdepth 3 -type f -name "*.c") \
 	$(shell find system -maxdepth 3 -type f -name "*.c") \
-	$(shell find task -maxdepth 3 -type f -name "*.c")
+	$(shell find task -maxdepth 3 -type f -name "*.c") \
+	$(shell find utils -maxdepth 3 -type f -name "*.c")
 
 #******************************************************************************
 # CPP File

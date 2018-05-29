@@ -573,6 +573,8 @@ typedef struct	{
 #define IS_ETH_PHY_ADDRESS(ADDRESS) ((ADDRESS) <= 0x20)
 #define IS_ETH_PHY_REG(REG) (((REG) == PHY_BCR) || \
 							 ((REG) == PHY_BSR) || \
+							 ((REG) == PHY_ISFR) || \
+							 ((REG) == PHY_IMR) || \
 							 ((REG) == PHY_SR))
 /**
   * @}

@@ -19,22 +19,14 @@
 #include "htmlPage.h"
 #include "httpServerTSK.h"
 
-/**
- * HTTP_DEBUG_LEVEL: Enable debugging for http server
- */
-#define HTTP_DEBUG_LEVEL	0	//0 - No printed
-								//1 - Error
-								//2 - Connected IP Address
-								//3 - All
-#define HTTP_DEBUG_ERR		(HTTP_DEBUG_LEVEL >= 1)
-#define HTTP_DEBUG_IP		(HTTP_DEBUG_LEVEL >= 2)
-#define HTTP_DEBUG_ALL		(HTTP_DEBUG_LEVEL >= 3)
-
-#define LEN					1024
+#define LEN				1024
+#define LOG_LOCAL_LEVEL P_LOG_WARN
 
 /*!****************************************************************************
  * MEMORY
  */
+static char *logTag = "HTTP";
+
 httpServer_type httpServer;
 char pageData[LEN];
 const char http_200[] 				= "HTTP/1.1 200 OK\n";
@@ -71,11 +63,11 @@ void http_server_serve(struct netconn *conn){
 
 	res = netconn_recv(conn, &inbuf);
 	if(res != ERR_OK){
-		report(HTTP_DEBUG_ERR, "[HTTP] Error in netconn_recv, %d\n", res);
+		P_LOGE(logTag, "Error in netconn_recv, %d", res);
 	}
 	else{ //res == ERR_OK
 		netbuf_data(inbuf, (void**)&buf, &buflen);
-		report(HTTP_DEBUG_ALL, "[HTTP] netbuf_data: 0x%x (%u)\n", buf, buflen);
+		P_LOGD(logTag, "Netbuf_data: 0x%x (%u)", buf, buflen);
 
 		if(httpStrcmp(buf, "GET /")){
 			const url_type *url = NULL;
@@ -100,7 +92,7 @@ void http_server_serve(struct netconn *conn){
 				strcat(data, http_headerEnd);
 				uint32_t size = strlen(data);
 				netconn_write(conn, data, size, NETCONN_NOCOPY);
-				report(HTTP_DEBUG_ALL, "[HTTP] netconn_write (%u)\n", size);
+				P_LOGD(logTag, "Netconn_write (%u)", size);
 
 				if(urlData.size != 0){
 					size = urlData.size;
@@ -108,7 +100,7 @@ void http_server_serve(struct netconn *conn){
 					size = strlen(urlData.data.html);
 				}
 				netconn_write(conn, urlData.data.html, size, NETCONN_NOCOPY);
-				report(HTTP_DEBUG_ALL, "[HTTP] netconn_write (%u)\n", size);
+				P_LOGD(logTag, "Netconn_write (%u)", size);
 			}else{
 				strcpy(data, http_404);
 				strcat(data, http_server);
@@ -117,7 +109,7 @@ void http_server_serve(struct netconn *conn){
 				strcat(data, http_headerEnd);
 				uint32_t size = strlen(data);
 				netconn_write(conn, data, size, NETCONN_NOCOPY);
-				report(HTTP_DEBUG_ALL, "[HTTP] netconn_write (%u)\n", size);
+				P_LOGD(logTag, "Netconn_write (%u)", size);
 
 				if(getUrlTable[getUrlNumber - 1].data.size != 0){
 					size = getUrlTable[getUrlNumber - 1].data.size;
@@ -126,12 +118,12 @@ void http_server_serve(struct netconn *conn){
 				}
 
 				netconn_write(conn, getUrlTable[getUrlNumber - 1].data.data.html, size, NETCONN_NOCOPY);
-				report(HTTP_DEBUG_ALL, "[HTTP] netconn_write (%u)\n", size);
+				P_LOGD(logTag, "Netconn_write (%u)", size);
 			}
 		}
 
 		else if(httpStrcmp(buf, "POST /\n")){
-			report(HTTP_DEBUG_ALL, "[HTTP] POST /\n");
+			P_LOGD(logTag, "POST /");
 		}
 	}
 
@@ -158,22 +150,22 @@ void httpServerTSK(void *pPrm){
 	err = netconn_bind(conn, NULL, 80);
 	assert(err == ERR_OK);
 
-	report(HTTP_DEBUG_ALL, "[HTTP] Put the connection into LISTEN state\n");
+	P_LOGD(logTag, "Put the connection into LISTEN state");
 	netconn_listen(conn);
 
 	while(1){
-		report(HTTP_DEBUG_ALL, "[HTTP] Accept any icoming connection\n");
+		P_LOGD(logTag, "Accept any icoming connection");
 		err = netconn_accept(conn, &newconn);
 
 		if(err != ERR_OK){
-			report(HTTP_DEBUG_ERR, "[HTTP] Error %i\n", err);
+			P_LOGE(logTag, "Error %i", err);
 		}
 		else{
 			httpServer.numberRequest++;
-			report(HTTP_DEBUG_IP, "[HTTP] Connection %u, Remote IP address: %s\n", httpServer.numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
+			P_LOGD(logTag, "Connection %u, Remote IP address: %s", httpServer.numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
 			http_server_serve(newconn);
 
-			report(HTTP_DEBUG_ALL, "[HTTP] Delete connection\n");
+			P_LOGD(logTag, "Delete connection\n");
 			netconn_delete(newconn);
 		}
 	}

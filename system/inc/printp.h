@@ -40,34 +40,6 @@ typedef enum{
 /*!****************************************************************************
  * Macro functions
  */
-#ifndef NDEBUG           /* required by ANSI standard */
-
-	#define printp(...) l_print(__VA_ARGS__)
-
-	#define report(test, ...) 				\
-		do { 								\
-			if(test){ 						\
-				l_print(__VA_ARGS__); 		\
-			} 								\
-		}while(0);
-
-	#define stopif(assertion, error_action, ...) {              \
-		if (assertion){                                         \
-			l_print(__VA_ARGS__); 								\
-			{													\
-				error_action;									\
-			}                  									\
-		} }
-
-#else //NDEBUG
-
-	#define printp(...) ((void)0)
-
-	#define report(test, ...) ((void)0)
-
-	#define stopif(assertion, error_action, ...) ((void)0)
-
-#endif /* !NDEBUG */
 
 /*!****************************************************************************
  * Function declaration

@@ -246,7 +246,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 		//Detection of menu item switching
 		if((*sMenu != NULL)&&(sMenuPrev != *sMenu)){
 			editSection = 0;
-			if((*sMenu)->prmHandle->limType == prmLimVariable){
+			if(((*sMenu)->prmHandle != NULL)&&((*sMenu)->prmHandle->limType == prmLimVariable)){
 				setLimit((*sMenu), editSection);
 			}
 			sMenuPrev = *sMenu;
@@ -716,7 +716,8 @@ void printDateVar(char *string, const time_t unixTime, uint8_t editSectionNumber
 void printTimeVar(char *string, const time_t unixTime, uint8_t editSectionNumber, uint8_t *selectionPosition, uint8_t *selectionLength){
 	uint32_t	nchars = 0;
 	struct tm	tm;
-	localtime_r(&unixTime, &tm);
+	//localtime_r(&unixTime, &tm);
+	gmtime_r(&unixTime, &tm);
 	strftime(string, 16, "%H:%M:%S", &tm);
 
 	switch(editSectionNumber){
