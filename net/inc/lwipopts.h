@@ -393,31 +393,33 @@
  * - To disable it and process by CPU comment the  the checksum.
  */
 
+#define CHECKSUM_BY_HARDWARE
+
 /**
  * CHECKSUM_GEN_X==1: Generate checksums in software for outgoing X packets.
  */
-#define CHECKSUM_GEN_IP					1
-#define CHECKSUM_GEN_UDP				1
-#define CHECKSUM_GEN_TCP				1
-#define CHECKSUM_GEN_ICMP				1
-#define CHECKSUM_GEN_ICMP6				1
-#define CHECKSUM_CHECK_IP				1
-#define CHECKSUM_CHECK_UDP				1
-#define CHECKSUM_CHECK_TCP				1
-#define CHECKSUM_CHECK_ICMP				1
-#define CHECKSUM_CHECK_ICMP6			1
+#define CHECKSUM_GEN_IP					0
+#define CHECKSUM_GEN_UDP				0
+#define CHECKSUM_GEN_TCP				0
+#define CHECKSUM_GEN_ICMP				0
+#define CHECKSUM_GEN_ICMP6				0
+#define CHECKSUM_CHECK_IP				0
+#define CHECKSUM_CHECK_UDP				0
+#define CHECKSUM_CHECK_TCP				0
+#define CHECKSUM_CHECK_ICMP				0
+#define CHECKSUM_CHECK_ICMP6			0
 
 /*----------------------------------------
    ---------- Debugging options ----------
    ---------------------------------------*/
-//#define LWIP_DEBUG					0
+//#define LWIP_DEBUG					1
 
 /**
  * LWIP_DBG_TYPES_ON: A mask that can be used to globally enable/disable
  * debug messages of certain types.
  * @see debugging_levels
  */
-#define LWIP_DBG_TYPES_ON				LWIP_DBG_TRACE
+#define LWIP_DBG_TYPES_ON				LWIP_DBG_ON
 
 /**
  * LWIP_DBG_MIN_LEVEL: After masking, the value of the debug is

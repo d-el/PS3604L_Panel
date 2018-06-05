@@ -68,14 +68,17 @@ typedef int sys_prot_t;
 
 #endif
 
-/* Plaform specific diagnostic output */
-#include "assert.h"
-#include "printp.h"
+/* Platform specific diagnostic output */
 #include "plog.h"
-#include "rng.h"
 
-#define LWIP_PLATFORM_ASSERT(x) //do {P_LOGE("LWIP", "%s %d: %s\n", __FILE__, __LINE__, x);} while(0)
-#define LWIP_PLATFORM_DIAG(x)   //do {P_LOGD("", x);} while(0)
+#define LWIP_PRINT_ASSERT(format, ...) plog_write(P_LOG_ERROR, "LWIP", LOG_COLOR_E "E (%d) LWIP: " format LOG_RESET_COLOR, plog_timestamp(), ##__VA_ARGS__)
+#define LWIP_PLATFORM_ASSERT(x) { LWIP_PRINT_ASSERT("%s %d: %s\n", __FILE__, __LINE__, x); }
+
+#define LWIP_PRINT_DIAG(format, ...) plog_write(P_LOG_DEBUG, "LWIP", LOG_COLOR_D "D (%d) LWIP: " format LOG_RESET_COLOR, plog_timestamp(), ##__VA_ARGS__)
+#define LWIP_PLATFORM_DIAG(x) do { LWIP_PRINT_DIAG x ; } while(0)
+
+/* Platform random number generator */
+#include "rng.h"
 #define LWIP_RAND rng_get
 
 #endif /* __CC_H__ */

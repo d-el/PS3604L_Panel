@@ -58,13 +58,18 @@ enum OperationNumber{
  * @param[in] arg0 R1
  * @return R0
  */
-__attribute__ ((noinline))
 int32_t sh_callHost(uint32_t reason, const void* arg0){
-	/* Wait ICEe
-	 */
-	__BKPT(0xAB);
-	register int r0 asm("r0");
-	return r0;
+	int retval;
+
+	asm volatile (	"mov r0, %1\n"
+					"mov r1, %2\n"
+					"bkpt 0xAB\n"
+					"mov %0, r0"
+					: "=r" (retval)
+					: "r" (reason), "r" (arg0)
+				);
+
+	return retval;
 }
 
 /*!****************************************************************************

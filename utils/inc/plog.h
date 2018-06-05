@@ -52,48 +52,11 @@
 
 #define LOG_FORMAT(letter, format)  LOG_COLOR_ ## letter #letter " (%d) %s: " format LOG_RESET_COLOR "\n"
 
-/** @endcond */
-
-/// macro to output logs in startup code, before heap allocator and syscalls have been initialized. log at ``P_LOG_ERROR`` level. @see ``printf``,``P_LOGE``
-#define P_EARLY_LOGE( tag, format, ... ) P_LOG_EARLY_IMPL(tag, format, P_LOG_ERROR,   E, ##__VA_ARGS__)
-/// macro to output logs in startup code at ``P_LOG_WARN`` level.  @see ``P_EARLY_LOGE``,``P_LOGE``, ``printf``
-#define P_EARLY_LOGW( tag, format, ... ) P_LOG_EARLY_IMPL(tag, format, P_LOG_WARN,    W, ##__VA_ARGS__)
-/// macro to output logs in startup code at ``P_LOG_INFO`` level.  @see ``P_EARLY_LOGE``,``P_LOGE``, ``printf``
-#define P_EARLY_LOGI( tag, format, ... ) P_LOG_EARLY_IMPL(tag, format, P_LOG_INFO,    I, ##__VA_ARGS__)
-/// macro to output logs in startup code at ``P_LOG_DEBUG`` level.  @see ``P_EARLY_LOGE``,``P_LOGE``, ``printf``
-#define P_EARLY_LOGD( tag, format, ... ) P_LOG_EARLY_IMPL(tag, format, P_LOG_DEBUG,   D, ##__VA_ARGS__)
-/// macro to output logs in startup code at ``P_LOG_VERBOSE`` level.  @see ``P_EARLY_LOGE``,``P_LOGE``, ``printf``
-#define P_EARLY_LOGV( tag, format, ... ) P_LOG_EARLY_IMPL(tag, format, P_LOG_VERBOSE, V, ##__VA_ARGS__)
-
-#define P_LOG_EARLY_IMPL(tag, format, log_level, log_tag_letter, ...) do {                         \
-        if (LOG_LOCAL_LEVEL >= log_level) {                                                          \
-            ets_printf(LOG_FORMAT(log_tag_letter, format), p_log_timestamp(), tag, ##__VA_ARGS__); \
-        }} while(0)
-
-#ifndef BOOTLOADER_BUILD
 #define P_LOGE( tag, format, ... ) P_LOG_LEVEL_LOCAL(P_LOG_ERROR,   tag, format, ##__VA_ARGS__)
 #define P_LOGW( tag, format, ... ) P_LOG_LEVEL_LOCAL(P_LOG_WARN,    tag, format, ##__VA_ARGS__)
 #define P_LOGI( tag, format, ... ) P_LOG_LEVEL_LOCAL(P_LOG_INFO,    tag, format, ##__VA_ARGS__)
 #define P_LOGD( tag, format, ... ) P_LOG_LEVEL_LOCAL(P_LOG_DEBUG,   tag, format, ##__VA_ARGS__)
 #define P_LOGV( tag, format, ... ) P_LOG_LEVEL_LOCAL(P_LOG_VERBOSE, tag, format, ##__VA_ARGS__)
-#else
-/**
- * macro to output logs at P_LOG_ERROR level.
- *
- * @param tag tag of the log, which can be used to change the log level by ``plog_level_set`` at runtime.
- *
- * @see ``printf``
- */
-#define P_LOGE( tag, format, ... )  P_EARLY_LOGE(tag, format, ##__VA_ARGS__)
-/// macro to output logs at ``P_LOG_WARN`` level.  @see ``P_LOGE``
-#define P_LOGW( tag, format, ... )  P_EARLY_LOGW(tag, format, ##__VA_ARGS__)
-/// macro to output logs at ``P_LOG_INFO`` level.  @see ``P_LOGE``
-#define P_LOGI( tag, format, ... )  P_EARLY_LOGI(tag, format, ##__VA_ARGS__)
-/// macro to output logs at ``P_LOG_DEBUG`` level.  @see ``P_LOGE``
-#define P_LOGD( tag, format, ... )  P_EARLY_LOGD(tag, format, ##__VA_ARGS__)
-/// macro to output logs at ``P_LOG_VERBOSE`` level.  @see ``P_LOGE``
-#define P_LOGV( tag, format, ... )  P_EARLY_LOGV(tag, format, ##__VA_ARGS__)
-#endif  // BOOTLOADER_BUILD
 
 /** runtime macro to output logs at a specified level.
  *

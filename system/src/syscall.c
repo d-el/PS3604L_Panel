@@ -156,7 +156,7 @@ int _close(int file){
  * @retval	Returns -1 on error or number of bytes sent
  */
 __attribute__((weak))
-int _write(int file, char *ptr, int len){
+int _write(int file, const void *ptr, size_t len){
 	errno = ENOSYS;
 	return -1;
 }

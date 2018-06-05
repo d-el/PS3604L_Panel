@@ -23,7 +23,7 @@
 static plog_vprintf_type log_vprintf;
 static plog_write_type log_write;
 static plog_timestamp_type log_timestamp;
-static char log_buf[128];
+static char log_buf[256];
 static int log_fd;
 
 /*!****************************************************************************
@@ -87,11 +87,11 @@ plog_timestamp_type plog_setTimestamp(plog_timestamp_type func){
 void plog_write(plog_level_t level, const char* tag, const char* format, ...){
 	va_list va;
 	va_start(va, format);
-	vsiprintf(log_buf, format, va);
+	int len = vsiprintf(log_buf, format, va);
 	va_end(va);
 
 	if(log_write != NULL){
-		log_write(log_fd, log_buf, strlen(log_buf));
+		log_write(log_fd, log_buf, len);
 	}
 }
 

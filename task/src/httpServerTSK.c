@@ -10,17 +10,17 @@
 /*!****************************************************************************
  * Include
  */
-#include "assert.h"
-#include "printp.h"
-#include "lwip/api.h"
-#include "lwip/ip.h"
 #include "stdio.h"
 #include "string.h"
+#include "assert.h"
+#include "plog.h"
+#include "lwip/api.h"
+#include "lwip/ip.h"
 #include "htmlPage.h"
 #include "httpServerTSK.h"
 
 #define LEN				1024
-#define LOG_LOCAL_LEVEL P_LOG_WARN
+#define LOG_LOCAL_LEVEL P_LOG_ERROR
 
 /*!****************************************************************************
  * MEMORY
@@ -158,7 +158,7 @@ void httpServerTSK(void *pPrm){
 		err = netconn_accept(conn, &newconn);
 
 		if(err != ERR_OK){
-			P_LOGE(logTag, "Error %i", err);
+			P_LOGW(logTag, "Error %i", err);
 		}
 		else{
 			httpServer.numberRequest++;

@@ -13,9 +13,9 @@
 /*!****************************************************************************
  * Include
  */
-#include "printp.h"
 #include "stdlib.h"
 #include "assert.h"
+#include "plog.h"
 #include "prmSystem.h"
 #include "pvd.h"
 #include "board.h"
@@ -35,6 +35,7 @@
 #include "baseTSK.h"
 #include "monitorTSK.h"
 #include "plog.h"
+#include "write.h"
 
 /*!****************************************************************************
  * Memory
@@ -55,14 +56,13 @@ void shutdown(void);
 /**
  * SYS_DEBUG_LEVEL: Enable debugging for system task
  */
+#define TASK_MONITOR_EN	0
+#if(TASK_MONITOR_EN == 0)
+	#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
+#else
+	#define LOG_LOCAL_LEVEL P_LOG_NONE
+#endif
 static char *logTag = "SYS";
-#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
-
-#define SYS_DEBUG_LEVEL	2	//0 - No printed
-							//1 - Error
-							//2 - All
-#define SYS_DEBUG_ERR		(SYS_DEBUG_LEVEL >= 1)
-#define SYS_DEBUG_ALL		(SYS_DEBUG_LEVEL >= 2)
 
 /*!****************************************************************************
  * @brief
@@ -72,13 +72,11 @@ void systemTSK(void *pPrm){
 	selWindow_type 	selWindowPrev = noneWindow;
 	BaseType_t 		osres = pdTRUE;
 
-	print_init(stdOut_uart);
-
 	//Init log system
 	plog_setVprintf(vprintf);
 	plog_setWrite(_write);
 	plog_setTimestamp(xTaskGetTickCount);
-	plog_setWriteFd(stdOut_uart);
+	plog_setWriteFd(write_uart); // write_semihost, write_uart
 
 	P_LOGI(logTag, "Started systemTSK");
 
@@ -97,11 +95,11 @@ void systemTSK(void *pPrm){
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started httpServerTSK");
 
-	/*
+#if(TASK_MONITOR_EN > 0)
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
-	report(SYS_DEBUG_ALL, "[SYS] Started monitorTSK\n");
- 	 */
+	P_LOGI(logTag, "Started monitorTSK");
+#endif
 
 	selWindow(startupWindow);
 

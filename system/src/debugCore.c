@@ -10,9 +10,9 @@
 /*!****************************************************************************
  * Include
  */
-#include "printp.h"
-#include "plog.h"
 #include "stdint.h"
+#include "write.h"
+#include "plog.h"
 #include "stm32f4xx.h"
 
 /*!****************************************************************************
@@ -58,7 +58,7 @@ void hardFaultHandlerC(unsigned int * stackedContextPtr){
 	stacked_pc = stackedContextPtr[6];
 	stacked_psr = stackedContextPtr[7];
 
-	plog_setWriteFd(stdOut_semihost);
+	plog_setWriteFd(write_semihost);
 
 	P_LOGE(logTag, "[GAME OVER]");
 	P_LOGE(logTag, "R0 = 0x%008X", stacked_r0);
