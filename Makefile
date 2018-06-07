@@ -77,9 +77,7 @@ CPUFLAGS := \
 	-mfpu=fpv4-sp-d16 \
 	-DSTM32F407xx
 
-CCFLAGS := \
-	$(CPUFLAGS) \
-	-std=gnu11 \
+COMMONFLAGS := \
 	-g3 -O2 \
 	-fmessage-length=0 \
 	-ffunction-sections \
@@ -89,6 +87,18 @@ CCFLAGS := \
 	-Wfloat-equal \
 	-Wuninitialized \
 	-Wextra
+
+CCFLAGS := \
+	$(CPUFLAGS) \
+	$(COMMONFLAGS) \
+	-std=gnu11
+
+CPPFLAGS := \
+	$(CPUFLAGS) \
+	$(COMMONFLAGS) \
+	-std=c++1y \
+	-fno-rtti \
+	-fno-exceptions
 
 LDFLAGS := \
 	$(CPUFLAGS) \
@@ -137,7 +147,7 @@ DEPS :=	$(CSRCS:%.c=$(OBJODIR)/%.d) \
 		$(ASRCS:%.S=$(OBJODIR)/%.d)
 
 CFLAGS = $(CCFLAGS) $(INCLUDES)
-DFLAGS = $(CCFLAGS) $(INCLUDES)
+CPFLAGS = $(CPPFLAGS) $(INCLUDES)
 
 #******************************************************************************
 # Targets
@@ -151,7 +161,7 @@ prebuild:
 	@echo ' '
 
 mainbuild: prebuild
-	$(Q)$(MAKE) hex
+	$(Q)$(MAKE) robjcopy
 
 postbuild: mainbuild
 	@echo 'Print Size:'
@@ -163,7 +173,7 @@ elf: $(OBJS)
 	$(Q)$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $(ODIR)/$(TARGET).elf
 	@echo ' '
 	
-hex: elf
+robjcopy: elf
 	@echo [OBJCOPY] $@
 	$(Q)$(OBJCOPY) -O ihex $(ODIR)/$(TARGET).elf $(ODIR)/$(TARGET).hex
 	@echo ' '
@@ -179,7 +189,7 @@ disasm: elf
 
 PHONY += listc
 listc:
-	@echo $(CSRCS) $(CPPSRCS)
+	@echo $(CSRCS) $(CPPSRCS) $(CASRCS)
 
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),disasm)
@@ -198,7 +208,7 @@ $(OBJODIR)/%.o: %.c
 $(OBJODIR)/%.o: %.cpp
 	@echo [CPP] $<
 	$(Q)mkdir -p $(dir $@)
-	$(Q)$(CC) -MT $@ -MMD -MP -MF $(OBJODIR)/$*.Td $(CFLAGS) -c -o $@ $<
+	$(Q)$(CC) -MT $@ -MMD -MP -MF $(OBJODIR)/$*.Td $(CPFLAGS) -c -o $@ $<
 	$(Q)mv -f $(OBJODIR)/$*.Td $(OBJODIR)/$*.d && touch $@
 
 $(OBJODIR)/%.o: %.s
