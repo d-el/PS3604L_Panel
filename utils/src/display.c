@@ -47,7 +47,6 @@ void disp_setContentColor(disp_color_type contentColor){
  *
  */
 void disp_setPixel(uint16_t x, uint16_t y, disp_color_type color){
-	//spfd_setPixel(x, y, color);
 	st7735_setPixel(x, y, color);
 }
 

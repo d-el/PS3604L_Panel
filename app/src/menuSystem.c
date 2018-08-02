@@ -17,7 +17,6 @@
 #include "string.h"
 #include "stdlib.h"
 #include "time.h"
-#include "FreeRTOS.h"
 #include "menuSystem.h"
 #include "settingTSK.h"
 #include "ui.h"
@@ -27,6 +26,20 @@
 #include "key.h"
 #include "enco.h"
 #include "beep.h"
+#include "systemTSK.h"
+
+/*!****************************************************************************
+ * Define
+ */
+#define MENU_SCREEN_W       DISP_W
+#define MENU_SCREEN_H       DISP_H
+#define MENU_PATH_FONT      font6x8
+#define MENU_PATH_H         9
+#define MENU_PATH_CHAR_W    6
+#define MENU_ITEM_FONT      font8x12
+#define MENU_ITEM_H         13
+#define MENU_ITEM_CHAR_W    8
+#define MENU_MAXPATH        5
 
 /*!****************************************************************************
  * MEMORY
@@ -52,24 +65,11 @@ const menuItem_type menuTree[] = {
 };
 #undef MENU_ITEM
 
-char mstring[22];
-char vstring[22];
-const menuItem_type *selectedTopMenuPath[5];
-const menuItem_type *selectedMenuPath[5];
-
-/*!****************************************************************************
- * Define
- */
-#define menuFont			font8x12
-#define MENU_SCREEN_W		160
-#define MENU_Y_DISTANCE		13
-#define MENU_CHAR_W			8
+const menuItem_type *selectedTopMenuPath[MENU_MAXPATH];
+const menuItem_type *selectedMenuPath[MENU_MAXPATH];
 
 /*!****************************************************************************
  * Local function declaration
- */
-/*!****************************************************************************
- * @brief	Call function on Select
  */
 void callSelect(const struct menuItem* item);
 void callUnselect(const struct menuItem* item);
@@ -94,17 +94,17 @@ void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, ui
  * @param	startMenuItem	- starting menu item
  */
 void menuEngine(menuItemNumber_type menuItemNumber){
-	TickType_t			xLastWakeTime;				//Вемя ОС
+	TickType_t			xLastWakeTime; //Вемя ОС
 
 	const menuItem_type **topMenu = selectedTopMenuPath;
 	const menuItem_type **sMenu = selectedMenuPath;
 	const menuItem_type *sMenuPrev = NULL;
-
-	uint8_t				bigstepUp = 0;
-	uint8_t				bigstepDown = 0;
-	uint8_t				setDef = 0;
-	uint8_t				editSection = 0;
-	enStatus_type		enstatus = enNoCharge;
+	uint8_t			numItems = 1;
+	uint8_t         startItem = 0;
+	uint8_t			bigstepUp = 0;
+	uint8_t			bigstepDown = 0;
+	uint8_t			setDef = 0;
+	uint8_t			editSection = 0;
 
 	*topMenu = &menuTree[menuItemNumber];
 	*sMenu = *topMenu;
@@ -114,6 +114,11 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 	disp_fillScreen(black);
 	ksSet(15, 5, kUp | kDown);
 	enSetNtic(3);
+
+	numItems = 1;
+	for(const menuItem_type *m = *topMenu; m != m->next; m = m->next){
+		numItems++;
+	}
 
 	while(1){
 		/**************************************
@@ -133,63 +138,25 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 			}
 
 			//Previous
-			if(keyState(kView)){
-				if((*sMenu != NULL)&&(*sMenu != (*sMenu)->previous)){
-					const menuItem_type *item = (*sMenu)->previous;
-
-					while(1){
-						if(item->flags.bit.chmod == chmodMenuAlways){
-							if(item->prmHandle != NULL){
-								if(item->prmHandle->chmod == chmodAlways){
-									callUnselect(*sMenu);
-									*sMenu = item;			//Available select
-									callSelect(*sMenu);
-								}
-								break;
-							}
-							else{
-								callUnselect(*sMenu);
-								*sMenu = item;				//Available select
-								callSelect(*sMenu);
-								break;
-							}
-						}
-						if(item == item->previous){			//Ending
-							break;
-						}
-						item = item->previous;
-					}
-				}
-			}
+			if(keyState(kView) != 0 && *sMenu != NULL){
+                const menuItem_type *item = *sMenu;
+                if(item != item->previous){ //Begin of list
+                    item = item->previous;
+                    callUnselect(*sMenu);
+                    *sMenu = item;
+                    callSelect(*sMenu);
+                }
+            }
 
 			//Next
-			if(keyState(kSet)){
-				if((*sMenu != NULL)&&(*sMenu != (*sMenu)->next)){
-					const menuItem_type *item = (*sMenu)->next;
-
-					while(1){
-						if(item->flags.bit.chmod == chmodMenuAlways){
-							if(item->prmHandle != NULL){
-								if(item->prmHandle->chmod == chmodAlways){
-									callUnselect(*sMenu);
-									*sMenu = item;			//Available select
-									callSelect(*sMenu);
-								}
-								break;
-							}
-							else{
-								callUnselect(*sMenu);
-								*sMenu = item;				//Available select
-								callSelect(*sMenu);
-								break;
-							}
-						}
-						if(item == item->next){				//Ending
-							break;
-						}
-						item = item->next;
-					}
-				}
+			if(keyState(kSet) != 0 && *sMenu != NULL){
+                const menuItem_type *item = *sMenu;
+                if(item != item->next){ //End of list
+                    item = item->next;
+                    callUnselect(*sMenu);
+                    *sMenu = item;
+                    callSelect(*sMenu);
+                }
 			}
 
 			//Parent
@@ -199,54 +166,59 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 					*sMenu = NULL;
 					topMenu--;
 					sMenu--;
+					numItems = 1;
+					for(const menuItem_type *m = *topMenu; m != m->next; m = m->next){
+						numItems++;
+					}
 					callExit(*sMenu);
 					disp_fillScreen(black);
 				}
 				else{
-					//Exit out menu
-					return;
+					return; //Exit
 				}
 			}
 
 			//Child
-			if(keyState(kOnOff)){
-					if((*sMenu != NULL)&&(*sMenu != (*sMenu)->child)){
-					callEnter(*sMenu);
-					topMenu++;
-					*topMenu = (*sMenu)->child;
-					sMenu++;
-					*sMenu = NULL;
-					const menuItem_type *item = *topMenu;
+			if(keyState(kOnOff) && *sMenu != NULL && *sMenu != (*sMenu)->child){
+                callEnter(*sMenu);
+                topMenu++;
+                *topMenu = (*sMenu)->child;
+                sMenu++;
+                *sMenu = NULL;
+                const menuItem_type *item = *topMenu;
 
-					while(1){
-						if(item->flags.bit.chmod == chmodMenuAlways){
-							if(item->prmHandle != NULL){
-								if(item->prmHandle->chmod == chmodAlways){
-									*sMenu = item;			//Available select
-									callSelect(*sMenu);
-								}
-								break;
-							}
-							else{
-								*sMenu = item;				//Available select
-								callSelect(*sMenu);
-								break;
-							}
-						}
-						if(item == item->next){				//Ending
-							break;
-						}
-						item = item->next;
-					}
-					disp_fillScreen(black);
-				}
-			}
+                while(1){
+                    if(item->flags.bit.chmod == chmodMenuAlways){
+                        if(item->prmHandle != NULL){
+                            if(item->prmHandle->chmod == chmodAlways){
+                                *sMenu = item;			//Available select
+                                callSelect(*sMenu);
+                            }
+                            break;
+                        }
+                        else{
+                            *sMenu = item;				//Available select
+                            callSelect(*sMenu);
+                            break;
+                        }
+                    }
+                    if(item == item->next){ //End of list
+                        break;
+                    }
+                    item = item->next;
+                }
+                numItems = 1;
+                for(const menuItem_type *m = *topMenu; m != m->next; m = m->next){
+                    numItems++;
+                }
+                disp_fillScreen(black);
+            }
 		}
 
 		//Detection of menu item switching
-		if((*sMenu != NULL)&&(sMenuPrev != *sMenu)){
+		if(*sMenu != NULL && sMenuPrev != *sMenu){
 			editSection = 0;
-			if(((*sMenu)->prmHandle != NULL)&&((*sMenu)->prmHandle->limType == prmLimVariable)){
+			if((*sMenu)->prmHandle != NULL && (*sMenu)->prmHandle->limType == prmLimVariable){
 				setLimit((*sMenu), editSection);
 			}
 			sMenuPrev = *sMenu;
@@ -255,9 +227,10 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 		/************************
 		 * Editor
 		 */
+		enStatus_type enstatus = enNoCharge;
 		const menuItem_type *eitem = *sMenu;
 		if(eitem->prmHandle != NULL){
-			if((eitem->flags.bit.chmod == chmodMenuAlways)&&(eitem->prmHandle->chmod == chmodAlways)){
+			if(eitem->flags.bit.chmod == chmodMenuAlways && eitem->prmHandle->chmod == chmodAlways){
 				if(bigstepUp != 0){
 					if(eitem->prmHandle->limType == prmLimVariable){
 						if(editSection < 3){
@@ -287,7 +260,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 				}else{
 					enstatus = enUpDate(eitem->prmHandle);
 				}
-				if((enstatus != enNoCharge) && (eitem->pfChanges != NULL)){
+				if(enstatus != enNoCharge && eitem->pfChanges != NULL){
 					callChanges(eitem);
 				}
 				if((enstatus == enLimDown) || (enstatus == enLimUp)){
@@ -319,11 +292,48 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 		printMenuPath(selectedMenuPath, *sMenu);
 
 		/******************************
-		 * Print all menu item in this tree
+		 * Print menu item in this tree
 		 */
+		uint8_t numItems = 0;
+		uint8_t selectedItem = 0;
+		const menuItem_type *item1 = *topMenu;
+		while(1){
+			if(item1 == *sMenu){
+				selectedItem = numItems;
+			}
+			if(item1 == item1->next){
+				break;
+			}
+			item1 = item1->next;
+			numItems++;
+		}
+
+		// Calculate start item
+		uint8_t maItems = (MENU_SCREEN_H - MENU_PATH_H) / MENU_ITEM_H;
+		if(selectedItem - startItem > maItems - 1){
+			startItem++;
+		}
+		if(selectedItem < startItem){
+			startItem = selectedItem;
+		}
+
+		// Skip
 		uint8_t itemNum = 0;
 		const menuItem_type *item = *topMenu;
 		while(1){
+			if(item == item->next || itemNum == startItem){
+				break;
+			}
+			item = item->next;
+			itemNum++;
+		}
+
+		// Print
+		itemNum = 0;
+		while(1){
+			if(itemNum >= maItems){
+				break;
+			}
 			printItem(item, itemNum, item == *sMenu, editSection);
 			if(item == item->next){
 				break;
@@ -333,6 +343,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 		}
 
 		/*************************************/
+		//lcd_flush();
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(MENU_PERIOD));
 	}
 }
@@ -342,7 +353,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
  */
 void printMessageWindow(char *string){
 	disp_fillScreen(black);
-	disp_putStr(0, MENU_Y_DISTANCE, &menuFont, 0, string);
+	disp_putStr(0, MENU_ITEM_H, &MENU_ITEM_FONT, 0, string);
 	while(keyProc() == 0){
 		vTaskDelay(pdMS_TO_TICKS(MENU_PERIOD));
 	}
@@ -353,8 +364,11 @@ void printMessageWindow(char *string){
  * @brief	Call function on Select
  */
 void callSelect(const struct menuItem* item){
-	if((item->pfSelect != NULL)&&(item->prmHandle != NULL)){
+	if(item->pfSelect != NULL && item->prmHandle != NULL){
 		itemState_type res = item->pfSelect(item);
+		if(res.state != menuItemOk){
+			printMessageWindow(res.string);
+		}
 	}
 }
 
@@ -362,8 +376,11 @@ void callSelect(const struct menuItem* item){
  * @brief	Call function on Unselect
  */
 void callUnselect(const struct menuItem* item){
-	if((item->pfUnselect != NULL)&&(item->prmHandle != NULL)){
+	if(item->pfUnselect != NULL && item->prmHandle != NULL){
 		itemState_type res = item->pfUnselect(item);
+		if(res.state != menuItemOk){
+			printMessageWindow(res.string);
+		}
 	}
 }
 
@@ -371,7 +388,7 @@ void callUnselect(const struct menuItem* item){
  * @brief	Call function on Enter
  */
 void callEnter(const struct menuItem* item){
-	if((item->pfSelect != NULL)&&(item->prmHandle == NULL)){
+	if(item->pfSelect != NULL && item->prmHandle == NULL){
 		itemState_type res = item->pfSelect(item);
 		if(res.state != menuItemOk){
 			printMessageWindow(res.string);
@@ -383,7 +400,7 @@ void callEnter(const struct menuItem* item){
  * @brief	Call function on Exit
  */
 void callExit(const struct menuItem *item){
-	if((item->pfUnselect != NULL)&&(item->prmHandle == NULL)){
+	if(item->pfUnselect != NULL && item->prmHandle == NULL){
 		itemState_type res = item->pfUnselect(item);
 		if(res.state != menuItemOk){
 			printMessageWindow(res.string);
@@ -397,6 +414,9 @@ void callExit(const struct menuItem *item){
 void callChanges(const struct menuItem *item){
 	if(item->pfChanges != NULL){
 		itemState_type res = item->pfChanges(item);
+		if(res.state != menuItemOk){
+			printMessageWindow(res.string);
+		}
 	}
 }
 
@@ -406,6 +426,9 @@ void callChanges(const struct menuItem *item){
 void callPeriodic(const struct menuItem *item){
 	if(item->pfPeriod != NULL){
 		itemState_type res = item->pfPeriod(item);
+		if(res.state != menuItemOk){
+			printMessageWindow(res.string);
+		}
 	}
 }
 
@@ -441,6 +464,9 @@ void setLimit(const menuItem_type *menuItem, uint8_t editSection){
 					break;
 			}
 			break;
+
+		default:
+			break;
 	}
 }
 
@@ -448,7 +474,7 @@ void setLimit(const menuItem_type *menuItem, uint8_t editSection){
  * @param menuPath: pointer to menu path
  */
 void printMenuPath(const menuItem_type **menuPath, const menuItem_type *selectedItem){
-	char string[MENU_SCREEN_W / MENU_CHAR_W + 1];
+	char string[MENU_SCREEN_W / MENU_PATH_CHAR_W + 1];
 
 	strcpy(string, "/");
 
@@ -459,11 +485,11 @@ void printMenuPath(const menuItem_type **menuPath, const menuItem_type *selected
 			strcpy(string + strlen(string), "/");
 		}
 	}
-	memset(string + strlen(string), ' ', MENU_SCREEN_W / MENU_CHAR_W - strlen(string));
-	string[MENU_SCREEN_W / MENU_CHAR_W] = 0;
+	memset(string + strlen(string), ' ', MENU_SCREEN_W / MENU_PATH_CHAR_W - strlen(string));
+	string[MENU_SCREEN_W / MENU_PATH_CHAR_W] = 0;
 
 	disp_setColor(black, green);
-	disp_putStr(0, 0, &menuFont, 0, string);	//Вывод на дисплей
+	disp_putStr(0, 0, &MENU_PATH_FONT, 0, string);	//Вывод на дисплей
 }
 
 /*!****************************************************************************
@@ -473,63 +499,63 @@ void printMenuPath(const menuItem_type **menuPath, const menuItem_type *selected
  * @param [in] selectedSectionNumber: selected section number in composite type (e.g. IP, Time)
  */
 void printItem(const menuItem_type *menuItem, uint8_t itemNumber, uint8_t isSelected, uint8_t selectedSectionNumber){
-	struct tm	tm;
-	uint8_t selectionPosition, selectionLength;
+    char string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
+    char vstring[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
+    uint8_t selectionPosition, selectionLength;
 
 	if(menuItem != menuItem->child){
-		sprintf(mstring, "%s/", menuItem->label);
+		sprintf(string, "/%s", menuItem->label);
 	}else{
-		sprintf(mstring, "%s", menuItem->label);
+		sprintf(string, "%s", menuItem->label);
 	}
 
 	if(menuItem->prmHandle == NULL){
-		outItemString(mstring, "", itemNumber, isSelected);
+		outItemString(string, "", itemNumber, isSelected);
 	}
 	else{
 		switch(menuItem->prmHandle->type){
 			case u8Frmt:
 				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->t_u8Frmt);
-				outItemString(mstring, vstring, itemNumber, isSelected);
+				outItemString(string, vstring, itemNumber, isSelected);
 				break;
 			case s8Frmt:
 				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->t_s8Frmt);
-				outItemString(mstring, vstring, itemNumber, isSelected);
+				outItemString(string, vstring, itemNumber, isSelected);
 				break;
 			case u16Frmt:
 				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->t_u16Frmt);
-				outItemString(mstring, vstring, itemNumber, isSelected);
+				outItemString(string, vstring, itemNumber, isSelected);
 				break;
 			case s16Frmt:
 				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->t_s16Frmt);
-				outItemString(mstring, vstring, itemNumber, isSelected);
+				outItemString(string, vstring, itemNumber, isSelected);
 				break;
 			case u32Frmt:
 				printUsigVar(vstring, menuItem, menuItem->prmHandle->prm->t_u32Frmt);
-				outItemString(mstring, vstring, itemNumber, isSelected);
+				outItemString(string, vstring, itemNumber, isSelected);
 				break;
 			case s32Frmt:
 				printSigVar(vstring, menuItem, menuItem->prmHandle->prm->t_s32Frmt);
-				outItemString(mstring, vstring, itemNumber, isSelected);
+				outItemString(string, vstring, itemNumber, isSelected);
 				break;
 			case floatFrmt:
 				printFloatVar(vstring, menuItem);
-				outItemString(mstring, vstring, itemNumber, isSelected);
+				outItemString(string, vstring, itemNumber, isSelected);
 				break;
 			case unixDateFrmt:
 				printDateVar(vstring, menuItem->prmHandle->prm->t_unixDateFrmt, selectedSectionNumber, &selectionPosition, &selectionLength);
-				//outItemStringWithSelection(mstring, vstring, itemNumber, isSelected, selectionPosition, selectionLength);
-				outItemString(mstring, vstring, itemNumber, isSelected);
+				outItemString(string, vstring, itemNumber, isSelected);
 				break;
 			case unixTimeFrmt:
 				printTimeVar(vstring, menuItem->prmHandle->prm->t_unixTimeFrmt, selectedSectionNumber, &selectionPosition, &selectionLength);
-				outItemStringWithSelection(mstring, vstring, itemNumber, isSelected, selectionPosition, selectionLength);
+				outItemStringWithSelection(string, vstring, itemNumber, isSelected, selectionPosition, selectionLength);
 				break;
 			case ipAdrFrmt:
 				printIpVar(vstring, menuItem->prmHandle->prm->t_ipAdrFrmt, selectedSectionNumber, &selectionPosition, &selectionLength);
-				outItemStringWithSelection(mstring, vstring, itemNumber, isSelected, selectionPosition, selectionLength);
+				outItemStringWithSelection(string, vstring, itemNumber, isSelected, selectionPosition, selectionLength);
 				break;
 			default:
-				outItemString(mstring, "Error", itemNumber, isSelected);
+				outItemString(string, "Error", itemNumber, isSelected);
 		}
 	}
 }
@@ -538,93 +564,40 @@ void printItem(const menuItem_type *menuItem, uint8_t itemNumber, uint8_t isSele
  * @brief
  */
 void printUsigVar(char *string, const menuItem_type *menuItem, uint32_t var){
-	switch(menuItem->prmHandle->power){
-		case 0:
-			sprintf(string, "%u%s", var, menuItem->units);
-			break;
-		case 1:
-			sprintf(string, "%u.%01u%s", var / 10, var % 10, menuItem->units);
-			break;
-		case 2:
-			sprintf(string, "%u.%02u%s", var / 100, var % 100, menuItem->units);
-			break;
-		case 3:
-			sprintf(string, "%u.%03u%s", var / 1000, var % 1000, menuItem->units);
-			break;
-		case 4:
-			sprintf(string, "%u.%04u%s", var / 10000, var % 10000, menuItem->units);
-			break;
-		case 5:
-			sprintf(string, "%u.%05u%s", var / 100000, var % 100000, menuItem->units);
-			break;
-		case 6:
-			sprintf(string, "%u.%06u%s", var / 1000000, var % 1000000, menuItem->units);
-			break;
-		default:
-			sprintf(string, "");
-	}
+    static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
+
+    if(menuItem->prmHandle->power == 0){
+        sprintf(string, "%u%s", var, menuItem->units);
+    }else{
+        uint32_t a = var / pows[menuItem->prmHandle->power];
+        uint32_t b = var % pows[menuItem->prmHandle->power];
+        sprintf(string, "%u.%0*u%s", a, menuItem->prmHandle->power, b, menuItem->units);
+    }
 }
 
 /*!****************************************************************************
  * @brief
  */
 void printSigVar(char *string, const menuItem_type *menuItem, int32_t var){
-	switch(menuItem->prmHandle->power){
-		case 0:
-			sprintf(string, "%i%s", var, menuItem->units);
-			break;
-		case 1:
-			sprintf(string, "%i.%01i%s", var / 10, abs(var) % 10, menuItem->units);
-			break;
-		case 2:
-			sprintf(string, "%i.%02i%s", var / 100, abs(var) % 100, menuItem->units);
-			break;
-		case 3:
-			sprintf(string, "%i.%03i%s", var / 1000, abs(var) % 1000, menuItem->units);
-			break;
-		case 4:
-			sprintf(string, "%i.%04i%s", var / 10000, abs(var) % 10000, menuItem->units);
-			break;
-		case 5:
-			sprintf(string, "%i.%05i%s", var / 100000, abs(var) % 100000, menuItem->units);
-			break;
-		case 6:
-			sprintf(string, "%i.%06i%s", var / 1000000, abs(var) % 1000000, menuItem->units);
-			break;
-		default:
-			sprintf(string, "");
-	}
+    static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
+
+    if(menuItem->prmHandle->power == 0){
+        sprintf(string, "%i%s", var, menuItem->units);
+    }else{
+        uint32_t a = abs(var) / pows[menuItem->prmHandle->power];
+        uint32_t b = abs(var) % pows[menuItem->prmHandle->power];
+        if(var < 0){
+            *string++ = '-';
+        }
+        sprintf(string, "%u.%0*u%s", a, menuItem->prmHandle->power, b, menuItem->units);
+    }
 }
 
 /*!****************************************************************************
  * @brief
  */
 void printFloatVar(char *string, const menuItem_type *menuItem){
-	switch(menuItem->prmHandle->power){
-		case 0:
-			sprintf(string, "%.0f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
-			break;
-		case 1:
-			sprintf(string, "%.1f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
-			break;
-		case 2:
-			sprintf(string, "%.2f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
-			break;
-		case 3:
-			sprintf(string, "%.3f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
-			break;
-		case 4:
-			sprintf(string, "%.4f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
-			break;
-		case 5:
-			sprintf(string, "%.5f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
-			break;
-		case 6:
-			sprintf(string, "%.6f%s", menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
-			break;
-		default:
-			sprintf(string, "Error");
-	}
+    sprintf(string, "%.*f%s", menuItem->prmHandle->power, menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 }
 
 /*!****************************************************************************
@@ -682,7 +655,6 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
  * @param [out] selectionLength: selected char length
  */
 void printDateVar(char *string, const time_t unixTime, uint8_t editSectionNumber, uint8_t *selectionPosition, uint8_t *selectionLength){
-	uint32_t	nchars = 0;
 	struct tm	tm;
 	localtime_r(&unixTime, &tm);
 	strftime(string, 16, "%d.%m.%Y", &tm);
@@ -714,9 +686,7 @@ void printDateVar(char *string, const time_t unixTime, uint8_t editSectionNumber
  * @param [out] selectionLength: selected char length
  */
 void printTimeVar(char *string, const time_t unixTime, uint8_t editSectionNumber, uint8_t *selectionPosition, uint8_t *selectionLength){
-	uint32_t	nchars = 0;
 	struct tm	tm;
-	//localtime_r(&unixTime, &tm);
 	gmtime_r(&unixTime, &tm);
 	strftime(string, 16, "%H:%M:%S", &tm);
 
@@ -747,23 +717,23 @@ void printTimeVar(char *string, const time_t unixTime, uint8_t editSectionNumber
  * @param [in] isSelected: item selected flag
  */
 void outItemString(char *label, char *value, uint8_t itemNumber, uint8_t isSelected){
-	char	string[MENU_SCREEN_W / MENU_CHAR_W + 1];
+	char	string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
 	uint8_t	labelLen = strlen(label);
 	uint8_t	valLen = strlen(value);
 
 	memcpy(string, label, labelLen);
 	memset(string + labelLen, ' ', sizeof(string) - labelLen);
-	memcpy(string + MENU_SCREEN_W / MENU_CHAR_W - valLen, value, valLen + 1);
+	memcpy(string + MENU_SCREEN_W / MENU_ITEM_CHAR_W - valLen, value, valLen + 1);
 
-	grf_line(0, itemNumber * MENU_Y_DISTANCE + MENU_Y_DISTANCE - 1,
-			MENU_SCREEN_W - 1, itemNumber * MENU_Y_DISTANCE +  MENU_Y_DISTANCE - 1, halfLightGray);
+	grf_line(0, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1,
+			MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
 
 	if(isSelected != 0){
 		disp_setContentColor(red);
 	}else{
 		disp_setContentColor(white);
 	}
-	disp_putStr(0, MENU_Y_DISTANCE + MENU_Y_DISTANCE * itemNumber, &menuFont, 0, string);
+	disp_putStr(0, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
 }
 
 /*!****************************************************************************
@@ -776,11 +746,11 @@ void outItemString(char *label, char *value, uint8_t itemNumber, uint8_t isSelec
  * @param [in] selectionLength
  */
 void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, uint8_t isSelected, uint8_t selectionPosition, uint8_t selectionLength){
-	char	string[MENU_SCREEN_W / MENU_CHAR_W + 1];
+	char	string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
 	uint8_t poschars = 0;
 
-	grf_line(0, itemNumber * MENU_Y_DISTANCE + MENU_Y_DISTANCE - 1,
-				MENU_SCREEN_W - 1, itemNumber * MENU_Y_DISTANCE +  MENU_Y_DISTANCE - 1, halfLightGray);
+	grf_line(0, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1,
+				MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
 
 	// Print label
 	if(isSelected != 0){
@@ -788,20 +758,20 @@ void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, ui
 	}else{
 		disp_setContentColor(white);
 	}
-	disp_putStr(poschars, MENU_Y_DISTANCE + MENU_Y_DISTANCE * itemNumber, &menuFont, 0, label);
+	disp_putStr(poschars, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, label);
 	poschars += strlen(label);
 
 	// Print spaces
-	memset(string, ' ', MENU_SCREEN_W / MENU_CHAR_W - strlen(label) - strlen(value));
-	string[MENU_SCREEN_W / MENU_CHAR_W - strlen(label) - strlen(value)] = 0;
-	disp_putStr(poschars * MENU_CHAR_W, MENU_Y_DISTANCE + MENU_Y_DISTANCE * itemNumber, &menuFont, 0, string);
+	memset(string, ' ', MENU_SCREEN_W / MENU_ITEM_CHAR_W - strlen(label) - strlen(value));
+	string[MENU_SCREEN_W / MENU_ITEM_CHAR_W - strlen(label) - strlen(value)] = 0;
+	disp_putStr(poschars * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
 	poschars += strlen(string);
 
 	// Print unselect
 	memcpy(string, value, selectionPosition);
 	string[selectionPosition] = 0;
 	disp_setContentColor(white);
-	disp_putStr(poschars * MENU_CHAR_W, MENU_Y_DISTANCE + MENU_Y_DISTANCE * itemNumber, &menuFont, 0, string);
+	disp_putStr(poschars * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
 	poschars += strlen(string);
 
 	// Print select
@@ -812,13 +782,13 @@ void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, ui
 	}else{
 		disp_setContentColor(white);
 	}
-	disp_putStr(poschars * MENU_CHAR_W, MENU_Y_DISTANCE + MENU_Y_DISTANCE * itemNumber, &menuFont, 0, string);
+	disp_putStr(poschars * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
 	poschars += strlen(string);
 
 	// Print unselect
 	strcpy(string, value + selectionPosition + selectionLength);
 	disp_setContentColor(white);
-	disp_putStr(poschars * MENU_CHAR_W, MENU_Y_DISTANCE + MENU_Y_DISTANCE * itemNumber, &menuFont, 0, string);
+	disp_putStr(poschars * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
 }
 
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

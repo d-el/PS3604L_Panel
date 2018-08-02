@@ -18,10 +18,7 @@
 /*!****************************************************************************
  * @brief
  */
-uint32_t *ii;
 void TIM7_IRQHandler(void){
-	uint32_t j[4];
-	ii = j;
 	if((TIME_B_TIM->SR & TIM_SR_UIF) != 0){
 		TIME_B_TIM->ARR = 0;
 		BEEP_TIM->CR1 &= ~TIM_CR1_CEN;

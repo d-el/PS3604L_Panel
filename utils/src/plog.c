@@ -20,7 +20,7 @@
 /*!****************************************************************************
  * MEMORY
  */
-static plog_vprintf_type log_vprintf;
+static plog_vprintf_type log_vsprintf;
 static plog_write_type log_write;
 static plog_timestamp_type log_timestamp;
 static char log_buf[256];
@@ -38,8 +38,8 @@ static int log_fd;
  * @return func old Function used for output.
  */
 plog_vprintf_type plog_setVprintf(plog_vprintf_type func){
-	plog_vprintf_type oldfunc = log_vprintf;
-	log_vprintf = func;
+	plog_vprintf_type oldfunc = log_vsprintf;
+	log_vsprintf = func;
 	return oldfunc;
 }
 
@@ -80,25 +80,27 @@ plog_timestamp_type plog_setTimestamp(plog_timestamp_type func){
  * @brief Write message into the log
  *
  * This function is not intended to be used directly. Instead, use one of
- * ESP_LOGE, ESP_LOGW, ESP_LOGI, ESP_LOGD, ESP_LOGV macros.
+ * P_LOGE, P_LOGW, P_LOGI, P_LOGD, P_LOGV macros.
  *
  * This function or these macros should not be used from an interrupt.
  */
 void plog_write(plog_level_t level, const char* tag, const char* format, ...){
-	va_list va;
-	va_start(va, format);
-	int len = vsiprintf(log_buf, format, va);
-	va_end(va);
+	if(log_vsprintf != NULL){
+		va_list va;
+		va_start(va, format);
+		int len = log_vsprintf(log_buf, format, va);
+		va_end(va);
 
-	if(log_write != NULL){
-		log_write(log_fd, log_buf, len);
+		if(log_write != NULL){
+			log_write(log_fd, log_buf, len);
+		}
 	}
 }
 
 /*!****************************************************************************
  * @brief Function which returns timestamp to be used in log output
  *
- * This function is used in expansion of ESP_LOGx macros.
+ * This function is used in expansion of P_LOGx macros.
  * In the 2nd stage bootloader, and at early application startup stage
  * this function uses CPU cycle counter as time source. Later when
  * FreeRTOS scheduler start running, it switches to FreeRTOS tick count.

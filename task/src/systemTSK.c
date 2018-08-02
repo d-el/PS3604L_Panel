@@ -73,7 +73,7 @@ void systemTSK(void *pPrm){
 	BaseType_t 		osres = pdTRUE;
 
 	//Init log system
-	plog_setVprintf(vprintf);
+	plog_setVprintf(vsprintf);
 	plog_setWrite(_write);
 	plog_setTimestamp(xTaskGetTickCount);
 	plog_setWriteFd(write_uart); // write_semihost, write_uart
