@@ -3,11 +3,7 @@
  * @author		d_el
  * @version		V1.0
  * @date		05.07.2013
- * @brief
- * @copyright	Copyright (C) 2013 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 #ifndef DRIVERS_H
 #define DRIVERS_H
@@ -40,4 +36,4 @@ extern uint8_t macAddress[6];
 void hardInit(void);
 
 #endif //DRIVERS_H
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

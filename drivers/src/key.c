@@ -3,7 +3,7 @@
  * @author		d_el
  * @version		V1.0
  * @date		07.06.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver for keyboard
  */
 
@@ -112,4 +112,4 @@ void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, kKey_type reiter
 	key.reiterationSelect = reiterationKeyMask;
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

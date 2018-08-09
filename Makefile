@@ -114,7 +114,7 @@ LDFLAGS := \
 CSRCS := \
 	$(shell find app -maxdepth 3 -type f -name "*.c") \
 	$(shell find cm4 -maxdepth 7 -type f -name "*.c") \
-	$(shell find drivers -maxdepth 3 -type f -name "*.c" -not -path "drivers/src/core/src/spfd54124b.c") \
+	$(shell find drivers -maxdepth 3 -type f -name "*.c") \
 	$(shell find freertos -maxdepth 3 -type f -name "*.c") \
 	$(shell find lwip -maxdepth 4 -path lwip/src/core/ipv6 -prune -o -type f -name '*.c' -print) \
 	$(shell find net -maxdepth 3 -type f -name "*.c") \

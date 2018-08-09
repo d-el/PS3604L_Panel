@@ -3,11 +3,8 @@
  * @author		d_el
  * @version		V1.5
  * @date		18.12.2017
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver for I2C STM32F4 MCUs
- * @copyright	Copyright (C) 2017 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
  */
 #ifndef i2c_H
 #define i2c_H
@@ -120,4 +117,4 @@ void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr);
 void i2c_read(i2c_type *i2cx, void *dst, uint16_t len, uint8_t slaveAdr);
 
 #endif //i2c_H
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

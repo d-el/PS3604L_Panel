@@ -2,9 +2,9 @@
  * @file		ledpwm.c
  * @author		d_el
  * @version		V1.0
- * @date		27.12.2015, by d_el
+ * @date		27.12.2015
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		pwm for lcd led
- * @copyright	GNU Public License
  */
 
 /*!****************************************************************************
@@ -38,4 +38,4 @@ void ledPwm_init(void){
 	TIM5->CR1	|= TIM_CR1_CEN;								//Count enable
 }
 
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/******************************** END OF FILE ********************************/

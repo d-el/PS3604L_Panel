@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.1
  * @date		18.10.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Parameters system
  */
 
@@ -237,4 +237,4 @@ prm_state_type prm_load(void *pMemory, prmNvSave_type prmNvSave){
 	return prm_ok;
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

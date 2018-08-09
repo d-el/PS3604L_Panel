@@ -75,3 +75,4 @@ static const uint8_t image_data_ImageLogo[950] = {
 
 const image_type ImageLogo = { image_data_ImageLogo, 150, 50};
 
+/******************************** END OF FILE ********************************/

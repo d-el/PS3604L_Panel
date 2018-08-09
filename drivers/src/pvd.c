@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		01.08.2016
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver power voltage detector
  */
 
@@ -66,4 +66,4 @@ void PVD_IRQHandler(void){
 	EXTI->PR = EXTI_PR_PR16;	//Pending bit
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

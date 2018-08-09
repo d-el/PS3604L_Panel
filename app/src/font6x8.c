@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		06.08.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Font 6 x 8 pix
  */
 
@@ -1039,4 +1039,4 @@ static const char_type font6x8_array[] = {
 
 const font_type font6x8 = { 177, font6x8_array };
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

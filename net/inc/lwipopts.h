@@ -1,11 +1,12 @@
 ﻿/******************************************************************************
-  * @file	 lwipopts.h
-  * @author	 Storozhenko Roman
-  * @version V1.0
-  * @date	 22.04.2018
-  * @brief	 lwIP Options Configuration.
-  *			 This file is based on Utilities\lwip_v1.3.2\src\include\lwip\opt.h
-  *			 and contains the lwIP configuration for the STM32F4x7 demonstration.
+  * @file		lwipopts.h
+  * @author	 	Storozhenko Roman
+  * @version	V1.0
+  * @date		22.04.2018
+  * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+  * @brief		lwIP Options Configuration.
+  *				This file is based on Utilities\lwip_v1.3.2\src\include\lwip\opt.h
+  *				and contains the lwIP configuration for the STM32F4x7 demonstration.
   */
 
 #ifndef LWIPOPTS_L
@@ -466,4 +467,4 @@
 #define IP6_DEBUG						LWIP_DBG_OFF
 
 #endif /*LWIPOPTS_H */
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/******************************** END OF FILE ********************************/

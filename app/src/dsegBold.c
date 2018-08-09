@@ -942,4 +942,4 @@ static const char_type dSegBold_array[] = {
 
 const font_type dSegBold = { 0x39, dSegBold_array };
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

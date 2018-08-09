@@ -1,7 +1,8 @@
 ﻿/*!****************************************************************************
- * @file	mandelbrot.h
- * @author	Storozhenko Roman - D_EL
- * @version V1.0.0
+ * @file		mandelbrot.h
+ * @author		Storozhenko Roman - D_EL
+ * @version		V1.0.0
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 #ifndef mandelbrot_H
 #define mandelbrot_H
@@ -24,4 +25,4 @@
 void iq_mandel(_iq cx, _iq cy, _iq scale);
 
 #endif	//mandelbrot_H
-/******************* (C) COPYRIGHT ***************** END OF FILE ********* D_EL *****/
+/******************************** END OF FILE ********************************/

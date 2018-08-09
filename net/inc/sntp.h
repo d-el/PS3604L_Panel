@@ -3,7 +3,7 @@
  * @author		Author: Simon Goldschmidt (lwIP raw API part), d_el - Storozhenko Roman
  * @version		V1.0
  * @date		24.09.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		SNTP client module
  */
 #ifndef sntp_H
@@ -39,4 +39,4 @@
 void sntp_init(void);
 
 #endif //sntp_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

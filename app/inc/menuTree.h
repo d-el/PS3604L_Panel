@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		10.02.2016
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Parameters table
  */
 
@@ -52,5 +52,4 @@ MENU_ITEM(lan			,"LAN"		,""		,NULL			,chmodMenuAlways	,0		,NULL		,NULL		,netUpda
 /*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 MENU_ITEM(brightness	,"Bright"	,"%"	,&prmh[Nbrightness]	,chmodMenuAlways	,0		,setBright	,NULL		,NULL		,NULL		,lan		,brightness	,brightness	,brightness)
 
-
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

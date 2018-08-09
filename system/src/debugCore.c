@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		15.01.2016
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Debug utils, HardFault_Handler tracer
  */
 
@@ -104,17 +104,17 @@ void hardFaultHandlerC(unsigned int * stackedContextPtr){
  */
 void HardFault_Handler(void){
 	__asm volatile (
-			" 		MOVS   R0, #4							\n" /* Determine if processor uses PSP or MSP by checking bit.4 at LR register.		*/
-			"		MOV    R1, LR							\n"
-			"		TST    R0, R1							\n"
-			"		BEQ    _IS_MSP							\n" /* Jump to '_MSP' if processor uses MSP stack.									*/
-			"_IS_PSP:                                       \n"
-			"		MRS    R0, PSP							\n" /* Prepare PSP content as parameter to the calling function below.				*/
-			"		BL	   hardFaultHandlerC      			\n" /* Call 'hardfaultGetContext' passing PSP content as stackedContextPtr value.	*/
+			" 		MOVS	R0, #4							\n" /* Determine if processor uses PSP or MSP by checking bit.4 at LR register.		*/
+			"		MOV		R1, LR							\n"
+			"		TST		R0, R1							\n"
+			"		BEQ		_IS_MSP							\n" /* Jump to '_MSP' if processor uses MSP stack.									*/
+			"_IS_PSP:										\n"
+			"		MRS		R0, PSP							\n" /* Prepare PSP content as parameter to the calling function below.				*/
+			"		BL		hardFaultHandlerC				\n" /* Call 'hardfaultGetContext' passing PSP content as stackedContextPtr value.	*/
 			"_IS_MSP:										\n"
-			"		MRS    R0, MSP							\n" /* Prepare MSP content as parameter to the calling function below.				*/
-			"		BL	   hardFaultHandlerC		        \n" /* Call 'hardfaultGetContext' passing MSP content as stackedContextPtr value.	*/
+			"		MRS		R0, MSP							\n" /* Prepare MSP content as parameter to the calling function below.				*/
+			"		BL		hardFaultHandlerC				\n" /* Call 'hardfaultGetContext' passing MSP content as stackedContextPtr value.	*/
 			:: );
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

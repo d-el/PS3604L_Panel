@@ -3,8 +3,8 @@
 * @author		d_el - Storozhenko Roman
 * @version		V1.0
 * @date			07.07.2017
+* @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
 * @brief		Startup STM32F407xx
-* @copyright	GNU Lesser General Public License v3
 */
 
 /*!****************************************************************************
@@ -296,4 +296,4 @@ intVector_type intVector[] __attribute__ ((section (".isr_vector"))) = {
 	FPU_IRQHandler,
 };
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

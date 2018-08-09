@@ -4,8 +4,8 @@
  * @version		V2.3
  * @date		13.05.2015
  * @date		14.11.2016 fix "temp > enco.top"
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Средства работы с энкодером
- * @copyright	GNU Public License
  */
 #ifndef ENCO_H
 #define ENCO_H
@@ -60,4 +60,4 @@ enStatus_type enUpDate(const prmHandle_type *prmHandle);
 void enSetNtic(uint16_t n);
 
 #endif //ENCO_H
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/******************************** END OF FILE ********************************/

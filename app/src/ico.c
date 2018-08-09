@@ -96,3 +96,4 @@ static const char_type ico_array[] = {
 
 const font_type ico = { 3, ico_array };
 
+/******************************** END OF FILE ********************************/

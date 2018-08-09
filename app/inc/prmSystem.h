@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		08.02.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Parameters system
  */
 #ifndef PRMSYSTEM_H
@@ -157,4 +157,4 @@ prm_state_type prm_store(void *pMemory, prmNvSave_type prmNvSave);
 prm_state_type prm_load(void *pMemory, prmNvSave_type prmNvSave);
 
 #endif /* PRMSYSTEM_H */
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

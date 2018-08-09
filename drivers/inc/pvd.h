@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		01.08.2016
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver power voltage detector
  */
 #ifndef pvd_H
@@ -47,4 +47,4 @@ void pvd_disable(void);
 void pvd_setSupplyFaultCallBack(suplyFaultCallBack_type callBack);
 
 #endif //pvd_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

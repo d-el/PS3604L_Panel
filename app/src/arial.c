@@ -2126,4 +2126,4 @@ static const char_type arial_array[] = {
 
 const font_type arial = { 95, arial_array };
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

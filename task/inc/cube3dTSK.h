@@ -1,9 +1,9 @@
 ﻿/*!****************************************************************************
- * @file    cube3d.c
- * @author
- * @version V1.0
- * @date    31.10.2013
- * @brief
+ * @file		cube3d.c
+ * @author		Storozhenko Roman
+ * @version		V1.0
+ * @date		31.10.2013
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 #ifndef CUBE3D_H
 #define CUBE3D_H
@@ -45,5 +45,4 @@ typedef struct {
 void cube3dTSK(void *pPrm);
 
 #endif //CUBE3D_H
-
-/******************* (C) COPYRIGHT ***************** END OF FILE ********* D_EL *****/
+/******************************** END OF FILE ********************************/

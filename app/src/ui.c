@@ -3,6 +3,7 @@
  * @author		d_el
  * @version		V1.0
  * @date		20.12.2015, by d_el
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		user interface
  */
 
@@ -40,5 +41,4 @@ const ui_type ui = {
 	}
 };
 
-/***************** (C) COPYRIGHT ************** END OF FILE ******** d_el ****/
-
+/******************************** END OF FILE ********************************/

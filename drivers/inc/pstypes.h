@@ -3,6 +3,7 @@
  * @author		d_el
  * @version		V1.1
  * @date		13.12.2017, by d_el
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 #ifndef types_H
 #define types_H
@@ -113,4 +114,4 @@ typedef struct {
  */
 
 #endif //types_H
-/***************** (C) COPYRIGHT ************** END OF FILE ******** d_el ****/
+/******************************** END OF FILE ********************************/

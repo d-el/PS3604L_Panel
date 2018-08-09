@@ -3,11 +3,8 @@
  * @author		d_el
  * @version		V1.0
  * @date		01.08.2017
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Time meter on DWT cycle counter
- * @copyright	Copyright (C) 2017 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -63,4 +60,4 @@ uint64_t sysTimeMeasTo_us(uint64_t cycles){
 	return  (cycles * 1000000ULL) / CORE_FREQUENCY;
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

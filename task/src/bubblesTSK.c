@@ -3,7 +3,7 @@
  * @author		D_EL - Storozhenko Roman
  * @version		V1.0
  * @date		19.08.2014
- * @copyright	GNU Public License
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 
 /*!****************************************************************************

@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		06.08.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Font 8 x 12 pix
  */
 
@@ -1137,4 +1137,4 @@ static const char_type font8x12_array[] = {
 
 const font_type font8x12 = { 160, font8x12_array };
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

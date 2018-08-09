@@ -14,4 +14,4 @@ const char fwinfoVersion[] = {"2.1.5.3963"};
 const char fwinfoDate[] = {"2018-05-31"};
 const char fwinfoTime[] = {"12:39:24"};
 
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		26.06.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 #ifndef uniqueDeviceId_H
 #define uniqueDeviceId_H
@@ -43,4 +43,4 @@ uint32_t getDid(void);
 uint8_t checkUniqDevId(void);
 
 #endif //uniqueDeviceId_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

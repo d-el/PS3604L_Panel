@@ -3,11 +3,8 @@
  * @author		d_el
  * @version		V1.1
  * @date		13.12.2017
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		connect interface with regulator
- * @copyright	Copyright (C) 2017 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license.	 See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -163,4 +160,4 @@ static void uartTskHook(uart_type *puart){
 	}
 }
 
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

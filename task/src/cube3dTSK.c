@@ -1,9 +1,9 @@
 ﻿/*!****************************************************************************
- * @file	cube3d.c
- * @author
- * @version V1.0
- * @date	31.10.2013
- * @brief
+ * @file		cube3d.c
+ * @author		Storozhenko Roman
+ * @version		V1.0
+ * @date		31.10.2013
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 
 /*!****************************************************************************

@@ -3,11 +3,8 @@
  * @author		d_el
  * @version		V1.0
  * @date		31.01.2018
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver display on controller ST7735
- * @copyright	Copyright (C) 2017 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
  */
 
 #ifndef st7735_H
@@ -89,4 +86,4 @@ void initB(void);
 void initR(uint8_t options);
 
 #endif //st7735_H
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

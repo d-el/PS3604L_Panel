@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		15.01.2016
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Debug utils, HardFault_Handler tracer
  */
 #ifndef debugCore_H
@@ -39,4 +39,4 @@
 uint32_t coreIsInDebugMode(void);
 
 #endif //debugCore_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		06.09.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		HTTP Server
  */
 #ifndef httpServerTSK_H
@@ -44,4 +44,4 @@ extern httpServer_type httpServer;
 void httpServerTSK(void *pPrm);
 
 #endif //httpServerTSK__H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

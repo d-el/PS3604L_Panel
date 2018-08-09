@@ -3,10 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		17.11.2017
- * @copyright	Copyright (C) 2017 d_el
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 
 /*!****************************************************************************
@@ -321,4 +318,4 @@ void grf_fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2
 	}
 }
 
-/******************************* END OF FILE *********** D_EL ****************/
+/******************************** END OF FILE ********************************/

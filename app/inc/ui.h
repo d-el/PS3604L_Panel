@@ -4,6 +4,7 @@
  * @version		V1.0
  * @date		20.12.2015, by d_el
  * @brief		user interface
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 #ifndef ui_H
 #define ui_H
@@ -71,4 +72,4 @@ extern const ui_type ui;
  */
 
 #endif //ui_H
-/***************** (C) COPYRIGHT ************** END OF FILE ******** d_el ****/
+/******************************** END OF FILE ********************************/

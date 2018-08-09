@@ -3,11 +3,8 @@
  * @author		d_el
  * @version		V1.0
  * @date		21.12.2015
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver for eeprom memory 24AA04, 24AA08
- * @copyright	Copyright (C) 2013 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -155,4 +152,4 @@ eepStatus_type eep_read(void *dst, uint16_t src, uint16_t len){
 	return eepOk;
 }
 
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

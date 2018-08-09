@@ -3,21 +3,14 @@
  * @author		d_el
  * @version		V1.0
  * @date		22.11.2016
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		gpio driver for stm32F4 microcontroller
- * @copyright	Copyright (C) 2013 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
- */
 
 /*!****************************************************************************
 * Include
 */
 #include "bitbanding.h"
 #include "board.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
 #include "gpio.h"
 
 /*!****************************************************************************
@@ -139,4 +132,4 @@ void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_t
 	}
 }
 
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

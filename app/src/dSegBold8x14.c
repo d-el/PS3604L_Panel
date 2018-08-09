@@ -582,3 +582,4 @@ static const char_type dSegBold8x14_array[] = {
 
 const font_type dSegBold8x14 = { 26, dSegBold8x14_array };
 
+/******************************** END OF FILE ********************************/

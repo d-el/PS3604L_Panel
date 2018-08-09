@@ -3,7 +3,7 @@
  * @author		d_el
  * @version		V1.0
  * @date		19.12.2014
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver beep
  */
 #ifndef beep_H
@@ -46,4 +46,4 @@ void beep_init(void);
 void Dht(void *pvParameters);
 
 #endif //beep_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

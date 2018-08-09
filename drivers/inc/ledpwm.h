@@ -3,8 +3,8 @@
  * @author		d_el
  * @version		V1.0
  * @date		27.12.2015
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		pwm for lcd led
- * @copyright	GNU Public License
  */
 #ifndef ledpwm_H
 #define ledpwm_H
@@ -41,4 +41,4 @@
 void ledPwm_init(void);
 
 #endif //ledpwm_H
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/******************************** END OF FILE ********************************/

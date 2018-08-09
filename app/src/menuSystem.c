@@ -2,8 +2,8 @@
  * @file		menuSystem.c
  * @author		Storozhenko Roman - D_EL
  * @version		V1.3
- * @copyright	GNU Lesser General Public License v3
  * @date		06.061.2018
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		menu system
  */
 
@@ -100,7 +100,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 	const menuItem_type **sMenu = selectedMenuPath;
 	const menuItem_type *sMenuPrev = NULL;
 	uint8_t			numItems = 1;
-	uint8_t         startItem = 0;
+	uint8_t			startItem = 0;
 	uint8_t			bigstepUp = 0;
 	uint8_t			bigstepDown = 0;
 	uint8_t			setDef = 0;
@@ -139,24 +139,24 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 
 			//Previous
 			if(keyState(kView) != 0 && *sMenu != NULL){
-                const menuItem_type *item = *sMenu;
-                if(item != item->previous){ //Begin of list
-                    item = item->previous;
-                    callUnselect(*sMenu);
-                    *sMenu = item;
-                    callSelect(*sMenu);
-                }
-            }
+				const menuItem_type *item = *sMenu;
+				if(item != item->previous){ //Begin of list
+					item = item->previous;
+					callUnselect(*sMenu);
+					*sMenu = item;
+					callSelect(*sMenu);
+				}
+			}
 
 			//Next
 			if(keyState(kSet) != 0 && *sMenu != NULL){
-                const menuItem_type *item = *sMenu;
-                if(item != item->next){ //End of list
-                    item = item->next;
-                    callUnselect(*sMenu);
-                    *sMenu = item;
-                    callSelect(*sMenu);
-                }
+				const menuItem_type *item = *sMenu;
+				if(item != item->next){ //End of list
+					item = item->next;
+					callUnselect(*sMenu);
+					*sMenu = item;
+					callSelect(*sMenu);
+				}
 			}
 
 			//Parent
@@ -180,39 +180,38 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 
 			//Child
 			if(keyState(kOnOff) && *sMenu != NULL && *sMenu != (*sMenu)->child){
-                callEnter(*sMenu);
-                topMenu++;
-                *topMenu = (*sMenu)->child;
-                sMenu++;
-                *sMenu = NULL;
-                const menuItem_type *item = *topMenu;
+				callEnter(*sMenu);
+				topMenu++;
+				*topMenu = (*sMenu)->child;
+				sMenu++;
+				*sMenu = NULL;
+				const menuItem_type *item = *topMenu;
 
-                while(1){
-                    if(item->flags.bit.chmod == chmodMenuAlways){
-                        if(item->prmHandle != NULL){
-                            if(item->prmHandle->chmod == chmodAlways){
-                                *sMenu = item;			//Available select
-                                callSelect(*sMenu);
-                            }
-                            break;
-                        }
-                        else{
-                            *sMenu = item;				//Available select
-                            callSelect(*sMenu);
-                            break;
-                        }
-                    }
-                    if(item == item->next){ //End of list
-                        break;
-                    }
-                    item = item->next;
-                }
-                numItems = 1;
-                for(const menuItem_type *m = *topMenu; m != m->next; m = m->next){
-                    numItems++;
-                }
-                disp_fillScreen(black);
-            }
+				while(1){
+					if(item->flags.bit.chmod == chmodMenuAlways){
+						if(item->prmHandle != NULL){
+							if(item->prmHandle->chmod == chmodAlways){
+								*sMenu = item;			//Available select
+								callSelect(*sMenu);
+							}
+							break;
+						}else{
+							*sMenu = item;				//Available select
+							callSelect(*sMenu);
+							break;
+						}
+					}
+					if(item == item->next){ //End of list
+						break;
+					}
+					item = item->next;
+				}
+				numItems = 1;
+				for(const menuItem_type *m = *topMenu; m != m->next; m = m->next){
+					numItems++;
+				}
+				disp_fillScreen(black);
+			}
 		}
 
 		//Detection of menu item switching
@@ -499,9 +498,9 @@ void printMenuPath(const menuItem_type **menuPath, const menuItem_type *selected
  * @param [in] selectedSectionNumber: selected section number in composite type (e.g. IP, Time)
  */
 void printItem(const menuItem_type *menuItem, uint8_t itemNumber, uint8_t isSelected, uint8_t selectedSectionNumber){
-    char string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
-    char vstring[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
-    uint8_t selectionPosition, selectionLength;
+	char string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
+	char vstring[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
+	uint8_t selectionPosition, selectionLength;
 
 	if(menuItem != menuItem->child){
 		sprintf(string, "/%s", menuItem->label);
@@ -564,40 +563,40 @@ void printItem(const menuItem_type *menuItem, uint8_t itemNumber, uint8_t isSele
  * @brief
  */
 void printUsigVar(char *string, const menuItem_type *menuItem, uint32_t var){
-    static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
+	static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
 
-    if(menuItem->prmHandle->power == 0){
-        sprintf(string, "%u%s", var, menuItem->units);
-    }else{
-        uint32_t a = var / pows[menuItem->prmHandle->power];
-        uint32_t b = var % pows[menuItem->prmHandle->power];
-        sprintf(string, "%u.%0*u%s", a, menuItem->prmHandle->power, b, menuItem->units);
-    }
+	if(menuItem->prmHandle->power == 0){
+		sprintf(string, "%u%s", var, menuItem->units);
+	}else{
+		uint32_t a = var / pows[menuItem->prmHandle->power];
+		uint32_t b = var % pows[menuItem->prmHandle->power];
+		sprintf(string, "%u.%0*u%s", a, menuItem->prmHandle->power, b, menuItem->units);
+	}
 }
 
 /*!****************************************************************************
  * @brief
  */
 void printSigVar(char *string, const menuItem_type *menuItem, int32_t var){
-    static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
+	static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
 
-    if(menuItem->prmHandle->power == 0){
-        sprintf(string, "%i%s", var, menuItem->units);
-    }else{
-        uint32_t a = abs(var) / pows[menuItem->prmHandle->power];
-        uint32_t b = abs(var) % pows[menuItem->prmHandle->power];
-        if(var < 0){
-            *string++ = '-';
-        }
-        sprintf(string, "%u.%0*u%s", a, menuItem->prmHandle->power, b, menuItem->units);
-    }
+	if(menuItem->prmHandle->power == 0){
+		sprintf(string, "%i%s", var, menuItem->units);
+	}else{
+		uint32_t a = abs(var) / pows[menuItem->prmHandle->power];
+		uint32_t b = abs(var) % pows[menuItem->prmHandle->power];
+		if(var < 0){
+			*string++ = '-';
+		}
+		sprintf(string, "%u.%0*u%s", a, menuItem->prmHandle->power, b, menuItem->units);
+	}
 }
 
 /*!****************************************************************************
  * @brief
  */
 void printFloatVar(char *string, const menuItem_type *menuItem){
-    sprintf(string, "%.*f%s", menuItem->prmHandle->power, menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
+	sprintf(string, "%.*f%s", menuItem->prmHandle->power, menuItem->prmHandle->prm->t_floatFrmt, menuItem->units);
 }
 
 /*!****************************************************************************
@@ -791,4 +790,4 @@ void outItemStringWithSelection(char *label, char *value, uint8_t itemNumber, ui
 	disp_putStr(poschars * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

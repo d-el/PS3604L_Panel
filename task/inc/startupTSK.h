@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		02.08.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		This task create start screen
  */
 #ifndef startupTSK_H
@@ -47,4 +47,4 @@ extern uint32_t startCounter;
 void startupTSK(void *pPrm);
 
 #endif //startupTSK_H
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

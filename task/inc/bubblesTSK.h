@@ -1,10 +1,9 @@
 ﻿/*!****************************************************************************
- * @file			bubbles.h
+ * @file		bubbles.h
  * @author		Matthew Weathers + D_EL - Storozhenko Roman
- * @version      V1.0
- * @date			14.09.2004
- * @Up date:     19.08.2014
- * @copyright 	GNU Public License
+ * @version		V1.0
+ * @date		14.09.2004
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 #ifndef BUBBLES_H
 #define BUBBLES_H
@@ -38,4 +37,4 @@ typedef struct {
 void bubblesTSK(void *pPrm);
 
 #endif //BUBBLES_H
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/******************************** END OF FILE ********************************/

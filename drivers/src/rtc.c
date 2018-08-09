@@ -3,11 +3,8 @@
  * @author		d_el
  * @version		V1.1
  * @date		13.02.2018
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver RTC module
- * @copyright	Copyright (C) 2018 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -294,4 +291,4 @@ rtcStatus_type rtc_setTimeUnix(time_t timeUnix){
 	return rtc_setOk;
 }
 
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

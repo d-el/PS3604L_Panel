@@ -12,4 +12,4 @@ extern const uint32_t fwinfoBuild;
 extern const char fwinfoVersion[];
 extern const char fwinfoDate[];
 
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

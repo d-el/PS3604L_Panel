@@ -2,8 +2,8 @@
  * @file		OSinit.c
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
- * @copyright	GNU Lesser General Public License v3
- * @brief		Create semaphore, mutex, nitialization operational system
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @brief		Itialization operational system
  */
 
 /*!****************************************************************************
@@ -26,4 +26,4 @@ void OSinit(void){
 	vTaskStartScheduler();
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

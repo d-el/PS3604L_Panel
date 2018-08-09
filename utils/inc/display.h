@@ -3,10 +3,7 @@
  * @author		d_el
  * @version		V1.0
  * @date		17.11.2017
- * @copyright	Copyright (C) 2017 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
 #ifndef display_H
 #define display_H
@@ -77,4 +74,4 @@ void disp_putStr(uint16_t x, uint16_t y, const font_type *font, uint8_t distance
 void disp_PrintImageMonochrome(uint8_t x, uint8_t y, lcd_color_type color, lcd_color_type backgroundColor, const image_type *image);
 
 #endif //display_H
-/******************************* END OF FILE *********** D_EL ****************/
+/******************************** END OF FILE ********************************/

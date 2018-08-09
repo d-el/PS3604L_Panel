@@ -2,8 +2,8 @@
  * @file		menuSystem.h
  * @author		Storozhenko Roman - D_EL
  * @version		V1.3
- * @copyright	GNU Lesser General Public License v3
  * @date		06.061.2018
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		menu system
  */
 #ifndef MENUSYSTEM_H
@@ -95,4 +95,4 @@ typedef struct menuItem{
 void menuEngine(menuItemNumber_type menuItemNumber);
 
 #endif /* MENUSYSTEM_H */
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

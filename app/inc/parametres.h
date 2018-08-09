@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		08.02.2017
- * @copyright	GNU Lesser General Public License v3
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Parameters table
  */
 
@@ -60,4 +60,4 @@ parametres(ipadr		,""	,fp.fpSet.ipadr				,ipAdrFrmt		,chmodAlways	,0xC0A8010A	,0
 parametres(netmask		,""	,fp.fpSet.netmask			,ipAdrFrmt		,chmodAlways	,0xFFFFFF00	,0		,0xFFFFFFFF	,1		,1		,0	,prmLimVariable	,prmStepVariable,prmEepSys) /* 255.255.255.0 */
 parametres(gateway		,""	,fp.fpSet.gateway			,ipAdrFrmt		,chmodAlways	,0xC0A80101	,0		,0xFFFFFFFF	,1		,1		,0	,prmLimVariable	,prmStepVariable,prmEepSys) /* 192.168.1.1 */
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

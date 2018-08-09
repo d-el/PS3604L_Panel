@@ -4,8 +4,8 @@
  * @version		V2.3
  * @date		13.05.2015
  * @date		14.11.2016 fix "temp > enco.top"
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		encoder driver, stm32f1
- * @copyright	GNU Public License
  */
 
 /*!****************************************************************************
@@ -240,4 +240,4 @@ void enSetNtic(uint16_t n){
 	enco.ntic = n;
 }
 
-/*************** GNU GPL ************** END OF FILE ********* D_EL ***********/
+/******************************** END OF FILE ********************************/

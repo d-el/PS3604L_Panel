@@ -3,11 +3,9 @@
  * @author		d_el
  * @version		V1.5
  * @date		18.12.2017
+ * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver for I2C STM32F4 MCUs
  * @copyright	Copyright (C) 2017 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license. See the LICENSE file for details
  */
 
 /*!****************************************************************************
@@ -305,4 +303,4 @@ void DMA1_Stream4_IRQHandler(void){			//TX
 }
 #endif
 
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/
