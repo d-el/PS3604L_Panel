@@ -37,6 +37,7 @@ static void uartTskHook(uart_type *puart);
  * @brief
  */
 void uartTSK(void *pPrm){
+	(void)pPrm;
 	TickType_t	xLastWakeTime = xTaskGetTickCount();
 	BaseType_t 	res;
 	uint16_t 	crc;
@@ -152,6 +153,7 @@ uint8_t waitForTf(void){
  * @brief	uart RX & TX callback
  */
 static void uartTskHook(uart_type *puart){
+	(void)puart;
 	BaseType_t xHigherPriorityTaskWoken;
 	xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(regulatorConnUartRxSem, &xHigherPriorityTaskWoken);

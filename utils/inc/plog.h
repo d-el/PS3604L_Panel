@@ -52,7 +52,7 @@
 #define LOG_RESET_COLOR
 #endif //CONFIG_LOG_COLORS
 
-#define LOG_FORMAT(letter, format)	LOG_COLOR_ ## letter #letter " (%d) %s: " format LOG_RESET_COLOR "\n"
+#define LOG_FORMAT(letter, format)	LOG_COLOR_ ## letter #letter " (%lu) %s: " format LOG_RESET_COLOR "\n"
 
 #define P_LOGE( tag, format, ... ) P_LOG_LEVEL_LOCAL(P_LOG_ERROR,	tag, format, ##__VA_ARGS__)
 #define P_LOGW( tag, format, ... ) P_LOG_LEVEL_LOCAL(P_LOG_WARN,	tag, format, ##__VA_ARGS__)

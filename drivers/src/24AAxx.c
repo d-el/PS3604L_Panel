@@ -32,6 +32,7 @@ static SemaphoreHandle_t i2cSem;
 * @brief	I2C Callback
 */
 static void eep_i2cCallback(i2c_type *i2cx){
+	(void)i2cx;
 	BaseType_t xHigherPriorityTaskWoken;
 	xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(i2cSem, &xHigherPriorityTaskWoken);

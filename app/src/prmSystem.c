@@ -158,7 +158,6 @@ prm_state_type prm_store(void *pMemory, prmNvSave_type prmNvSave){
 	uint16_t signature = 0x2805;
 	uint16_t crc;
 	uint32_t size;
-	uint32_t prmSize;
 	uint8_t *pbuf = &prmLoadBff[0];
 
 	// Copy data to signature

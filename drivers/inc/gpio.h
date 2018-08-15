@@ -10,9 +10,9 @@
 #define GPIO_H
 
 /*!****************************************************************************
-* Include
-*/
-#include "stdint.h"
+ * Include
+ */
+#include <stdint.h>
 #include "stm32f4xx.h"
 
 /*!****************************************************************************
@@ -116,12 +116,12 @@ GP_NOT_USED
 }GPnum_type;
 
 /*!****************************************************************************
-* Macro functions
-*/
+ * Macro functions
+ */
 #define makepin(port, npin, mode, pull, iniState, nAF)	  { port, (1<<npin), npin, mode, iniState, pull, nAF }
 
-#define _gppin_set(port, pinmask)		(*(volatile uint16_t*)(&port->BSRR) = (pinmask))
-#define _gppin_reset(port, pinmask)		(*((volatile uint16_t*)(&port->BSRR) + 1) = (pinmask))
+#define _gppin_set(port, pinmask)		port->BSRR = (uint16_t)(pinmask)
+#define _gppin_reset(port, pinmask)		*((volatile uint16_t*)&(port)->BSRR + 1) =  (uint16_t)(pinmask)
 #define _gppin_toggle(port, pinmask)	(port->ODR	^=(pinmask))
 #define _gppin_get(port, pinmask)		(port->IDR &  (pinmask))
 #define gppin_set(n)					_gppin_set(pinsMode[n].p, pinsMode[n].mask)
@@ -155,13 +155,13 @@ GP_NOT_USED
 //example: EXTI_INIT(GPIOA, 9, EXTI_MODE_BOTH, 15);
 
 /*!****************************************************************************
-* External variables
-*/
+ * External variables
+ */
 extern pinMode_type	  const pinsMode[];
 
 /*!****************************************************************************
-* Prototypes for the functions in gpio.c
-*/
+ * Prototypes for the functions in gpio.c
+ */
 void gpio_init(void);
 void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_type pull, uint8_t iniState, uint8_t nAF);
 

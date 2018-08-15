@@ -289,14 +289,15 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
  * @brief
  */
 void uart_deinit(uart_type *uartx){
-
+	(void)uartx;
+	while(1);
 }
 
 /*!****************************************************************************
 * @brief	transfer data buffer
 */
 void uart_setBaud(uart_type *uartx, uartBaudRate_type baudRate){
-	if((uartx->baudRate != baudRate)&&(baudRate < BR_NUMBER)){
+	if(uartx->baudRate != baudRate && baudRate < BR_NUMBER){
 		uartx->pUart->BRR = usartBaudRateDiv[baudRate];
 		uartx->baudRate = baudRate;
 	}

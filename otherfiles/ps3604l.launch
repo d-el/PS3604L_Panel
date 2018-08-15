@@ -6,7 +6,7 @@
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.doReset" value="false"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageFileName" value=""/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.imageOffset" value=""/>
-<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.initCommands" value="monitor reset halt&#13;&#10;flushregs"/>
+<stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.initCommands" value="monitor reset&#13;&#10;monitor halt&#13;&#10;flushregs"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.ipAddress" value="localhost"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.jtagDeviceId" value="org.eclipse.cdt.debug.gdbjtag.core.jtagdevice.genericDevice"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.loadImage" value="true"/>

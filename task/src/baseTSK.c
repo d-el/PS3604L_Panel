@@ -41,6 +41,7 @@ uint32_t 	timebs_us __attribute((used));
  * Base task
  */
 void baseTSK(void *pPrm){
+	(void)pPrm;
 	TickType_t 				xLastWakeTime = xTaskGetTickCount();
 	TickType_t 				IdleTime = xTaskGetTickCount();
 	const prmHandle_type 	*sHandle = &prmh[NbsSet0u];
@@ -187,7 +188,7 @@ void baseTSK(void *pPrm){
 		 */
 		//Print voltage
 		if(fp.tf.state.bit.switchIsON != 0){
-			sprintf(str, "%02u.%03u", measV / 1000000, (measV / 1000) % 1000);
+			sprintf(str, "%02lu.%03lu", measV / 1000000, (measV / 1000) % 1000);
 		}else{
 			sprintf(str, "%02u.%03u", bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u % 1000);
 		}
@@ -208,11 +209,11 @@ void baseTSK(void *pPrm){
 
 		if(fp.tf.state.bit.switchIsON != 0){
 			if(measI < 99000){
-				sprintf(str, "%2u.%03u", measI / 1000, measI % 1000);
+				sprintf(str, "%2lu.%03lu", measI / 1000, measI % 1000);
 				disp_putChar(150, 36, &font8x12, 'm');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}else{
-				sprintf(str, "%2u.%03u", measI / 1000000, (measI / 1000) % 1000);
+				sprintf(str, "%2lu.%03lu", measI / 1000000, (measI / 1000) % 1000);
 				disp_putChar(150, 36, &font8x12, ' ');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}
@@ -331,12 +332,12 @@ void printStatusBar(void){
 		disp_setColor(black, white);
 
 		//Print output power
-		sprintf(str, "%02u.%03u W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
+		sprintf(str, "%02lu.%03lu W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
 		disp_putStr(0, 110, &font6x8, 0, str);
 
 		//Print load resistance
 		if(fp.tf.meas.resistance != 99999){
-			sprintf(str, "%05u  \xB1", fp.tf.meas.resistance);
+			sprintf(str, "%05lu  \xB1", fp.tf.meas.resistance);
 			disp_putStr(0, 120, &font6x8, 0, str);
 		}else{
 			disp_putStr(0, 120, &font6x8, 0, " ---   \xB1");

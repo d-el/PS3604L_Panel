@@ -49,8 +49,6 @@ uint8_t			i2c3RxBff[I2C3_RxBffSz];
  *
  */
 void i2c_init(i2c_type *i2cx){
-	uint32_t speed;
-
 	#if (I2C1_USE == 1)
 	if(i2cx == i2c1){
 		/************************************************

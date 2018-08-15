@@ -56,7 +56,6 @@
 #include "stm32f4x7_eth.h"
 #include "string.h"
 
-
 #define netifMTU                                (1500)
 #define netifGUARD_BLOCK_TIME					( 250 )
 /* The time to block waiting for input. */
@@ -66,13 +65,11 @@
 #define IFNAME0 'e'
 #define IFNAME1 '0'
 
-
 static struct netif *s_pxNetIf = NULL;
 SemaphoreHandle_t s_xSemaphore = NULL;
 
-
 /* Ethernet Rx & Tx DMA Descriptors */
-extern ETH_DMADESCTypeDef  DMARxDscrTab[ETH_RXBUFNB], DMATxDscrTab[ETH_TXBUFNB];
+extern ETH_DMADESCTypeDef DMARxDscrTab[ETH_RXBUFNB], DMATxDscrTab[ETH_TXBUFNB];
 
 /* Ethernet Receive buffers  */
 extern uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE];
@@ -81,18 +78,14 @@ extern uint8_t Rx_Buff[ETH_RXBUFNB][ETH_RX_BUF_SIZE];
 extern uint8_t Tx_Buff[ETH_TXBUFNB][ETH_TX_BUF_SIZE];
 
 /* Global pointers to track current transmit and receive descriptors */
-extern ETH_DMADESCTypeDef  *DMATxDescToSet;
-extern ETH_DMADESCTypeDef  *DMARxDescToGet;
+extern ETH_DMADESCTypeDef *DMATxDescToSet;
+extern ETH_DMADESCTypeDef *DMARxDescToGet;
 
 /* Global pointer for last received frame infos */
 extern ETH_DMA_Rx_Frame_infos *DMA_RX_FRAME_infos;
 
-
-
-
-static void ethernetif_input( void * pvParameters );
+static void ethernetif_input(void * pvParameters);
 static void arp_timer(void *arg);
-
 
 /**
  * In this function, the hardware should be initialized.
@@ -101,69 +94,64 @@ static void arp_timer(void *arg);
  * @param netif the already initialized lwip network interface structure
  *        for this ethernetif
  */
-static void low_level_init(struct netif *netif)
-{
-  uint32_t i;
+static void low_level_init(struct netif *netif){
+	uint32_t i;
 
-  /* set netif MAC hardware address length */
-  netif->hwaddr_len = ETHARP_HWADDR_LEN;
+	/* set netif MAC hardware address length */
+	netif->hwaddr_len = ETHARP_HWADDR_LEN;
 
-  /* set netif MAC hardware address */
-  netif->hwaddr[0] =  MAC_ADDR0;
-  netif->hwaddr[1] =  MAC_ADDR1;
-  netif->hwaddr[2] =  MAC_ADDR2;
-  netif->hwaddr[3] =  MAC_ADDR3;
-  netif->hwaddr[4] =  MAC_ADDR4;
-  netif->hwaddr[5] =  MAC_ADDR5;
+	/* set netif MAC hardware address */
+	netif->hwaddr[0] = MAC_ADDR0;
+	netif->hwaddr[1] = MAC_ADDR1;
+	netif->hwaddr[2] = MAC_ADDR2;
+	netif->hwaddr[3] = MAC_ADDR3;
+	netif->hwaddr[4] = MAC_ADDR4;
+	netif->hwaddr[5] = MAC_ADDR5;
 
-  /* set netif maximum transfer unit */
-  netif->mtu = 1500;
+	/* set netif maximum transfer unit */
+	netif->mtu = 1500;
 
-  /* Accept broadcast address and ARP traffic */
-  netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
+	/* Accept broadcast address and ARP traffic */
+	netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
 
-  s_pxNetIf =netif;
+	s_pxNetIf = netif;
 
-  /* create binary semaphore used for informing ethernetif of frame reception */
-  if (s_xSemaphore == NULL)
-  {
-    s_xSemaphore= xSemaphoreCreateCounting(20,0);
-  }
+	/* create binary semaphore used for informing ethernetif of frame reception */
+	if(s_xSemaphore == NULL){
+		s_xSemaphore = xSemaphoreCreateCounting(20, 0);
+	}
 
-  /* initialize MAC address in ethernet MAC */
-  ETH_MACAddressConfig(ETH_MAC_Address0, netif->hwaddr);
+	/* initialize MAC address in ethernet MAC */
+	ETH_MACAddressConfig(ETH_MAC_Address0, netif->hwaddr);
 
-  /* Initialize Tx Descriptors list: Chain Mode */
-  ETH_DMATxDescChainInit(DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
-  /* Initialize Rx Descriptors list: Chain Mode  */
-  ETH_DMARxDescChainInit(DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
+	/* Initialize Tx Descriptors list: Chain Mode */
+	ETH_DMATxDescChainInit(DMATxDscrTab, &Tx_Buff[0][0], ETH_TXBUFNB);
+	/* Initialize Rx Descriptors list: Chain Mode  */
+	ETH_DMARxDescChainInit(DMARxDscrTab, &Rx_Buff[0][0], ETH_RXBUFNB);
 
-  /* Enable Ethernet Rx interrrupt */
-  {
-    for(i=0; i<ETH_RXBUFNB; i++)
-    {
-      ETH_DMARxDescReceiveITConfig(&DMARxDscrTab[i], ENABLE);
-    }
-  }
+	/* Enable Ethernet Rx interrrupt */
+	{
+		for(i = 0; i < ETH_RXBUFNB; i++){
+			ETH_DMARxDescReceiveITConfig(&DMARxDscrTab[i], ENABLE);
+		}
+	}
 
 #ifdef CHECKSUM_BY_HARDWARE
-  /* Enable the checksum insertion for the Tx frames */
-  {
-    for(i=0; i<ETH_TXBUFNB; i++)
-    {
-      ETH_DMATxDescChecksumInsertionConfig(&DMATxDscrTab[i], ETH_DMATxDesc_ChecksumTCPUDPICMPFull);
-    }
-  }
+	/* Enable the checksum insertion for the Tx frames */
+	{
+		for(i = 0; i < ETH_TXBUFNB; i++){
+			ETH_DMATxDescChecksumInsertionConfig(&DMATxDscrTab[i], ETH_DMATxDesc_ChecksumTCPUDPICMPFull);
+		}
+	}
 #endif
 
-  /* create the task that handles the ETH_MAC */
-  xTaskCreate(ethernetif_input, "Eth_if", netifINTERFACE_TASK_STACK_SIZE, NULL,
-              netifINTERFACE_TASK_PRIORITY,NULL);
+	/* create the task that handles the ETH_MAC */
+	xTaskCreate(ethernetif_input, "Eth_if", netifINTERFACE_TASK_STACK_SIZE, NULL,
+	netifINTERFACE_TASK_PRIORITY, NULL);
 
-  /* Enable MAC and DMA transmission and reception */
-  ETH_Start();
+	/* Enable MAC and DMA transmission and reception */
+	ETH_Start();
 }
-
 
 /**
  * This function should do the actual transmission of the packet. The packet is
@@ -181,36 +169,29 @@ static void low_level_init(struct netif *netif)
  *       dropped because of memory failure (except for the TCP timers).
  */
 
-static err_t low_level_output(struct netif *netif, struct pbuf *p)
-{
-  static SemaphoreHandle_t xTxSemaphore = NULL;
-  struct pbuf *q;
-  uint32_t l = 0;
-  uint8_t *buffer ;
+static err_t low_level_output(struct netif *netif, struct pbuf *p){
+	(void)netif;
+	static SemaphoreHandle_t xTxSemaphore = NULL;
+	struct pbuf *q;
+	uint32_t l = 0;
+	uint8_t *buffer;
 
-  if (xTxSemaphore == NULL)
-  {
-    vSemaphoreCreateBinary (xTxSemaphore);
-  }
+	if(xTxSemaphore == NULL){
+		vSemaphoreCreateBinary(xTxSemaphore);
+	}
 
-  if (xSemaphoreTake(xTxSemaphore, netifGUARD_BLOCK_TIME))
-  {
-    buffer =  (uint8_t *)(DMATxDescToSet->Buffer1Addr);
-    for(q = p; q != NULL; q = q->next)
-    {
-      memcpy((u8_t*)&buffer[l], q->payload, q->len);
-      l = l + q->len;
-    }
-    ETH_Prepare_Transmit_Descriptors(l);
-    xSemaphoreGive(xTxSemaphore);
-  }
+	if(xSemaphoreTake(xTxSemaphore, netifGUARD_BLOCK_TIME)){
+		buffer = (uint8_t *) (DMATxDescToSet->Buffer1Addr);
+		for(q = p; q != NULL; q = q->next){
+			memcpy((u8_t*) &buffer[l], q->payload, q->len);
+			l = l + q->len;
+		}
+		ETH_Prepare_Transmit_Descriptors(l);
+		xSemaphoreGive(xTxSemaphore);
+	}
 
-  return ERR_OK;
+	return ERR_OK;
 }
-
-
-
-
 
 /**
  * Should allocate a pbuf and transfer the bytes of the incoming
@@ -220,76 +201,66 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
  * @return a pbuf filled with the received packet (including MAC header)
  *         NULL on memory error
  */
-static struct pbuf * low_level_input(struct netif *netif)
-{
-  struct pbuf *p, *q;
-  u16_t len;
-  uint32_t l=0,i =0;
-  FrameTypeDef frame;
-  uint8_t *buffer;
-  __IO ETH_DMADESCTypeDef *DMARxNextDesc;
+static struct pbuf * low_level_input(struct netif *netif){
+	(void)netif;
+	struct pbuf *p, *q;
+	u16_t len;
+	uint32_t l = 0, i = 0;
+	FrameTypeDef frame;
+	uint8_t *buffer;
+	__IO ETH_DMADESCTypeDef *DMARxNextDesc;
 
-  p = NULL;
+	p = NULL;
 
-  /* Get received frame */
-  frame = ETH_Get_Received_Frame_interrupt();
+	/* Get received frame */
+	frame = ETH_Get_Received_Frame_interrupt();
 
-  /* check that frame has no error */
-  if ((frame.descriptor->Status & ETH_DMARxDesc_ES) == (uint32_t)RESET)
-  {
+	/* check that frame has no error */
+	if((frame.descriptor->Status & ETH_DMARxDesc_ES) == (uint32_t) RESET){
 
-    /* Obtain the size of the packet and put it into the "len" variable. */
-    len = frame.length;
-    buffer = (uint8_t *)frame.buffer;
+		/* Obtain the size of the packet and put it into the "len" variable. */
+		len = frame.length;
+		buffer = (uint8_t *) frame.buffer;
 
-    /* We allocate a pbuf chain of pbufs from the pool. */
-    p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
+		/* We allocate a pbuf chain of pbufs from the pool. */
+		p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
 
-    /* Copy received frame from ethernet driver buffer to stack buffer */
-    if (p != NULL)
-    {
-      for (q = p; q != NULL; q = q->next)
-      {
-        memcpy((u8_t*)q->payload, (u8_t*)&buffer[l], q->len);
-        l = l + q->len;
-      }
-    }
-  }
+		/* Copy received frame from ethernet driver buffer to stack buffer */
+		if(p != NULL){
+			for(q = p; q != NULL; q = q->next){
+				memcpy((u8_t*) q->payload, (u8_t*) &buffer[l], q->len);
+				l = l + q->len;
+			}
+		}
+	}
 
-  /* Release descriptors to DMA */
-  /* Check if received frame with multiple DMA buffer segments */
-  if (DMA_RX_FRAME_infos->Seg_Count > 1)
-  {
-    DMARxNextDesc = DMA_RX_FRAME_infos->FS_Rx_Desc;
-  }
-  else
-  {
-    DMARxNextDesc = frame.descriptor;
-  }
+	/* Release descriptors to DMA */
+	/* Check if received frame with multiple DMA buffer segments */
+	if(DMA_RX_FRAME_infos->Seg_Count > 1){
+		DMARxNextDesc = DMA_RX_FRAME_infos->FS_Rx_Desc;
+	}else{
+		DMARxNextDesc = frame.descriptor;
+	}
 
-  /* Set Own bit in Rx descriptors: gives the buffers back to DMA */
-  for (i=0; i<DMA_RX_FRAME_infos->Seg_Count; i++)
-  {
-    DMARxNextDesc->Status = ETH_DMARxDesc_OWN;
-    DMARxNextDesc = (ETH_DMADESCTypeDef *)(DMARxNextDesc->Buffer2NextDescAddr);
-  }
+	/* Set Own bit in Rx descriptors: gives the buffers back to DMA */
+	for(i = 0; i < DMA_RX_FRAME_infos->Seg_Count; i++){
+		DMARxNextDesc->Status = ETH_DMARxDesc_OWN;
+		DMARxNextDesc = (ETH_DMADESCTypeDef *) (DMARxNextDesc->Buffer2NextDescAddr);
+	}
 
-  /* Clear Segment_Count */
-  DMA_RX_FRAME_infos->Seg_Count =0;
+	/* Clear Segment_Count */
+	DMA_RX_FRAME_infos->Seg_Count = 0;
 
+	/* When Rx Buffer unavailable flag is set: clear it and resume reception */
+	if((ETH->DMASR & ETH_DMASR_RBUS) != (uint32_t) RESET){
+		/* Clear RBUS ETHERNET DMA flag */
+		ETH->DMASR = ETH_DMASR_RBUS;
 
-  /* When Rx Buffer unavailable flag is set: clear it and resume reception */
-  if ((ETH->DMASR & ETH_DMASR_RBUS) != (uint32_t)RESET)
-  {
-    /* Clear RBUS ETHERNET DMA flag */
-    ETH->DMASR = ETH_DMASR_RBUS;
-
-    /* Resume DMA reception */
-    ETH->DMARPDR = 0;
-  }
-  return p;
+		/* Resume DMA reception */
+		ETH->DMARPDR = 0;
+	}
+	return p;
 }
-
 
 /**
  * This function is the ethernetif_input task, it is processed when a packet
@@ -300,22 +271,19 @@ static struct pbuf * low_level_input(struct netif *netif)
  *
  * @param netif the lwip network interface structure for this ethernetif
  */
-void ethernetif_input( void * pvParameters )
-{
-  struct pbuf *p;
+void ethernetif_input(void * pvParameters){
+	(void)pvParameters;
+	struct pbuf *p;
 
-  for( ;; )
-  {
-    if (xSemaphoreTake( s_xSemaphore, emacBLOCK_TIME_WAITING_FOR_INPUT)==pdTRUE)
-    {
-      p = low_level_input( s_pxNetIf );
-      if (ERR_OK != s_pxNetIf->input( p, s_pxNetIf))
-      {
-        pbuf_free(p);
-        p=NULL;
-      }
-    }
-  }
+	for(;;){
+		if(xSemaphoreTake( s_xSemaphore, emacBLOCK_TIME_WAITING_FOR_INPUT) == pdTRUE){
+			p = low_level_input(s_pxNetIf);
+			if(ERR_OK != s_pxNetIf->input(p, s_pxNetIf)){
+				pbuf_free(p);
+				p = NULL;
+			}
+		}
+	}
 }
 
 /**
@@ -330,33 +298,31 @@ void ethernetif_input( void * pvParameters )
  *         ERR_MEM if private data couldn't be allocated
  *         any other err_t on error
  */
-err_t ethernetif_init(struct netif *netif)
-{
-  LWIP_ASSERT("netif != NULL", (netif != NULL));
+err_t ethernetif_init(struct netif *netif){
+	LWIP_ASSERT("netif != NULL", (netif != NULL));
 
 #if LWIP_NETIF_HOSTNAME
-  /* Initialize interface hostname */
-  netif->hostname = "lwip";
+	/* Initialize interface hostname */
+	netif->hostname = "lwip";
 #endif /* LWIP_NETIF_HOSTNAME */
 
-  netif->name[0] = IFNAME0;
-  netif->name[1] = IFNAME1;
+	netif->name[0] = IFNAME0;
+	netif->name[1] = IFNAME1;
 
-  netif->output = etharp_output;
-  netif->linkoutput = low_level_output;
+	netif->output = etharp_output;
+	netif->linkoutput = low_level_output;
 
-  /* initialize the hardware */
-  low_level_init(netif);
+	/* initialize the hardware */
+	low_level_init(netif);
 
-  etharp_init();
-  sys_timeout(ARP_TMR_INTERVAL, arp_timer, NULL);
+	etharp_init();
+	sys_timeout(ARP_TMR_INTERVAL, arp_timer, NULL);
 
-  return ERR_OK;
+	return ERR_OK;
 }
 
-
-static void arp_timer(void *arg)
-{
-  etharp_tmr();
-  sys_timeout(ARP_TMR_INTERVAL, arp_timer, NULL);
+static void arp_timer(void *arg){
+	(void)arg;
+	etharp_tmr();
+	sys_timeout(ARP_TMR_INTERVAL, arp_timer, NULL);
 }

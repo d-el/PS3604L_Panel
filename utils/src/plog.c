@@ -82,6 +82,8 @@ plog_timestamp_type plog_setTimestamp(plog_timestamp_type func){
  * This function or these macros should not be used from an interrupt.
  */
 void plog_write(plog_level_t level, const char* tag, const char* format, ...){
+	(void)level;
+	(void)tag;
 	if(log_vsprintf != NULL){
 		va_list va;
 		va_start(va, format);

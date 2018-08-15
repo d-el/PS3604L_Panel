@@ -44,6 +44,7 @@ void moveball(void);
  *
  */
 void bubblesTSK(void *pPrm){
+	(void)pPrm;
 	uint16_t  old_val_encoder = enGeReg();
 	disp_fillScreen(black);
 	disp_setColor(black, white);
@@ -138,11 +139,10 @@ void moveball(void){
  *
  */
 void physics(void){
-	uint8_t i, Sumradius;
-	signed int yDistance, xDistance, yAbsDistance, xAbsDistance;
-	uint8_t j, k;
+	//uint8_t Sumradius;
+	//signed int yDistance, xDistance, yAbsDistance, xAbsDistance;
 
-	for(i = 0; i < CountOfBalls; i++){
+	for(uint8_t i = 0; i < CountOfBalls; i++){
 		//From Top
 		if((ball[i].new_ycenter - ball[i].radius + ball[i].speedy) <=  0){
 			ball[i].speedy = -ball[i].speedy; // Reflect From Top

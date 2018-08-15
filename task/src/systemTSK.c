@@ -65,9 +65,9 @@ static char *logTag = "SYS";
  * @brief
  */
 void systemTSK(void *pPrm){
+	(void)pPrm;
 	TickType_t 		xLastWakeTime = xTaskGetTickCount();
 	selWindow_type 	selWindowPrev = noneWindow;
-	BaseType_t 		osres = pdTRUE;
 
 	//Init log system
 	plog_setVprintf(vsprintf);
@@ -84,7 +84,7 @@ void systemTSK(void *pPrm){
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	sntp_init();													// Initialize service SNTP
 
-	osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
+	BaseType_t osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started uartTSK");
 
@@ -244,7 +244,7 @@ void shutdown(void){
 	if(stat == prm_ok){
 		P_LOGI(logTag, "System settings store ok");
 	}else{
-		P_LOGE(logTag, "System settings store error: %u", stat);
+		P_LOGE(logTag, "System settings store error: %i", stat);
 	}
 
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
@@ -321,7 +321,7 @@ void netSettingUpdate(void){
 /*!****************************************************************************
  */
 void timezoneUpdate(void){
-	char str[10];
+	char str[12];
 	sprintf(str, "TZ=GMT%i", -fp.fpSet.timezone);
 	putenv(str);
 	tzset();

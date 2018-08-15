@@ -5,18 +5,19 @@
  * @date		22.11.2016
  * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		gpio driver for stm32F4 microcontroller
+ */
 
 /*!****************************************************************************
-* Include
-*/
+ * Include
+ */
 #include "bitbanding.h"
 #include "board.h"
 #include "gpio.h"
 
 /*!****************************************************************************
-* MEMORY
-*/
-const pinMode_type	 const pinsMode[] = {
+ * MEMORY
+ */
+const pinMode_type pinsMode[] = {
 /*0 */makepin(GPIOE, 5,		digitalInput,	pullUp,					0, 0), //bMode
 /*1 */makepin(GPIOE, 2,		digitalInput,	pullUp,					0, 0), //bOnOff
 /*2 */makepin(GPIOE, 4,		digitalInput,	pullUp,					0, 0), //bView
@@ -43,8 +44,8 @@ const pinMode_type	 const pinsMode[] = {
 const uint32_t pinNum = sizeof(pinsMode) / sizeof(pinMode_type);
 
 /*!****************************************************************************
-* InitAllGpio
-*/
+ * InitAllGpio
+ */
 void gpio_init(void){
 	pinMode_type *pgpios;
 	pinMode_type *pgpiosEnd;
@@ -59,8 +60,8 @@ void gpio_init(void){
 }
 
 /*!****************************************************************************
-*
-*/
+ *
+ */
 void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_type pull, uint8_t iniState, uint8_t nAF){
 	//Clock enable
 		 if(port == GPIOA)	 RCC->AHB1ENR	 |= RCC_AHB1ENR_GPIOAEN;

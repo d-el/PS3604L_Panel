@@ -34,6 +34,7 @@ time_t 		unixTime;	//At 00:00 hours, Jan 1, 1970 UTC
  * @brief    Setting system task
  */
 void settingTSK(void *pPrm){
+	(void)pPrm;
 	menuEngine(mN_voltmeter);
 	prm_store(SYSEEPADR, prmEepSys);
 	selWindow(baseWindow);
@@ -82,6 +83,7 @@ itemState_type PrepareI(const menuItem_type *item){
  * @brief
  */
 itemState_type savePointU(const menuItem_type *item){
+	(void)item;
 	sendCommand(setSavePointU0 + calibratePoint);
 	if(waitForTf() != 0){
 		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
@@ -94,6 +96,7 @@ itemState_type savePointU(const menuItem_type *item){
  * @brief
  */
 itemState_type savePointI(const menuItem_type *item){
+	(void)item;
 	sendCommand(setSavePointI0 + calibratePoint);
 	if(waitForTf() != 0){
 		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
@@ -106,6 +109,7 @@ itemState_type savePointI(const menuItem_type *item){
  * @brief    setup regulator to mode_off
  */
 itemState_type regSave(const menuItem_type *item){
+	(void)item;
 	sendCommand(setSaveSettings);
 	fp.tf.task.mode = mode_off;
 	if(waitForTf() != 0){
@@ -127,6 +131,7 @@ itemState_type setBright(const menuItem_type *item){
  * @brief    RTC select callback
  */
 itemState_type rtcSelect(const menuItem_type *item){
+	(void)item;
 	unixTime = time(NULL) + (3600 * fp.fpSet.timezone);
 
 	return (itemState_type) {.state = menuItemOk};
@@ -136,6 +141,7 @@ itemState_type rtcSelect(const menuItem_type *item){
  * @brief    RTC select callback
  */
 itemState_type rtcUnselect(const menuItem_type *item){
+	(void)item;
 	timezoneUpdate();
 	rtc_setTimeUnix(unixTime - (3600 * fp.fpSet.timezone));
 	return (itemState_type) {.state = menuItemOk};
@@ -145,6 +151,7 @@ itemState_type rtcUnselect(const menuItem_type *item){
  * @brief    NET pfUnselect
  */
 itemState_type netUpdate(const menuItem_type *item){
+	(void)item;
 	netSettingUpdate();
 	return (itemState_type) {.state = menuItemOk};
 }

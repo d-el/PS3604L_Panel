@@ -276,10 +276,8 @@ void ETH_StructInit(ETH_InitTypeDef* ETH_InitStruct){
  *		   ETH_SUCCESS: Ethernet successfully initialized
  */
 uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress){
-	uint32_t RegValue = 0, tmpreg = 0;
-	__IO uint32_t i = 0;
+	uint32_t tmpreg = 0;
 	uint32_t hclk;
-	__IO uint32_t timeout = 0;
 	/* Check the parameters */
 	/* MAC --------------------------*/
 	assert_param(IS_ETH_AUTONEGOTIATION(ETH_InitStruct->ETH_AutoNegotiation));

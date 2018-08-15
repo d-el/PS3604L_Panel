@@ -53,6 +53,7 @@ caddr_t _sbrk(intptr_t incr){
  */
 __attribute__((weak))
 void _exit(int code){
+	(void)code;
 	while(1);
 }
 
@@ -113,6 +114,8 @@ void __libc_fini_array(void){
  */
 __attribute__((weak))
 int _kill(int pid, int sig){
+	(void)pid;
+	(void)sig;
 	errno = ENOSYS;
 	return -1;
 }
@@ -133,6 +136,9 @@ int _getpid(void){
  * @retval	Returns -1 on error or number of bytes sent
  */
 int _open (const char *name, int flags, int mode){
+	(void)name;
+	(void)flags;
+	(void)mode;
 	errno = ENOSYS;
 	return -1;
 }
@@ -143,6 +149,7 @@ int _open (const char *name, int flags, int mode){
  */
 __attribute__((weak))
 int _close(int file){
+	(void)file;
 	errno = ENOSYS;
 	return -1;
 }
@@ -154,6 +161,9 @@ int _close(int file){
  */
 __attribute__((weak))
 int _write(int file, const void *ptr, size_t len){
+	(void)file;
+	(void)ptr;
+	(void)len;
 	errno = ENOSYS;
 	return -1;
 }
@@ -166,6 +176,9 @@ int _write(int file, const void *ptr, size_t len){
  */
 __attribute__((weak))
 int _read(int file, char *ptr, int len){
+	(void)file;
+	(void)ptr;
+	(void)len;
 	errno = ENOSYS;
 	return -1;
 }
@@ -175,6 +188,9 @@ int _read(int file, char *ptr, int len){
  */
 __attribute__((weak))
 int _lseek(int file, int ptr, int dir){
+	(void)file;
+	(void)ptr;
+	(void)dir;
 	errno = ENOSYS;
 	return -1;
 }
@@ -188,6 +204,7 @@ int _lseek(int file, int ptr, int dir){
  */
 __attribute__((weak))
 int _fstat(int file, struct stat *st){
+	(void)file;
 	st->st_mode = S_IFCHR;
 	return 0;
 }

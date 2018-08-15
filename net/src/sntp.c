@@ -10,17 +10,17 @@
 /*!****************************************************************************
  * Include
  */
+#include <string.h>
+#include <assert.h>
+#include <time.h>
 #include "plog.h"
-#include "string.h"
 #include "rtc.h"
-#include "time.h"
 #include "lwipopts.h"
 #include "lwip/timeouts.h"
 #include "lwip/udp.h"
 #include "lwip/dns.h"
 #include "lwip/ip_addr.h"
 #include "lwip/pbuf.h"
-#include "assert.h"
 
 /**
  * SNTP_DEBUG_LEVEL: Enable debugging for SNTP
@@ -192,6 +192,7 @@ static void sntp_try_next_server(void* arg){
 
 /** UDP recv callback for the sntp pcb */
 static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, const ip_addr_t *addr, u16_t port){
+	(void)addr;
 	u8_t mode;
 	u8_t stratum;
 	u32_t receive_timestamp[SNTP_RECEIVE_TIME_SIZE];

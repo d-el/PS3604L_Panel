@@ -126,7 +126,7 @@ void disp_putStr(uint16_t x, uint16_t y, const font_type *font, uint8_t distance
 /*!****************************************************************************
  *
  */
-void disp_PrintImageMonochrome(uint8_t x, uint8_t y, disp_color_type color, disp_color_type backgroundColor, const image_type *image){
+void disp_PrintImageMonochrome(uint8_t x, uint8_t y, const image_type *image){
 	uint8_t width, height;
 	uint8_t c_width = image->w;
 	uint8_t c_height = image->h;

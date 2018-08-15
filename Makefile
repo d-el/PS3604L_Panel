@@ -52,22 +52,6 @@ OBJCOPY	= $(CROSS_COMPILE)objcopy
 OBJDUMP	= $(CROSS_COMPILE)objdump
 SIZE	= $(CROSS_COMPILE)size
 
-INCLUDES := \
-	-I app/inc \
-	-I cm4/Device/ST/STM32F4xx/Include \
-	-I cm4/Include \
-	-I drivers/inc \
-	-I freertos/inc \
-	-I lib/inc \
-	-I lwip/src/include/lwip \
-	-I lwip/src/include \
-	-I lwip/port/include \
-	-I lwip/port \
-	-I net/inc \
-	-I system/inc \
-	-I task/inc \
-	-I utils/inc
-
 LDFILES	:= -T ldscript/STM32F407VETx_FLASH.ld
 LIBS	:= lib/IQmathLib-cm4.a
 
@@ -86,7 +70,8 @@ COMMONFLAGS := \
 	-fsingle-precision-constant \
 	-Wfloat-equal \
 	-Wuninitialized \
-	-Wextra
+	-Wextra \
+	-Wall
 
 CCFLAGS := \
 	$(CPUFLAGS) \
@@ -108,6 +93,22 @@ LDFLAGS := \
 	-Xlinker --gc-sections --specs=nano.specs \
 	-Wl,--print-memory-usage \
 	-Wl,--undefined=uxTopUsedPriority
+
+INCLUDES := \
+	-I app/inc \
+	-I cm4/Device/ST/STM32F4xx/Include \
+	-I cm4/Include \
+	-I drivers/inc \
+	-I freertos/inc \
+	-I lib/inc \
+	-I lwip/src/include/lwip \
+	-I lwip/src/include \
+	-I lwip/port/include \
+	-I lwip/port \
+	-I net/inc \
+	-I system/inc \
+	-I task/inc \
+	-I utils/inc
 
 #******************************************************************************
 # C File

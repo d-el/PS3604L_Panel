@@ -57,8 +57,6 @@ void http_server_serve(struct netconn *conn){
 	err_t res;
 	char* buf;
 	u16_t buflen;
-	size_t len;
-	ip_addr_t *remote_addr;
 	char *data = pageData;
 
 	res = netconn_recv(conn, &inbuf);
@@ -67,7 +65,7 @@ void http_server_serve(struct netconn *conn){
 	}
 	else{ //res == ERR_OK
 		netbuf_data(inbuf, (void**)&buf, &buflen);
-		P_LOGD(logTag, "Netbuf_data: 0x%x (%u)", buf, buflen);
+		P_LOGD(logTag, "Netbuf_data: 0x%p (%i)", buf, buflen);
 
 		if(httpStrcmp(buf, "GET /")){
 			const url_type *url = NULL;
@@ -92,7 +90,7 @@ void http_server_serve(struct netconn *conn){
 				strcat(data, http_headerEnd);
 				uint32_t size = strlen(data);
 				netconn_write(conn, data, size, NETCONN_NOCOPY);
-				P_LOGD(logTag, "Netconn_write (%u)", size);
+				P_LOGD(logTag, "Netconn_write (%lu)", size);
 
 				if(urlData.size != 0){
 					size = urlData.size;
@@ -100,7 +98,7 @@ void http_server_serve(struct netconn *conn){
 					size = strlen(urlData.data.html);
 				}
 				netconn_write(conn, urlData.data.html, size, NETCONN_NOCOPY);
-				P_LOGD(logTag, "Netconn_write (%u)", size);
+				P_LOGD(logTag, "Netconn_write (%lu)", size);
 			}else{
 				strcpy(data, http_404);
 				strcat(data, http_server);
@@ -109,7 +107,7 @@ void http_server_serve(struct netconn *conn){
 				strcat(data, http_headerEnd);
 				uint32_t size = strlen(data);
 				netconn_write(conn, data, size, NETCONN_NOCOPY);
-				P_LOGD(logTag, "Netconn_write (%u)", size);
+				P_LOGD(logTag, "Netconn_write (%lu)", size);
 
 				if(getUrlTable[getUrlNumber - 1].data.size != 0){
 					size = getUrlTable[getUrlNumber - 1].data.size;
@@ -118,7 +116,7 @@ void http_server_serve(struct netconn *conn){
 				}
 
 				netconn_write(conn, getUrlTable[getUrlNumber - 1].data.data.html, size, NETCONN_NOCOPY);
-				P_LOGD(logTag, "Netconn_write (%u)", size);
+				P_LOGD(logTag, "Netconn_write (%lu)", size);
 			}
 		}
 
@@ -139,6 +137,7 @@ void http_server_serve(struct netconn *conn){
  *
  */
 void httpServerTSK(void *pPrm){
+	(void)pPrm;
 	struct netconn *conn, *newconn;
 	err_t err;
 
@@ -162,7 +161,7 @@ void httpServerTSK(void *pPrm){
 		}
 		else{
 			httpServer.numberRequest++;
-			P_LOGD(logTag, "Connection %u, Remote IP address: %s", httpServer.numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
+			P_LOGD(logTag, "Connection %lu, Remote IP address: %s", httpServer.numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
 			http_server_serve(newconn);
 
 			P_LOGD(logTag, "Delete connection\n");

@@ -34,6 +34,7 @@ charge_type ch;
  * Charger task
  */
 void chargeTSK(void *pPrm){
+	(void)pPrm;
 	TickType_t 				xLastWakeTime = xTaskGetTickCount();
 	const prmHandle_type 	*sHandle = &prmh[Nchu];
 	const prmHandle_type 	*pHandle = &prmh[Nchu];
@@ -43,7 +44,6 @@ void chargeTSK(void *pPrm){
 	uint8_t 				bigstepUp = 0;
 	uint8_t 				bigstepDown = 0;
 	uint8_t 				setDef = 0;
-	enStatus_type 			enstatus;
 	uint8_t 				chargerIsOn = 0;
 	char 					str[30];
 
@@ -89,6 +89,7 @@ void chargeTSK(void *pPrm){
 			/***************************************
 			 * Encoder process
 			 */
+			enStatus_type enstatus;
 			sHandle = pHandle + varParam;
 			if(bigstepUp != 0){
 				enstatus = enBigStepUp(sHandle);
@@ -148,7 +149,7 @@ void chargeTSK(void *pPrm){
 		}
 		//Print voltage
 		if(fp.tf.state.bit.switchIsON != 0){
-			sprintf(str, "U:        %02u.%03u", measV / 1000000, (measV / 1000) % 1000);
+			sprintf(str, "U:        %02lu.%03lu", measV / 1000000, (measV / 1000) % 1000);
 		}else{
 			sprintf(str, "U:        %02u.%03u", ch.u / 1000, ch.u % 1000);
 		}
@@ -161,7 +162,7 @@ void chargeTSK(void *pPrm){
 
 		//Print current
 		if(fp.tf.state.bit.switchIsON != 0){
-			sprintf(str, "I:          %01u.%03u A", measI / 1000000, (measI / 1000) % 1000);
+			sprintf(str, "I:          %01lu.%03lu A", measI / 1000000, (measI / 1000) % 1000);
 		}else{
 			sprintf(str, "I:          %01u.%03u A", ch.i / 1000, ch.i % 1000);
 		}
@@ -175,13 +176,13 @@ void chargeTSK(void *pPrm){
 		//Time
 		if(ch.mode == ch_modeTime){
 			if(fp.tf.state.bit.switchIsON != 0){
-				sprintf(str, "Time:  %um %02us   ", (ch.t * 60 - fp.tf.meas.time) / 60, (ch.t * 60 - fp.tf.meas.time) % 60);
+				sprintf(str, "Time:  %lum %02lus   ", (ch.t * 60 - fp.tf.meas.time) / 60, (ch.t * 60 - fp.tf.meas.time) % 60);
 			}else{
 				sprintf(str, "Time:  %um 00s     ", ch.t);
 			}
 		}else{
 			if(fp.tf.state.bit.switchIsON != 0){
-				sprintf(str, "Time:  %um %02us   ", (fp.tf.meas.time) / 60, (fp.tf.meas.time) % 60);
+				sprintf(str, "Time:  %lum %02lus   ", (fp.tf.meas.time) / 60, (fp.tf.meas.time) % 60);
 			}else{
 				sprintf(str, "Time:  - - -            ");
 			}
@@ -208,7 +209,7 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 60, &arial, 0, str);
 
 		//Print Capacity
-		sprintf(str, "C:         %01u.%03u A/h", fp.tf.meas.capacity / 1000, fp.tf.meas.capacity % 1000);
+		sprintf(str, "C:         %01lu.%03lu A/h", fp.tf.meas.capacity / 1000, fp.tf.meas.capacity % 1000);
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
 

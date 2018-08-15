@@ -78,7 +78,6 @@ enStatus_type enAdd(const prmHandle_type *prmHandle, const prmval_type *prmval, 
 	int32_t s32t;
 	int64_t s64t;
 	float	ftemp;
-	extern uint32_t ipMul;
 
 	switch(prmHandle->type){
 		case u8Frmt:

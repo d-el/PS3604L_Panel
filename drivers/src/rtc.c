@@ -43,13 +43,6 @@ static uint32_t binToBcd(uint32_t x){
 /*!****************************************************************************
  * @brief
  */
-static uint32_t bcdToBin(uint32_t x){
-	return (((x >> 4) & 0x0F)  * 10) + (x & 0x0F);
-}
-
-/*!****************************************************************************
- * @brief
- */
 static uint8_t yearIsLeap(uint16_t year){
 	return (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) ? 1 : 0;
 
@@ -97,66 +90,6 @@ static time_t tmToUnixTime(struct tm *tm){
 	seconds += tm->tm_sec;
 
 	return seconds;
-}
-
-/*!****************************************************************************
- * @brief
- * @param	data
- * @param	time
- */
-static void unixTimeToTm(struct tm *data, time_t time){
-	uint16_t year;
-
-	// Get seconds from UNIX
-	data->tm_sec = time % RTC_SECONDS_PER_MINUTE;
-	// Go to minutes
-	time /= RTC_SECONDS_PER_MINUTE;
-	// Get minutes
-	data->tm_min = time % RTC_MINUTE_PER_HOUR;
-	// Go to hours
-	time /= RTC_MINUTE_PER_HOUR;
-	// Get hours
-	data->tm_hour = time % RTC_HOUR_PER_DAY;
-	// Go to days
-	time /= RTC_HOUR_PER_DAY;
-
-	// Get year
-	year = 1970;
-	while(1){
-		if(yearIsLeap(year) != 0){
-			if(time >= 366){
-				time -= 366;
-			}else{
-				break;
-			}
-		}else if(time >= 365){
-			time -= 365;
-		}else{
-			break;
-		}
-		year++;
-	}
-
-	// Get year in xx format
-	data->tm_year = year - 1900;
-
-	// Get month
-	for(data->tm_mon = 0; data->tm_mon < 12; data->tm_mon++){
-		if(yearIsLeap(year) != 0){
-			if(time >= TM_RTC_Months[1][data->tm_mon]){
-				time -= TM_RTC_Months[1][data->tm_mon];
-			}else{
-				break;
-			}
-		}else if(time >= TM_RTC_Months[0][data->tm_mon]){
-			time -= TM_RTC_Months[0][data->tm_mon];
-		}else{
-			break;
-		}
-	}
-
-	// Date starts with 1
-	data->tm_mday = time + 1;
 }
 
 /*!****************************************************************************

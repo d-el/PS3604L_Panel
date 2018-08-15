@@ -25,6 +25,7 @@ uint32_t startCounter;	///< Device start counter
  * @brief	GUI invitation program task
  */
 void startupTSK(void *pPrm){
+	(void)pPrm;
 	char str[30];
 
 	while(1){
@@ -38,10 +39,10 @@ void startupTSK(void *pPrm){
 
 		disp_setColor(black, white);
 		disp_fillScreen(black);
-		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, black, white, &ImageLogo);  //Logo
+		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, &ImageLogo);  //Logo
 
 		if(fp.state.sysSettingLoadDefault == 0){
-			sprintf(str, "COUNT %u", startCounter);
+			sprintf(str, "COUNT %lu", startCounter);
 		}else{
 			sprintf(str, "COUNT -");
 		}

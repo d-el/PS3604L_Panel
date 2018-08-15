@@ -56,12 +56,13 @@ unsigned long vGetTimerForRunTimeStats(void){
 	// Return time in us
 	return counter;
 }
-uint32_t load;
+
 /*!****************************************************************************
  * @brief
  */
 void monitorTSK(void *pPrm){
-		static const char *stateToChar[] = {
+	(void)pPrm;
+	static const char *stateToChar[] = {
 		"Running",		/* A task is querying the state of itself, so must be running. */
 		"Ready",		/* The task being queried is in a read or pending ready list. */
 		"Blocked",		/* The task being queried is in the Blocked state. */
@@ -95,7 +96,7 @@ void monitorTSK(void *pPrm){
 
 				taskTimePrev[task] = buffer[task].ulRunTimeCounter;
 
-				P_LOGI(logTag, "%20s: %9s, %u, %6u, %u us\n",
+				P_LOGI(logTag, "%20s: %9s, %lu, %6i, %lu us\n",
 				buffer[task].pcTaskName,
 				stateToChar[buffer[task].eCurrentState],
 				buffer[task].uxCurrentPriority,
@@ -104,17 +105,17 @@ void monitorTSK(void *pPrm){
 			}
 
 			P_LOGI(logTag, "Current Heap Free Size: %u\n", xPortGetFreeHeapSize());
-			P_LOGI(logTag, "Total RunTime: %u us\n", totalRuntime);
-			P_LOGI(logTag, "System Uptime: %u ms\n", xTaskGetTickCount() * portTICK_PERIOD_MS);
+			P_LOGI(logTag, "Total RunTime: %lu us\n", totalRuntime);
+			P_LOGI(logTag, "System Uptime: %lu ms\n", xTaskGetTickCount() * portTICK_PERIOD_MS);
 
-			P_LOGI(logTag, "All task PeriodTime:  %u us\n", allTaskPeriodTime);
-			P_LOGI(logTag, "Idle task PeriodTime: %u us\n", idleTaskPeriodTime);
+			P_LOGI(logTag, "All task PeriodTime:  %lu us\n", allTaskPeriodTime);
+			P_LOGI(logTag, "Idle task PeriodTime: %lu us\n", idleTaskPeriodTime);
 
 
 			if(allTaskPeriodTime >= idleTaskPeriodTime){
 				uint64_t effectiveTaskPeriodTime = allTaskPeriodTime - idleTaskPeriodTime;
-				load = (effectiveTaskPeriodTime * 100000) / allTaskPeriodTime;
-				P_LOGI(logTag, "OS load: %u.%03u %%\n", load / 1000, load % 1000);
+				uint32_t load = (effectiveTaskPeriodTime * 100000) / allTaskPeriodTime;
+				P_LOGI(logTag, "OS load: %lu.%03lu %%\n", load / 1000, load % 1000);
 			}
 		}
 
@@ -126,6 +127,7 @@ void monitorTSK(void *pPrm){
  *
  */
 void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName){
+	(void)xTask;
 	P_LOGE(logTag, "Stack Overflow on %s\n", pcTaskName);
 	while(1);
 }
