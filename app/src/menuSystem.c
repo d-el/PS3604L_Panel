@@ -10,13 +10,14 @@
 /*!****************************************************************************
  * Include
  */
-#include "stdio.h"
+#include <inttypes.h>
+#include <stdio.h>
+#include <stddef.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
 #include "FreeRTOS.h"
 #include "task.h"
-#include "stddef.h"
-#include "string.h"
-#include "stdlib.h"
-#include "time.h"
 #include "menuSystem.h"
 #include "settingTSK.h"
 #include "ui.h"
@@ -503,9 +504,9 @@ void printItem(const menuItem_type *menuItem, uint8_t itemNumber, uint8_t isSele
 	uint8_t selectionPosition, selectionLength;
 
 	if(menuItem != menuItem->child){
-		sprintf(string, "/%s", menuItem->label);
+		snprintf(string, sizeof(string), "/%s", menuItem->label);
 	}else{
-		sprintf(string, "%s", menuItem->label);
+		snprintf(string, sizeof(string), "%s", menuItem->label);
 	}
 
 	if(menuItem->prmHandle == NULL){
@@ -566,11 +567,11 @@ void printUsigVar(char *string, const menuItem_type *menuItem, uint32_t var){
 	static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
 
 	if(menuItem->prmHandle->power == 0){
-		sprintf(string, "%lu%s", var, menuItem->units);
+		sprintf(string, "%"PRIu32"%s", var, menuItem->units);
 	}else{
 		uint32_t a = var / pows[menuItem->prmHandle->power];
 		uint32_t b = var % pows[menuItem->prmHandle->power];
-		sprintf(string, "%lu.%0*lu%s", a, menuItem->prmHandle->power, b, menuItem->units);
+		sprintf(string, "%"PRIu32".%0*"PRIu32"%s", a, menuItem->prmHandle->power, b, menuItem->units);
 	}
 }
 
@@ -581,14 +582,14 @@ void printSigVar(char *string, const menuItem_type *menuItem, int32_t var){
 	static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
 
 	if(menuItem->prmHandle->power == 0){
-		sprintf(string, "%li%s", var, menuItem->units);
+		sprintf(string, "%"PRIi32"%s", var, menuItem->units);
 	}else{
 		uint32_t a = abs(var) / pows[menuItem->prmHandle->power];
 		uint32_t b = abs(var) % pows[menuItem->prmHandle->power];
 		if(var < 0){
 			*string++ = '-';
 		}
-		sprintf(string, "%lu.%0*lu%s", a, menuItem->prmHandle->power, b, menuItem->units);
+		sprintf(string, "%"PRIu32".%0*"PRIi32"%s", a, menuItem->prmHandle->power, b, menuItem->units);
 	}
 }
 
@@ -613,7 +614,7 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
 	if(editSectionNumber == 0){
 		*selectionPosition = 0;
 	}
-	nchars += sprintf(string, "%lu:", (ip >> 24) & 0xFF);
+	nchars += sprintf(string, "%"PRIu32":", (ip >> 24) & 0xFF);
 	if(editSectionNumber == 0){
 		*selectionLength = nchars - *selectionPosition - 1;
 	}
@@ -622,7 +623,7 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
 	if(editSectionNumber == 1){
 		*selectionPosition = nchars;
 	}
-	nchars += sprintf(string + nchars, "%lu:", (ip >> 16) & 0xFF);
+	nchars += sprintf(string + nchars, "%"PRIu32":", (ip >> 16) & 0xFF);
 	if(editSectionNumber == 1){
 		*selectionLength = nchars - *selectionPosition - 1;
 	}
@@ -631,7 +632,7 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
 	if(editSectionNumber == 2){
 		*selectionPosition = nchars;
 	}
-	nchars += sprintf(string + nchars, "%lu:", (ip >> 8) & 0xFF);
+	nchars += sprintf(string + nchars, "%"PRIu32":", (ip >> 8) & 0xFF);
 	if(editSectionNumber == 2){
 		*selectionLength = nchars - *selectionPosition - 1;
 	}
@@ -640,7 +641,7 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
 	if(editSectionNumber == 3){
 		*selectionPosition = nchars;
 	}
-	nchars += sprintf(string + nchars, "%lu", (ip >> 0) & 0xFF);
+	nchars += sprintf(string + nchars, "%"PRIu32"", (ip >> 0) & 0xFF);
 	if(editSectionNumber == 3){
 		*selectionLength = nchars - *selectionPosition;
 	}

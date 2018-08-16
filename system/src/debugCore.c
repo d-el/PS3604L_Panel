@@ -10,7 +10,8 @@
 /*!****************************************************************************
  * Include
  */
-#include "stdint.h"
+#include <inttypes.h>
+#include <stdint.h>
 #include "write.h"
 #include "plog.h"
 #include "stm32f4xx.h"
@@ -61,38 +62,38 @@ void hardFaultHandlerC(unsigned int * stackedContextPtr){
 	plog_setWriteFd(write_semihost);
 
 	P_LOGE(logTag, "[GAME OVER]");
-	P_LOGE(logTag, "R0 = 0x%08lX", stacked_r0);
-	P_LOGE(logTag, "R1 = 0x%08lX", stacked_r1);
-	P_LOGE(logTag, "R2 = 0x%08lX", stacked_r2);
-	P_LOGE(logTag, "R3  = 0x%08lX", stacked_r3);
-	P_LOGE(logTag, "R12 = 0x%08lX", stacked_r12);
-	P_LOGE(logTag, "R14 LR = 0x%08lX  subroutine call return address", stacked_lr);
-	P_LOGE(logTag, "R15 PC = 0x%08lX  program counter", stacked_pc);
+	P_LOGE(logTag, "R0 = 0x%08"PRIX32, stacked_r0);
+	P_LOGE(logTag, "R1 = 0x%08"PRIX32, stacked_r1);
+	P_LOGE(logTag, "R2 = 0x%08"PRIX32, stacked_r2);
+	P_LOGE(logTag, "R3  = 0x%08"PRIX32, stacked_r3);
+	P_LOGE(logTag, "R12 = 0x%08"PRIX32, stacked_r12);
+	P_LOGE(logTag, "R14 LR = 0x%08"PRIX32"  subroutine call return address", stacked_lr);
+	P_LOGE(logTag, "R15 PC = 0x%08"PRIX32"  program counter", stacked_pc);
 	P_LOGE(logTag, "PSR = 0x%08lX", stacked_psr);
 
 	// System Handler Control and State Register
-	P_LOGE(logTag, "SHCSR = 0x%08lX", SCB->SHCSR);
+	P_LOGE(logTag, "SHCSR = 0x%08"PRIX32, SCB->SHCSR);
 
 	// Configurable Fault Status Register
 	// Consists of MMSR, BFSR and UFSR
-	P_LOGE(logTag, "CFSR = 0x%08lX", SCB->CFSR);
+	P_LOGE(logTag, "CFSR = 0x%08"PRIX32, SCB->CFSR);
 
 	// Hard Fault Status Register
-	P_LOGE(logTag, "HFSR = 0x%08lX", SCB->HFSR);
+	P_LOGE(logTag, "HFSR = 0x%08"PRIX32, SCB->HFSR);
 
 	// Debug Fault Status Register
-	P_LOGE(logTag, "DFSR = 0x%08lX", SCB->DFSR);
+	P_LOGE(logTag, "DFSR = 0x%08"PRIX32, SCB->DFSR);
 
 	// Read the Fault Address Registers. These may not contain valid values.
 	// Check BFARVALID/MMARVALID to see if they are valid values
 	// MemManage Fault Address Register
-	P_LOGE(logTag, "MMFAR = 0x%08lX", SCB->MMFAR);
+	P_LOGE(logTag, "MMFAR = 0x%08"PRIX32, SCB->MMFAR);
 
 	// Bus Fault Address Register
-	P_LOGE(logTag, "BFAR = 0x%08lX", SCB->BFAR);
+	P_LOGE(logTag, "BFAR = 0x%08"PRIX32, SCB->BFAR);
 
 	// Auxiliary Fault Status Register
-	P_LOGE(logTag, "AFSR = 0x%08lX", SCB->AFSR);
+	P_LOGE(logTag, "AFSR = 0x%08"PRIX32, SCB->AFSR);
 
 	asm("BKPT #1");
 	while(1)

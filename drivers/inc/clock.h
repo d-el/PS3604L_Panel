@@ -40,7 +40,7 @@ typedef enum {
 /*!****************************************************************************
  * Function declaration
  */
-uint8_t clock_init(void);
+clockState_type clock_init(void);
 
 #endif //clock_H
 /******************************** END OF FILE ********************************/

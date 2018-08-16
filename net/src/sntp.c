@@ -10,6 +10,7 @@
 /*!****************************************************************************
  * Include
  */
+#include <inttypes.h>
 #include <string.h>
 #include <assert.h>
 #include <time.h>
@@ -241,7 +242,7 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, const ip_a
 	#else
 		/* Set up timeout for next request */
 		sys_timeout((u32_t) SNTP_UPDATE_DELAY, sntp_request, NULL);
-		P_LOGD(logTag, "sntp_recv: Scheduled next time request: %u ms", (u32_t)SNTP_UPDATE_DELAY);
+		P_LOGD(logTag, "sntp_recv: Scheduled next time request: %"PRIu16" ms", (u32_t)SNTP_UPDATE_DELAY);
 	#endif
 	}else if(err == SNTP_ERR_KOD){
 		/* Kiss-of-death packet. Use another server or increase UPDATE_DELAY. */
@@ -269,7 +270,7 @@ static void sntp_send_request(const ip_addr_t *server_addr){
 		/* set up receive timeout: try next server or retry on timeout */
 		sys_timeout((u32_t) SNTP_RECV_TIMEOUT, sntp_try_next_server, NULL);
 	}else{
-		P_LOGD(logTag, "sntp_send_request: Out of memory, trying again in %u ms", SNTP_RETRY_TIMEOUT);
+		P_LOGD(logTag, "sntp_send_request: Out of memory, trying again in %"PRIu16" ms", SNTP_RETRY_TIMEOUT);
 		/* out of memory: set up a timer to send a retry */
 		sys_timeout(SNTP_RETRY_TIMEOUT, sntp_request, NULL);
 	}

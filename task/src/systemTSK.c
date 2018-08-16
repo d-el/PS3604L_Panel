@@ -10,8 +10,9 @@
 /*!****************************************************************************
  * Include
  */
-#include "stdlib.h"
-#include "assert.h"
+#include <inttypes.h>
+#include <stdlib.h>
+#include <assert.h>
 #include "plog.h"
 #include "prmSystem.h"
 #include "pvd.h"
@@ -244,7 +245,7 @@ void shutdown(void){
 	if(stat == prm_ok){
 		P_LOGI(logTag, "System settings store ok");
 	}else{
-		P_LOGE(logTag, "System settings store error: %i", stat);
+		P_LOGE(logTag, "System settings store error: %u", stat);
 	}
 
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
@@ -322,7 +323,7 @@ void netSettingUpdate(void){
  */
 void timezoneUpdate(void){
 	char str[12];
-	sprintf(str, "TZ=GMT%i", -fp.fpSet.timezone);
+	sprintf(str, "TZ=GMT%"PRIi8, -fp.fpSet.timezone);
 	putenv(str);
 	tzset();
 }

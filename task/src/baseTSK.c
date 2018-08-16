@@ -10,9 +10,10 @@
 /*!****************************************************************************
  * Include
  */
+#include <inttypes.h>
+#include <string.h>
+#include <stdio.h>
 #include "plog.h"
-#include "string.h"
-#include "stdio.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -188,9 +189,9 @@ void baseTSK(void *pPrm){
 		 */
 		//Print voltage
 		if(fp.tf.state.bit.switchIsON != 0){
-			sprintf(str, "%02lu.%03lu", measV / 1000000, (measV / 1000) % 1000);
+			snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32"", measV / 1000000, (measV / 1000) % 1000);
 		}else{
-			sprintf(str, "%02u.%03u", bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u % 1000);
+			snprintf(str, sizeof(str), "%02"PRIu16".%03"PRIu16"", bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u % 1000);
 		}
 		if(varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
@@ -209,11 +210,11 @@ void baseTSK(void *pPrm){
 
 		if(fp.tf.state.bit.switchIsON != 0){
 			if(measI < 99000){
-				sprintf(str, "%2lu.%03lu", measI / 1000, measI % 1000);
+				snprintf(str, sizeof(str), "%2"PRIu32".%03"PRIu32"", measI / 1000, measI % 1000);
 				disp_putChar(150, 36, &font8x12, 'm');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}else{
-				sprintf(str, "%2lu.%03lu", measI / 1000000, (measI / 1000) % 1000);
+				snprintf(str, sizeof(str), "%2"PRIu32".%03"PRIu32, measI / 1000000, (measI / 1000) % 1000);
 				disp_putChar(150, 36, &font8x12, ' ');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}
@@ -247,7 +248,7 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.imax);
 		}
-		sprintf(str, "%2u.%03u", bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
+		snprintf(str, sizeof(str), "%2"PRIu16".%03"PRIu16, bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
 		disp_putStr(16, 70, &arial, 0, str);
 		disp_putChar(64, 72, &font8x12, 'A');
 
@@ -332,19 +333,19 @@ void printStatusBar(void){
 		disp_setColor(black, white);
 
 		//Print output power
-		sprintf(str, "%02lu.%03lu W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
+		snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32" W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
 		disp_putStr(0, 110, &font6x8, 0, str);
 
 		//Print load resistance
 		if(fp.tf.meas.resistance != 99999){
-			sprintf(str, "%05lu  \xB1", fp.tf.meas.resistance);
+			snprintf(str, sizeof(str), "%05"PRIu32"  \xB1", fp.tf.meas.resistance);
 			disp_putStr(0, 120, &font6x8, 0, str);
 		}else{
 			disp_putStr(0, 120, &font6x8, 0, " ---   \xB1");
 		}
 
 		//Print regulator temperature
-		sprintf(str, "%02u.%u\xB0\x43", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
+		snprintf(str, sizeof(str), "%02"PRIu16".%"PRIu16"\xB0\x43", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
 		//Print time
@@ -375,11 +376,11 @@ void printStatusBar(void){
 				disp_setColor(black, red);
 			}
 
-			sprintf(str, "LAN");
+			snprintf(str, sizeof(str), "LAN");
 			disp_putStr(69, 110, &font6x8, 0, str);
 		}
 		else{
-			sprintf(str, "    ");
+			snprintf(str, sizeof(str), "    ");
 			disp_putStr(69, 110, &font6x8, 0, str);
 		}
 

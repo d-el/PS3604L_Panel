@@ -61,11 +61,11 @@ void http_server_serve(struct netconn *conn){
 
 	res = netconn_recv(conn, &inbuf);
 	if(res != ERR_OK){
-		P_LOGE(logTag, "Error in netconn_recv, %d", res);
+		P_LOGE(logTag, "Error in netconn_recv, %"PRIi8, res);
 	}
 	else{ //res == ERR_OK
 		netbuf_data(inbuf, (void**)&buf, &buflen);
-		P_LOGD(logTag, "Netbuf_data: 0x%p (%i)", buf, buflen);
+		P_LOGD(logTag, "Netbuf_data: 0x%p (%"PRIu16")", buf, buflen);
 
 		if(httpStrcmp(buf, "GET /")){
 			const url_type *url = NULL;
@@ -90,7 +90,7 @@ void http_server_serve(struct netconn *conn){
 				strcat(data, http_headerEnd);
 				uint32_t size = strlen(data);
 				netconn_write(conn, data, size, NETCONN_NOCOPY);
-				P_LOGD(logTag, "Netconn_write (%lu)", size);
+				P_LOGD(logTag, "Netconn_write (%"PRIu32")", size);
 
 				if(urlData.size != 0){
 					size = urlData.size;
@@ -98,7 +98,7 @@ void http_server_serve(struct netconn *conn){
 					size = strlen(urlData.data.html);
 				}
 				netconn_write(conn, urlData.data.html, size, NETCONN_NOCOPY);
-				P_LOGD(logTag, "Netconn_write (%lu)", size);
+				P_LOGD(logTag, "Netconn_write (%"PRIu32")", size);
 			}else{
 				strcpy(data, http_404);
 				strcat(data, http_server);
@@ -107,7 +107,7 @@ void http_server_serve(struct netconn *conn){
 				strcat(data, http_headerEnd);
 				uint32_t size = strlen(data);
 				netconn_write(conn, data, size, NETCONN_NOCOPY);
-				P_LOGD(logTag, "Netconn_write (%lu)", size);
+				P_LOGD(logTag, "Netconn_write (%"PRIu32")", size);
 
 				if(getUrlTable[getUrlNumber - 1].data.size != 0){
 					size = getUrlTable[getUrlNumber - 1].data.size;
@@ -116,7 +116,7 @@ void http_server_serve(struct netconn *conn){
 				}
 
 				netconn_write(conn, getUrlTable[getUrlNumber - 1].data.data.html, size, NETCONN_NOCOPY);
-				P_LOGD(logTag, "Netconn_write (%lu)", size);
+				P_LOGD(logTag, "Netconn_write (%"PRIu32")", size);
 			}
 		}
 
@@ -161,7 +161,7 @@ void httpServerTSK(void *pPrm){
 		}
 		else{
 			httpServer.numberRequest++;
-			P_LOGD(logTag, "Connection %lu, Remote IP address: %s", httpServer.numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
+			P_LOGD(logTag, "Connection %"PRIu32", Remote IP address: %s", httpServer.numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
 			http_server_serve(newconn);
 
 			P_LOGD(logTag, "Delete connection\n");

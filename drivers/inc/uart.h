@@ -102,7 +102,7 @@ typedef struct uartStruct{
 	void (*rxHoock)(struct uartStruct *uartx);
 	volatile uartTxState_type	txState			:8;
 	volatile uartRxState_type	rxState			:8;
-	uartTxState_type			baudRate		:4;
+	uartBaudRate_type			baudRate		:4;
 	uint8_t						halfDuplex		:1;
 	uint8_t						rxIdleLineMode	:1;
 	volatile uint16_t			txCnt;

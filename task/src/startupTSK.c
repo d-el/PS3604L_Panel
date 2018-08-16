@@ -10,7 +10,8 @@
 /*!****************************************************************************
  * Include
  */
-#include "stdio.h"
+#include <inttypes.h>
+#include <stdio.h>
 #include "ledpwm.h"
 #include "key.h"
 #include "startupTSK.h"
@@ -42,7 +43,7 @@ void startupTSK(void *pPrm){
 		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, &ImageLogo);  //Logo
 
 		if(fp.state.sysSettingLoadDefault == 0){
-			sprintf(str, "COUNT %lu", startCounter);
+			sprintf(str, "COUNT %"PRIu32, startCounter);
 		}else{
 			sprintf(str, "COUNT -");
 		}

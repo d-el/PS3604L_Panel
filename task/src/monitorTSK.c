@@ -96,7 +96,7 @@ void monitorTSK(void *pPrm){
 
 				taskTimePrev[task] = buffer[task].ulRunTimeCounter;
 
-				P_LOGI(logTag, "%20s: %9s, %lu, %6i, %lu us\n",
+				P_LOGI(logTag, "%20s: %9s, %"PRIu32", %6"PRIu16", %"PRIu32" us\n",
 				buffer[task].pcTaskName,
 				stateToChar[buffer[task].eCurrentState],
 				buffer[task].uxCurrentPriority,
@@ -105,17 +105,17 @@ void monitorTSK(void *pPrm){
 			}
 
 			P_LOGI(logTag, "Current Heap Free Size: %u\n", xPortGetFreeHeapSize());
-			P_LOGI(logTag, "Total RunTime: %lu us\n", totalRuntime);
-			P_LOGI(logTag, "System Uptime: %lu ms\n", xTaskGetTickCount() * portTICK_PERIOD_MS);
+			P_LOGI(logTag, "Total RunTime: %"PRIu32" us\n", totalRuntime);
+			P_LOGI(logTag, "System Uptime: %"PRIu32" ms\n", xTaskGetTickCount() * portTICK_PERIOD_MS);
 
-			P_LOGI(logTag, "All task PeriodTime:  %lu us\n", allTaskPeriodTime);
-			P_LOGI(logTag, "Idle task PeriodTime: %lu us\n", idleTaskPeriodTime);
+			P_LOGI(logTag, "All task PeriodTime:  %"PRIu32" us\n", allTaskPeriodTime);
+			P_LOGI(logTag, "Idle task PeriodTime: %"PRIu32" us\n", idleTaskPeriodTime);
 
 
 			if(allTaskPeriodTime >= idleTaskPeriodTime){
 				uint64_t effectiveTaskPeriodTime = allTaskPeriodTime - idleTaskPeriodTime;
 				uint32_t load = (effectiveTaskPeriodTime * 100000) / allTaskPeriodTime;
-				P_LOGI(logTag, "OS load: %lu.%03lu %%\n", load / 1000, load % 1000);
+				P_LOGI(logTag, "OS load: %"PRIu32".%03"PRIu32" %%\n", load / 1000, load % 1000);
 			}
 		}
 
