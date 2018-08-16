@@ -9,12 +9,12 @@
 /*!****************************************************************************
  * Include
  */
+#include "../inc/i2c22.h"
 #include "pvd.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "beep.h"
 #include "st7735.h"
 #include "uart.h"
-#include "i2c.h"
 #include "enco.h"
 #include "clock.h"
 #include "ledpwm.h"

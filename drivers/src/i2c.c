@@ -1,17 +1,16 @@
 ﻿/*!****************************************************************************
  * @file		i2c.c
  * @author		d_el
- * @version		V1.5
+ * @version		V1.6
  * @date		18.12.2017
  * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver for I2C STM32F4 MCUs
- * @copyright	Copyright (C) 2017 Storozhenko Roman
  */
 
 /*!****************************************************************************
  * Include
  */
-#include "stddef.h"
+#include <stddef.h>
 #include "i2c.h"
 #include "gpio.h"
 
@@ -169,13 +168,15 @@ void i2c_setCallback(i2c_type *i2cx, i2cCallback_type tcHook){
 /******************************************************************************
  *
  */
-void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr){
+void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode){
 	i2cx->pDmaStreamTx->CR		&= ~DMA_SxCR_EN;
 	i2cx->pDmaStreamTx->M0AR	= (uint32_t)src;
 	i2cx->pDmaStreamTx->NDTR	= len;
 	i2cx->slaveAdr				= slaveAdr & 0xFE;				//Write
+	i2cx->stopMode				= stopMode;
+
 	i2cx->pDmaStreamTx->CR		|= DMA_SxCR_EN;
-	i2cx->pI2c->CR1				 |= I2C_CR1_START;				//Generation start condition
+	i2cx->pI2c->CR1				|= I2C_CR1_START;				//Generation start condition
 	i2cx->state					= i2cTxRun;
 }
 
@@ -188,7 +189,7 @@ void i2c_read(i2c_type *i2cx, void *dst, uint16_t len, uint8_t slaveAdr){
 	i2cx->pDmaStreamRx->NDTR	= len;
 	i2cx->slaveAdr				= slaveAdr | 0x01;				//Read
 	i2cx->pDmaStreamRx->CR		|= DMA_SxCR_EN;
-	I2C1->CR1					|= I2C_CR1_START;				//Generation start condition
+	i2cx->pI2c->CR1				|= I2C_CR1_START;				//Generation start condition
 	i2cx->state					= i2cRxRun;
 }
 
@@ -200,23 +201,34 @@ void i2cEventHendler(i2c_type *i2cx){
 
 	I2Cx_SR1 = i2cx->pI2c->SR1;
 
-	if(I2Cx_SR1 & I2C_SR1_SB){					//Start condition generated
+	//Start condition generated
+	if(I2Cx_SR1 & I2C_SR1_SB){
 		i2cx->pI2c->DR = i2c1Sct.slaveAdr;
 		return;
 	}
-	if(I2Cx_SR1 & I2C_SR1_ADDR){				//ADDR is set
+
+	//ADDR is set
+	if(I2Cx_SR1 & I2C_SR1_ADDR){
 		(void)i2cx->pI2c->SR2;					//Clear ADDR flag by reading SR2 register
 		return;
 	}
 
-	if(I2Cx_SR1 & I2C_SR1_BTF){					//Data byte transfer succeeded
-		I2C1->CR1	|= I2C_CR1_STOP;
-		while((I2C1->CR1 & I2C_CR1_STOP) != 0);
+	//Data byte transfer succeeded
+	//Cleared by software by either a read or write in the DR register or by hardware after a start or
+	//a stop condition in transmission or when PE=0.
+	if(I2Cx_SR1 & I2C_SR1_BTF){
 		if(i2cx->state == i2cTxRun){
+			if(i2cx->stopMode == i2cNeedStop){
+				i2cx->pI2c->CR1	|= I2C_CR1_STOP;
+				while((i2c1->pI2c->CR1 & I2C_CR1_STOP) != 0);
+			}else{
+				(void)i2cx->pI2c->DR;
+			}
+
 			i2cx->state = i2cTxSuccess;
-		}
-		if(i2cx->tcHook != NULL){				//Call hook
-			i2cx->tcHook(i2cx);
+			if(i2cx->tcHook != NULL){				//Call hook
+				i2cx->tcHook(i2cx);
+			}
 		}
 	}
 }
@@ -242,6 +254,21 @@ void i2cErrorHendler(i2c_type *i2cx){
 }
 
 /******************************************************************************
+ * I2C RX DMA HANDLER
+ */
+void i2cRxDmaHendler(i2c_type *i2cx){
+	i2cx->pI2c->CR1	|= I2C_CR1_STOP;
+	while((i2cx->pI2c->CR1 & I2C_CR1_STOP) != 0);
+
+	if(i2cx->state == i2cRxRun){
+		i2cx->state = i2cRxSuccess;
+		if(i2cx->tcHook != NULL){				//Call hook
+			i2cx->tcHook(i2cx);
+		}
+	}
+}
+
+/******************************************************************************
  * I2C1
  */
 #if (I2C1_USE == 1)
@@ -252,10 +279,7 @@ void I2C1_ER_IRQHandler(void){
 	i2cErrorHendler(i2c1);
 }
 void DMA1_Stream5_IRQHandler(void){			//RX
-	i2c1Sct.state = i2cRxSuccess;
-	if(i2c1Sct.tcHook != NULL){				//Call hook
-		i2c1Sct.tcHook(&i2c1Sct);
-	}
+	i2cRxDmaHendler(i2c1);
 	DMA1->HIFCR	 =	DMA_HIFCR_CTCIF5;		//Clear flag
 }
 void DMA1_Stream6_IRQHandler(void){			//TX
@@ -274,8 +298,8 @@ void I2C1_ER_IRQHandler(void){
 	i2cErrorHendler(i2c2);
 }
 void DMA1_Stream3_IRQHandler(void){			//RX
+	i2cRxDmaHendler(i2c2);
 	DMA1->HIFCR	 =	DMA_HIFCR_CTCIF3;		//Clear flag
-	i2c2Sct.state = i2cRxSuccess;
 }
 void DMA1_Stream7_IRQHandler(void){			//TX
 	DMA1->HIFCR	 =	DMA_HIFCR_CTCIF7;		//Clear flag
@@ -293,8 +317,8 @@ void I2C1_ER_IRQHandler(void){
 	i2cErrorHendler(i2c3);
 }
 void DMA1_Stream2_IRQHandler(void){			//RX
+	i2cRxDmaHendler(i2c3);
 	DMA1->HIFCR	 =	DMA_HIFCR_CTCIF2;		//Clear flag
-	i2c3Sct.state = i2cRxSuccess;
 }
 void DMA1_Stream4_IRQHandler(void){			//TX
 	DMA1->HIFCR	 =	DMA_HIFCR_CTCIF4;		//Clear flag

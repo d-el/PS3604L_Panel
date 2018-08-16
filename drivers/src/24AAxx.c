@@ -10,13 +10,13 @@
 /*!****************************************************************************
 * Include
 */
-#include "string.h"
-#include "assert.h"
+#include <string.h>
+#include <assert.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-#include "i2c.h"
 #include "24AAxx.h"
+#include "i2c.h"
 
 /*!****************************************************************************
 * Memory
@@ -88,7 +88,7 @@ eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len){
 			eep_tempBff[0] = adrInBlock;
 			memcpy(&eep_tempBff[1], pData, len);
 
-			i2c_write(usei2c, eep_tempBff, len + 1, eepAdr.all);
+			i2c_write(usei2c, eep_tempBff, len + 1, eepAdr.all, i2cNeedStop);
 			res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
 			if(res != pdTRUE){
 				return eepI2cError;
@@ -101,7 +101,7 @@ eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len){
 			eep_tempBff[0] = adrInBlock;
 			memcpy(&eep_tempBff[1], pData, canWrite);
 
-			i2c_write(usei2c, eep_tempBff, canWrite + 1, eepAdr.all);
+			i2c_write(usei2c, eep_tempBff, canWrite + 1, eepAdr.all, i2cNeedStop);
 			res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
 			if(res != pdTRUE){
 				return eepI2cError;
@@ -136,7 +136,7 @@ eepStatus_type eep_read(void *dst, uint16_t src, uint16_t len){
 	eepAdr.bit.rw = eepWrite;
 	adrInBlock = src % BYTESINPAGE;
 
-	i2c_write(usei2c, &adrInBlock, 1, eepAdr.all);
+	i2c_write(usei2c, &adrInBlock, 1, eepAdr.all, i2cNeedStop);
 	res = xSemaphoreTake(i2cSem, pdMS_TO_TICKS(i2ctimeout));
 	if(res != pdTRUE){
 		return eepI2cError;

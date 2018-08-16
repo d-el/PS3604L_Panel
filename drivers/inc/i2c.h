@@ -1,7 +1,7 @@
 ﻿/*!****************************************************************************
  * @file		i2c.h
  * @author		d_el
- * @version		V1.5
+ * @version		V1.6
  * @date		18.12.2017
  * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		Driver for I2C STM32F4 MCUs
@@ -73,6 +73,11 @@ typedef enum{
 	i2cSoftTimeout
 }i2cState_type;
 
+typedef enum{
+    i2cNeedStop,
+    i2cWithoutStop
+}i2c_stopMode_type;
+
 typedef struct i2cStruct{
 	I2C_TypeDef			*pI2c;
 	DMA_Stream_TypeDef	*pDmaStreamRx;
@@ -84,7 +89,8 @@ typedef struct i2cStruct{
 	uint8_t				dmaChannelRx	:4;
 	uint8_t				dmaChannelTx	:4;
 	uint8_t				slaveAdr;
-	volatile i2cState_type		 state;
+	i2c_stopMode_type	stopMode;
+	volatile i2cState_type	state;
 }i2c_type;
 
 typedef void (*i2cCallback_type)(i2c_type *i2cx);
@@ -113,7 +119,7 @@ extern i2c_type		   *i2c1;
 void i2c_init(i2c_type *i2cx);
 void i2c_reInit(i2c_type *i2cx);
 void i2c_setCallback(i2c_type *i2cx, i2cCallback_type tcHook);
-void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr);
+void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode);
 void i2c_read(i2c_type *i2cx, void *dst, uint16_t len, uint8_t slaveAdr);
 
 #endif //i2c_H
