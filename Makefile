@@ -2,7 +2,8 @@
 # Makefile PS3604LF
 #
 TARGET := PS3604LF
-ODIR := build
+ODIR ?= build
+OBJODIR := $(ODIR)/obj
 
 # A simple variant is to prefix commands with $(Q) - that's useful
 # for commands that shall be hidden in non-verbose mode.
@@ -52,8 +53,14 @@ OBJCOPY	= $(CROSS_COMPILE)objcopy
 OBJDUMP	= $(CROSS_COMPILE)objdump
 SIZE	= $(CROSS_COMPILE)size
 
+# File System Utilities
+MKDIR	= mkdir -p
+RM		= rm -f
+MV		= mv -f
+
 LDFILES	:= -T ldscript/STM32F407VETx_FLASH.ld
 LIBS	:= lib/IQmathLib-cm4.a
+BIN2OBJ	:= -I binary -O elf32-littlearm -B arm --rename-section .data=.rodata
 
 CPUFLAGS := \
 	-mcpu=cortex-m4 -mthumb \
@@ -94,6 +101,8 @@ LDFLAGS := \
 	-Wl,--print-memory-usage \
 	-Wl,--undefined=uxTopUsedPriority
 
+#******************************************************************************
+# Header File
 INCLUDES := \
 	-I app/inc \
 	-I cm4/Device/ST/STM32F4xx/Include \
@@ -135,12 +144,15 @@ ASRCS :=
 # ASM File (*.s)
 ASRCs :=
 
-OBJODIR := $(ODIR)/obj
+#******************************************************************************
+# Binary resource (*)
+BSRC := $(shell find net/resource -maxdepth 3 -type f -name "*")
 
 OBJS :=	$(CSRCS:%.c=$(OBJODIR)/%.o) \
 		$(CPPSRCS:%.cpp=$(OBJODIR)/%.o) \
 		$(ASRCs:%.s=$(OBJODIR)/%.o) \
-		$(ASRCS:%.S=$(OBJODIR)/%.o)
+		$(ASRCS:%.S=$(OBJODIR)/%.o) \
+		$(BSRC:%=$(OBJODIR)/%)
 
 DEPS :=	$(CSRCS:%.c=$(OBJODIR)/%.d) \
 		$(CPPSRCS:%.cpp=$(OBJODIR)/%.d) \
@@ -149,6 +161,43 @@ DEPS :=	$(CSRCS:%.c=$(OBJODIR)/%.d) \
 
 CFLAGS = $(CCFLAGS) $(INCLUDES)
 CPFLAGS = $(CPPFLAGS) $(INCLUDES)
+
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(MAKECMDGOALS),disasm)
+ifdef DEPS
+sinclude $(DEPS)
+endif
+endif
+endif
+
+$(OBJODIR)/%.o: %.c
+	@echo [CC] $<
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(CC) -MT $@ -MMD -MP -MF $(OBJODIR)/$*.Td $(CFLAGS) -c -o $@ $<
+	$(Q)$(MV) $(OBJODIR)/$*.Td $(OBJODIR)/$*.d && touch $@
+
+$(OBJODIR)/%.o: %.cpp
+	@echo [CPP] $<
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(CC) -MT $@ -MMD -MP -MF $(OBJODIR)/$*.Td $(CPFLAGS) -c -o $@ $<
+	$(Q)$(MV) $(OBJODIR)/$*.Td $(OBJODIR)/$*.d && touch $@
+
+$(OBJODIR)/%.o: %.s
+	@echo [AS] $<
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(AS) $(CFLAGS) -M -o $(OBJODIR)/$*.d $<
+	$(Q)$(AS) $(CFLAGS) -MMD -MP -MF $(OBJODIR)/$*.d -MT$@ -c -o $@ $<
+
+$(OBJODIR)/%.o: %.S
+	@echo [AS] $<
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(AS) $(CFLAGS) -M -o $(OBJODIR)/$*.d $<
+	$(Q)$(AS) $(CFLAGS) -MMD -MP -MF $(OBJODIR)/$*.d -MT$@ -c -o $@ $<
+
+$(OBJODIR)/%: %
+	@echo [OBJCOPY] $<
+	$(Q)$(MKDIR) $(dir $@)
+	$(Q)$(OBJCOPY) $(BIN2OBJ) $< $@
 
 #******************************************************************************
 # Targets
@@ -181,7 +230,7 @@ robjcopy: elf
 
 PHONY += clean
 clean:
-	$(Q)rm -rf $(ODIR)
+	$(Q)$(RM) -r $(ODIR)
 	@echo ' '
 
 disasm: elf
@@ -191,38 +240,6 @@ disasm: elf
 PHONY += listc
 listc:
 	@echo $(CSRCS) $(CPPSRCS) $(CASRCS)
-
-ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(MAKECMDGOALS),disasm)
-ifdef DEPS
-sinclude $(DEPS)
-endif
-endif
-endif
-
-$(OBJODIR)/%.o: %.c
-	@echo [CC] $<
-	$(Q)mkdir -p $(dir $@)
-	$(Q)$(CC) -MT $@ -MMD -MP -MF $(OBJODIR)/$*.Td $(CFLAGS) -c -o $@ $<
-	$(Q)mv -f $(OBJODIR)/$*.Td $(OBJODIR)/$*.d && touch $@
-
-$(OBJODIR)/%.o: %.cpp
-	@echo [CPP] $<
-	$(Q)mkdir -p $(dir $@)
-	$(Q)$(CC) -MT $@ -MMD -MP -MF $(OBJODIR)/$*.Td $(CPFLAGS) -c -o $@ $<
-	$(Q)mv -f $(OBJODIR)/$*.Td $(OBJODIR)/$*.d && touch $@
-
-$(OBJODIR)/%.o: %.s
-	@echo [AS] $<
-	$(Q)mkdir -p $(dir $@)
-	$(Q)$(AS) $(CFLAGS) -M -o $(OBJODIR)/$*.d $<
-	$(Q)$(AS) $(CFLAGS) -MMD -MP -MF $(OBJODIR)/$*.d -MT$@ -c -o $@ $<
-
-$(OBJODIR)/%.o: %.S
-	@echo [AS] $<
-	$(Q)mkdir -p $(dir $@)
-	$(Q)$(AS) $(CFLAGS) -M -o $(OBJODIR)/$*.d $<
-	$(Q)$(AS) $(CFLAGS) -MMD -MP -MF $(OBJODIR)/$*.d -MT$@ -c -o $@ $<
 
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.

@@ -68,19 +68,19 @@ void http_server_serve(struct netconn *conn){
 		P_LOGD(logTag, "Netbuf_data: 0x%p (%"PRIu16")", buf, buflen);
 
 		if(httpStrcmp(buf, "GET /")){
-			const url_type *url = NULL;
+			const httpResource_type *urlres = NULL;
 			for(uint32_t i = 0; i < getUrlNumber; i++){
-				if(httpStrcmp(buf + strlen("GET "), getUrlTable[i].url)){
-					url = &getUrlTable[i];
+				if(httpStrcmp(buf + strlen("GET "), httpResource[i].url)){
+					urlres = &httpResource[i];
 				}
 			}
-			if(url != NULL){
+			if(urlres != NULL){
 				urlData_type urlData;
 
-				if(url->handler != NULL){
-					urlData = url->handler();
+				if(urlres->handler != NULL){
+					urlData = urlres->handler();
 				}else{
-					urlData = url->data;
+					urlData = urlres->data;
 				}
 
 				strcpy(data, http_200);
@@ -95,27 +95,27 @@ void http_server_serve(struct netconn *conn){
 				if(urlData.size != 0){
 					size = urlData.size;
 				}else{
-					size = strlen(urlData.data.html);
+					size = strlen(urlData.payload);
 				}
-				netconn_write(conn, urlData.data.html, size, NETCONN_NOCOPY);
+				netconn_write(conn, urlData.payload, size, NETCONN_NOCOPY);
 				P_LOGD(logTag, "Netconn_write (%"PRIu32")", size);
 			}else{
 				strcpy(data, http_404);
 				strcat(data, http_server);
 				strcat(data, http_connectionClose);
-				strcat(data, http_contentType[getUrlTable[getUrlNumber - 1].data.type]);
+				strcat(data, http_contentType[httpResource[getUrlNumber - 1].data.type]);
 				strcat(data, http_headerEnd);
 				uint32_t size = strlen(data);
 				netconn_write(conn, data, size, NETCONN_NOCOPY);
 				P_LOGD(logTag, "Netconn_write (%"PRIu32")", size);
 
-				if(getUrlTable[getUrlNumber - 1].data.size != 0){
-					size = getUrlTable[getUrlNumber - 1].data.size;
+				if(httpResource[getUrlNumber - 1].data.size != 0){
+					size = httpResource[getUrlNumber - 1].data.size;
 				}else{
-					size = strlen(getUrlTable[getUrlNumber - 1].data.data.html);
+					size = strlen(httpResource[getUrlNumber - 1].data.payload);
 				}
 
-				netconn_write(conn, getUrlTable[getUrlNumber - 1].data.data.html, size, NETCONN_NOCOPY);
+				netconn_write(conn, httpResource[getUrlNumber - 1].data.payload, size, NETCONN_NOCOPY);
 				P_LOGD(logTag, "Netconn_write (%"PRIu32")", size);
 			}
 		}

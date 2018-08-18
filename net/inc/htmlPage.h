@@ -24,34 +24,31 @@
 /*!****************************************************************************
  * Typedef
  */
+typedef enum{
+	urlDataType_html,
+	urlDataType_css,
+	urlDataType_bin,
+	urlDataType_js,
+	urlDataType_ico,
+	urlDataTypeNumber
+}urlType_type;
+
 typedef struct{
-	enum{
-		urlDataType_html,
-		urlDataType_css,
-		urlDataType_bin,
-		urlDataType_js,
-		urlDataType_ico,
-		urlDataTypeNumber
-	}type;
-
-	union{
-		const char *html;
-		const void *bin;
-	}data;
-
-	uint32_t	size;
+	const void *payload;
+	size_t size;
+	urlType_type type;
 }urlData_type;
 
 typedef struct{
-	char				*url;
-	urlData_type		(*handler)(void);
-	urlData_type		data;
-}url_type;
+	char *url;
+	urlData_type data;
+	urlData_type (*handler)(void);
+}httpResource_type;
 
 /*!****************************************************************************
  * Exported variables
  */
-extern const url_type getUrlTable[];
+extern const httpResource_type httpResource[];
 extern const uint8_t getUrlNumber;
 
 /*!****************************************************************************
