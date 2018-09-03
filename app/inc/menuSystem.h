@@ -1,8 +1,8 @@
 ﻿/*!****************************************************************************
  * @file		menuSystem.h
  * @author		Storozhenko Roman - D_EL
- * @version		V1.3
- * @date		06.061.2018
+ * @version		V1.4
+ * @date		04.09.2018
  * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  * @brief		menu system
  */
@@ -46,13 +46,20 @@ typedef enum {
 	menuItemError
 } menuItemState_type;
 
+typedef enum {
+    menuItemUnselect,
+    menuItemSelect,
+    menuItemUnselectUnchangeable,
+    menuItemSelectUnchangeable
+} menuItemSelect_type;
+
 typedef union {
 	struct {
-		uint16_t istext :1;
+		int16_t istext :1;
 		chmodMenu_type chmod :2;
-		uint16_t pfParamert :4;
+		int16_t pfParamert :4;
 	} bit;
-	uint16_t all;
+	int16_t all;
 } menuFlags_type;
 
 typedef struct itemState{
@@ -95,4 +102,4 @@ typedef struct menuItem{
 void menuEngine(menuItemNumber_type menuItemNumber);
 
 #endif /* MENUSYSTEM_H */
-/******************************** END OF FILE ********************************/
+/*************** LGPL ************** END OF FILE *********** D_EL ************/
