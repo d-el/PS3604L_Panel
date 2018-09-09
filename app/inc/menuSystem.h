@@ -87,10 +87,6 @@ typedef struct menuItem{
 /*!****************************************************************************
  * External variables
  */
-#define MENU_ITEM(_name, _label, _units, _prmHandle, _chmod, _pfPrm, _pfChanges, _pfSelect, _pfUnselect, _pfPeriod, _previous, _next, _parent , _child) \
-	extern const menuItem_type item_##_name;
-	#include "menuTree.h"
-#undef MENU_ITEM
 
 /*!****************************************************************************
  * Macro functions

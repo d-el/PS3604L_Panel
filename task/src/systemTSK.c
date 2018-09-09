@@ -323,7 +323,7 @@ void netSettingUpdate(void){
  */
 void timezoneUpdate(void){
 	char str[12];
-	sprintf(str, "TZ=GMT%"PRIi8, -fp.fpSet.timezone);
+	snprintf(str, sizeof(str), "TZ=GMT%i", -fp.fpSet.timezone);
 	putenv(str);
 	tzset();
 }
