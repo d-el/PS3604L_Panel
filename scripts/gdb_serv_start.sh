@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# save current dir
+cwd=$(pwd)
+# cd to script dir
+DIR="$(cd "$(dirname "$0")" && pwd)"
+cd $DIR
+
 print_usage () {
     echo "usage: gdb_serv_start.sh <metod>[openocd_stlink, openocd_jlink, jlink]"
     exit 1
@@ -19,18 +25,14 @@ elif [ "$1" == "openocd_jlink" ]; then
 
 elif [ "$1" == "jlink" ]; then
     echo "start" $1
-    FLAG="
-    -device STM32F407VG
-    -If SWD
-    -speed auto
-    -port 1234
-    -SWOPort 1235
-    -TelnetPort 1236
-    -nolocalhostonly
-    "
+    while read line; do    
+        FLAG+='-'$line' '
+    done < jlink.cfg
     echo $FLAG
     JLinkGDBServer $FLAG
 
 else
     print_usage
 fi
+
+cd $cwd

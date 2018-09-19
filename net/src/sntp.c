@@ -332,10 +332,11 @@ static void sntp_request(void *arg){
  */
 void sntp_init(void){
 	sntp_pcb = udp_new();
-	assert(sntp_pcb != NULL);
 	if(sntp_pcb != NULL){
 		udp_recv(sntp_pcb, sntp_recv, NULL);
 		sntp_request(NULL);
+	}else{
+		P_LOGE(logTag, "Error create sntp_pcb");
 	}
 }
 
