@@ -56,7 +56,7 @@ extern uartTsk_type uartTsk;
 /******************************************************************************
  * Prototypes for the functions
  */
-void uartTSK(void *pPrm);
+void regulatorConnTSK(void *pPrm);
 uint8_t waitForTf(void);
 uint8_t sendCommand(request_type command);
 

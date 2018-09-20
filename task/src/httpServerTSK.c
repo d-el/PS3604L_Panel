@@ -143,11 +143,17 @@ void httpServerTSK(void *pPrm){
 
 	/* Create a new TCP connection handle */
 	conn = netconn_new(NETCONN_TCP);
-	assert(conn != NULL);
+	if(conn == NULL){
+		P_LOGE(logTag, "Error create netconn");
+		vTaskDelete(NULL);
+	}
 
 	/* Bind to port 80 (HTTP) with default IP address */
 	err = netconn_bind(conn, NULL, 80);
-	assert(err == ERR_OK);
+	if(err != ERR_OK){
+		P_LOGE(logTag, "Error netconn bind");
+		vTaskDelete(NULL);
+	}
 
 	P_LOGD(logTag, "Put the connection into LISTEN state");
 	netconn_listen(conn);
@@ -170,4 +176,4 @@ void httpServerTSK(void *pPrm){
 	}
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

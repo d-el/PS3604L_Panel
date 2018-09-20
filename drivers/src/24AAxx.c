@@ -36,9 +36,7 @@ static void eep_i2cCallback(i2c_type *i2cx){
 	BaseType_t xHigherPriorityTaskWoken;
 	xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(i2cSem, &xHigherPriorityTaskWoken);
-	if(xHigherPriorityTaskWoken != pdFALSE){
-		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 /*!****************************************************************************

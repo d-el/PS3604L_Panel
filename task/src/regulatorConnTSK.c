@@ -36,7 +36,7 @@ static void uartTskHook(uart_type *puart);
 /*!****************************************************************************
  * @brief
  */
-void uartTSK(void *pPrm){
+void regulatorConnTSK(void *pPrm){
 	(void)pPrm;
 	TickType_t	xLastWakeTime = xTaskGetTickCount();
 	BaseType_t 	res;
@@ -68,21 +68,17 @@ void uartTSK(void *pPrm){
 		uart_read(uartTskUse, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type) + sizeof(uint16_t));
 		res = xSemaphoreTake(regulatorConnUartRxSem, pdMS_TO_TICKS(UART_TSK_MAX_WAIT_ms));
 		if(res == pdTRUE){
-			//Приняли ответ
+			// Receive answer
 			crc = crc16Calc(&crcModBus, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type) + sizeof(uint16_t));
 			if(crc == 0){
-				/*****************************
-				 * Очередь команд
-				 */
+				// Queue command
 				request_type request;
 				res = xQueueReceive(queueCommand, &request, 0);
 				if(res == pdPASS){
 					fp.tf.task.request = request;
 				}else{
-					//Если из очереди не прочитано ни одного элемента
 					fp.tf.task.request = setNone;
 				}
-
 				memcpy(&fp.tf.state, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type));
 				uartTsk.normAnswer++;
 				errPrev = uartTsk.errorAnswer;
@@ -95,7 +91,7 @@ void uartTSK(void *pPrm){
 				}
 			}
 		}else{
-			//Таймаут
+			// Timeout
 			uartTsk.noAnswer++;
 			if((uartTsk.noAnswer - noAnswerPrev) > UART_TSK_MAX_ERR){
 				uartTsk.state = uartNoConnect;
@@ -157,9 +153,7 @@ static void uartTskHook(uart_type *puart){
 	BaseType_t xHigherPriorityTaskWoken;
 	xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(regulatorConnUartRxSem, &xHigherPriorityTaskWoken);
-	if(xHigherPriorityTaskWoken != pdFALSE){
-		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 /******************************** END OF FILE ********************************/

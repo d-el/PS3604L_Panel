@@ -85,7 +85,7 @@ void systemTSK(void *pPrm){
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	sntp_init();													// Initialize service SNTP
 
-	BaseType_t osres = xTaskCreate(uartTSK, "uartTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
+	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started uartTSK");
 

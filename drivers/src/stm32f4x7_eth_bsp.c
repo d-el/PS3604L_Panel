@@ -182,9 +182,7 @@ void ETH_IRQHandler(void){
 	ETH_DMAClearITPendingBit(ETH_DMA_IT_NIS);
 
 	/* Switch tasks if necessary. */
-	if(xHigherPriorityTaskWoken != pdFALSE){
-		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
-	}
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 /*********** Portions COPYRIGHT 2012 Embest Tech. Co., Ltd.*****END OF FILE****/

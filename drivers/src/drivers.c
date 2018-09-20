@@ -55,7 +55,7 @@ void hardInit(void){
 		fp.state.mainOscillatorError = 1;
 	}
 	gpio_init();
-	uart_init(uart1, BR38400);
+	uart_init(uart1, BR38400);	//Connect
 	uart_init(uart3, BR57600);
 	uart_init(uart4, BR1M);		//Debug out
 	macAddressGen();
