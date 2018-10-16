@@ -599,12 +599,9 @@ void printSigVar(char *string, const menuItem_type *menuItem, int32_t var){
 	if(menuItem->prmHandle->power == 0){
 		sprintf(string, "%"PRIi32"%s", var, menuItem->units);
 	}else{
-		uint32_t a = abs(var) / pows[menuItem->prmHandle->power];
+		uint32_t a = var / pows[menuItem->prmHandle->power];
 		uint32_t b = abs(var) % pows[menuItem->prmHandle->power];
-		if(var < 0){
-			*string++ = '-';
-		}
-		sprintf(string, "%"PRIu32".%0*"PRIi32"%s", a, menuItem->prmHandle->power, b, menuItem->units);
+		sprintf(string, "%"PRIi32".%0*"PRIu32"%s", a, menuItem->prmHandle->power, b, menuItem->units);
 	}
 }
 

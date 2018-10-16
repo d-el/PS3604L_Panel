@@ -110,7 +110,7 @@ void systemTSK(void *pPrm){
 			if(windowTskHandle != NULL){
 				assert(osres == pdTRUE);	//Fail windowTskHandle
 				P_LOGI(logTag, "Stopped %s", pcTaskGetName(windowTskHandle));
-				vTaskDelete(windowTskHandle);	//Удаляем текущее окно
+				vTaskDelete(windowTskHandle);
 			}
 
 			switch(fp.currentSelWindow){

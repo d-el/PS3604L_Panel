@@ -45,7 +45,7 @@ CROSS_COMPILE ?= arm-none-eabi-
 AS		= $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)gcc
 CC		= $(CROSS_COMPILE)gcc
-CPP		= $(CC) -E
+CXX		= $(CC)
 AR		= $(CROSS_COMPILE)ar
 NM		= $(CROSS_COMPILE)nm
 STRIP	= $(CROSS_COMPILE)strip
@@ -177,9 +177,9 @@ $(OBJODIR)/%.o: %.c
 	$(Q)$(MV) $(OBJODIR)/$*.Td $(OBJODIR)/$*.d && touch $@
 
 $(OBJODIR)/%.o: %.cpp
-	@echo [CPP] $<
+	@echo [CXX] $<
 	$(Q)$(MKDIR) $(dir $@)
-	$(Q)$(CC) -MT $@ -MMD -MP -MF $(OBJODIR)/$*.Td $(CPFLAGS) -c -o $@ $<
+	$(Q)$(CXX) -MT $@ -MMD -MP -MF $(OBJODIR)/$*.Td $(CPFLAGS) -c -o $@ $<
 	$(Q)$(MV) $(OBJODIR)/$*.Td $(OBJODIR)/$*.d && touch $@
 
 $(OBJODIR)/%.o: %.s
@@ -244,3 +244,6 @@ listc:
 # Declare the contents of the .PHONY variable as phony.  We keep that
 # information in a variable so we can use it in if_changed and friends.
 .PHONY: $(PHONY)
+
+# Set default target
+.DEFAULT_GOAL:= all
