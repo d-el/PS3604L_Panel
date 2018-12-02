@@ -27,17 +27,17 @@
 /*!****************************************************************************
  * Enumeration
  */
-enum initRflags{
-	INITR_GREENTAB		= 0x0,
-	INITR_REDTAB		= 0x1,
-	INITR_BLACKTAB		= 0x2,
+typedef enum {
+	JD_T18003,
+	IPS16080
+}display_type;
 
-	INITR_18GREENTAB	= INITR_GREENTAB,
-	INITR_18REDTAB		= INITR_REDTAB,
-	INITR_18BLACKTAB	= INITR_BLACKTAB,
-	INITR_144GREENTAB	= 0x1,
-	INITR_MINI160x80	= 0x4
-};
+typedef enum {
+	ST7735_R0,
+	ST7735_R90,
+	ST7735_R180,
+	ST7735_R270
+}displayRotation_type;
 
 /*!****************************************************************************
  * Typedef
@@ -81,9 +81,8 @@ static inline void st7735_setPixel(uint16_t x, uint16_t y, lcd_color_type color)
 /*!****************************************************************************
  * Function declaration
  */
-void st7735_init(void);
-void initB(void);
-void initR(uint8_t options);
+void st7735_initB(display_type t, displayRotation_type r);
+void st7735_initR(display_type t, displayRotation_type r);
 
 #endif //st7735_H
 /******************************** END OF FILE ********************************/

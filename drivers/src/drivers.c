@@ -64,7 +64,7 @@ void hardInit(void){
 	enco_init();
 	beep_init();
 	ledPwm_init();
-	initR(INITR_BLACKTAB);	 	//Initialize 1.8" TFT - ST7735S chip, black tab
+	st7735_initR(JD_T18003, ST7735_R270);
 	rtcStatus_type rtcStatus = rtc_init();
 	if((rtcStatus == rtc_Ok)&&(rtcStatus == rtc_wasOn)){
 		fp.state.rtcOscillatorError = 0;

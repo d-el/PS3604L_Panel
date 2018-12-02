@@ -10,21 +10,10 @@
 /*!****************************************************************************
  * Include
  */
+#include <stddef.h>
 #include "stm32f4xx.h"
 #include "gpio.h"
 #include "st7735.h"
-
-/*!****************************************************************************
- * Define
- */
-// for 1.44 and mini
-#define ST7735_TFTWIDTH_128	 128
-// for mini
-#define ST7735_TFTWIDTH_80	 80
-// for 1.44" display
-#define ST7735_TFTHEIGHT_128 128
-// for 1.8" and mini display
-#define ST7735_TFTHEIGHT_160  160
 
 /*!****************************************************************************
  * Enumeration
@@ -91,9 +80,7 @@ enum lcdDescribed{
  * MEMORY
  */
 uint16_t videoBff[ST7735_W * ST7735_H];
-uint8_t colstart, rowstart, xstart, ystart; // some displays need this changed
-uint8_t height, width;
-uint8_t tabcolor;
+static uint8_t xstart, ystart, width, height;
 
 /*!
  * Rather than a bazillion writecommand() and writedata() calls, screen
@@ -103,7 +90,7 @@ uint8_t tabcolor;
  * than the equivalent code.  Companion function follows.
  */
 /// Initialization commands for 7735B screens
-const uint8_t Bcmd[] = {
+static const uint8_t Bcmd[] = {
 	18,		// 18 commands in list
 
 	ST7735_SWRESET,	0, 50,	// 1: Software reset
@@ -170,8 +157,8 @@ const uint8_t Bcmd[] = {
 	ST7735_DISPON, 0, 255	// 18: Main screen turn on
 };
 
-/// Initialization for 7735R, part 1 (red or green tab)
-const uint8_t Rcmd1[] = {
+/// Initialization for 7735R, part 1
+static const uint8_t Rcmd1[] = {
 	15,	// 15 commands in list
 
 	ST7735_SWRESET, 0, 150,	 // 1: Software reset
@@ -221,60 +208,8 @@ const uint8_t Rcmd1[] = {
 	0x05					//	   16-bit color
 };
 
-/// Initialization for 7735R, part 2 (green tab only)
-const uint8_t Rcmd2green[] = {
-	2,	//	2 commands in list
-
-	ST7735_CASET, 4, 0,		// 1: Column addr set
-	0x00, 0x02,				//	   XSTART = 0
-	0x00, 0x7F + 0x02,		//	   XEND = 127
-
-	ST7735_RASET, 4, 0,		// 2: Row addr set
-	0x00, 0x01,				//	   XSTART = 0
-	0x00, 0x9F + 0x01		//	   XEND = 159
-};
-
-/// Initialization for 7735R, part 2 (red tab only)
-const uint8_t Rcmd2red[] = {
-	2,	//	2 commands in list
-
-	ST7735_CASET, 4, 0,		// 1: Column addr set
-	0x00, 0x00,				//	   XSTART = 0
-	0x00, 0x7F,				//	   XEND = 127
-
-	ST7735_RASET, 4, 0,		// 2: Row addr set
-	0x00, 0x00,				//	   XSTART = 0
-	0x00, 0x9F				//	   XEND = 159
-};
-
-/// Initialization for 7735R, part 2 (green 1.44 tab)
-const uint8_t Rcmd2green144[] = {
-	2,	//	2 commands in list
-
-	ST7735_CASET, 4, 0,		// 1: Column addr set
-	0x00, 0x00,				//	   XSTART = 0
-	0x00, 0x7F,				//	   XEND = 127
-
-	ST7735_RASET, 4, 0,		// 2: Row addr set
-	0x00, 0x00,				//	   XSTART = 0
-	0x00, 0x7F				//	   XEND = 127
-};
-
-/// Initialization for 7735R, part 2 (mini 160x80)
-const uint8_t Rcmd2green160x80[] = {
-	2,	//	2 commands in list
-
-	ST7735_CASET, 4, 0,		// 1: Column addr set
-	0x00, 0x00,				//	   XSTART = 0
-	0x00, 0x7F,				//	   XEND = 79
-
-	ST7735_RASET, 4, 0,		// 2: Row addr set
-	0x00, 0x00,				//	   XSTART = 0
-	0x00, 0x9F				//	   XEND = 159
-};
-
-/// Initialization for 7735R, part 3 (red or green tab)
-const uint8_t Rcmd3[] = {
+/// Initialization for 7735R, part 2
+static const uint8_t Rcmd2[] = {
 	4,	//	4 commands in list
 
 	ST7735_GMCTRP1, 16, 0,	// 1: Magical unicorn dust,
@@ -314,7 +249,7 @@ static void spiInit(void){
 /*!****************************************************************************
  *
  */
-void initSpiDMA(void){
+static void initSpiDMA(void){
 	/************************************************
 	 * DMA
 	 */
@@ -344,42 +279,16 @@ void initSpiDMA(void){
 /*!****************************************************************************
  * @brief Send data from SPI
  */
-void spiSend(uint8_t data){
+static void spiSend(uint8_t data){
 	LCD_SPI->DR = data;
 	while((LCD_SPI->SR & SPI_SR_TXE) != 0);
 	while((LCD_SPI->SR & SPI_SR_BSY) != 0);
 }
 
-///*!****************************************************************************
-// * @brief Send data from SPI
-// */
-//void st7735_bffSpiWrite(const void *bff, uint16_t len){
-//	DMA_Stream_TypeDef *pDmaStreamTx = LCD_DMA_STREAM;
-//	pDmaStreamTx->CR &= ~DMA_SxCR_EN;
-//	pDmaStreamTx->CR &= ~DMA_SxCR_CIRC;		//Circular mode disable
-//	pDmaStreamTx->M0AR = (uint32_t) &bff;		//Memory address
-//	pDmaStreamTx->NDTR = len;					//Number of data
-//	pDmaStreamTx->CR |= DMA_SxCR_EN;
-//	while((LCD_SPI->SR & SPI_SR_BSY) != 0)
-//		;
-//}
-//
-///*!****************************************************************************
-// * @brief Circular Send data from SPI
-// */
-//void st7735_bffCircSpiWrite(const void *bff, uint16_t len){
-//	DMA_Stream_TypeDef *pDmaStreamTx = LCD_DMA_STREAM;
-//	pDmaStreamTx->CR &= ~DMA_SxCR_EN;
-//	pDmaStreamTx->CR |= DMA_SxCR_CIRC;		//Circular mode disable
-//	pDmaStreamTx->M0AR = (uint32_t) &bff;		//Memory address
-//	pDmaStreamTx->NDTR = len;					//Number of data
-//	pDmaStreamTx->CR |= DMA_SxCR_EN;
-//}
-
 /*!****************************************************************************
  * @brief Send command
  */
-void st7735_lcdCmd(uint8_t cmd){
+static void st7735_lcdCmd(uint8_t cmd){
 	gppin_reset(GP_LCD_DC);
 	spiSend(cmd);
 }
@@ -387,7 +296,7 @@ void st7735_lcdCmd(uint8_t cmd){
 /*!****************************************************************************
  * @brief Send data
  */
-void st7735_lcdDat(uint8_t data){
+static void st7735_lcdDat(uint8_t data){
 	gppin_set(GP_LCD_DC);
 	spiSend(data);
 }
@@ -404,7 +313,7 @@ void st7735_lcdDat16(uint16_t data){
 /*!****************************************************************************
  * @brief
  */
-void lcdDelay(uint64_t delay){
+static void lcdDelay(uint64_t delay){
 	delay = delay * 10000;
 	for(uint64_t i = 0; i < delay; i++){
 		__NOP();
@@ -438,9 +347,13 @@ void st7735_setAddressWindow(uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1){
  * @brief Companion code to the above tables.  Reads and issues
  * a series of LCD commands stored in PROGMEM byte array.
  */
-void commandList(const uint8_t *addr){
+static void commandList(const uint8_t *addr){
 	uint8_t	 numCommands, numArgs;
 	uint16_t ms;
+
+	if(addr == NULL){
+		return;
+	}
 
 	numCommands = *addr++;					// Number of commands to follow
 	while(numCommands--){					// For each command...
@@ -463,7 +376,7 @@ void commandList(const uint8_t *addr){
 /*!****************************************************************************
  * @brief Initialization code common to both 'B' and 'R' type displays
  */
-void commonInit(const uint8_t *cmdList) {
+static void commonInit(void) {
 	spiInit();
 
 	gppin_reset(GP_LCD_CS);
@@ -474,105 +387,56 @@ void commonInit(const uint8_t *cmdList) {
 	lcdDelay(10);
 	gppin_set(GP_LCD_RST);
 	lcdDelay(10);
-
-	if(cmdList){
-		commandList(cmdList);
-	}
 }
+
+typedef struct{
+	uint8_t w;
+	uint8_t h;
+	uint8_t cstart;
+	uint8_t rstart;
+	uint8_t invert;
+	uint8_t madctl;
+}st7735cfg_type;
+
+static const st7735cfg_type st7735cfg[] = {
+	[JD_T18003]	= { .w = 128,	.h = 160,	.cstart = 0,	.rstart = 0, .invert = 0,	.madctl = MADCTL_RGB },
+	[IPS16080]	= { .w = 80,	.h = 160,	.cstart = 26,	.rstart = 1, .invert = 1,	.madctl = MADCTL_BGR }
+};
 
 /*!****************************************************************************
  * @brief Set rotation display
  */
-void setRotation(uint8_t m){
-	uint8_t rotation;
-
+void setRotation(display_type t, displayRotation_type r){
 	st7735_lcdCmd(ST7735_MADCTL);
-
-	rotation = m % 4; // can't be higher than 3
-	switch (rotation){
-		case 0:
-			if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
-				st7735_lcdDat(MADCTL_MX | MADCTL_MY | MADCTL_RGB);
-			}else{
-				st7735_lcdDat(MADCTL_MX | MADCTL_MY | MADCTL_BGR);
-			}
-
-			if (tabcolor == INITR_144GREENTAB) {
-				height = ST7735_TFTHEIGHT_128;
-				width  = ST7735_TFTWIDTH_128;
-			} else if (tabcolor == INITR_MINI160x80)  {
-				height = ST7735_TFTHEIGHT_160;
-				width = ST7735_TFTWIDTH_80;
-			} else {
-				height = ST7735_TFTHEIGHT_160;
-				width  = ST7735_TFTWIDTH_128;
-			}
-			xstart = colstart;
-			ystart = rowstart;
-		break;
-
-		case 1:
-			if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
-				st7735_lcdDat(MADCTL_MY | MADCTL_MV | MADCTL_RGB);
-			} else {
-				st7735_lcdDat(MADCTL_MY | MADCTL_MV | MADCTL_BGR);
-			}
-
-			if (tabcolor == INITR_144GREENTAB)	{
-				width = ST7735_TFTHEIGHT_128;
-				height = ST7735_TFTWIDTH_128;
-			} else if (tabcolor == INITR_MINI160x80)  {
-				width = ST7735_TFTHEIGHT_160;
-				height = ST7735_TFTWIDTH_80;
-			} else {
-				width = ST7735_TFTHEIGHT_160;
-				height = ST7735_TFTWIDTH_128;
-			}
-			ystart = colstart;
-			xstart = rowstart;
-		break;
-
-		case 2:
-			if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
-				st7735_lcdDat(MADCTL_RGB);
-			} else {
-				st7735_lcdDat(MADCTL_BGR);
-			}
-
-			if (tabcolor == INITR_144GREENTAB) {
-				height = ST7735_TFTHEIGHT_128;
-				width  = ST7735_TFTWIDTH_128;
-			} else if (tabcolor == INITR_MINI160x80)  {
-				height = ST7735_TFTHEIGHT_160;
-				width = ST7735_TFTWIDTH_80;
-			} else {
-				height = ST7735_TFTHEIGHT_160;
-				width  = ST7735_TFTWIDTH_128;
-			}
-			xstart = colstart;
-			ystart = rowstart;
-		break;
-
-		case 3:
-			if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
-				st7735_lcdDat(MADCTL_MX | MADCTL_MV | MADCTL_RGB);
-			} else {
-				st7735_lcdDat(MADCTL_MX | MADCTL_MV | MADCTL_BGR);
-			}
-
-			if (tabcolor == INITR_144GREENTAB)	{
-				width = ST7735_TFTHEIGHT_128;
-				height = ST7735_TFTWIDTH_128;
-			} else if (tabcolor == INITR_MINI160x80)  {
-				width = ST7735_TFTHEIGHT_160;
-				height = ST7735_TFTWIDTH_80;
-			} else {
-				width = ST7735_TFTHEIGHT_160;
-				height = ST7735_TFTWIDTH_128;
-			}
-			ystart = colstart;
-			xstart = rowstart;
-		break;
+	switch (r){
+		case ST7735_R0:
+			st7735_lcdDat(MADCTL_MX | MADCTL_MY | st7735cfg[t].madctl);
+			xstart = st7735cfg[t].cstart;
+			ystart = st7735cfg[t].rstart;
+			width = st7735cfg[t].w;
+			height = st7735cfg[t].h;
+			break;
+		case ST7735_R90:
+			st7735_lcdDat(MADCTL_MY | MADCTL_MV | st7735cfg[t].madctl);
+			xstart = st7735cfg[t].rstart;
+			ystart = st7735cfg[t].cstart;
+			width = st7735cfg[t].h;
+			height = st7735cfg[t].w;
+			break;
+		case ST7735_R180:
+			st7735_lcdDat(st7735cfg[t].madctl);
+			xstart = st7735cfg[t].cstart;
+			ystart = st7735cfg[t].rstart;
+			width = st7735cfg[t].w;
+			height = st7735cfg[t].h;
+			break;
+		case ST7735_R270:
+			st7735_lcdDat(MADCTL_MX | MADCTL_MV | st7735cfg[t].madctl);
+			xstart = st7735cfg[t].rstart;
+			ystart = st7735cfg[t].cstart;
+			width = st7735cfg[t].h;
+			height = st7735cfg[t].w;
+			break;
 	}
 }
 
@@ -590,57 +454,22 @@ void invertDisplay(uint8_t i){
 /*!****************************************************************************
  * @brief Initialization for ST7735B screens
  */
-void initB(void){
-	commonInit(Bcmd);
-	setRotation(0);
+void st7735_initB(display_type t, displayRotation_type r){
+	commonInit();
+	commandList(Bcmd);
+	setRotation(t, r);
 }
 
 /*!****************************************************************************
  * @brief Initialization for ST7735R screens (green or red tabs)
  */
-void initR(uint8_t options){
-	commonInit(Rcmd1);
-
-	if(options == INITR_GREENTAB){
-		commandList(Rcmd2green);
-		colstart = 2;
-		rowstart = 1;
-	}
-
-	else if(options == INITR_144GREENTAB){
-		height = ST7735_TFTHEIGHT_128;
-		width = ST7735_TFTWIDTH_128;
-		commandList(Rcmd2green144);
-		colstart = 2;
-		rowstart = 3;
-	}
-
-	else if(options == INITR_MINI160x80){
-		height = ST7735_TFTHEIGHT_160;
-		width = ST7735_TFTWIDTH_80;
-		commandList(Rcmd2green160x80);
-		colstart = 24;
-		rowstart = 0;
-	}
-
-	else{
-		// colstart, rowstart left at default '0' values
-		commandList(Rcmd2red);
-	}
-
-	commandList(Rcmd3);
-
-	// if black, change MADCTL color filter
-	if((options == INITR_BLACKTAB) || (options == INITR_MINI160x80)){
-		st7735_lcdCmd(ST7735_MADCTL);
-		st7735_lcdDat(0xC0);
-	}
-
-	tabcolor = options;
-
-	setRotation(3);
-
-	st7735_setAddressWindow(0, 0, 159, 127);
+void st7735_initR(display_type t, displayRotation_type r){
+	commonInit();
+	commandList(Rcmd1);
+	commandList(Rcmd2);
+	setRotation(t, r);
+	invertDisplay(st7735cfg[t].invert);
+	st7735_setAddressWindow(0, 0, width - 1, height - 1);
 	initSpiDMA();
 }
 
