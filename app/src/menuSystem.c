@@ -25,7 +25,7 @@
 #include "display.h"
 #include "graphics.h"
 #include "key.h"
-#include "enco.h"
+#include "prmEditor.h"
 #include "beep.h"
 #include "systemTSK.h"
 
@@ -114,7 +114,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 	disp_setColor(black, white);
 	disp_fillScreen(black);
 	ksSet(15, 5, kUp | kDown);
-	enSetNtic(3);
+	prmEditorSetNtic(3);
 
 	numItems = 1;
 	for(const menuItem_type *m = *topMenu; m != m->next; m = m->next){
@@ -227,7 +227,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 		/************************
 		 * Editor
 		 */
-		enStatus_type enstatus = enNoCharge;
+		prmEditorStatus_type status = enNoCharge;
 		const menuItem_type *eitem = *sMenu;
 		if(eitem->prmHandle != NULL){
 			if(eitem->flags.bit.chmod == chmodMenuAlways && eitem->prmHandle->chmod == chmodAlways){
@@ -239,7 +239,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 						}
 					}
 					else{
-						enstatus = enBigStepUp(eitem->prmHandle);
+						status = prmEditorBigStepUp(eitem->prmHandle);
 					}
 					bigstepUp = 0;
 				}
@@ -250,22 +250,22 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 							setLimit(eitem, editSection);
 						}
 					}else{
-						enstatus = enBigStepDown(eitem->prmHandle);
+						status = prmEditorBigStepDown(eitem->prmHandle);
 					}
 					bigstepDown = 0;
 				}else if(setDef != 0){
-					enWriteVal(eitem->prmHandle, &eitem->prmHandle->def);
-					enstatus = enCharge;
+					prmEditorWriteVal(eitem->prmHandle, &eitem->prmHandle->def);
+					status = enCharge;
 					setDef = 0;
 				}else{
-					enstatus = enUpDate(eitem->prmHandle);
+					status = prmEditorUpDate(eitem->prmHandle);
 				}
-				if(enstatus != enNoCharge && eitem->pfChanges != NULL){
+				if(status != enNoCharge && eitem->pfChanges != NULL){
 					callChanges(eitem);
 				}
-				if((enstatus == enLimDown) || (enstatus == enLimUp)){
+				if((status == enLimDown) || (status == enLimUp)){
 					BeepTime(ui.beep.encoLim.time, ui.beep.encoLim.freq);
-				}else if((enstatus == enTransitionDown) || (enstatus == enTransitionUp)){
+				}else if((status == enTransitionDown) || (status == enTransitionUp)){
 					BeepTime(ui.beep.encoTransition.time, ui.beep.encoTransition.freq);
 				}
 			}

@@ -21,7 +21,8 @@
 #include "graphics.h"
 #include "display.h"
 #include "key.h"
-#include "enco.h"
+#include "prmSystem.h"
+#include "prmEditor.h"
 #include "beep.h"
 #include "chargeTSK.h"
 #include "regulatorConnTSK.h"
@@ -55,7 +56,7 @@ void chargeTSK(void *pPrm){
 	//Print static element
 	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 10, kUp | kDown);
-	enSetNtic(5);
+	prmEditorSetNtic(5);
 
 	while(1){
 		/**************************************
@@ -92,20 +93,20 @@ void chargeTSK(void *pPrm){
 			/***************************************
 			 * Encoder process
 			 */
-			enStatus_type enstatus;
+			prmEditorStatus_type enstatus;
 			sHandle = pHandle + varParam;
 			if(bigstepUp != 0){
-				enstatus = enBigStepUp(sHandle);
+				enstatus = prmEditorBigStepUp(sHandle);
 				bigstepUp = 0;
 			}else if(bigstepDown != 0){
-				enstatus = enBigStepDown(sHandle);
+				enstatus = prmEditorBigStepDown(sHandle);
 				bigstepDown = 0;
 			}else if(setDef != 0){
-				enWriteVal(sHandle, &(sHandle)->def);
+				prmEditorWriteVal(sHandle, &(sHandle)->def);
 				enstatus = enCharge;
 				setDef = 0;
 			}else{
-				enstatus = enUpDate(sHandle);
+				enstatus = prmEditorUpDate(sHandle);
 			}
 			if((enstatus == enLimDown) || (enstatus == enLimUp)){
 				BeepTime(ui.beep.encoLim.time, ui.beep.encoLim.freq);

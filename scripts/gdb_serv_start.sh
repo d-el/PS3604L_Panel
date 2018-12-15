@@ -35,4 +35,5 @@ else
     print_usage
 fi
 
+# restore current dir
 cd $cwd

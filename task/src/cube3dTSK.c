@@ -68,7 +68,7 @@ void cube3dTSK(void *pPrm){
 	uint8_t x2d[MESH_COUNT], y2d[MESH_COUNT];	//”Плоские” точки
 	pairsOfPoints_type pairsOfPoints[MESH_COUNT];
 
-	uint16_t  old_val_encoder = enGeReg();
+	uint16_t  old_val_encoder = enco_read();
 	disp_fillScreen(black);
 	disp_setColor(black, white);
 
@@ -159,7 +159,7 @@ void cube3dTSK(void *pPrm){
 		dir_z = alpha;
 
 		//Выходим если нажата кнопка или повернут энкодер
-		if((keyProc() != 0) || (old_val_encoder != enGeReg())){
+		if((keyProc() != 0) || (old_val_encoder != enco_read())){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			selWindow(baseWindow);
 		}

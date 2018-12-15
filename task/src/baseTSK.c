@@ -23,7 +23,7 @@
 #include "rtc.h"
 #include "beep.h"
 #include "key.h"
-#include "enco.h"
+#include "prmEditor.h"
 #include "display.h"
 #include "graphics.h"
 #include "regulatorConnTSK.h"
@@ -53,7 +53,7 @@ void baseTSK(void *pPrm){
 	uint8_t 				bigstepUp = 0;
 	uint8_t 				bigstepDown = 0;
 	uint8_t 				setDef = 0;
-	enStatus_type 			enstatus;
+	prmEditorStatus_type 	status;
 	char 					str[30];
 
 	disp_setColor(black, red);
@@ -61,7 +61,7 @@ void baseTSK(void *pPrm){
 	//Print static
 	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 5, kUp | kDown);
-	enSetNtic(3);
+	prmEditorSetNtic(3);
 
 	while(1){
 		sysTimeMeasStart(sysTimeBs);
@@ -118,21 +118,21 @@ void baseTSK(void *pPrm){
 		 */
 		sHandle = pHandle + (bs.curPreSet * 3) + varParam;
 		if(bigstepUp != 0){
-			enstatus = enBigStepUp(sHandle);
+			status = prmEditorBigStepUp(sHandle);
 			bigstepUp = 0;
 		}else if(bigstepDown != 0){
-			enstatus = enBigStepDown(sHandle);
+			status = prmEditorBigStepDown(sHandle);
 			bigstepDown = 0;
 		}else if(setDef != 0){
-			enWriteVal(sHandle, &(sHandle)->def);
-			enstatus = enCharge;
+			prmEditorWriteVal(sHandle, &(sHandle)->def);
+			status = enCharge;
 			setDef = 0;
 		}else{
-			enstatus = enUpDate(sHandle);
+			status = prmEditorUpDate(sHandle);
 		}
-		if((enstatus == enLimDown) || (enstatus == enLimUp)){
+		if((status == enLimDown) || (status == enLimUp)){
 			BeepTime(ui.beep.encoLim.time, ui.beep.encoLim.freq);
-		}else if((enstatus == enTransitionDown) || (enstatus == enTransitionUp)){
+		}else if((status == enTransitionDown) || (status == enTransitionUp)){
 			BeepTime(ui.beep.encoTransition.time, ui.beep.encoTransition.freq);
 		}
 

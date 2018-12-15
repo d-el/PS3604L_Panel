@@ -45,7 +45,7 @@ void moveball(void);
  */
 void bubblesTSK(void *pPrm){
 	(void)pPrm;
-	uint16_t  old_val_encoder = enGeReg();
+	uint16_t  old_val_encoder = enco_read();
 	disp_fillScreen(black);
 	disp_setColor(black, white);
 	initialize();
@@ -55,7 +55,7 @@ void bubblesTSK(void *pPrm){
 		moveball();
 
 		//Выходим если нажата кнопка или повернут энкодер
-		if((keyProc() != 0) || (old_val_encoder != enGeReg())){
+		if((keyProc() != 0) || (old_val_encoder != enco_read())){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			selWindow(baseWindow);
 		}
