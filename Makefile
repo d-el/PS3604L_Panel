@@ -1,4 +1,4 @@
-﻿#******************************************************************************
+#******************************************************************************
 # Makefile PS3604LF
 #
 TARGET := PS3604LF
@@ -207,35 +207,41 @@ all: postbuild
 
 PHONY += prebuild
 prebuild:
+	@echo 'prebuild run'
 	$(Q)scripts/vgen.sh app/src/version.c
-	@echo ' '
+	@echo 'prebuild done'
 
 mainbuild: prebuild
 	$(Q)$(MAKE) robjcopy
+	@echo 'mainbuild done'
 
 postbuild: mainbuild
+	@echo 'postbuild run'
 	@echo 'Print Size:'
 	$(Q)$(SIZE) --format=berkeley "$(ODIR)/$(TARGET).elf"
-	@echo ' '
+	@echo 'postbuild done'
 
 elf: $(OBJS)
+	@echo 'elf run'
 	@echo [LD] $@
 	$(Q)$(LD) $(LDFLAGS) $(OBJS) $(LIBS) -o $(ODIR)/$(TARGET).elf
-	@echo ' '
+	@echo 'elf done'
 	
 robjcopy: elf
+	@echo 'robjcopy run'
 	@echo [OBJCOPY] $@
 	$(Q)$(OBJCOPY) -O ihex $(ODIR)/$(TARGET).elf $(ODIR)/$(TARGET).hex
-	@echo ' '
+	@echo 'robjcopy done'
 
 PHONY += clean
 clean:
+	@echo 'clean run'
 	$(Q)$(RM) -r $(ODIR)
-	@echo ' '
+	@echo 'clean done'
 
 disasm: elf
 	$(Q)$(OBJDUMP) -h -S -z $(ODIR)/$(TARGET).elf > $(ODIR)/$(TARGET).S
-	@echo ' '
+	@echo 'disasm done'
 
 PHONY += listc
 listc:

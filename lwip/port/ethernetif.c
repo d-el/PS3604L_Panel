@@ -88,6 +88,23 @@ static void ethernetif_input(void * pvParameters);
 static void arp_timer(void *arg);
 
 /**
+ * @brief  This function callback ethernet DMA interrupt
+ * @param  None
+ * @retval None
+ */
+static void low_level_ethIrqHandler(void *arg){
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+
+	/* Frame received */
+	if(ETH_GetDMAFlagStatus(ETH_DMA_FLAG_R) == SET){
+		/* Give the semaphore to wakeup LwIP task */
+		xSemaphoreGiveFromISR(s_xSemaphore, &xHigherPriorityTaskWoken);
+	}
+	/* Switch tasks if necessary. */
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+}
+
+/**
  * In this function, the hardware should be initialized.
  * Called from ethernetif_init().
  *
@@ -120,6 +137,8 @@ static void low_level_init(struct netif *netif){
 	if(s_xSemaphore == NULL){
 		s_xSemaphore = xSemaphoreCreateCounting(20, 0);
 	}
+
+	ETH_BSP_setHandler(low_level_ethIrqHandler);
 
 	/* initialize MAC address in ethernet MAC */
 	ETH_MACAddressConfig(ETH_MAC_Address0, netif->hwaddr);

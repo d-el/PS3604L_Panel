@@ -17,12 +17,15 @@
 #include "stm32f4xx.h"
 
 /* Exported types ------------------------------------------------------------*/
+typedef void (*ETH_IRQHandler_type)(void *arg);
+
 /* Exported constants --------------------------------------------------------*/
 #define LAN8720_PHY_ADDRESS		  0x01 /* Relative to STM324xG-EVAL Board */
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void  ETH_BSP_Config(void);
+void  ETH_BSP_setHandler(ETH_IRQHandler_type h);
 
 #ifdef __cplusplus
 }

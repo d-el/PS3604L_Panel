@@ -6,19 +6,17 @@
  * @brief		STM32F4x7 Ethernet hardware configuration.
  */
 /* Includes ------------------------------------------------------------------*/
+#include <stddef.h>
 #include "stm32f4x7_eth.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "gpio.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "semphr.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 __IO uint32_t EthInitStatus = 0;
-extern SemaphoreHandle_t s_xSemaphore;
+ETH_IRQHandler_type eth_IRQHandler;
 
 /* Private function prototypes -----------------------------------------------*/
 static void ETH_GPIO_Config(void);
@@ -41,6 +39,15 @@ void ETH_BSP_Config(void){
 
 	/* Configure the Ethernet MAC/DMA */
 	ETH_MACDMA_Config();
+}
+
+/**
+ * @brief  ETH_BSP_setHandler
+ * @param  pointer to handler
+ * @retval None
+ */
+void  ETH_BSP_setHandler(ETH_IRQHandler_type h){
+	eth_IRQHandler = h;
 }
 
 /**
@@ -168,21 +175,17 @@ void ETH_NVIC_Config(void){
  * @retval None
  */
 void ETH_IRQHandler(void){
-	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
-
 	/* Frame received */
 	if(ETH_GetDMAFlagStatus(ETH_DMA_FLAG_R) == SET){
-		/* Give the semaphore to wakeup LwIP task */
-		xSemaphoreGiveFromISR(s_xSemaphore, &xHigherPriorityTaskWoken);
+		if(eth_IRQHandler != 0){
+			eth_IRQHandler(NULL);
+		}
 	}
 
 	/* Clear the interrupt flags. */
 	/* Clear the Eth DMA Rx IT pending bits */
 	ETH_DMAClearITPendingBit(ETH_DMA_IT_R);
 	ETH_DMAClearITPendingBit(ETH_DMA_IT_NIS);
-
-	/* Switch tasks if necessary. */
-	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 /*********** Portions COPYRIGHT 2012 Embest Tech. Co., Ltd.*****END OF FILE****/
