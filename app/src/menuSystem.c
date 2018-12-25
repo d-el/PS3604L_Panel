@@ -16,8 +16,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
-#include "FreeRTOS.h"
-#include "task.h"
+#include <FreeRTOS.h>
+#include <task.h>
 #include "menuSystem.h"
 #include "settingTSK.h"
 #include "ui.h"
@@ -357,7 +357,7 @@ void menuEngine(menuItemNumber_type menuItemNumber){
 		}
 
 		/*************************************/
-		//disp_flush();
+		disp_flushfill(ui.color.background);
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(MENU_PERIOD));
 	}
 }
@@ -369,6 +369,7 @@ void printMessageWindow(char *string){
 	disp_fillScreen(black);
 	disp_setColor(black, white);
 	disp_putStr(0, MENU_ITEM_H, &MENU_ITEM_FONT, 0, string);
+	disp_flushfill(ui.color.background);
 	while(keyProc() == 0){
 		vTaskDelay(pdMS_TO_TICKS(MENU_PERIOD));
 	}
@@ -500,8 +501,6 @@ void printMenuPath(const menuItem_type **menuPath, const menuItem_type *selected
 			strcpy(string + strlen(string), "/");
 		}
 	}
-	memset(string + strlen(string), ' ', MENU_SCREEN_W / MENU_PATH_CHAR_W - strlen(string));
-	string[MENU_SCREEN_W / MENU_PATH_CHAR_W] = 0;
 
 	disp_setColor(black, green);
 	disp_putStr(0, 0, &MENU_PATH_FONT, 0, string);

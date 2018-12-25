@@ -12,13 +12,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "display.h"
-#include "beep.h"
-#include "ui.h"
-#include "version.h"
-#include "systemTSK.h"
-#include "FreeRTOS.h"
-#include "task.h"
+#include <stdint.h>
 
 /*!****************************************************************************
  * Define

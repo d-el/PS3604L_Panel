@@ -9,9 +9,9 @@
 /*!****************************************************************************
  * Include
  */
-#include "math.h"
-#include "FreeRTOS.h"
-#include "task.h"
+#include <math.h>
+#include <FreeRTOS.h>
+#include <task.h>
 #include "ui.h"
 #include "display.h"
 #include "graphics.h"
@@ -136,9 +136,6 @@ void cube3dTSK(void *pPrm){
 
 		//Рисуем ребра/сетку
 		for(i = 0; i < MESH_COUNT; i++){
-			grf_line(pairsOfPoints[i].x1, pairsOfPoints[i].y1,		 //Рисуем линию черным цветом
-					pairsOfPoints[i].x2, pairsOfPoints[i].y2, black);
-
 			pairsOfPoints[i].x1 = x2d[s1[i]];
 			pairsOfPoints[i].y1 = y2d[s1[i]];
 			pairsOfPoints[i].x2 = x2d[f1[i]];
@@ -171,7 +168,7 @@ void cube3dTSK(void *pPrm){
 		localtime_r(&unixTime, &tm);
 		strftime(str, sizeof(str), "%H:%M:%S", &tm);
 		disp_putStr(48, 110, &arial, 0, str);
-
+		disp_flushfill(ui.color.background);
 		vTaskDelay(pdMS_TO_TICKS(40));
 	}
 }

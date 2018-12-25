@@ -15,14 +15,18 @@
 #include <assert.h>
 #include "plog.h"
 #include "prmSystem.h"
-#include "pvd.h"
-#include "board.h"
-#include "ledpwm.h"
 #include "sntp.h"
 #include "stm32f4x7_eth.h"
 #include "ethernetif.h"
 #include "tcpip.h"
 #include "lwip/dns.h"
+#include "write.h"
+#include "display.h"
+#include "beep.h"
+#include "pvd.h"
+#include "ledpwm.h"
+#include "board.h"
+#include "ui.h"
 #include "regulatorConnTSK.h"
 #include "startupTSK.h"
 #include "settingTSK.h"
@@ -32,8 +36,7 @@
 #include "httpServerTSK.h"
 #include "baseTSK.h"
 #include "monitorTSK.h"
-#include "plog.h"
-#include "write.h"
+#include "systemTSK.h"
 
 /*!****************************************************************************
  * Memory
@@ -54,7 +57,7 @@ void shutdown(void);
 /**
  * SYS_DEBUG_LEVEL: Enable debugging for system task
  */
-#define TASK_MONITOR_EN	0
+#define TASK_MONITOR_EN	1
 #if(TASK_MONITOR_EN == 0)
 	#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
 #else
@@ -81,7 +84,7 @@ void systemTSK(void *pPrm){
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate();
 	pvd_setSupplyFaultCallBack(shutdown);							// Setup callback for Supply Fault
-
+	disp_init();
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	sntp_init();													// Initialize service SNTP
 
@@ -96,7 +99,6 @@ void systemTSK(void *pPrm){
 #if(TASK_MONITOR_EN > 0)
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
-	P_LOGI(logTag, "Started monitorTSK");
 #endif
 
 	selWindow(startupWindow);

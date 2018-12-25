@@ -54,6 +54,7 @@
 #include "lwip/timeouts.h"
 #include "board.h"
 #include "stm32f4x7_eth.h"
+#include "stm32f4x7_eth_bsp.h"
 #include "string.h"
 
 #define netifMTU                                (1500)
@@ -93,6 +94,7 @@ static void arp_timer(void *arg);
  * @retval None
  */
 static void low_level_ethIrqHandler(void *arg){
+	(void)arg;
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
 	/* Frame received */

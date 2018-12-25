@@ -28,6 +28,8 @@
  * DMA2_Stream7		-> USART1_TX
  * DMA2_Stream2		-> USART1_RX
  *
+ * DMA2_Stream0		-> MEM2MEM in st7735 driver
+ *
  */
 #ifndef board_H
 #define board_H

@@ -10,18 +10,18 @@
 /*!****************************************************************************
  * Include
  */
-#include "FreeRTOS.h"
-#include "task.h"
+#include <FreeRTOS.h>
+#include <task.h>
 #include "pstypes.h"
 #include "rtc.h"
 #include "main.h"
 #include "menuSystem.h"
 #include "enco.h"
-#include "systemTSK.h"
 #include "netif.h"
 #include "ledpwm.h"
 #include "regulatorConnTSK.h"
 #include "settingTSK.h"
+#include "systemTSK.h"
 
 /*!****************************************************************************
  * MEMORY

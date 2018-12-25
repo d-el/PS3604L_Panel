@@ -12,10 +12,16 @@
  */
 #include <inttypes.h>
 #include <stdio.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include "display.h"
 #include "ledpwm.h"
 #include "key.h"
-#include "startupTSK.h"
 #include "board.h"
+#include "beep.h"
+#include "ui.h"
+#include "version.h"
+#include "systemTSK.h"
 
 /*!****************************************************************************
  * MEMORY
@@ -51,6 +57,7 @@ void startupTSK(void *pPrm){
 		disp_putStr(00, 70, &arial, 0, str);
 		disp_putStr(0, 90, &arial, 0, fwinfoVersion);
 		disp_putStr(0, 110, &arial, 0, "2012 - 2018");
+		disp_flush();
 
 		if(fp.fpSet.lcdLight < 10){
 			fp.fpSet.lcdLight = 10;
@@ -81,6 +88,7 @@ void startupTSK(void *pPrm){
 				disp_putStr(00, 40, &arial, 0, "Load default user");
 				disp_putStr(00, 60, &arial, 0, "setting");
 			}
+			disp_flush();
 			while(keyProc() == 0){
 				vTaskDelay(pdMS_TO_TICKS(10));
 			}

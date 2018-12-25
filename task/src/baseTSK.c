@@ -13,11 +13,11 @@
 #include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
+#include <semphr.h>
 #include "plog.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
 #include "ui.h"
 #include "pstypes.h"
 #include "rtc.h"
@@ -30,7 +30,6 @@
 #include "sysTimeMeas.h"
 #include "systemTSK.h"
 #include "baseTSK.h"
-#include "semihosting.h"
 
 /******************************************************************************
  * Memory
@@ -58,8 +57,6 @@ void baseTSK(void *pPrm){
 
 	disp_setColor(black, red);
 	disp_fillScreen(black);
-	//Print static
-	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 5, kUp | kDown);
 	prmEditorSetNtic(3);
 
@@ -259,14 +256,17 @@ void baseTSK(void *pPrm){
 			disp_setColor(black, ui.color.mode);
 		}
 		if(bs.set[bs.curPreSet].mode == baseImax){
-			disp_putStr(16, 88, &arial, 0, "I max            ");
+			disp_putStr(16, 88, &arial, 0, "I max");
 		}
 		if(bs.set[bs.curPreSet].mode == baseILimitation){
-			disp_putStr(16, 88, &arial, 0, "Limiting        ");
+			disp_putStr(16, 88, &arial, 0, "Limiting");
 		}
 		if(bs.set[bs.curPreSet].mode == baseUnprotected){
 			disp_putStr(16, 88, &arial, 0, "Unprotected");
 		}
+
+		//Print line
+		grf_line(0, 107, 159, 107, halfLightGray);
 
 		//Print status bar
 		printStatusBar();
@@ -274,6 +274,8 @@ void baseTSK(void *pPrm){
 		//Measure time
 		sysTimeMeasStop(sysTimeBs);
 		timebs_us = sysTimeMeasTo_us(sysTimeMeasGet_cycles(sysTimeBs));
+
+		disp_flushfill(ui.color.background);
 
 		//Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));

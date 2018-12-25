@@ -9,17 +9,17 @@
 /*!****************************************************************************
  * Include
  */
-#include "string.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "portable.h"
+#include <string.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <portable.h>
 #include "plog.h"
 #include "sysTimeMeas.h"
 
 /*!****************************************************************************
  * MEMORY
  */
-#define LOG_LOCAL_LEVEL P_LOG_ERROR
+#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
 static char *logTag = "MONITOR TSK";
 
 /*
@@ -76,6 +76,8 @@ void monitorTSK(void *pPrm){
 	uint32_t taskTimePrev[maxTask];
 	memset(taskTimePrev, 0, sizeof(taskTimePrev));
 
+	P_LOGI(logTag, "Started monitorTSK");
+
 	while(1){
 		UBaseType_t taskCount = uxTaskGetNumberOfTasks();
 
@@ -96,7 +98,7 @@ void monitorTSK(void *pPrm){
 
 				taskTimePrev[task] = buffer[task].ulRunTimeCounter;
 
-				P_LOGI(logTag, "%20s: %9s, %"PRIu32", %6"PRIu16", %"PRIu32" us\n",
+				P_LOGI(logTag, "%20s: %9s, %"PRIu32", %6"PRIu16", %"PRIu32" us",
 				buffer[task].pcTaskName,
 				stateToChar[buffer[task].eCurrentState],
 				buffer[task].uxCurrentPriority,
@@ -104,18 +106,18 @@ void monitorTSK(void *pPrm){
 				buffer[task].ulRunTimeCounter);
 			}
 
-			P_LOGI(logTag, "Current Heap Free Size: %u\n", xPortGetFreeHeapSize());
-			P_LOGI(logTag, "Total RunTime: %"PRIu32" us\n", totalRuntime);
-			P_LOGI(logTag, "System Uptime: %"PRIu32" ms\n", xTaskGetTickCount() * portTICK_PERIOD_MS);
+			P_LOGI(logTag, "Current Heap Free Size: %u", xPortGetFreeHeapSize());
+			P_LOGI(logTag, "Total RunTime: %"PRIu32" us", totalRuntime);
+			P_LOGI(logTag, "System Uptime: %"PRIu32" ms", xTaskGetTickCount() * portTICK_PERIOD_MS);
 
-			P_LOGI(logTag, "All task PeriodTime:  %"PRIu32" us\n", allTaskPeriodTime);
-			P_LOGI(logTag, "Idle task PeriodTime: %"PRIu32" us\n", idleTaskPeriodTime);
+			P_LOGI(logTag, "All task PeriodTime:  %"PRIu32" us", allTaskPeriodTime);
+			P_LOGI(logTag, "Idle task PeriodTime: %"PRIu32" us", idleTaskPeriodTime);
 
 
 			if(allTaskPeriodTime >= idleTaskPeriodTime){
 				uint64_t effectiveTaskPeriodTime = allTaskPeriodTime - idleTaskPeriodTime;
 				uint32_t load = (effectiveTaskPeriodTime * 100000) / allTaskPeriodTime;
-				P_LOGI(logTag, "OS load: %"PRIu32".%03"PRIu32" %%\n", load / 1000, load % 1000);
+				P_LOGI(logTag, "OS load: %"PRIu32".%03"PRIu32" %%", load / 1000, load % 1000);
 			}
 		}
 
@@ -128,7 +130,7 @@ void monitorTSK(void *pPrm){
  */
 void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName){
 	(void)xTask;
-	P_LOGE(logTag, "Stack Overflow on %s\n", pcTaskName);
+	P_LOGE(logTag, "Stack Overflow on %s", pcTaskName);
 	while(1);
 }
 
@@ -136,7 +138,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName){
  *
  */
 void vApplicationMallocFailedHook(void){
-	P_LOGE(logTag, "Malloc Failed\n");
+	P_LOGE(logTag, "Malloc Failed");
 	while(1);
 }
 

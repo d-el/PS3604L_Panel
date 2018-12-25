@@ -9,13 +9,55 @@
 /*!****************************************************************************
  * Include
  */
+#include <assert.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <semphr.h>
 #include "display.h"
 
 /*!****************************************************************************
  * MEMORY
  */
-disp_color_type		uiBackgroundColor;
-disp_color_type		uiContentColor;
+static disp_color_type	uiBackgroundColor;
+static disp_color_type	uiContentColor;
+static SemaphoreHandle_t	dispFlushSem;
+
+/*!****************************************************************************
+ * Initialize display subsystem
+ */
+void disp_init(void){
+	vSemaphoreCreateBinary(dispFlushSem);
+	assert(dispFlushSem != NULL);
+	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
+}
+
+/*!****************************************************************************
+ * Flush callback
+ */
+void disp_cb(void *arg){
+	(void)arg;
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	xSemaphoreGiveFromISR(dispFlushSem, &xHigherPriorityTaskWoken);
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+}
+
+/*!****************************************************************************
+ * Flush video buffer
+ */
+void disp_flush(void){
+	st7735_flush(disp_cb);
+	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
+}
+
+/*!****************************************************************************
+ * Flush video buffer and fill
+ */
+void disp_flushfill(lcd_color_type color){
+	st7735_flush(disp_cb);
+	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
+	st7735_setBuffer(color, disp_cb);
+	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
+}
 
 /*!****************************************************************************
  *

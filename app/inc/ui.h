@@ -32,6 +32,7 @@ typedef struct {
 	uint16_t capacity;
 	uint16_t imax;
 	uint16_t mode;
+	uint16_t background;
 } uicolor_type;
 
 typedef struct {

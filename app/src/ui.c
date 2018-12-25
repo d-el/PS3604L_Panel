@@ -24,6 +24,7 @@ const ui_type ui = {
 		.capacity = white,
 		.imax = white,
 		.mode = white,
+		.background = black
 	},
 
 	.beep = {

@@ -12,10 +12,10 @@
 #include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
+#include <semphr.h>
 #include "ui.h"
 #include "pstypes.h"
 #include "graphics.h"
@@ -52,9 +52,6 @@ void chargeTSK(void *pPrm){
 	char 					str[30];
 
 	disp_fillScreen(black);
-
-	//Print static element
-	grf_line(0, 107, 159, 107, halfLightGray);
 	ksSet(30, 10, kUp | kDown);
 	prmEditorSetNtic(5);
 
@@ -217,6 +214,8 @@ void chargeTSK(void *pPrm){
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
 
+		grf_line(0, 107, 159, 107, halfLightGray);
+
 		//Detection finish
 		if((chargerIsOn != 0) && (fp.tf.state.bit.switchIsON == 0)){
 			if(keyState(kOnOff)){
@@ -235,6 +234,7 @@ void chargeTSK(void *pPrm){
 		//Print status bar
 		printStatusBar();
 
+		disp_flushfill(ui.color.background);
 		//Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CH_TSK_PERIOD));
 	}

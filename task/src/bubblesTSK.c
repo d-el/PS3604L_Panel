@@ -9,8 +9,8 @@
 /*!****************************************************************************
  * Include
  */
-#include "FreeRTOS.h"
-#include "task.h"
+#include <FreeRTOS.h>
+#include <task.h>
 #include "graphics.h"
 #include "ui.h"
 #include "display.h"
@@ -67,7 +67,7 @@ void bubblesTSK(void *pPrm){
 		localtime_r(&unixTime, &tm);
 		strftime(str, sizeof(str), "%H:%M:%S", &tm);
 		disp_putStr(48, 110, &arial, 0, str);
-
+		disp_flushfill(ui.color.background);
 		vTaskDelay(pdMS_TO_TICKS(60));
 	}
 }
@@ -125,12 +125,8 @@ void initialize(void){ // Initialize the game
 void moveball(void){
 	uint8_t i;
 	for(i = 0; i < CountOfBalls; i++){
-		paint_ball(ball[i].new_xcenter, ball[i].new_ycenter, ball[i].radius, black);
-
 		ball[i].new_xcenter = ball[i].new_xcenter + ball[i].speedx;
 		ball[i].new_ycenter = ball[i].new_ycenter + ball[i].speedy;
-
-		//clear_ball(ball[i].old_xcenter, ball[i].old_ycenter, ball[i].radius, black);
 		paint_ball(ball[i].new_xcenter, ball[i].new_ycenter, ball[i].radius, ball[i].color);
 	}
 }

@@ -81,6 +81,8 @@ enum lcdDescribed{
  */
 uint16_t videoBff[ST7735_W * ST7735_H];
 static uint8_t xstart, ystart, width, height;
+static flushcb_type flushcb;
+static setbufcb_type setbufcb;
 
 /*!
  * Rather than a bazillion writecommand() and writedata() calls, screen
@@ -251,29 +253,91 @@ static void spiInit(void){
  */
 static void initSpiDMA(void){
 	/************************************************
+	 * DMA ME2MEM
+	 */
+	RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+	LCD_DMAMEM_STREAM->CR	= 0;
+	//LCD_DMAMEM_STREAM->CR	|= (uint32_t)((LCD_DMA_CHANNEL & 0x03) << 25);	//Channel selection
+	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_PL_1;								//Priority level High
+	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_MSIZE_0;							//Memory data size half-word (16-bit)
+	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_PSIZE_0;							//Memory data size half-word (16-bit)
+	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_MINC;								//Memory increment mode enabled
+	LCD_DMAMEM_STREAM->CR	&= ~DMA_SxCR_PINC;								//Peripheral increment mode disabled
+	LCD_DMAMEM_STREAM->CR	&= ~DMA_SxCR_CIRC;								//Circular mode disable
+	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_DIR_1;								//Direction Memory-to-memory
+	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_TCIE;								//Transfer complete interrupt enable
+	LCD_DMAMEM_STREAM->NDTR	= sizeof(videoBff) / 2;							//Number of data
+	LCD_DMAMEM_STREAM->PAR	= 0;											//Peripheral address
+	LCD_DMAMEM_STREAM->M0AR	= (uint32_t)&videoBff[0];						//Memory address
+
+	NVIC_EnableIRQ(DMA2_Stream0_IRQn);
+	NVIC_SetPriority(DMA2_Stream0_IRQn, LCD_DMA_IRQPrior);
+
+	/************************************************
 	 * DMA
 	 */
-	uint32_t dmaChannelTx = 0;
-	DMA_Stream_TypeDef *pDmaStreamTx = DMA1_Stream7;
-
 	RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
-	pDmaStreamTx->CR	= 0;
-	pDmaStreamTx->CR	|= (uint32_t)((dmaChannelTx & 0x03) << 25);		//Channel selection
-	pDmaStreamTx->CR	|= DMA_SxCR_PL_1;								//Priority level High
-	pDmaStreamTx->CR	|= DMA_SxCR_MSIZE_0;							//Memory data size half-word (16-bit)
-	pDmaStreamTx->CR	|= DMA_SxCR_PSIZE_0;							//Memory data size half-word (16-bit)
-	pDmaStreamTx->CR	|= DMA_SxCR_MINC;								//Memory increment mode enabled
-	pDmaStreamTx->CR	&= ~DMA_SxCR_PINC;								//Peripheral increment mode disabled
-	pDmaStreamTx->CR	|= DMA_SxCR_CIRC;								//Circular mode enable
-	pDmaStreamTx->CR	|= DMA_SxCR_DIR_0;								//Direction Memory-to-peripheral
-	pDmaStreamTx->NDTR	 = sizeof(videoBff) / 2;						//Number of data
-	pDmaStreamTx->PAR	 = (uint32_t)&LCD_SPI->DR;						//Peripheral address
-	pDmaStreamTx->M0AR	 = (uint32_t)&videoBff[0];						//Memory address
+	LCD_DMA_STREAM->CR	= 0;
+	LCD_DMA_STREAM->CR	|= (uint32_t)((LCD_DMA_CHANNEL & 0x03) << 25);	//Channel selection
+	LCD_DMA_STREAM->CR	|= DMA_SxCR_PL_1;								//Priority level High
+	LCD_DMA_STREAM->CR	|= DMA_SxCR_MSIZE_0;							//Memory data size half-word (16-bit)
+	LCD_DMA_STREAM->CR	|= DMA_SxCR_PSIZE_0;							//Memory data size half-word (16-bit)
+	LCD_DMA_STREAM->CR	|= DMA_SxCR_MINC;								//Memory increment mode enabled
+	LCD_DMA_STREAM->CR	&= ~DMA_SxCR_PINC;								//Peripheral increment mode disabled
+	LCD_DMA_STREAM->CR	&= ~DMA_SxCR_CIRC;								//Circular mode disable
+	LCD_DMA_STREAM->CR	|= DMA_SxCR_DIR_0;								//Direction Memory-to-peripheral
+	LCD_DMA_STREAM->CR	|= DMA_SxCR_TCIE;								//Transfer complete interrupt enable
+	LCD_DMA_STREAM->NDTR	= sizeof(videoBff) / 2;						//Number of data
+	LCD_DMA_STREAM->PAR		= (uint32_t)&LCD_SPI->DR;					//Peripheral address
+	LCD_DMA_STREAM->M0AR	= (uint32_t)&videoBff[0];					//Memory address
 
 	gppin_set(GP_LCD_DC);
-	LCD_SPI->CR1 |= SPI_CR1_DFF;				//16-bit data frame format is selected for transmission/reception
+	LCD_SPI->CR1 |= SPI_CR1_DFF;	//16-bit data frame format is selected for transmission/reception
 	LCD_SPI->CR2 |= SPI_CR2_TXDMAEN;
-	DMA1_Stream7->CR |= DMA_SxCR_EN;
+
+	NVIC_EnableIRQ(DMA1_Stream7_IRQn);
+	NVIC_SetPriority(DMA1_Stream7_IRQn, LCD_DMA_IRQPrior);
+}
+
+/*!****************************************************************************
+ * @brief Flush video buffer to display
+ */
+void st7735_flush(flushcb_type cb){
+	flushcb = cb;
+	LCD_DMA_STREAM->NDTR = sizeof(videoBff) / 2;
+	LCD_DMA_STREAM->CR |= DMA_SxCR_EN;
+}
+
+/*!****************************************************************************
+ * @brief Set fill video buffer
+ */
+void st7735_setBuffer(lcd_color_type color, setbufcb_type cb){
+	setbufcb = cb;
+	uint16_t ramcolor = color;
+	LCD_DMAMEM_STREAM->PAR	= (uint32_t)&ramcolor;
+	LCD_DMAMEM_STREAM->CR |= DMA_SxCR_EN;
+}
+
+/*!****************************************************************************
+ * @brief Handler tx DMA
+ */
+void DMA1_Stream7_IRQHandler(void){
+	if(flushcb != NULL){
+		flushcb(NULL);
+	}
+	LCD_DMA_STREAM->CR &= ~DMA_SxCR_EN;
+	DMA1->HIFCR = DMA_HIFCR_CTCIF7;		//Clear flag
+}
+
+/*!****************************************************************************
+ * @brief Handler memory DMA
+ */
+void DMA2_Stream0_IRQHandler(void){
+	if(setbufcb != NULL){
+		setbufcb(NULL);
+	}
+	LCD_DMAMEM_STREAM->CR &= ~DMA_SxCR_EN;
+	DMA2->LIFCR = DMA_LIFCR_CTCIF0;		//Clear flag
 }
 
 /*!****************************************************************************
