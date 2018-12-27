@@ -8,10 +8,10 @@
 const uint32_t fwinfoMajor    = 2;
 const uint32_t fwinfoMinor    = 1;
 const uint32_t fwinfoRevision = 6;
-const uint32_t fwinfoBuild    = 4260;
+const uint32_t fwinfoBuild    = 4266;
 
-const char fwinfoVersion[] = {"2.1.6.4260"};
-const char fwinfoDate[] = {"2018-12-25"};
-const char fwinfoTime[] = {"21:10:24"};
+const char fwinfoVersion[] = {"2.1.6.4266"};
+const char fwinfoDate[] = {"2018-12-27"};
+const char fwinfoTime[] = {"23:05:42"};
 
 /******************************** END OF FILE ********************************/

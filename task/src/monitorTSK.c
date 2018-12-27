@@ -107,6 +107,7 @@ void monitorTSK(void *pPrm){
 			}
 
 			P_LOGI(logTag, "Current Heap Free Size: %u", xPortGetFreeHeapSize());
+			P_LOGI(logTag, "Minimal Heap Size: %u", xPortGetMinimumEverFreeHeapSize());
 			P_LOGI(logTag, "Total RunTime: %"PRIu32" us", totalRuntime);
 			P_LOGI(logTag, "System Uptime: %"PRIu32" ms", xTaskGetTickCount() * portTICK_PERIOD_MS);
 
