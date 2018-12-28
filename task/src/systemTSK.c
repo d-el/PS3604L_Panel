@@ -57,7 +57,7 @@ void shutdown(void);
 /**
  * SYS_DEBUG_LEVEL: Enable debugging for system task
  */
-#define TASK_MONITOR_EN	1
+#define TASK_MONITOR_EN	0
 #if(TASK_MONITOR_EN == 0)
 	#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
 #else

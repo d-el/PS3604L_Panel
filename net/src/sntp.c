@@ -26,7 +26,7 @@
 /**
  * SNTP_DEBUG_LEVEL: Enable debugging for SNTP
  */
-#define LOG_LOCAL_LEVEL P_LOG_WARN
+#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
 
 /**
  * SNTP_SINGLESYNC: Enable single sync
@@ -147,14 +147,9 @@ static void sntp_process(u32_t *receive_timestamp){
 	/* convert SNTP time (1900-based) to unix GMT time (1970-based)
 	 * @todo: if MSB is 1, SNTP time is 2036-based!
 	 */
-	time_t t = (ntohl(receive_timestamp[0]) - DIFF_SEC_1900_1970);
+	time_t t = ntohl(receive_timestamp[0]) - DIFF_SEC_1900_1970;
+	P_LOGD(logTag, "sntp_recv: set time: unix GMT time (1970-based) %"PRIu32"", (uint32_t)t);
 	rtc_setTimeUnix(t);
-
-	#if SNTP_DEBUG_TIME
-	char str[32];
-	ctime_r(&t, str);
-	report(SNTP_DEBUG_TIME, "Sync time: %s\n", str);
-	#endif
 }
 
 /**
@@ -234,8 +229,8 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, const ip_a
 	}
 	pbuf_free(p);
 	if(err == ERR_OK){
+		P_LOGD(logTag, "sntp_recv: receive success");
 		sntp_process(receive_timestamp);
-
 	#if(SNTP_SINGLESYNC > 0)
 		udp_remove(pcb);
 		return;
@@ -286,7 +281,7 @@ static void sntp_dns_found(const char* hostname, const ip_addr_t *ipaddr, void *
 	if(ipaddr != NULL){
 		/* Address resolved, send request */
 		P_LOGD(logTag, "sntp_dns_found: Server address resolved, sending request");
-		P_LOGD(logTag, "sntp_server_address: %s\n", ipaddr_ntoa(ipaddr));
+		P_LOGD(logTag, "sntp_server_address: %s", ipaddr_ntoa(ipaddr));
 		sntp_send_request(ipaddr);
 	}else{
 		/* DNS resolving failed -> try another server */
