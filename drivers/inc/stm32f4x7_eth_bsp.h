@@ -20,11 +20,14 @@
 typedef void (*ETH_IRQHandler_type)(void *arg);
 
 /* Exported constants --------------------------------------------------------*/
-#define LAN8720_PHY_ADDRESS		  0x01 /* Relative to STM324xG-EVAL Board */
+#define LAN8720_ADDRESS0	0x00
+#define LAN8720_ADDRESS1	0x01
+#define PHY_ADDRESS			LAN8720_ADDRESS0
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void  ETH_BSP_Config(void);
+void  ETH_BSP_Deinit(void);
 void  ETH_BSP_setHandler(ETH_IRQHandler_type h);
 
 #ifdef __cplusplus

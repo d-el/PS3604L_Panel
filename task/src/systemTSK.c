@@ -16,6 +16,7 @@
 #include "plog.h"
 #include "prmSystem.h"
 #include "sntp.h"
+#include "stm32f4x7_eth_bsp.h"
 #include "stm32f4x7_eth.h"
 #include "ethernetif.h"
 #include "tcpip.h"
@@ -41,18 +42,19 @@
 /*!****************************************************************************
  * Memory
  */
-frontPanel_type	fp;					///< Data structure front panel
-TaskHandle_t	windowTskHandle;	///< Program task handler
-struct netif	xnetif; 			///< Network interface structure
+frontPanel_type			fp;					///< Data structure front panel
+static TaskHandle_t		windowTskHandle;	///< Program task handler
+static struct netif		xnetif; 			///< Network interface structure
+static uint8_t			shutdownFlag;
 
 /*!****************************************************************************
  * Local prototypes for the functions
  */
 int _write(int fd, const void *buf, size_t count);
-void loadParameters(void);
-void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
-void netSettingUpdate(void);
-void shutdown(void);
+static void loadParameters(void);
+static void shutdown(void);
+static void pvdCallback(void);
+static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
 
 /**
  * SYS_DEBUG_LEVEL: Enable debugging for system task
@@ -79,11 +81,11 @@ void systemTSK(void *pPrm){
 	plog_setTimestamp(xTaskGetTickCount);
 	plog_setWriteFd(write_uart); // write_semihost, write_uart
 
-	P_LOGI(logTag, "Started systemTSK");
+	P_LOGI(logTag, "\n\nStarted systemTSK");
 
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate();
-	pvd_setSupplyFaultCallBack(shutdown);							// Setup callback for Supply Fault
+	pvd_setSupplyFaultCallBack(pvdCallback);							// Setup callback for Supply Fault
 	disp_init();
 	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
 	sntp_init();													// Initialize service SNTP
@@ -104,7 +106,7 @@ void systemTSK(void *pPrm){
 	selWindow(startupWindow);
 
 	while(1){
-		if(fp.tf.state.bit.lowInputVoltage != 0){
+		if((fp.tf.state.bit.lowInputVoltage != 0) || (shutdownFlag != 0)){
 			shutdown();
 		}
 
@@ -168,7 +170,7 @@ void systemTSK(void *pPrm){
 		static uint8_t linkCount = 0;
 		if(linkCount++ == (LINK_DETECT_PERIOD / SYSTEM_TSK_PERIOD)){
 			if(gppin_get(GP_LANnINT) == 0){	//Detect by GPIO
-				ETH_ReadPHYRegister(1, PHY_BSR);
+				ETH_ReadPHYRegister(PHY_ADDRESS, PHY_BSR);
 				if(fp.state.lanLink != 0){
 					netif_set_link_down(&xnetif);
 					netif_set_down(&xnetif);
@@ -177,7 +179,7 @@ void systemTSK(void *pPrm){
 				}
 			}
 			if(fp.state.lanLink == 0){		//Detect by read status register
-				if(ETH_AutoNegotiation(1, NULL) == ETH_SUCCESS){
+				if(ETH_AutoNegotiation(PHY_ADDRESS, NULL) == ETH_SUCCESS){
 					netif_set_link_up(&xnetif);
 					netif_set_up(&xnetif);	//When the netif is fully configured this function must be called
 					P_LOGI(logTag, "LAN link Up");
@@ -200,14 +202,12 @@ void systemTSK(void *pPrm){
 /*!****************************************************************************
  * @brief	Load parameters from memory
  */
-void loadParameters(void){
-	prm_state_type stat;
-
-	stat = prm_load(SYSEEPADR, prmEepSys);
+static void loadParameters(void){
+	prm_state_type stat = prm_load(SYSEEPADR, prmEepSys);
 	if(stat == prm_ok){
 		P_LOGI(logTag, "System settings load ok");
 	}else{
-		P_LOGE(logTag, "System settings load error: %u", stat);
+		P_LOGW(logTag, "System settings load error: %u", stat);
 		prm_loadDefault(prmEepSys);
 		fp.state.sysSettingLoadDefault = 1;
 	}
@@ -216,34 +216,18 @@ void loadParameters(void){
 	if(stat == prm_ok){
 		P_LOGI(logTag, "User settings load ok");
 	}else{
-		P_LOGE(logTag, "User settings load error: %u", stat);
+		P_LOGW(logTag, "User settings load error: %u", stat);
 		prm_loadDefault(prmEep);
 		fp.state.userSettingLoadDefault = 1;
 	}
 }
 
 /*!****************************************************************************
- * @brief	Select window task & wait selected
- * 			This function need call from current GUI window
- * @param 	window	window task identifier
+ * @brief	Save parameters to memory
  */
-void selWindow(selWindow_type window){
-	fp.currentSelWindow = window;
-	while(windowTskHandle != NULL){
-		 vTaskSuspend(NULL);	//Suspend current window
-	}
-}
-
-/*!****************************************************************************
- * Выключение
- */
-void shutdown(void){
-	pvd_disable();
-	setLcdBrightness(0);
-	LED_OFF();
-
-	prm_state_type stat;
-	stat = prm_store(USEREEPADR, prmEep);
+static void shutdown(void){
+	P_LOGD(logTag, "System shutdown3");
+	prm_state_type stat = prm_store(USEREEPADR, prmEep);
 	if(stat == prm_ok){
 		P_LOGI(logTag, "System settings store ok");
 	}else{
@@ -253,10 +237,20 @@ void shutdown(void){
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
 	LED_ON();
 	if(windowTskHandle != NULL){
-		vTaskDelete(windowTskHandle);	//Удаляем текущее окно
+		vTaskDelete(windowTskHandle);	//Delete window
 	}
 	vTaskDelay(pdMS_TO_TICKS(10000));
 	NVIC_SystemReset();
+}
+
+/*!****************************************************************************
+ * Выключение
+ */
+static void pvdCallback(void){
+	setLcdBrightness(0);
+	LED_OFF();
+	ETH_BSP_Deinit();
+	shutdownFlag = 1;
 }
 
 /*!****************************************************************************
@@ -286,6 +280,7 @@ void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gat
 	 * The init function pointer must point to a initialization function for
 	 * your ethernet netif interface. The following code illustrates it's use.
 	 */
+	P_LOGI(logTag, "set IP: %s", ipaddr_ntoa(&l_ipaddr) );
 	netif_add(&xnetif, &l_ipaddr, &l_netmask, &l_gateway, NULL, &ethernetif_init, &tcpip_input);
 
 	/*  Registers the default network interface. */
@@ -318,7 +313,20 @@ void netSettingUpdate(void){
 	l_netmask.addr = htonl(fp.fpSet.netmask);
 	l_gateway.addr = htonl(fp.fpSet.gateway);
 
+	P_LOGI(logTag, "update IP: %s", ipaddr_ntoa(&l_ipaddr) );
 	netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
+}
+
+/*!****************************************************************************
+ * @brief	Select window task & wait selected
+ * 			This function need call from current GUI window
+ * @param 	window	window task identifier
+ */
+void selWindow(selWindow_type window){
+	fp.currentSelWindow = window;
+	while(windowTskHandle != NULL){
+		 vTaskSuspend(NULL);	//Suspend current window
+	}
 }
 
 /*!****************************************************************************

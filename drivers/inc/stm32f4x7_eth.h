@@ -1785,7 +1785,6 @@ typedef struct	{
 /** @defgroup ETH_Exported_Functions
   * @{
   */
-void ETH_DeInit(void);
 uint32_t ETH_Init(ETH_InitTypeDef* ETH_InitStruct, uint16_t PHYAddress);
 uint32_t ETH_AutoNegotiation(uint16_t PHYAddress, ETH_ConnectTypeDef *arg);
 void ETH_StructInit(ETH_InitTypeDef* ETH_InitStruct);

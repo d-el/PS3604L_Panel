@@ -26,7 +26,7 @@ void pvd_init(void){
 	RCC->APB1ENR	|= RCC_APB1ENR_PWREN;				//Power interface clock enable
 	PWR->CR			&= ~PWR_CR_PVDE;					//Power voltage detector disable
 	PWR->CR			&= ~PWR_CR_PLS;
-	PWR->CR			|= PWR_CR_PLS_LEV6;					//Power voltage detector level selection VPVD6 around 2.9 V
+	PWR->CR			|= PWR_CR_PLS_LEV7;					//Power voltage detector level selection VPVD6 around 2.9 V
 	PWR->CR			|= PWR_CR_PVDE;						//Power voltage detector enable				//Restore value
 
 	EXTI->IMR		|= EXTI_IMR_IM16;					//Interrupt request from Line 16 is not masked

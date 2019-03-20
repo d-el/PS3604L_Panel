@@ -41,6 +41,13 @@ void ETH_BSP_Config(void){
 	ETH_MACDMA_Config();
 }
 
+void  ETH_BSP_Deinit(void){
+	RCC->AHB1ENR &= ~RCC_AHB1ENR_ETHMACEN;
+	RCC->AHB1ENR &= ~RCC_AHB1ENR_ETHMACTXEN;
+	RCC->AHB1ENR &= ~RCC_AHB1ENR_ETHMACRXEN;
+	_gppin_reset(GPIOC, pinm2);
+}
+
 /**
  * @brief  ETH_BSP_setHandler
  * @param  pointer to handler
@@ -59,13 +66,9 @@ static void ETH_MACDMA_Config(void){
 	ETH_InitTypeDef ETH_InitStructure;
 
 	/* Enable ETHERNET clock  */
-	/* Enable ETHERNET clock  */
 	RCC->AHB1ENR |= RCC_AHB1ENR_ETHMACEN;
 	RCC->AHB1ENR |= RCC_AHB1ENR_ETHMACTXEN;
 	RCC->AHB1ENR |= RCC_AHB1ENR_ETHMACRXEN;
-
-	/* Reset ETHERNET on AHB Bus */
-	ETH_DeInit();
 
 	/* Reset ETHERNET on AHB Bus */
 	RCC->AHB1RSTR |= RCC_AHB1RSTR_ETHMACRST;
@@ -120,7 +123,7 @@ static void ETH_MACDMA_Config(void){
 	ETH_InitStructure.ETH_DMAArbitration = ETH_DMAArbitration_RoundRobin_RxTx_2_1;
 
 	/* Configure Ethernet */
-	EthInitStatus = ETH_Init(&ETH_InitStructure, LAN8720_PHY_ADDRESS);
+	EthInitStatus = ETH_Init(&ETH_InitStructure, PHY_ADDRESS);
 
 	/* Enable the Ethernet Rx Interrupt */
 	ETH_DMAITConfig(ETH_DMA_IT_NIS | ETH_DMA_IT_R, ENABLE);

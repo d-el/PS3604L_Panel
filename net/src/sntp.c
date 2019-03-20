@@ -231,14 +231,13 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, const ip_a
 	if(err == ERR_OK){
 		P_LOGD(logTag, "sntp_recv: receive success");
 		sntp_process(receive_timestamp);
-	#if(SNTP_SINGLESYNC > 0)
+	if(SNTP_SINGLESYNC > 0)
 		udp_remove(pcb);
-		return;
-	#else
+	else{
 		/* Set up timeout for next request */
 		sys_timeout((u32_t) SNTP_UPDATE_DELAY, sntp_request, NULL);
 		P_LOGD(logTag, "sntp_recv: Scheduled next time request: %"PRIu16" ms", (u32_t)SNTP_UPDATE_DELAY);
-	#endif
+	}
 	}else if(err == SNTP_ERR_KOD){
 		/* Kiss-of-death packet. Use another server or increase UPDATE_DELAY. */
 		sntp_try_next_server(NULL);

@@ -181,6 +181,10 @@ rtcStatus_type rtc_setTime(const struct tm *t){
 	uint32_t rtctr = 0;
 	uint32_t rtcdr = 0;
 
+	if((RCC->BDCR & RCC_BDCR_RTCEN) == 0 || (RCC->BDCR & RCC_BDCR_LSERDY) == 0){
+		return rtc_error;
+	}
+
 	if((t->tm_sec > 59) || (t->tm_min > 59) || (t->tm_hour > 23) || (t->tm_mday > 31) || (t->tm_mon > 12) || (t->tm_year < 100) || (t->tm_year > 200)){
 		return rtc_error;
 	}
@@ -220,8 +224,7 @@ rtcStatus_type rtc_setTime(const struct tm *t){
 rtcStatus_type rtc_setTimeUnix(time_t timeUnix){
 	struct tm tm;
 	gmtime_r(&timeUnix, &tm);
-	rtc_setTime(&tm);
-	return rtc_setOk;
+	return rtc_setTime(&tm);
 }
 
 /******************************** END OF FILE ********************************/

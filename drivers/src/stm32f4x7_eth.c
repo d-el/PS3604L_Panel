@@ -155,17 +155,6 @@ static void ETH_Delay(__IO uint32_t nCount){
 /******************************************************************************/
 
 /**
- * @brief  Deinitializes the ETHERNET peripheral registers to their default reset values.
- * @param  None
- * @retval None
- * XXX
- */
-void ETH_DeInit(void){
-	RCC->AHB1RSTR |= RCC_AHB1RSTR_ETHMACRST;
-	RCC->AHB1RSTR &= ~RCC_AHB1RSTR_ETHMACRST;
-}
-
-/**
  * @brief  Fills each ETH_InitStruct member with its default value.
  * @param  ETH_InitStruct: pointer to a ETH_InitTypeDef structure which will be initialized.
  * @retval None

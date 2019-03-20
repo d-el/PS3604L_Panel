@@ -10,6 +10,7 @@
 /**
  * TIM15_CH2 (PB15)		-> PWM Beep
  * TIM6					-> Time for Beep
+ * TIM8_CH2 (PC7)		-> LED PWM
 
  * *******************
  *
@@ -63,6 +64,7 @@ extern uint8_t macAddress[6];
 #define LED_ON()			gppin_set(GP_LED_GP)
 #define LED_OFF()			gppin_reset(GP_LED_GP)
 #define LED_TOGGLE()		gppin_togle(GP_LED_GP)
+#define PHY_RESET()			gppin_reset(GP_LED_GP)
 
 /*!****************************************************************************
  * Prototypes for the functions

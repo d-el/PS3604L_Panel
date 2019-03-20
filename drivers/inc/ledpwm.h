@@ -33,12 +33,12 @@
 /*!****************************************************************************
  * Macro functions
  */
-#define setLcdBrightness(x)	   (TIM5->CCR1 = (x)) //[XXX_X %]
 
 /*!****************************************************************************
  * Prototypes for the functions
  */
 void ledPwm_init(void);
+void setLcdBrightness(uint16_t percent);	// [XXX_X %]
 
 #endif //ledpwm_H
 /******************************** END OF FILE ********************************/

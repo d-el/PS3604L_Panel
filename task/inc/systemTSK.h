@@ -76,7 +76,6 @@ extern frontPanel_type fp;
 /*!****************************************************************************
  * Function declaration
  */
-void selWindow(selWindow_type window);
 void systemTSK(void *pPrm);
 void netSettingUpdate(void);
 void selWindow(selWindow_type window);

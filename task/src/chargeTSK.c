@@ -210,7 +210,7 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 60, &arial, 0, str);
 
 		//Print Capacity
-		snprintf(str, sizeof(str), "C:         %01"PRIu32".%03"PRIu32" A/h", fp.tf.meas.capacity / 1000, fp.tf.meas.capacity % 1000);
+		snprintf(str, sizeof(str), "C:         %01"PRIu32".%03"PRIu32" Ah", fp.tf.meas.capacity / 1000, fp.tf.meas.capacity % 1000);
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
 

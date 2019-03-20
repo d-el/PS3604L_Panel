@@ -56,7 +56,7 @@ void startupTSK(void *pPrm){
 
 		disp_putStr(00, 70, &arial, 0, str);
 		disp_putStr(0, 90, &arial, 0, fwinfoVersion);
-		disp_putStr(0, 110, &arial, 0, "2012 - 2018");
+		disp_putStr(0, 110, &arial, 0, "2012 - 2019");
 		disp_flush();
 
 		if(fp.fpSet.lcdLight < 10){
