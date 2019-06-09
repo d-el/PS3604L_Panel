@@ -17,7 +17,7 @@
 /*!****************************************************************************
  * Define
  */
-#define SYSTEM_TSK_PERIOD   (10)		///< [ms]
+#define SYSTEM_TSK_PERIOD   (20)		///< [ms]
 #define LINK_DETECT_PERIOD  (500)		///< [ms]
 #define I_SHORT_CIRCUIT     (4000000)	///< [X_XXXXXX A]
 

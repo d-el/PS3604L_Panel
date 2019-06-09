@@ -81,13 +81,13 @@ void baseTSK(void *pPrm){
 				}else{
 					BeepTime(ui.beep.error.time, ui.beep.error.freq);
 				}
-			}else if(keyState(kView)){                        	//Переключаем набор параметров
-				if(fp.tf.state.bit.switchIsON == 0){    //Если выключен выход
+			}else if(keyState(kView)){					//Next preset
+				if(fp.tf.state.bit.switchIsON == 0){
 					bs.curPreSet++;
 					if(bs.curPreSet >= NPRESET){
 						bs.curPreSet = 0;
 					}
-				}else{      //Если включен выход
+				}else{
 					BeepTime(ui.beep.error.time, ui.beep.error.freq);
 				}
 			}else if(keyState(kOnOff)){
@@ -305,10 +305,9 @@ void printStatusBar(void){
 	}
 	ovfCurrent = fp.tf.state.bit.ovfCurrent;
 
-//	if((fp.tf.state.bit.errorLinearRegTemperSens != 0) || (fp.tf.state.bit.ovfLinearRegTemper != 0)
-//			|| (fp.tf.state.bit.reverseVoltage != 0) || (uartTsk.state == uartNoConnect))
-//	{
-	if(0){
+	if((fp.tf.state.bit.errorLinearRegTemperSens != 0) || (fp.tf.state.bit.ovfLinearRegTemper != 0)
+			|| (fp.tf.state.bit.reverseVoltage != 0) || (uartTsk.state == uartNoConnect))
+	{
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
 		if(errPrev == 0){
@@ -327,7 +326,7 @@ void printStatusBar(void){
 		}
 
 		errPrev = 1;
-	}else{  //Not failure
+	}else{	//Not failure
 		if(errPrev != 0){
 			grf_fillRect(0, 108, 160, 19, black);
 			errPrev = 0;

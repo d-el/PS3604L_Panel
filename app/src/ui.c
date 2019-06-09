@@ -36,7 +36,7 @@ const ui_type ui = {
 		.ccToCv			= { 4500, 50 },
 		.ovfCurrent		= { 4500, 500 },
 		.chargeReady	= { 4100, 2000 },
-		.error			= { 3000, 1000 },
+		.error			= { 3000, 100 },
 		.encoLim		= { 4100, 200 },
 		.encoTransition = { 4100, 30 },
 	}
