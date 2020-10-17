@@ -311,10 +311,9 @@ void st7735_flush(flushcb_type cb){
 /*!****************************************************************************
  * @brief Set fill video buffer
  */
-void st7735_setBuffer(lcd_color_type color, setbufcb_type cb){
+void st7735_setBuffer(lcd_color_type *color, setbufcb_type cb){
 	setbufcb = cb;
-	uint16_t ramcolor = color;
-	LCD_DMAMEM_STREAM->PAR	= (uint32_t)&ramcolor;
+	LCD_DMAMEM_STREAM->PAR	= (uint32_t)color;
 	LCD_DMAMEM_STREAM->CR |= DMA_SxCR_EN;
 }
 

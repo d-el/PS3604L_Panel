@@ -1,2 +1,7 @@
 This repository include the source code of the front panel Power Supply PS3604L.
 MCU: STM32F407VG.
+
+mkdir build
+cd build
+cmake ..
+make -j8

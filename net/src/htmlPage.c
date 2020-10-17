@@ -41,39 +41,39 @@ resource_reg(net_resource_404_html)
 const httpResource_type httpResource[] = {
 	{
 		.url = "/ ",
-		.handler = NULL,
 		.data.type = urlDataType_html,
-		resource_add(net_resource_index_html)
+		resource_add(net_resource_index_html),
+		.handler = NULL
 	},
 	{
 		.url = "/overall.js",
-		.handler = NULL,
 		.data.type = urlDataType_js,
-		resource_add(net_resource_overall_js)
+		resource_add(net_resource_overall_js),
+		.handler = NULL
 	},
 	{
 		.url = "/styles.css",
-		.handler = NULL,
 		.data.type = urlDataType_css,
-		resource_add(net_resource_styles_css)
+		resource_add(net_resource_styles_css),
+		.handler = NULL
 	},
 	{
 		.url = "/statemeastask.bin",
-		.handler = handle_statemeastask,
 		.data.type = urlDataType_bin,
 		.data.size = sizeof(bin_statemeastask),
+		.handler = handle_statemeastask
 	},
 	{
 		.url = "/favicon.ico",
-		.handler = NULL,
 		.data.type = urlDataType_ico,
 		resource_add(net_resource_favico_bmp),
+		.handler = NULL
 	},
 	{
 		.url = "/404",
-		.handler = NULL,
 		.data.type = urlDataType_html,
 		resource_add(net_resource_404_html),
+		.handler = NULL
 	},
 };
 

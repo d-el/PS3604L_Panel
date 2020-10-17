@@ -19,8 +19,8 @@
 #include "stm32f4x7_eth_bsp.h"
 #include "stm32f4x7_eth.h"
 #include "ethernetif.h"
-#include "tcpip.h"
-#include "lwip/dns.h"
+#include <lwip/tcpip.h>
+#include <lwip/dns.h>
 #include "write.h"
 #include "display.h"
 #include "beep.h"
@@ -31,13 +31,12 @@
 #include "regulatorConnTSK.h"
 #include "startupTSK.h"
 #include "settingTSK.h"
-#include "cube3dTSK.h"
-#include "bubblesTSK.h"
 #include "chargeTSK.h"
 #include "httpServerTSK.h"
 #include "baseTSK.h"
 #include "monitorTSK.h"
 #include "systemTSK.h"
+#include <OSinit.h>
 
 /*!****************************************************************************
  * Memory
@@ -131,12 +130,6 @@ void systemTSK(void *pPrm){
 					break;
 				case chargerWindow:
 					osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
-					break;
-				case cube3dWindow:
-					osres = xTaskCreate(cube3dTSK, "cube3dTSK", CUBE_TSK_SZ_STACK, NULL, CUBE_TSK_PRIO, &windowTskHandle);
-					break;
-				case bubblesWindow:
-					osres = xTaskCreate(bubblesTSK, "bubblesTSK", BUBLE_TSK_SZ_STACK, NULL, BUBLE_TSK_PRIO, &windowTskHandle);
 					break;
 				default:
 					assert(!"Fail selector");
