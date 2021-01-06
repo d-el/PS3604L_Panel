@@ -55,9 +55,7 @@ void hardInit(void){
 		fp.state.mainOscillatorError = 1;
 	}
 	gpio_init();
-	uart_init(uart1, BR38400);	//Connect
-	uart_init(uart3, BR57600);
-	uart_init(uart4, BR1M);		//Debug out
+	uart_init(uart3, 57600);
 	macAddressGen();
 	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();

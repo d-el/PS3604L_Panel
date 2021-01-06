@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		01.01.2016
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
  * @brief		This task create start screen
  */
 
@@ -26,8 +26,6 @@
  * MEMORY
  */
 settingSct_type settingSct;
-uint8_t calibratePoint;
-time_t 		unixTime;	//At 00:00 hours, Jan 1, 1970 UTC
 
 /*!****************************************************************************
  * @brief    Setting system task
@@ -47,16 +45,16 @@ void settingTSK(void *pPrm){
  */
 itemState_type PrepareU(const menuItem_type *item){
 	static uint32_t pointU[4] = { 10000, 100000, 19000000, 30000000 };
-	calibratePoint = item->flags.bit.pfParamert;
-	fp.tf.task.daci = 4095;
-	fp.tf.task.dacu = 0;
-	fp.tf.task.u = pointU[calibratePoint];
-	fp.tf.task.mode = mode_raw;
-	sendCommand(setSwitchOn);
-	if(waitForTf() != 0){
-		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
-	}else{
+	settingSct.calibratePoint = item->flags.bit.pfParamert;
+	settingSct.u = pointU[settingSct.calibratePoint];
+	bool regstate = reg_setDacCurrent(2048);
+	reg_setDacVoltage(settingSct.u);
+	reg_setMode(reg_raw);
+	reg_setEnable(true);
+	if(regstate){
 		return (itemState_type) {.state = menuItemOk};
+	}else{
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}
 }
 
@@ -65,16 +63,16 @@ itemState_type PrepareU(const menuItem_type *item){
  */
 itemState_type PrepareI(const menuItem_type *item){
 	static uint32_t pointI[4] = { 10000, 100000, 1500000, 3000000 };
-	calibratePoint = item->flags.bit.pfParamert;
-	fp.tf.task.daci = 0;
-	fp.tf.task.dacu = 4095;
-	fp.tf.task.i = pointI[calibratePoint];
-	fp.tf.task.mode = mode_raw;
-	sendCommand(setSwitchOn);
-	if(waitForTf() != 0){
-		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
-	}else{
+	settingSct.calibratePoint = item->flags.bit.pfParamert;
+	settingSct.i = pointI[settingSct.calibratePoint];
+	reg_setDacCurrent(settingSct.i);
+	bool regstate = reg_setDacVoltage(2048);
+	reg_setMode(reg_raw);
+	reg_setEnable(true);
+	if(regstate){
 		return (itemState_type) {.state = menuItemOk};
+	}else{
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}
 }
 
@@ -83,11 +81,17 @@ itemState_type PrepareI(const menuItem_type *item){
  */
 itemState_type savePointU(const menuItem_type *item){
 	(void)item;
-	sendCommand(setSavePointU0 + calibratePoint);
-	if(waitForTf() != 0){
-		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
-	}else{
+	reg_setVoltagePoint(settingSct.u, settingSct.calibratePoint);
+	reg_setDacVoltage(settingSct.dacu);
+	regMeas_t regmeas;
+	bool regstate = reg_getState(&regmeas);
+	if(regstate){
+		settingSct.adci = regmeas.iadc;
+		settingSct.adcu = regmeas.vadc;
+		settingSct.measu = regmeas.voltage;
 		return (itemState_type) {.state = menuItemOk};
+	}else{
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}
 }
 
@@ -96,25 +100,30 @@ itemState_type savePointU(const menuItem_type *item){
  */
 itemState_type savePointI(const menuItem_type *item){
 	(void)item;
-	sendCommand(setSavePointI0 + calibratePoint);
-	if(waitForTf() != 0){
-		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
-	}else{
+	reg_setCurrentPoint(settingSct.i, settingSct.calibratePoint);
+	reg_setDacCurrent(settingSct.daci);
+	regMeas_t regmeas;
+	bool regstate = reg_getState(&regmeas);
+	if(regstate){
+		settingSct.adci = regmeas.iadc;
+		settingSct.adcu = regmeas.vadc;
+		settingSct.measi = regmeas.current;
 		return (itemState_type) {.state = menuItemOk};
+	}else{
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}
 }
 
 /*!****************************************************************************
- * @brief    setup regulator to mode_off
+ * @brief
  */
-itemState_type regSave(const menuItem_type *item){
+itemState_type calibrExit(const menuItem_type *item){
 	(void)item;
-	sendCommand(setSaveSettings);
-	fp.tf.task.mode = mode_off;
-	if(waitForTf() != 0){
-		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
-	}else{
+	bool regstate = reg_setEnable(false);
+	if(regstate){
 		return (itemState_type) {.state = menuItemOk};
+	}else{
+		return (itemState_type) {.state = menuItemError, .string = "No Connect"};
 	}
 }
 
@@ -131,8 +140,7 @@ itemState_type setBright(const menuItem_type *item){
  */
 itemState_type rtcSelect(const menuItem_type *item){
 	(void)item;
-	unixTime = time(NULL) + (3600 * fp.fpSet.timezone);
-
+	settingSct.unixTime = time(NULL) + (3600 * fp.fpSettings.timezone);
 	return (itemState_type) {.state = menuItemOk};
 }
 
@@ -142,7 +150,7 @@ itemState_type rtcSelect(const menuItem_type *item){
 itemState_type rtcUnselect(const menuItem_type *item){
 	(void)item;
 	timezoneUpdate();
-	rtc_setTimeUnix(unixTime - (3600 * fp.fpSet.timezone));
+	rtc_setTimeUnix(settingSct.unixTime - (3600 * fp.fpSettings.timezone));
 	return (itemState_type) {.state = menuItemOk};
 }
 

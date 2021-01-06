@@ -236,7 +236,7 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, const ip_a
 	else{
 		/* Set up timeout for next request */
 		sys_timeout((u32_t) SNTP_UPDATE_DELAY, sntp_request, NULL);
-		P_LOGD(logTag, "sntp_recv: Scheduled next time request: %"PRIu16" ms", (u32_t)SNTP_UPDATE_DELAY);
+		P_LOGD(logTag, "sntp_recv: Scheduled next time request: %"PRIu32" ms", (u32_t)SNTP_UPDATE_DELAY);
 	}
 	}else if(err == SNTP_ERR_KOD){
 		/* Kiss-of-death packet. Use another server or increase UPDATE_DELAY. */

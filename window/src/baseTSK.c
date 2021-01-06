@@ -3,7 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		01.01.2015
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
  * @brief		This task is base GUI
  */
 
@@ -19,16 +19,15 @@
 #include <semphr.h>
 #include "plog.h"
 #include "ui.h"
-#include "pstypes.h"
 #include "rtc.h"
 #include "beep.h"
 #include "key.h"
 #include "prmEditor.h"
 #include "display.h"
 #include "graphics.h"
+#include "systemTSK.h"
 #include "regulatorConnTSK.h"
 #include "sysTimeMeas.h"
-#include "systemTSK.h"
 #include "baseTSK.h"
 
 /******************************************************************************
@@ -61,6 +60,10 @@ void baseTSK(void *pPrm){
 
 	while(1){
 		sysTimeMeasStart(sysTimeBs);
+		regMeas_t regmeas = {};
+		reg_getState(&regmeas);
+		bool regenable = false;
+		reg_getEnable(&regenable);
 
 		/**************************************
 		 * Key process
@@ -74,13 +77,13 @@ void baseTSK(void *pPrm){
 					varParam = VAR_VOLT;
 				}
 			}else if(keyState(kMode)){
-				if(fp.tf.state.bit.switchIsON == 0){
+				if(!regenable){
 					selWindow(chargerWindow);
 				}else{
 					BeepTime(ui.beep.error.time, ui.beep.error.freq);
 				}
 			}else if(keyState(kView)){					//Next preset
-				if(fp.tf.state.bit.switchIsON == 0){
+				if(!regenable){
 					bs.curPreSet++;
 					if(bs.curPreSet >= NPRESET){
 						bs.curPreSet = 0;
@@ -89,11 +92,11 @@ void baseTSK(void *pPrm){
 					BeepTime(ui.beep.error.time, ui.beep.error.freq);
 				}
 			}else if(keyState(kOnOff)){
-				uint8_t result;
-				if(fp.tf.state.bit.switchIsON == 0){
-					result = sendCommand(setSwitchOn);
+				uint8_t result = 0;
+				if(!regenable){
+					reg_setEnable(true);
 				}else{
-					result = sendCommand(setSwitchOff);
+					reg_setEnable(false);
 				}
 				if(result != 0){
 					disp_putStr(0, 0, &arial, 0, "Error Connect");
@@ -134,21 +137,21 @@ void baseTSK(void *pPrm){
 		/***************************************
 		 * Task for regulator
 		 */
-		fp.tf.task.u = bs.set[bs.curPreSet].u * 1000;
+		reg_setVoltage(bs.set[bs.curPreSet].u * 1000);
 		switch(bs.set[bs.curPreSet].mode){
 			case (baseImax): {
-				fp.tf.task.mode = mode_overcurrentShutdown;
-				fp.tf.task.i = bs.set[bs.curPreSet].i * 1000;
+				reg_setMode(reg_overcurrentShutdown);
+				reg_setCurrent(bs.set[bs.curPreSet].i * 1000);
 			}
 				break;
 			case (baseILimitation): {
-				fp.tf.task.mode = mode_limitation;
-				fp.tf.task.i = bs.set[bs.curPreSet].i * 1000;
+				reg_setMode(reg_limitation);
+				reg_setCurrent(bs.set[bs.curPreSet].i * 1000);
 			}
 				break;
 			case (baseUnprotected): {
-				fp.tf.task.mode = mode_limitation;
-				fp.tf.task.i = I_SHORT_CIRCUIT;
+				reg_setMode(reg_limitation);
+				reg_setCurrent(I_SHORT_CIRCUIT);
 			}
 				break;
 		}
@@ -156,11 +159,12 @@ void baseTSK(void *pPrm){
 		/**************************************
 		 * Copy measure data
 		 */
-		measV = fp.tf.meas.u;
-		if(measV > 99999999){
+		measV = (regmeas.voltage + 500) / 1000; // uV to mV
+		/*if(measV > 99999999){
 			measV = 99999999;
-		}
-		measI = fp.tf.meas.i;
+		}*/
+
+		measI = regmeas.current;
 		if(measI > 9999999){
 			measI = 9999999;
 		}
@@ -169,10 +173,10 @@ void baseTSK(void *pPrm){
 		 * Output data to display
 		 */
 		//Print voltage
-		if(fp.tf.state.bit.switchIsON != 0){
-			snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32"", measV / 1000000, (measV / 1000) % 1000);
+		if(regenable){
+			snprintf(str, sizeof(str), "%02"PRIu32".%02"PRIu32, measV / 1000, ((measV + 5) / 10) % 100);
 		}else{
-			snprintf(str, sizeof(str), "%02"PRIu16".%03"PRIu16"", bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u % 1000);
+			snprintf(str, sizeof(str), "%02"PRIu16".%02"PRIu16, bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u / 10 % 100);
 		}
 		if(varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
@@ -189,13 +193,13 @@ void baseTSK(void *pPrm){
 			disp_setColor(black, ui.color.current);
 		}
 
-		if(fp.tf.state.bit.switchIsON != 0){
+		if(regenable){
 			if(measI < 99000){
-				snprintf(str, sizeof(str), "%2"PRIu32".%03"PRIu32"", measI / 1000, measI % 1000);
+				snprintf(str, sizeof(str), "%02"PRIu32".%02"PRIu32, measI / 1000, (measI + 5) / 10 % 100);
 				disp_putChar(150, 36, &font8x12, 'm');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}else{
-				snprintf(str, sizeof(str), "%2"PRIu32".%03"PRIu32, measI / 1000000, (measI / 1000) % 1000);
+				snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32, measI / 1000000, (measI / 1000) % 1000);
 				disp_putChar(150, 36, &font8x12, ' ');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}
@@ -270,28 +274,29 @@ void baseTSK(void *pPrm){
  *
  */
 void printStatusBar(void){
-	static uint8_t	errPrev = 0;
-	static uint8_t	modeIlimPrev = 0;
-	static uint8_t	ovfCurrent = 0;
-	static char 			str[30];
+	static uint8_t errPrev = 0;
+	static uint8_t modeIlimPrev = 0;
+	static uint8_t ovfCurrent = 0;
+	static char str[30];
 
-	if(modeIlimPrev != fp.tf.state.bit.modeIlim){
-		if(fp.tf.state.bit.modeIlim != 0){
+	regMeas_t regmeas = {};
+	bool regstate = reg_getState(&regmeas);
+
+	if(modeIlimPrev != regmeas.state.m_limitation){
+		if(regmeas.state.m_limitation != 0){
 			BeepTime(ui.beep.cvToCc.time, ui.beep.cvToCc.freq);
 		}else{
 			BeepTime(ui.beep.ccToCv.time, ui.beep.ccToCv.freq);
 		}
-		modeIlimPrev = fp.tf.state.bit.modeIlim;
+		modeIlimPrev = regmeas.state.m_limitation;
 	}
 
-	if((fp.tf.state.bit.ovfCurrent != 0) && (ovfCurrent == 0)){
+	if((regmeas.state.m_overCurrent != 0) && (ovfCurrent == 0)){
 		BeepTime(ui.beep.ovfCurrent.time, ui.beep.ovfCurrent.freq);
 	}
-	ovfCurrent = fp.tf.state.bit.ovfCurrent;
+	ovfCurrent = regmeas.state.m_overCurrent;
 
-	if((fp.tf.state.bit.errorLinearRegTemperSens != 0) || (fp.tf.state.bit.ovfLinearRegTemper != 0)
-			|| (fp.tf.state.bit.reverseVoltage != 0) || (uartTsk.state == uartNoConnect))
-	{
+	if(regmeas.state.m_errorTemperatureSensor || regmeas.state.m_overheated || regmeas.state.m_reverseVoltage || !regstate){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
 		if(errPrev == 0){
@@ -299,13 +304,13 @@ void printStatusBar(void){
 			errPrev = 0;
 		}
 
-		if(fp.tf.state.bit.errorLinearRegTemperSens != 0){
+		if(regmeas.state.m_errorTemperatureSensor){
 			disp_putStr(16, 112, &arial, 0, "Err Temp Sensor");
-		}else if(fp.tf.state.bit.ovfLinearRegTemper != 0){
+		}else if(regmeas.state.m_overheated != 0){
 			disp_putStr(16, 112, &arial, 0, "Overflow Temp");
-		}else if(fp.tf.state.bit.reverseVoltage != 0){
+		}else if(regmeas.state.m_reverseVoltage != 0){
 			disp_putStr(16, 112, &arial, 0, "Reverse Voltage");
-		}else if(uartTsk.state == uartNoConnect){
+		}else if(!regstate){
 			disp_putStr(35, 112, &arial, 0, "No Connect");
 		}
 
@@ -318,19 +323,24 @@ void printStatusBar(void){
 		disp_setColor(black, white);
 
 		//Print output power
-		snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32" W", fp.tf.meas.power / 1000, fp.tf.meas.power % 1000);
+		snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32" W", regmeas.power / 1000, regmeas.power % 1000);
 		disp_putStr(0, 110, &font6x8, 0, str);
 
 		//Print load resistance
-		if(fp.tf.meas.resistance != 99999){
-			snprintf(str, sizeof(str), "%05"PRIu32"  \xB1", fp.tf.meas.resistance);
-			disp_putStr(0, 120, &font6x8, 0, str);
+		if(regmeas.resistance != 99999000){
+			if(regmeas.resistance < 10000){
+				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32 " \xB1", regmeas.resistance / 1000, regmeas.resistance % 1000);
+				disp_putStr(0, 120, &font6x8, 0, str);
+			}else{
+				snprintf(str, sizeof(str), "%05" PRIu32 " \xB1", regmeas.resistance / 1000);
+				disp_putStr(0, 120, &font6x8, 0, str);
+			}
 		}else{
 			disp_putStr(0, 120, &font6x8, 0, " ---   \xB1");
 		}
 
 		//Print regulator temperature
-		snprintf(str, sizeof(str), "%02"PRIu16".%"PRIu16"\xB0\x43", fp.tf.meas.temperatureLin / 10, fp.tf.meas.temperatureLin % 10);
+		snprintf(str, sizeof(str), "%02"PRIu16".%"PRIu16"\xB0\x43", regmeas.temperature / 10, regmeas.temperature % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
 		//Print time

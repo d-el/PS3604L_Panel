@@ -65,7 +65,7 @@ extern const font_type dSegBold8x14;
  */
 void disp_init(void);
 void disp_flush(void);
-void disp_flushfill(lcd_color_type *color);
+void disp_flushfill(const lcd_color_type *color);
 void disp_setColor(lcd_color_type backgroundColor, lcd_color_type contentColor);
 void disp_setBackgroundColor(lcd_color_type backgroundColor);
 void disp_setContentColor(lcd_color_type contentColor);

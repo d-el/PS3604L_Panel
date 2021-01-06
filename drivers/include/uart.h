@@ -23,8 +23,8 @@
 
 //UART1
 #define		UART1_USE					(1)
-#define		UART1_TxBffSz				(64)
-#define		UART1_RxBffSz				(64)
+#define		UART1_TxBffSz				(256)
+#define		UART1_RxBffSz				(256)
 #define		UART1_RxDmaInterruptPrior	(15)
 #define		UART1_TXIRQPrior			(15)
 #define		UART1_PINAFTX				(7)
@@ -62,18 +62,6 @@
  * Typedef
  */
 typedef enum {
-	BR9600,
-	BR38400,
-	BR57600,
-	BR115200,
-	BR230400,
-	BR250K,
-	BR500K,
-	BR1M,
-	BR_NUMBER
-} uartBaudRate_type;
-
-typedef enum {
 	uartTxFree,
 	uartTxRun,
 	uartTxSuccess,
@@ -100,9 +88,10 @@ typedef struct uartStruct{
 	uint32_t					dmaIfcrMaskRx;		///< DMA interrupt flag clear register mask Rx
 	void (*txHoock)(struct uartStruct *uartx);
 	void (*rxHoock)(struct uartStruct *uartx);
+	uint32_t frequency;
 	volatile uartTxState_type	txState			:8;
 	volatile uartRxState_type	rxState			:8;
-	uartBaudRate_type			baudRate		:4;
+	uint32_t					baudRate		:4;
 	uint8_t						halfDuplex		:1;
 	uint8_t						rxIdleLineMode	:1;
 	volatile uint16_t			txCnt;
@@ -135,9 +124,9 @@ extern uart_type *uart4;
 /*!****************************************************************************
  * Function declaration
  */
-void uart_init(uart_type *uartx, uartBaudRate_type baudRate);
+void uart_init(uart_type *uartx, uint32_t baudRate);
 void uart_deinit(uart_type *uartx);
-void uart_setBaud(uart_type *uartx, uartBaudRate_type baudRate);
+void uart_setBaud(uart_type *uartx, uint32_t baudRate);
 void uart_setCallback(uart_type *uartx, uartCallback_type txHoock, uartCallback_type rxHoock);
 void uart_write(uart_type *uartx, void const *src, uint16_t len);
 void uart_read(uart_type *uartx, void *dst, uint16_t len);

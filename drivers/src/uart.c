@@ -13,6 +13,7 @@
 #include "stddef.h"
 #include "gpio.h"
 #include "uart.h"
+#include "board.h"
 
 /*!****************************************************************************
  * uart1 memory
@@ -44,25 +45,10 @@ uint8_t uart4TxBff[UART4_TxBffSz];
 uint8_t uart4RxBff[UART4_RxBffSz];
 #endif //UART4_USE
 
-#define uartMakeMantissa(baud)		(UART_FREQ / 16 / (baud))
-#define uartMakeFraction(baud)		(((UART_FREQ + (baud) / 2)	/ (baud)) - (uartMakeMantissa(baud) * 16))
-#define uartMakeBrr(baud)			(uartMakeMantissa(baud) << USART_BRR_DIV_Mantissa_Pos | uartMakeFraction(baud))
-
-uint16_t usartBaudRateDiv[] = {
-	uartMakeBrr(9600),
-	uartMakeBrr(38400),
-	uartMakeBrr(57600),
-	uartMakeBrr(115200),
-	uartMakeBrr(230400),
-	uartMakeBrr(250000),
-	uartMakeBrr(500000),
-	uartMakeBrr(1000000),
-};
-
 /*!****************************************************************************
  * @brief
  */
-void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
+void uart_init(uart_type *uartx, uint32_t baudRate){
 	uint32_t dmaChannelRx = 0;
 	uint32_t dmaChannelTx = 0;
 
@@ -81,7 +67,8 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
 		uartx->dmaIfcrTx		= &DMA2->HIFCR;
 		uartx->dmaIfcrRx		= &DMA2->LIFCR;
 		uartx->dmaIfcrMaskTx	= DMA_HIFCR_CTCIF7;
-		uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF2;
+		uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF2 | DMA_LIFCR_CTEIF2;
+		uartx->frequency        = APB2_FREQ;
 
 		#if(UART1_RX_IDLE_LINE_MODE > 0)
 		uartx->rxIdleLineMode = 1;
@@ -137,6 +124,7 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
 		uartx->dmaIfcrRx		= &DMA1->LIFCR;
 		uartx->dmaIfcrMaskTx	= DMA_LIFCR_CTCIF3;
 		uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF1;
+		uartx->frequency        = APB1_FREQ;
 
 		#if(UART3_RX_IDLE_LINE_MODE > 0)
 		uartx->rxIdleLineMode = 1;
@@ -192,6 +180,7 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
 		uartx->dmaIfcrRx		= &DMA1->LIFCR;
 		uartx->dmaIfcrMaskTx	= DMA_HIFCR_CTCIF4;
 		uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF2;
+		uartx->frequency        = APB1_FREQ;
 
 		#if(UART4_RX_IDLE_LINE_MODE > 0)
 		uartx->rxIdleLineMode = 1;
@@ -242,7 +231,7 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
 	uartx->pUart->CR1 &= ~USART_CR1_OVER8;										//Oversampling by 16
 	uartx->pUart->CR2 &= ~USART_CR2_STOP;										//1 stop bit
 
-	uartx->pUart->BRR = usartBaudRateDiv[baudRate];								//Baud rate
+	uart_setBaud(uartx, baudRate);												//Baud rate
 	uartx->pUart->CR3 |= USART_CR3_DMAT;										//DMA enable transmitter
 	uartx->pUart->CR3 |= USART_CR3_DMAR;										//DMA enable receiver
 
@@ -250,8 +239,8 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
 	uartx->pUart->CR1 |= USART_CR1_RE;											//Receiver enable
 	if(uartx->rxIdleLineMode != 0){
 		//Clear IDLE flag by sequence (read USART_SR register followed by a read to the USART_DR register)
-		(void)uart1->pUart->SR;
-		(void)uart1->pUart->DR;
+		(void)uartx->pUart->SR;
+		(void)uartx->pUart->DR;
 		uartx->pUart->CR1 |= USART_CR1_IDLEIE;
 	}
 
@@ -265,7 +254,7 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
 	uartx->pDmaStreamTx->CR		|= (uint32_t)((dmaChannelTx & 0x07) << DMA_SxCR_CHSEL_Pos);		//Channel selection
 	uartx->pDmaStreamTx->CR		|= DMA_SxCR_PL_1;								//Priority level High
 	uartx->pDmaStreamTx->CR		&= ~DMA_SxCR_MSIZE;								//Memory data size 8 bit
-	uartx->pDmaStreamTx->CR		&= ~DMA_SxCR_PSIZE;								//Memory data size 8 bit
+	uartx->pDmaStreamTx->CR		&= ~DMA_SxCR_PSIZE;								//Peripheral data size 8 bit
 	uartx->pDmaStreamTx->CR		|= DMA_SxCR_MINC;								//Memory increment mode enabled
 	uartx->pDmaStreamTx->CR		&= ~DMA_SxCR_PINC;								//Peripheral increment mode disabled
 	uartx->pDmaStreamTx->CR		|= DMA_SxCR_DIR_0;								//Direction Memory-to-peripheral
@@ -276,7 +265,7 @@ void uart_init(uart_type *uartx, uartBaudRate_type baudRate){
 	uartx->pDmaStreamRx->CR		|= (uint32_t)((dmaChannelRx & 0x07) << DMA_SxCR_CHSEL_Pos);		//Channel selection
 	uartx->pDmaStreamRx->CR		|= DMA_SxCR_PL_1;								//Priority level High
 	uartx->pDmaStreamRx->CR		&= ~DMA_SxCR_MSIZE;								//Memory data size 8 bit
-	uartx->pDmaStreamRx->CR		&= ~DMA_SxCR_PSIZE;								//Memory data size 8 bit
+	uartx->pDmaStreamRx->CR		&= ~DMA_SxCR_PSIZE;								//Peripheral data size 8 bit
 	uartx->pDmaStreamRx->CR		|= DMA_SxCR_MINC;								//Memory increment mode enabled
 	uartx->pDmaStreamRx->CR		&= ~DMA_SxCR_PINC;								//Peripheral increment mode disabled
 	uartx->pDmaStreamRx->CR		&= ~DMA_SxCR_DIR;								//Direction Peripheral-to-memory
@@ -296,9 +285,9 @@ void uart_deinit(uart_type *uartx){
 /*!****************************************************************************
 * @brief	transfer data buffer
 */
-void uart_setBaud(uart_type *uartx, uartBaudRate_type baudRate){
-	if(uartx->baudRate != baudRate && baudRate < BR_NUMBER){
-		uartx->pUart->BRR = usartBaudRateDiv[baudRate];
+void uart_setBaud(uart_type *uartx, uint32_t baudRate){
+	if(uartx->baudRate != baudRate){
+		uartx->pUart->BRR = uartx->frequency / baudRate;
 		uartx->baudRate = baudRate;
 	}
 }
@@ -354,11 +343,11 @@ void USART_IRQHandler(uart_type *uartx){
 		uartx->pDmaStreamTx->CR &= ~DMA_SxCR_EN;										//Channel disabled
 		uartx->txCnt++;
 		uartx->txState = uartTxSuccess;
+		*uartx->dmaIfcrTx = uartx->dmaIfcrMaskTx;											//Clear flag
+		uartx->pUart->SR &= ~USART_SR_TC;
 		if(uartx->txHoock != NULL){
 			uartx->txHoock(uartx);
 		}
-		*uartx->dmaIfcrTx = uartx->dmaIfcrMaskTx;											//Clear flag
-		uartx->pUart->SR &= ~USART_SR_TC;
 	}
 	/************************************************
 	 * USART IDLE LINE interrupt
@@ -374,6 +363,7 @@ void USART_IRQHandler(uart_type *uartx){
 		//Clear IDLE flag by sequence (read USART_SR register followed by a read to the USART_DR register)
 		(void)uartx->pUart->SR;
 		(void)uartx->pUart->DR;
+
 	}
 }
 

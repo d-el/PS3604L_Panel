@@ -22,14 +22,14 @@
  * @brief  Initialize peripheral for incremental encoder
  */
 void enco_init(void){
-	gppin_init(GPIOD, 12, alternateFunctionPushPull, pullUp, 0, 2);					//CH1
-	gppin_init(GPIOD, 13, alternateFunctionPushPull, pullUp, 0, 2);					//CH2
+	gppin_init(GPIOD, 12, alternateFunctionPushPull, pullUp, 0, 2);	//CH1
+	gppin_init(GPIOD, 13, alternateFunctionPushPull, pullUp, 0, 2);	//CH2
 
 	//Timer init
 	RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;							//Clock enable
 
 	TIM4->CCMR1 = TIM_CCMR1_CC2S_0 | TIM_CCMR1_CC1S_0;			//Capture/Compare  selection T2, T1
-	TIM4->CCMR1 |= (TIM_CCMR1_IC2PSC_1 | TIM_CCMR1_IC1PSC_1);	//Capture is done once every 4 events
+	TIM4->CCMR1 |= TIM_CCMR1_IC2PSC_1 | TIM_CCMR1_IC1PSC_1;		//Capture is done once every 4 events
 	TIM4->CCMR1 |= TIM_CCMR1_IC1F | TIM_CCMR1_IC2F;				//Input capture 1 filter fSAMPLING=fDTS/32, N=8
 
 	TIM4->CCER |= TIM_CCER_CC1P;								//Capture/Compare output polarity - inverted/falling edge

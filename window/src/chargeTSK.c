@@ -39,26 +39,27 @@ charge_type ch;
  */
 void chargeTSK(void *pPrm){
 	(void)pPrm;
-	TickType_t 				xLastWakeTime = xTaskGetTickCount();
-	const prmHandle_type 	*sHandle = &prmh[Nchu];
-	const prmHandle_type 	*pHandle = &prmh[Nchu];
-	uint32_t 				measV;	//[uV]
-	uint32_t 				measI;	//[uA]
-	uint8_t 				varParam = 0;
-	uint8_t 				bigstepUp = 0;
-	uint8_t 				bigstepDown = 0;
-	uint8_t 				setDef = 0;
-	uint8_t 				chargerIsOn = 0;
-	char 					str[30];
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	const prmHandle_type *sHandle = &prmh[Nchu];
+	const prmHandle_type *pHandle = &prmh[Nchu];
+	uint8_t varParam = 0;
+	bool switchStatePrev = false;
+	char str[30];
 
 	disp_fillScreen(black);
 	ksSet(30, 10, kUp | kDown);
 	prmEditorSetNtic(5);
 
 	while(1){
+		regMeas_t regmeas = {};
+		reg_getState(&regmeas);
+		bool stateenable = false;
+		reg_getEnable(&stateenable);
+
 		/**************************************
 		 * Key process
 		 */
+		uint8_t bigstepUp = 0, bigstepDown = 0, setDef = 0;
 		if(keyProc() != 0){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			if(keyState(kSet)){
@@ -66,16 +67,16 @@ void chargeTSK(void *pPrm){
 				if(varParam == 4)
 					varParam = 0;
 			}else if(keyState(kMode)){
-				if(fp.tf.state.bit.switchIsON == 0){
+				if(!stateenable){
 					selWindow(baseWindow);
 				}else{
 					BeepTime(ui.beep.error.time, ui.beep.error.freq);
 				}
 			}else if(keyState(kOnOff)){
-				if(fp.tf.state.bit.switchIsON == 0){
-					sendCommand(setSwitchOn);
+				if(!stateenable){
+					reg_setEnable(true);
 				}else{
-					sendCommand(setSwitchOff);
+					reg_setEnable(false);
 				}
 			}else if(keyState(kUp)){
 				bigstepUp = 1;
@@ -86,7 +87,7 @@ void chargeTSK(void *pPrm){
 			}
 		}
 
-		if(fp.tf.state.bit.switchIsON == 0){
+		if(!stateenable){
 			/***************************************
 			 * Encoder process
 			 */
@@ -115,28 +116,25 @@ void chargeTSK(void *pPrm){
 		/***************************************
 		 * Task for regulator
 		 */
-		fp.tf.task.u = ch.u * 1000;
-		fp.tf.task.i = ch.i * 1000;
+		reg_setVoltage(ch.u * 1000);
+		reg_setCurrent(ch.i * 1000);
 		switch(ch.mode){
 			case (ch_modeTime):
-				fp.tf.task.mode = mode_timeShutdown;
-				fp.tf.task.time = ch.t * 60;
+				reg_setMode(reg_timeShutdown);
+				reg_setTime(ch.t * 60);
 				break;
 			case (ch_modeCurrent):
-				fp.tf.task.mode = mode_lowCurrentShutdown;
+				reg_setMode(reg_lowCurrentShutdown);
 				break;
 			default:
 				break;
 		}
 
-		/**************************************
-		 * Copy measure data
-		 */
-		measV = fp.tf.meas.u;
+		uint32_t measV = regmeas.voltage; //[uV]
 		if(measV > 99999999){
 			measV = 99999999;
 		}
-		measI = fp.tf.meas.i;
+		uint32_t measI = regmeas.current; //[uA]
 		if(measI > 9999999){
 			measI = 9999999;
 		}
@@ -149,12 +147,12 @@ void chargeTSK(void *pPrm){
 			varParam++;
 		}
 		//Print voltage
-		if(fp.tf.state.bit.switchIsON != 0){
+		if(stateenable){
 			snprintf(str, sizeof(str), "U:        %02"PRIu32".%03"PRIu32, measV / 1000000, (measV / 1000) % 1000);
 		}else{
 			snprintf(str, sizeof(str), "U:        %02"PRIu16".%03"PRIu16, ch.u / 1000, ch.u % 1000);
 		}
-		if((varParam == C_VOLT) && (fp.tf.state.bit.switchIsON == 0)){
+		if(varParam == C_VOLT && !stateenable){
 			disp_setColor(black, ui.color.cursor);
 		}else{
 			disp_setColor(black, ui.color.voltage);
@@ -162,12 +160,12 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 00, &arial, 0, str);
 
 		//Print current
-		if(fp.tf.state.bit.switchIsON != 0){
+		if(stateenable){
 			snprintf(str, sizeof(str), "I:          %01"PRIu32".%03"PRIu32" A", measI / 1000000, (measI / 1000) % 1000);
 		}else{
 			snprintf(str, sizeof(str), "I:          %0"PRIu16".%03"PRIu16" A", ch.i / 1000, ch.i % 1000);
 		}
-		if((varParam == C_CURR) && (fp.tf.state.bit.switchIsON == 0)){
+		if(varParam == C_CURR && !stateenable){
 			disp_setColor(black, ui.color.cursor);
 		}else{
 			disp_setColor(black, ui.color.current);
@@ -176,20 +174,20 @@ void chargeTSK(void *pPrm){
 
 		//Time
 		if(ch.mode == ch_modeTime){
-			if(fp.tf.state.bit.switchIsON != 0){
-				snprintf(str, sizeof(str), "Time:  %lum %02"PRIu32"s   ", (ch.t * 60 - fp.tf.meas.time) / 60, (ch.t * 60 - fp.tf.meas.time) % 60);
+			if(stateenable){
+				snprintf(str, sizeof(str), "Time:  %lum %02"PRIu32"s   ", (ch.t * 60 - regmeas.time) / 60, (ch.t * 60 - regmeas.time) % 60);
 			}else{
 				snprintf(str, sizeof(str), "Time:  %"PRIu16"m 00s     ", ch.t);
 			}
 		}else{
-			if(fp.tf.state.bit.switchIsON != 0){
-				snprintf(str, sizeof(str), "Time:  %"PRIu32"m %02"PRIu32"s   ", (fp.tf.meas.time) / 60, (fp.tf.meas.time) % 60);
+			if(stateenable){
+				snprintf(str, sizeof(str), "Time:  %"PRIu32"m %02"PRIu32"s   ", (regmeas.time) / 60, (regmeas.time) % 60);
 			}else{
 				snprintf(str, sizeof(str), "Time:  - - -            ");
 			}
 
 		}
-		if((varParam == C_TIME) && (fp.tf.state.bit.switchIsON == 0)){
+		if(varParam == C_TIME && !stateenable){
 			disp_setColor(black, ui.color.cursor);
 		}else{
 			disp_setColor(black, ui.color.current);
@@ -202,7 +200,7 @@ void chargeTSK(void *pPrm){
 		}else{
 			snprintf(str, sizeof(str), "Mode: VOLTAGE");
 		}
-		if((varParam == C_MODE) && (fp.tf.state.bit.switchIsON == 0)){
+		if(varParam == C_MODE && !stateenable){
 			disp_setColor(black, ui.color.cursor);
 		}else{
 			disp_setColor(black, ui.color.mode);
@@ -210,26 +208,17 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 60, &arial, 0, str);
 
 		//Print Capacity
-		snprintf(str, sizeof(str), "C:         %01"PRIu32".%03"PRIu32" Ah", fp.tf.meas.capacity / 1000, fp.tf.meas.capacity % 1000);
+		snprintf(str, sizeof(str), "C:         %01"PRIu32".%03"PRIu32" Ah", regmeas.capacity / 1000, regmeas.capacity % 1000);
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
 
 		grf_line(0, 107, 159, 107, halfLightGray);
 
-		//Detection finish
-		if((chargerIsOn != 0) && (fp.tf.state.bit.switchIsON == 0)){
-			if(keyState(kOnOff)){
-				BeepTime(ui.beep.chargeReady.time, ui.beep.chargeReady.freq);
-				chargerIsOn = 0;
-				while(keyProc() == 0){
-					printStatusBar();
-					vTaskDelayUntil(&xLastWakeTime, CH_TSK_PERIOD);
-				}
-			}
+
+		if(switchStatePrev && !stateenable && ch.t * 60 == regmeas.time){
+			BeepTime(ui.beep.chargeReady.time, ui.beep.chargeReady.freq);
 		}
-		if(fp.tf.state.bit.switchIsON != 0){
-			chargerIsOn = 1;
-		}
+		switchStatePrev = stateenable;
 
 		//Print status bar
 		printStatusBar();

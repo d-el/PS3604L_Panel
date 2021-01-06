@@ -155,20 +155,6 @@ int _close(int file){
 }
 
 /*!****************************************************************************
- * @brief	Write a character to a file. 'libc' subroutines will use this system
- * 			routine for output to all files, including stdout
- * @retval	Returns -1 on error or number of bytes sent
- */
-__attribute__((weak))
-int _write(int file, const void *ptr, size_t len){
-	(void)file;
-	(void)ptr;
-	(void)len;
-	errno = ENOSYS;
-	return -1;
-}
-
-/*!****************************************************************************
  * @brief	Read a character to a file. 'libc' subroutines will use this system
  * 			routine for input from all files, including stdin.
  * 			Returns -1 on error or blocks until the number of characters have

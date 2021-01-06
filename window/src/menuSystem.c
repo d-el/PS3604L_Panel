@@ -728,7 +728,7 @@ void printTimeVar(char *string, const time_t unixTime, uint8_t editSectionNumber
  * @param [in] isSelected: item selected flag
  */
 void outItemString(char *label, char *value, uint8_t itemNumber, menuItemSelect_type select){
-	char	string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
+	char string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
 
 	static const disp_color_type colorLabel[] = {
 	    [menuItemUnselect] = white,
@@ -749,7 +749,7 @@ void outItemString(char *label, char *value, uint8_t itemNumber, menuItemSelect_
 	            MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
 
 	// Label and spaces
-	strncpy(string, label, sizeof(string));
+	strcpy(string, label);
 	memset(string + strlen(label), ' ', sizeof(string) - 1 - strlen(label));
 	string[sizeof(string) -1 - strlen(value)] = 0;
     disp_setContentColor(colorLabel[select]);

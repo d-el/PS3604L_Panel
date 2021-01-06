@@ -56,10 +56,9 @@ typedef struct {
 } frontPanelState_type;
 
 typedef struct {
-	transfer_type 			tf;					///< Общие данные
-	frontPanelSetting_type 	fpSet;				///< Данные настройки передней панели
-	frontPanelState_type	state;				///< Флаги состояния
-	selWindow_type 			currentSelWindow;	///< Текущее окно GUI
+	frontPanelSetting_type 	fpSettings;
+	frontPanelState_type	state;
+	selWindow_type 			currentSelWindow;
 } frontPanel_type;
 
 /*!****************************************************************************
@@ -78,6 +77,7 @@ void systemTSK(void *pPrm);
 void netSettingUpdate(void);
 void selWindow(selWindow_type window);
 void timezoneUpdate(void);
+void OSinit(void);
 
 #endif //systemTSK_H
 /******************************** END OF FILE ********************************/

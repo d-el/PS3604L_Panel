@@ -1,159 +1,257 @@
 ﻿/*!****************************************************************************
- * @file		regulatorConnTSK.c
+ * @file		regulatorTSK.c
  * @author		d_el
- * @version		V1.1
- * @date		13.12.2017
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @version		V2.0
+ * @date		07.01.2021
+ * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
  * @brief		connect interface with regulator
  */
 
 /*!****************************************************************************
  * Include
  */
-#include "string.h"
-#include "assert.h"
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-#include "crc.h"
-#include "uart.h"
-#include "systemTSK.h"
+#include <stdbool.h>
+#include <string.h>
+#include <assert.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
+#include <semphr.h>
+#include <crc.h>
+#include <uart.h>
+#include <modbus.h>
+#include <plog.h>
 #include "regulatorConnTSK.h"
 
 /*!****************************************************************************
  * MEMORY
  */
-static QueueHandle_t 		queueCommand;
-static SemaphoreHandle_t 	regulatorConnUartRxSem;
-uartTsk_type 				uartTsk = { .state = uartUndef };
+#define uartTskUse (uart1)
+#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
+static char *logTag = "regulator";
 
-/******************************************************************************
- * Local function declaration
- */
-static void uartTskHook(uart_type *puart);
+typedef struct{
+	enum{
+		cmd_none,
+		cmd_enable,
+		cmd_calibrateV,
+		cmd_calibrateI
+	}command;
+
+	union{
+		uint16_t enable;
+
+		struct{
+			uint32_t value;
+			uint8_t number;
+		}calibratePoint;
+	};
+}command_t;
+
+SemaphoreHandle_t regulatorMutex;
+QueueHandle_t commandQueue;
+uint16_t enabled;
+bool connected;
+regTarget_t regTarget;
+regMeas_t regMeas;
+
+bool reg_setVoltage(uint32_t uV){
+	xSemaphoreTake(regulatorMutex, portMAX_DELAY);
+	regTarget.voltage_set = uV;
+	xSemaphoreGive(regulatorMutex);
+	return connected;
+}
+
+bool reg_setCurrent(uint32_t uA){
+	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+	regTarget.current_set = uA;
+	xSemaphoreGive(regulatorMutex);
+	return connected;
+}
+
+bool reg_setDacVoltage(uint16_t lsb){
+	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+	regTarget.vdac = lsb;
+	xSemaphoreGive(regulatorMutex);
+	return connected;
+}
+
+bool reg_setDacCurrent(uint16_t lsb){
+	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+	regTarget.idac = lsb;
+	xSemaphoreGive(regulatorMutex);
+	return connected;
+}
+
+bool reg_setMode(regMode_t mode){
+	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+	regTarget.mode = mode;
+	xSemaphoreGive(regulatorMutex);
+	return connected;
+}
+
+bool reg_setTime(uint32_t s){
+	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+	regTarget.time_set = s;
+	xSemaphoreGive(regulatorMutex);
+	return connected;
+}
+
+bool reg_setEnable(bool state){
+	if(state != enabled){
+		command_t command = {
+			.command = cmd_enable,
+			.enable = state ? 1 : 0,
+		};
+		return pdTRUE == xQueueSend(commandQueue, &command, 0);
+	}
+	return connected;
+}
+
+bool reg_setVoltagePoint(uint32_t uV, uint8_t number){
+	command_t command = {
+		.command = cmd_calibrateV,
+		.calibratePoint.value = uV,
+		.calibratePoint.number = number
+	};
+	return pdTRUE == xQueueSend(commandQueue, &command, 0);
+}
+
+bool reg_setCurrentPoint(uint32_t uA, uint8_t number){
+	command_t command = {
+		.command = cmd_calibrateI,
+		.calibratePoint.value = uA,
+		.calibratePoint.number = number
+	};
+	return pdTRUE == xQueueSend(commandQueue, &command, 0);
+}
+
+bool reg_getTarget(regTarget_t *target){
+	*target = regTarget;
+	return connected;
+}
+
+bool reg_getEnable(bool *state){
+	*state = enabled != 0;
+	return connected;
+}
+
+bool reg_getState(regMeas_t *state){
+	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+	*state = regMeas;
+	xSemaphoreGive(regulatorMutex);
+	return connected;
+}
 
 /*!****************************************************************************
  * @brief
  */
 void regulatorConnTSK(void *pPrm){
 	(void)pPrm;
+	regulatorMutex = xSemaphoreCreateMutex();
+	commandQueue = xQueueCreate(8, sizeof(command_t));
 	TickType_t	xLastWakeTime = xTaskGetTickCount();
-	BaseType_t 	res;
-	uint16_t 	crc;
-	uint16_t 	errPrev = 0;
-	uint16_t 	noAnswerPrev = 0;
 
-	vTaskDelay(1000);
+	modbus_t *ctx;
+	ctx = modbus_new_rtu("USART1", 115200, 'N', 8, 1);
+	modbus_set_slave(ctx, 0x01);
+	modbus_set_debug(ctx, FALSE);
+	modbus_connect(ctx);
 
-	// Create a queue
-	queueCommand = xQueueCreate(UART_TSK_QUEUE_COMMAND_LEN, sizeof(request_type));
-	assert(queueCommand != NULL);
-
-	// Create Semaphore for UART
-	vSemaphoreCreateBinary(regulatorConnUartRxSem);
-	assert(regulatorConnUartRxSem != NULL);
-	xSemaphoreTake(regulatorConnUartRxSem, portMAX_DELAY);
-
-	uart_setCallback(uartTskUse, (uartCallback_type)NULL, uartTskHook);
-
+	uint8_t errorCount = 0;
+	const uint8_t errorThreshold = 5;
 	while(1){
-		uartTsk.queueLen = uxQueueMessagesWaiting(queueCommand);
+		xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+		regTarget_t lpcalRegTarget = regTarget;
+		xSemaphoreGive(regulatorMutex);
 
-		crc = crc16Calc(&crcModBus, &fp.tf.task, sizeof(task_type));
-		memcpy(uartTskUse->pTxBff, &fp.tf.task, sizeof(task_type));
-		*(uint16_t*) (uartTskUse->pTxBff + sizeof(task_type)) = crc;
-		uart_write(uartTskUse, uartTskUse->pTxBff, sizeof(task_type) + sizeof(uint16_t));
+		// Set target value
+		int32_t number = sizeof(lpcalRegTarget)/sizeof(uint16_t);
+		int mbstatus = modbus_write_registers(ctx, 0x0100, number, (uint16_t*)&lpcalRegTarget);
+		if(mbstatus == number){
+			errorCount = 0;
+		}
+		else{
+			P_LOGW(logTag, "error write target, %s", modbus_strerror(libmodbuserrno));
+			if(errorCount < errorThreshold)
+				errorCount++;
+		}
 
-		uart_read(uartTskUse, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type) + sizeof(uint16_t));
-		res = xSemaphoreTake(regulatorConnUartRxSem, pdMS_TO_TICKS(UART_TSK_MAX_WAIT_ms));
-		if(res == pdTRUE){
-			// Receive answer
-			crc = crc16Calc(&crcModBus, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type) + sizeof(uint16_t));
-			if(crc == 0){
-				// Queue command
-				request_type request;
-				res = xQueueReceive(queueCommand, &request, 0);
-				if(res == pdPASS){
-					fp.tf.task.request = request;
-				}else{
-					fp.tf.task.request = setNone;
-				}
-				memcpy(&fp.tf.state, uartTskUse->pRxBff, sizeof(psState_type) + sizeof(meas_type));
-				uartTsk.normAnswer++;
-				errPrev = uartTsk.errorAnswer;
-				noAnswerPrev = uartTsk.noAnswer;
-				uartTsk.state = uartConnect;
-			}else{
-				uartTsk.errorAnswer++;
-				if((uartTsk.errorAnswer - errPrev) > UART_TSK_MAX_ERR){
-					uartTsk.state = uartNoConnect;
-				}
+		// Process command
+		command_t command;
+		if(xQueuePeek(commandQueue, &command, 0) == pdPASS ){
+			switch(command.command){
+				case cmd_enable:{
+					int status = modbus_write_register(ctx, 0x0109, command.enable);
+					if(status == 1){
+						xQueueReceive(commandQueue, &command, 0);
+						errorCount = 0;
+					}else{
+						P_LOGW(logTag, "error write enable, %s", modbus_strerror(libmodbuserrno));
+						if(errorCount < errorThreshold)
+							errorCount++;
+					}
+				}break;
+
+				case cmd_calibrateV:{
+					int status = modbus_write_registers(ctx, 0x0500 + 2 * command.calibratePoint.number, 2, (uint16_t*)&command.calibratePoint.value);
+					if(status == 2){
+						xQueueReceive(commandQueue, &command, 0);
+						errorCount = 0;
+					}else{
+						P_LOGW(logTag, "error write save V, %s", modbus_strerror(libmodbuserrno));
+						if(errorCount < errorThreshold)
+							errorCount++;
+					}
+				}break;
+
+				case cmd_calibrateI:{
+					int status = modbus_write_registers(ctx, 0x0600 + 2 * command.calibratePoint.number, 2, (uint16_t*)&command.calibratePoint.value);
+					if(status == 2){
+						errorCount = 0;
+						xQueueReceive(commandQueue, &command, 0);
+					}else{
+						P_LOGW(logTag, "error write save I, %s", modbus_strerror(libmodbuserrno));
+						if(errorCount < errorThreshold)
+							errorCount++;
+					}
+				}break;
+
+				default:
+					P_LOGW(logTag, "error command");
 			}
+		}
+
+		// Read enable state
+		mbstatus = modbus_read_registers(ctx, 0x0109, 1, (void*)&enabled);
+		if(mbstatus == 1){
+			errorCount = 0;
 		}else{
-			// Timeout
-			uartTsk.noAnswer++;
-			if((uartTsk.noAnswer - noAnswerPrev) > UART_TSK_MAX_ERR){
-				uartTsk.state = uartNoConnect;
-			}
+			P_LOGW(logTag, "error read enable, %s", modbus_strerror(libmodbuserrno));
+			if(errorCount < errorThreshold)
+				errorCount++;
 		}
 
-		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(UART_TSK_PERIOD));
-	}
-}
-
-/*!****************************************************************************
- * @brief
- */
-uint8_t sendCommand(request_type command){
-	BaseType_t res;
-
-	if(queueCommand == NULL){
-		return 1;
-	}
-
-	res = xQueueSend(queueCommand, (void*)&command, 0);
-	if(res == pdPASS){
-		return 0;
-	}else{
-		return 1;
-	}
-}
-
-/*!****************************************************************************
- * @brief
- */
-uint8_t waitForTf(void){
-	uint32_t l_normAnswer = uartTsk.normAnswer;
-	uint32_t l_noAnswer = uartTsk.noAnswer;
-	uint32_t l_errorAnswer = uartTsk.errorAnswer;
-	uint32_t cnt = 3;		// 3 attempt for failure connect
-
-	while(cnt != 0){
-		if(l_normAnswer < uartTsk.normAnswer){
-			return 0;
+		// Read measure
+		regMeas_t localRegMeas;
+		number = sizeof(localRegMeas)/sizeof(uint16_t);
+		mbstatus = modbus_read_registers(ctx, 0x0200, number, (void*)&localRegMeas);
+		if(mbstatus == number){
+			xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+			regMeas = localRegMeas;
+			xSemaphoreGive(regulatorMutex);
+			errorCount = 0;
 		}
-		if(l_noAnswer != uartTsk.noAnswer){
-			l_noAnswer = uartTsk.noAnswer;
-			cnt--;
+		else{
+			P_LOGW(logTag, "error read meas data, %s", modbus_strerror(libmodbuserrno));
+			if(errorCount < errorThreshold)
+				errorCount++;
 		}
-		if(l_errorAnswer != uartTsk.errorAnswer){
-			l_errorAnswer = uartTsk.errorAnswer;
-			cnt--;
-		}
-	}
-	return 1;
-}
 
-/*!****************************************************************************
- * @brief	uart RX & TX callback
- */
-static void uartTskHook(uart_type *puart){
-	(void)puart;
-	BaseType_t xHigherPriorityTaskWoken;
-	xHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(regulatorConnUartRxSem, &xHigherPriorityTaskWoken);
-	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+		connected = errorCount < errorThreshold ? true : false;
+
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(20));
+	}
 }
 
 /******************************** END OF FILE ********************************/

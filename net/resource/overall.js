@@ -45,30 +45,36 @@ function updateInfo() {
 
 		var x = new DataView(oReq.response, 0);
 
-		// State
-		var state = x.getUint32(0, true);
-		updateTable('.table1', [
-			{name: 'overcurrent', val: (state & 1 << 0) ? '<p style="color:red;">YES</p>' : 'NO'},
-			{name: 'switch', val: (state & 1 << 1) ? '<p style="color:red;">ON</p>' : 'OFF'},
-			{name: 'output', val: (state & 1 << 2) ? 'CC' : 'CV'}
-		]);
+		// Connect
+		var connect = x.getUint8(0, true);
+
+		// Enable
+		var enable = x.getUint8(1, true);
 
 		// Meas
 		updateTable('.table2', [
-			{name: 'power', val: x.getUint32(4, true) / 1000.0 + ' Wt'},
-			{name: 'resistance', val: x.getUint32(8, true) / 1000.0 + ' Ohm'},
-			{name: 'time', val: x.getUint32(12, true) + ' s'},
-			{name: 'capacity', val: x.getUint32(16, true) / 1000.0 + ' Ah'},
-			{name: 'u', val: x.getUint32(20, true) / 1000000.0 + ' V'},
-			{name: 'i', val: x.getUint32(24, true) / 1000000.0 + ' A'},
-			{name: 'uin', val: x.getUint16(32, true) / 1000.0 + ' V'},
-			{name: 'temperature', val: x.getUint16(34, true) / 10.0 + ' °C'}
+			{name: 'u', val: x.getUint32(2, true) / 1000000.0 + ' V'},
+			{name: 'i', val: x.getUint32(6, true) / 1000000.0 + ' A'},
+			{name: 'power', val: x.getUint32(10, true) / 1000.0 + ' Wt'},
+			{name: 'resistance', val: x.getUint32(14, true) / 1000.0 + ' Ohm'},
+			{name: 'time', val: x.getUint32(18, true) + ' s'},
+			{name: 'capacity', val: x.getUint32(22, true) / 1000.0 + ' Ah'},
+			{name: 'uin', val: x.getUint32(26, true) / 1000000.0 + ' V'},
+			{name: 'temperature', val: x.getUint16(30, true) / 10.0 + ' °C'}
+		]);
+
+		// State
+		var state = x.getUint16(32, true);
+		updateTable('.table1', [
+			{name: 'overcurrent', val: (state & 1) ? '<p style="color:red;">YES</p>' : 'NO'},
+			{name: 'switch', val: (enable != 0) ? '<p style="color:red;">ON</p>' : 'OFF'},
+			{name: 'output', val: (state & 2) ? 'CC' : 'CV'}
 		]);
 
 		// Settings
 		updateTable('.table3', [
-			{name: 'u', val: x.getUint32(36, true) / 1000000.0 + ' V'},
-			{name: 'i', val: x.getUint32(40, true) / 1000000.0 + ' A'},
+			{name: 'u', val: x.getUint32(34, true) / 1000000.0 + ' V'},
+			{name: 'i', val: x.getUint32(38, true) / 1000000.0 + ' A'},
 		]);
 	};
 	oReq.send(null);

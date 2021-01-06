@@ -3,20 +3,20 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		10.02.2016
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
  * @brief		Parameters table
  */
 
 /*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 MENU_ITEM(voltmeter		,"Vmeter"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,voltmeter	,ammeter	,voltmeter	,vPoint1)
 	/*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-	MENU_ITEM(vPoint1		,"Point1"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,PrepareU	,regSave	,NULL		,vPoint1	,vPoint2	,voltmeter	,vSetU)
-	MENU_ITEM(vPoint2		,"Point2"	,""		,NULL				,chmodMenuAlways	,1		,NULL		,PrepareU	,regSave	,NULL		,vPoint1	,vPoint3	,voltmeter	,vSetU)
-	MENU_ITEM(vPoint3		,"Point3"	,""		,NULL				,chmodMenuAlways	,2		,NULL		,PrepareU	,regSave	,NULL		,vPoint2	,vPoint4	,voltmeter	,vSetU)
-	MENU_ITEM(vPoint4		,"Point4"	,""		,NULL				,chmodMenuAlways	,3		,NULL		,PrepareU	,regSave	,NULL		,vPoint3	,vPoint4	,voltmeter	,vSetU)
+	MENU_ITEM(vPoint1		,"Point1"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,PrepareU	,calibrExit	,NULL		,vPoint1	,vPoint2	,voltmeter	,vSetU)
+	MENU_ITEM(vPoint2		,"Point2"	,""		,NULL				,chmodMenuAlways	,1		,NULL		,PrepareU	,calibrExit	,NULL		,vPoint1	,vPoint3	,voltmeter	,vSetU)
+	MENU_ITEM(vPoint3		,"Point3"	,""		,NULL				,chmodMenuAlways	,2		,NULL		,PrepareU	,calibrExit	,NULL		,vPoint2	,vPoint4	,voltmeter	,vSetU)
+	MENU_ITEM(vPoint4		,"Point4"	,""		,NULL				,chmodMenuAlways	,3		,NULL		,PrepareU	,calibrExit	,NULL		,vPoint3	,vPoint4	,voltmeter	,vSetU)
 		/*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-		MENU_ITEM(vSetU			,"Ureal"	,"V"	,&prmh[Nregu]		,chmodMenuAlways	,0		,savePointU	,NULL		,NULL		,NULL		,vSetU		,vSetDacU	,vPoint1	,vSetU)
-		MENU_ITEM(vSetDacU		,"DacU"		,"lsb"	,&prmh[Nregdacu]	,chmodMenuAlways	,0		,savePointU	,NULL		,NULL		,NULL		,vSetU		,vSetAdcU	,vPoint1	,vSetDacU)
+		MENU_ITEM(vSetU			,"Ureal"	,"V"	,&prmh[Nregu]		,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,savePointU	,vSetU		,vSetDacU	,vPoint1	,vSetU)
+		MENU_ITEM(vSetDacU		,"DacU"		,"lsb"	,&prmh[Nregdacu]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,vSetU		,vSetAdcU	,vPoint1	,vSetDacU)
 		MENU_ITEM(vSetAdcU		,"AdcU"		,"lsb"	,&prmh[Nmeas_adcu]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,vSetDacU	,vSetAdcI	,vPoint1	,vSetAdcU)
 		MENU_ITEM(vSetAdcI		,"AdcI"		,"lsb"	,&prmh[Nmeas_adci]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,vSetAdcU	,vSetMEasU	,vPoint1	,vSetAdcI)
 		MENU_ITEM(vSetMEasU		,"Umeas"	,"V"	,&prmh[Nmeas_u]		,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,vSetAdcI	,vSetMEasU	,vPoint1	,vSetMEasU)
@@ -24,13 +24,13 @@ MENU_ITEM(voltmeter		,"Vmeter"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		
 /*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
 MENU_ITEM(ammeter		,"Ameter"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,voltmeter	,datetime	,ammeter	,iPoint1)
 	/*		name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-	MENU_ITEM(iPoint1		,"Point1"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,PrepareI	,regSave	,NULL		,iPoint1	,iPoint2	,voltmeter	,iSetI)
-	MENU_ITEM(iPoint2		,"Point2"	,""		,NULL				,chmodMenuAlways	,1		,NULL		,PrepareI	,regSave	,NULL		,iPoint1	,iPoint3	,voltmeter	,iSetI)
-	MENU_ITEM(iPoint3		,"Point3"	,""		,NULL				,chmodMenuAlways	,2		,NULL		,PrepareI	,regSave	,NULL		,iPoint2	,iPoint4	,voltmeter	,iSetI)
-	MENU_ITEM(iPoint4		,"Point4"	,""		,NULL				,chmodMenuAlways	,3		,NULL		,PrepareI	,regSave	,NULL		,iPoint3	,iPoint4	,voltmeter	,iSetI)
+	MENU_ITEM(iPoint1		,"Point1"	,""		,NULL				,chmodMenuAlways	,0		,NULL		,PrepareI	,calibrExit	,NULL		,iPoint1	,iPoint2	,voltmeter	,iSetI)
+	MENU_ITEM(iPoint2		,"Point2"	,""		,NULL				,chmodMenuAlways	,1		,NULL		,PrepareI	,calibrExit	,NULL		,iPoint1	,iPoint3	,voltmeter	,iSetI)
+	MENU_ITEM(iPoint3		,"Point3"	,""		,NULL				,chmodMenuAlways	,2		,NULL		,PrepareI	,calibrExit	,NULL		,iPoint2	,iPoint4	,voltmeter	,iSetI)
+	MENU_ITEM(iPoint4		,"Point4"	,""		,NULL				,chmodMenuAlways	,3		,NULL		,PrepareI	,calibrExit	,NULL		,iPoint3	,iPoint4	,voltmeter	,iSetI)
 		/*		  name 			,label		,units	,prmHandle			,chmod				,pfPrm	,pfChanges	,pfSelect	,pfUnselect	,pfPeriod	,previous	,next		,parent		,child	*/
-		MENU_ITEM(iSetI			,"Ireal"	,"A"	,&prmh[Nregi]		,chmodMenuAlways	,0		,savePointI	,NULL		,NULL		,NULL		,iSetI		,iSetDacI	,iPoint1	,iSetI)
-		MENU_ITEM(iSetDacI		,"DacI"		,"lsb"	,&prmh[Nregdaci]	,chmodMenuAlways	,0		,savePointI	,NULL		,NULL		,NULL		,iSetI		,iSetAdcU	,iPoint1	,iSetDacI)
+		MENU_ITEM(iSetI			,"Ireal"	,"A"	,&prmh[Nregi]		,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,savePointI	,iSetI		,iSetDacI	,iPoint1	,iSetI)
+		MENU_ITEM(iSetDacI		,"DacI"		,"lsb"	,&prmh[Nregdaci]	,chmodMenuAlways	,0		,NULL		,NULL		,NULL		,NULL		,iSetI		,iSetAdcU	,iPoint1	,iSetDacI)
 		MENU_ITEM(iSetAdcU		,"AdcU"		,"lsb"	,&prmh[Nmeas_adcu]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,iSetDacI	,iSetAdcI	,iPoint1	,iSetAdcU)
 		MENU_ITEM(iSetAdcI		,"AdcI"		,"lsb"	,&prmh[Nmeas_adci]	,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,iSetAdcU	,iSetMEasI	,iPoint1	,iSetAdcI)
 		MENU_ITEM(iSetMEasI		,"Imeas"	,"A"	,&prmh[Nmeas_i]		,chmodMenuNone		,0		,NULL		,NULL		,NULL		,NULL		,iSetAdcI	,iSetMEasI	,iPoint1	,iSetMEasI)

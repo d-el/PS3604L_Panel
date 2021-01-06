@@ -167,7 +167,9 @@ prmEditorStatus_type prmEditorUpDate(const prmHandle_type *prmHandle){
 			step = step * 5;
 		}
 
-		status = prmEditorAdd(prmHandle, prmHandle->step, step);
+		if(step != 0){
+			status = prmEditorAdd(prmHandle, prmHandle->step, step);
+		}
 
 		ntic = 0;
 	}else{

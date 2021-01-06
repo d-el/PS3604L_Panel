@@ -59,15 +59,15 @@ void startupTSK(void *pPrm){
 		disp_putStr(0, 110, &arial, 0, "2012 - 2020");
 		disp_flush();
 
-		if(fp.fpSet.lcdLight < 10){
-			fp.fpSet.lcdLight = 10;
+		if(fp.fpSettings.lcdLight < 10){
+			fp.fpSettings.lcdLight = 10;
 		}
-		for(uint16_t i = 0; i < fp.fpSet.lcdLight; i++){
+		for(uint16_t i = 0; i < fp.fpSettings.lcdLight; i++){
 			setLcdBrightness(i);
 			vTaskDelay(pdMS_TO_TICKS(3));
 		}
 		vTaskDelay(pdMS_TO_TICKS(150));
-		setLcdBrightness(fp.fpSet.lcdLight);
+		setLcdBrightness(fp.fpSettings.lcdLight);
 
 		//Run key process
 		for(uint32_t cnt = 0; cnt < KEY_SAMPLES * 2; cnt++){

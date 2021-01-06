@@ -258,7 +258,7 @@ static void initSpiDMA(void){
 	RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
 	LCD_DMAMEM_STREAM->CR	= 0;
 	//LCD_DMAMEM_STREAM->CR	|= (uint32_t)((LCD_DMA_CHANNEL & 0x03) << 25);	//Channel selection
-	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_PL_1;								//Priority level High
+	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_PL_0;								//Priority level Medium
 	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_MSIZE_0;							//Memory data size half-word (16-bit)
 	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_PSIZE_0;							//Memory data size half-word (16-bit)
 	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_MINC;								//Memory increment mode enabled
@@ -270,8 +270,8 @@ static void initSpiDMA(void){
 	LCD_DMAMEM_STREAM->PAR	= 0;											//Peripheral address
 	LCD_DMAMEM_STREAM->M0AR	= (uint32_t)&videoBff[0];						//Memory address
 
-	NVIC_EnableIRQ(DMA2_Stream0_IRQn);
-	NVIC_SetPriority(DMA2_Stream0_IRQn, LCD_DMA_IRQPrior);
+	NVIC_EnableIRQ(DMA2_Stream5_IRQn);
+	NVIC_SetPriority(DMA2_Stream5_IRQn, LCD_DMA_IRQPrior);
 
 	/************************************************
 	 * DMA
@@ -311,7 +311,7 @@ void st7735_flush(flushcb_type cb){
 /*!****************************************************************************
  * @brief Set fill video buffer
  */
-void st7735_setBuffer(lcd_color_type *color, setbufcb_type cb){
+void st7735_setBuffer(const lcd_color_type *color, setbufcb_type cb){
 	setbufcb = cb;
 	LCD_DMAMEM_STREAM->PAR	= (uint32_t)color;
 	LCD_DMAMEM_STREAM->CR |= DMA_SxCR_EN;
@@ -331,12 +331,12 @@ void DMA1_Stream7_IRQHandler(void){
 /*!****************************************************************************
  * @brief Handler memory DMA
  */
-void DMA2_Stream0_IRQHandler(void){
+void DMA2_Stream5_IRQHandler(void){
 	if(setbufcb != NULL){
 		setbufcb(NULL);
 	}
 	LCD_DMAMEM_STREAM->CR &= ~DMA_SxCR_EN;
-	DMA2->LIFCR = DMA_LIFCR_CTCIF0;		//Clear flag
+	DMA2->HIFCR = DMA_HIFCR_CTCIF5;		//Clear flag
 }
 
 /*!****************************************************************************

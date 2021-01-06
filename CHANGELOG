@@ -3,6 +3,11 @@ HISTORY
 (git master)
 
   * [Enter new changes just after this line - do not remove this line]
+
+(2.2.0)
+
+  Migrate to CMake
+  Used modbus for communicate with regulator
   
 (STABLE-2.1.5)
 

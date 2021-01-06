@@ -52,7 +52,7 @@ void disp_flush(void){
 /*!****************************************************************************
  * Flush video buffer and fill
  */
-void disp_flushfill(lcd_color_type *color){
+void disp_flushfill(const lcd_color_type *color){
 	st7735_flush(disp_cb);
 	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
 	st7735_setBuffer(color, disp_cb);

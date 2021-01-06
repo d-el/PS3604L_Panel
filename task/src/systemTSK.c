@@ -23,10 +23,10 @@
 #include <lwip/dns.h>
 #include "write.h"
 #include "display.h"
-#include "beep.h"
-#include "pvd.h"
-#include "ledpwm.h"
-#include "board.h"
+#include <beep.h>
+#include <pvd.h>
+#include <ledpwm.h>
+#include <board.h>
 #include "ui.h"
 #include "regulatorConnTSK.h"
 #include "startupTSK.h"
@@ -36,7 +36,6 @@
 #include "baseTSK.h"
 #include "monitorTSK.h"
 #include "systemTSK.h"
-#include <OSinit.h>
 
 /*!****************************************************************************
  * Memory
@@ -86,12 +85,14 @@ void systemTSK(void *pPrm){
 	timezoneUpdate();
 	pvd_setSupplyFaultCallBack(pvdCallback);							// Setup callback for Supply Fault
 	disp_init();
-	LwIP_Init(fp.fpSet.ipadr, fp.fpSet.netmask, fp.fpSet.gateway);	// Initialize the LwIP stack
+	LwIP_Init(fp.fpSettings.ipadr, fp.fpSettings.netmask, fp.fpSettings.gateway);	// Initialize the LwIP stack
 	sntp_init();													// Initialize service SNTP
 
 	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
-	P_LOGI(logTag, "Started uartTSK");
+	P_LOGI(logTag, "Started regulatorConnTSK");
+
+	vTaskDelay(10);
 
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
@@ -105,7 +106,9 @@ void systemTSK(void *pPrm){
 	selWindow(startupWindow);
 
 	while(1){
-		if((fp.tf.state.bit.lowInputVoltage != 0) || (shutdownFlag != 0)){
+		regMeas_t state;
+		bool regulatorConnected = reg_getState(&state);
+		if((regulatorConnected && state.state.m_lowInputVoltage) || shutdownFlag != 0){
 			shutdown();
 		}
 
@@ -132,6 +135,7 @@ void systemTSK(void *pPrm){
 					osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
 					break;
 				default:
+					osres = pdTRUE;
 					assert(!"Fail selector");
 			}
 			assert(osres == pdTRUE);	//Fail windowTskHandle
@@ -150,7 +154,7 @@ void systemTSK(void *pPrm){
 		if(ledCount == 10){
 			LED_OFF();
 		}
-		if((ledCount == 20) && (uartTsk.state == uartConnect)){
+		if((ledCount == 20) && regulatorConnected){
 			LED_ON();
 		}
 		if(ledCount == 30){
@@ -237,7 +241,7 @@ static void shutdown(void){
 }
 
 /*!****************************************************************************
- * Выключение
+ * Shutdown
  */
 static void pvdCallback(void){
 	setLcdBrightness(0);
@@ -302,9 +306,9 @@ void netSettingUpdate(void){
 	ip_addr_t l_gateway;
 
 	//With convert 32-bits host order to network order
-	l_ipaddr.addr = htonl(fp.fpSet.ipadr);
-	l_netmask.addr = htonl(fp.fpSet.netmask);
-	l_gateway.addr = htonl(fp.fpSet.gateway);
+	l_ipaddr.addr = htonl(fp.fpSettings.ipadr);
+	l_netmask.addr = htonl(fp.fpSettings.netmask);
+	l_gateway.addr = htonl(fp.fpSettings.gateway);
 
 	P_LOGI(logTag, "update IP: %s", ipaddr_ntoa(&l_ipaddr) );
 	netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
@@ -326,9 +330,20 @@ void selWindow(selWindow_type window){
  */
 void timezoneUpdate(void){
 	char str[12];
-	snprintf(str, sizeof(str), "TZ=GMT%i", -fp.fpSet.timezone);
+	snprintf(str, sizeof(str), "TZ=GMT%i", -fp.fpSettings.timezone);
 	putenv(str);
 	tzset();
+}
+
+/*!****************************************************************************
+ * @brief Init operating system
+ */
+void OSinit(void){
+	BaseType_t Result = pdTRUE;
+
+	Result &= xTaskCreate(systemTSK, "systemTSK", SYSTEM_TSK_SZ_STACK, NULL, SYSTEM_TSK_PRIO, NULL);
+	assert(Result == pdTRUE);
+	vTaskStartScheduler();
 }
 
 /******************************** END OF FILE ********************************/

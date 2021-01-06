@@ -23,7 +23,7 @@
 #define LCD_SPI				SPI3
 #define LCD_DMA_CHANNEL		0
 #define LCD_DMA_STREAM		DMA1_Stream7
-#define LCD_DMAMEM_STREAM	DMA2_Stream0
+#define LCD_DMAMEM_STREAM	DMA2_Stream5
 #define LCD_DMA_IRQPrior	15
 
 /*!****************************************************************************
@@ -89,7 +89,7 @@ static inline void st7735_setPixel(uint16_t x, uint16_t y, lcd_color_type color)
 void st7735_initB(display_type t, displayRotation_type r);
 void st7735_initR(display_type t, displayRotation_type r);
 void st7735_flush(flushcb_type cb);
-void st7735_setBuffer(lcd_color_type *color, setbufcb_type cb);
+void st7735_setBuffer(const lcd_color_type *color, setbufcb_type cb);
 
 #endif //st7735_H
 /******************************** END OF FILE ********************************/

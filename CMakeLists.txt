@@ -50,6 +50,8 @@ set(CMAKE_C_FLAGS "${CPUFLAGS} ${COMMONFLAGS} -std=gnu11")
 
 set(FUSED "\
 	-u netconn_recv \
+	-u _write \
+	-u HardFault_Handler \
 	")
 
 set(CMAKE_EXE_LINKER_FLAGS "\
@@ -80,6 +82,8 @@ add_subdirectory(lib/CMSIS)
 add_subdirectory(lib/freertos)
 add_subdirectory(lib/IQmathLib-cm4)
 add_subdirectory(lib/lwip)
+add_subdirectory(libmodbus)
+add_subdirectory(libmodbusport)
 add_subdirectory(net)
 add_subdirectory(prmsystem)
 add_subdirectory(systems)
@@ -89,8 +93,6 @@ add_subdirectory(window)
 
 set(SOURCE_FILES
 	app/src/main.c
-	app/src/OSinit.c
-	app/src/version.c
 	)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCE_FILES} ${PROJECT_EMBED_OBJ_FILES})
@@ -113,7 +115,7 @@ target_link_libraries(${PROJECT_NAME}.elf
 
 # Additional command which will run after the above from a different directory
 add_custom_command(TARGET ${PROJECT_NAME}.elf PRE_BUILD
-	COMMAND ${PROJECT_SOURCE_DIR}/scripts/vgen.sh app/src/version.c
+	COMMAND ${PROJECT_SOURCE_DIR}/scripts/vgen.sh utils/src/version.c
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 )
 
