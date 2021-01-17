@@ -16,17 +16,16 @@
 #include <task.h>
 #include <queue.h>
 #include <semphr.h>
-#include "ui.h"
-#include "pstypes.h"
-#include "graphics.h"
-#include "display.h"
-#include "key.h"
-#include "prmSystem.h"
-#include "prmEditor.h"
-#include "beep.h"
+#include <beep.h>
+#include <key.h>
+#include <display.h>
+#include <regulatorConnTSK.h>
+#include <ui.h>
+#include <graphics.h>
+#include <prmSystem.h>
+#include <prmEditor.h>
+#include <systemTSK.h>
 #include "chargeTSK.h"
-#include "regulatorConnTSK.h"
-#include "systemTSK.h"
 #include "baseTSK.h"
 
 /******************************************************************************

@@ -12,15 +12,14 @@
  */
 #include <FreeRTOS.h>
 #include <task.h>
-#include "pstypes.h"
-#include "rtc.h"
-#include "menuSystem.h"
-#include "enco.h"
+#include <rtc.h>
+#include <enco.h>
 #include <lwip/netif.h>
-#include "ledpwm.h"
-#include "regulatorConnTSK.h"
+#include <ledpwm.h>
+#include <regulatorConnTSK.h>
+#include <systemTSK.h>
+#include "menuSystem.h"
 #include "settingTSK.h"
-#include "systemTSK.h"
 
 /*!****************************************************************************
  * MEMORY
