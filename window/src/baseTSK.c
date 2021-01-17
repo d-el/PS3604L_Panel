@@ -174,9 +174,9 @@ void baseTSK(void *pPrm){
 		 */
 		//Print voltage
 		if(regenable){
-			snprintf(str, sizeof(str), "%02"PRIu32".%02"PRIu32, measV / 1000, ((measV + 5) / 10) % 100);
+			snprintf(str, sizeof(str), "%02"PRIu32".%02"PRIu32"0", measV / 1000, ((measV + 5) / 10) % 100);
 		}else{
-			snprintf(str, sizeof(str), "%02"PRIu16".%02"PRIu16, bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u / 10 % 100);
+			snprintf(str, sizeof(str), "%02"PRIu16".%02"PRIu16"0", bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u / 10 % 100);
 		}
 		if(varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);

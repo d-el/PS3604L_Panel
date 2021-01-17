@@ -4,10 +4,8 @@
  * @version		V1.0
  * @date		Dec 27, 2020
  * @brief
- * @copyright	Copyright (C) 2017 Storozhenko Roman
- *				All rights reserved
- *				This software may be modified and distributed under the terms
- *				of the BSD license.	 See the LICENSE file for details
+ * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
+ * @brief		connect interface with regulator
  */
 
 /*!****************************************************************************
@@ -81,4 +79,4 @@ int modbus_serial_connect(const char *device, uint32_t baud, uint8_t parity, uin
     return 0;
 }
 
-/***************** Copyright (C) Storozhenko Roman ******* END OF FILE *******/
+/******************************** END OF FILE ********************************/

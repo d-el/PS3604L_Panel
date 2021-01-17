@@ -102,15 +102,7 @@ include_directories(btnet PUBLIC
 	)
 
 target_link_libraries(${PROJECT_NAME}.elf
-	dev
-	drivers
-	cmsis
-	freertos
-	lwip
-	net
 	systems
-	task
-	utils
 	)
 
 # Additional command which will run after the above from a different directory

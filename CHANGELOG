@@ -4,6 +4,10 @@ HISTORY
 
   * [Enter new changes just after this line - do not remove this line]
 
+(2.2.1)
+
+  ++ Bugfixes
+
 (2.2.0)
 
   Migrate to CMake
