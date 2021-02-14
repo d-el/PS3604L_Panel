@@ -14,14 +14,15 @@
 #include <stdio.h>
 #include <FreeRTOS.h>
 #include <task.h>
-#include "display.h"
-#include "ledpwm.h"
-#include "key.h"
-#include "board.h"
-#include "beep.h"
+#include <display.h>
+#include <ledpwm.h>
+#include <key.h>
+#include <board.h>
+#include <beep.h>
+#include <version.h>
+#include <systemTSK.h>
+#include <prmSystem.h>
 #include "ui.h"
-#include "version.h"
-#include "systemTSK.h"
 
 /*!****************************************************************************
  * MEMORY
@@ -49,7 +50,7 @@ void startupTSK(void *pPrm){
 		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, &ImageLogo);  //Logo
 
 		if(fp.state.sysSettingLoadDefault == 0){
-			sprintf(str, "COUNT %"PRIu32, startCounter);
+			sprintf(str, "COUNT %" PRIu32, startCounter);
 		}else{
 			sprintf(str, "COUNT -");
 		}
@@ -59,15 +60,12 @@ void startupTSK(void *pPrm){
 		disp_putStr(0, 110, &arial, 0, "2012 - 2020");
 		disp_flush();
 
-		if(fp.fpSettings.lcdLight < 10){
-			fp.fpSettings.lcdLight = 10;
-		}
-		for(uint16_t i = 0; i < fp.fpSettings.lcdLight; i++){
+		for(uint16_t i = 0; i < Prm::brightness.val; i++){
 			setLcdBrightness(i);
 			vTaskDelay(pdMS_TO_TICKS(3));
 		}
 		vTaskDelay(pdMS_TO_TICKS(150));
-		setLcdBrightness(fp.fpSettings.lcdLight);
+		setLcdBrightness(Prm::brightness.val);
 
 		//Run key process
 		for(uint32_t cnt = 0; cnt < KEY_SAMPLES * 2; cnt++){

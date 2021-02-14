@@ -9,18 +9,14 @@
 #ifndef httpServerTSK_H
 #define httpServerTSK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
 #include "stdint.h"
-
-/*!****************************************************************************
- * Define
- */
-
-/*!****************************************************************************
- * Enumeration
- */
 
 /*!****************************************************************************
  * Typedef
@@ -42,6 +38,10 @@ extern httpServer_type httpServer;
  * Function declaration
  */
 void httpServerTSK(void *pPrm);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //httpServerTSK__H
 /******************************** END OF FILE ********************************/

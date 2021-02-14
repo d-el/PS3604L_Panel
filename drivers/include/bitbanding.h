@@ -1,6 +1,10 @@
 ﻿#ifndef BITBANDING_H
 #define BITBANDING_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MASK_TO_BIT31(A)				(A==0x80000000)? 31 : 0
 #define MASK_TO_BIT30(A)				(A==0x40000000)? 30 : MASK_TO_BIT31(A)
 #define MASK_TO_BIT29(A)				(A==0x20000000)? 29 : MASK_TO_BIT30(A)
@@ -46,4 +50,8 @@
 //Example: BIT_BAND_PER(TIM1->SR, TIM_SR_UIF) = 0; //СЃР±СЂРѕСЃРёС‚СЊ Р±РёС‚ TIM_SR_UIF РІ TIM1->SR
 //Example2: BIT_BAND_SRAM(&a, 13) = 1; //СѓСЃС‚Р°РЅРѕРІРёС‚СЊ 13-Р№ Р±РёС‚ РІ РїРµСЂРµРјРµРЅРЅРѕР№ "a"
 //Example3: BIT_BAND_SRAM(&a, 13) ^= 1; //РёРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ 13-Р№ Р±РёС‚ РІ "a", РЅРµ Р·Р°РґРµРІР°СЏ РґСЂСѓРіРёРµ Р±РёС‚С‹ РїРµСЂРµРјРµРЅРЅРѕР№ (РїСЃРµРІРґРѕ-Р°С‚РѕРјР°СЂРЅРѕСЃС‚СЊ)
+#endif
+
+#ifdef __cplusplus
+}
 #endif

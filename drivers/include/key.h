@@ -9,6 +9,10 @@
 #ifndef key_H
 #define key_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -55,15 +59,15 @@ typedef struct {
 extern key_type key;
 
 /*!****************************************************************************
- * Macro functions
- */
-
-/*!****************************************************************************
  * Function declaration
  */
 uint32_t keyProc(void);
 uint32_t keyState(kKey_type keyMask);
-void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, kKey_type reiterationKeyMask);
+void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, uint16_t reiterationKeyMask);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //key_H
 /******************************** END OF FILE ********************************/

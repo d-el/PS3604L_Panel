@@ -9,6 +9,10 @@
 #ifndef sntp_H
 #define sntp_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -37,6 +41,10 @@
  * Function declaration
  */
 void sntp_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //sntp_H
 /******************************** END OF FILE ********************************/

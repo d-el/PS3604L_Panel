@@ -17,14 +17,6 @@
 #include "time.h"
 
 /*!****************************************************************************
- * Define
- */
-
-/*!****************************************************************************
- * Enumeration
- */
-
-/*!****************************************************************************
  * Typedef
  */
 typedef struct {
@@ -46,13 +38,14 @@ typedef struct {
 extern settingSct_type settingSct;
 
 /*!****************************************************************************
- * Macro functions
- */
-
-/*!****************************************************************************
  * Function declaration
  */
 void settingTSK(void *pPrm);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 itemState_type PrepareU(const menuItem_type *item);
 itemState_type PrepareI(const menuItem_type *item);
 itemState_type savePointU(const menuItem_type *item);
@@ -62,6 +55,10 @@ itemState_type setBright(const menuItem_type *item);
 itemState_type rtcSelect(const menuItem_type *item);
 itemState_type rtcUnselect(const menuItem_type *item);
 itemState_type netUpdate(const menuItem_type *item);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //settingTSK_H
 /******************************** END OF FILE ********************************/

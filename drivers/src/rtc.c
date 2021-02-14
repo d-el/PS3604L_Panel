@@ -223,7 +223,7 @@ rtcStatus_type rtc_setTime(const struct tm *t){
  */
 rtcStatus_type rtc_setTimeUnix(time_t timeUnix){
 	struct tm tm;
-	gmtime_r(&timeUnix, &tm);
+	//gmtime_r(&timeUnix, &tm);
 	return rtc_setTime(&tm);
 }
 

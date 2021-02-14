@@ -9,6 +9,10 @@
 #ifndef beep_H
 #define beep_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -22,18 +26,6 @@
 #define TIME_B_TIM			( TIM7 )
 
 /*!****************************************************************************
- * Enumeration
- */
-
-/*!****************************************************************************
- * Typedef
- */
-
-/*!****************************************************************************
- * Exported variables
- */
-
-/*!****************************************************************************
  * Macro functions
  */
 #define	beepSetFreq(freq)	BEEP_TIM->ARR = SYSTEM_FREQUENCY / (freq) / 2;
@@ -44,6 +36,10 @@
 void BeepTime(uint16_t time, uint16_t ferq);
 void beep_init(void);
 void Dht(void *pvParameters);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //beep_H
 /******************************** END OF FILE ********************************/

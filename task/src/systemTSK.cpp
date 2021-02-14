@@ -13,8 +13,10 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <time.h>
+
 #include "plog.h"
-#include "prmSystem.h"
+#include <prmSystem.h>
 #include "sntp.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "stm32f4x7_eth.h"
@@ -30,12 +32,13 @@
 #include "ui.h"
 #include "regulatorConnTSK.h"
 #include "startupTSK.h"
-#include "settingTSK.h"
+//#include "settingTSK.h"
 #include "chargeTSK.h"
 #include "httpServerTSK.h"
 #include "baseTSK.h"
 #include "monitorTSK.h"
 #include "systemTSK.h"
+#include <24AAxx.h>
 
 /*!****************************************************************************
  * Memory
@@ -48,7 +51,7 @@ static uint8_t			shutdownFlag;
 /*!****************************************************************************
  * Local prototypes for the functions
  */
-int _write(int fd, const void *buf, size_t count);
+extern "C" int _write(int fd, const void *buf, size_t count);
 static void loadParameters(void);
 static void shutdown(void);
 static void pvdCallback(void);
@@ -63,7 +66,7 @@ static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint3
 #else
 	#define LOG_LOCAL_LEVEL P_LOG_NONE
 #endif
-static char *logTag = "SYS";
+static const char *logTag = "SYS";
 
 /*!****************************************************************************
  * @brief
@@ -85,7 +88,7 @@ void systemTSK(void *pPrm){
 	timezoneUpdate();
 	pvd_setSupplyFaultCallBack(pvdCallback);							// Setup callback for Supply Fault
 	disp_init();
-	LwIP_Init(fp.fpSettings.ipadr, fp.fpSettings.netmask, fp.fpSettings.gateway);	// Initialize the LwIP stack
+	LwIP_Init(Prm::ipadr.val, Prm::netmask.val, Prm::gateway.val);	// Initialize the LwIP stack
 	sntp_init();													// Initialize service SNTP
 
 	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
@@ -125,15 +128,15 @@ void systemTSK(void *pPrm){
 				case startupWindow:
 					osres = xTaskCreate(startupTSK, "startupTSK", STARTUP_TSK_SZ_STACK, NULL, STARTUP_TSK_PRIO, &windowTskHandle);
 					break;
-				case settingWindow:
-					osres = xTaskCreate(settingTSK, "settingTSK", SETT_TSK_SZ_STACK, NULL, SETT_TSK_PRIO, &windowTskHandle);
-					break;
+				//case settingWindow:
+				//	osres = xTaskCreate(settingTSK, "settingTSK", SETT_TSK_SZ_STACK, NULL, SETT_TSK_PRIO, &windowTskHandle);
+				//	break;
 				case baseWindow:
 					osres = xTaskCreate(baseTSK, "baseTSK", BASE_TSK_SZ_STACK, NULL, BASE_TSK_PRIO, &windowTskHandle);
 					break;
-				case chargerWindow:
-					osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
-					break;
+				//case chargerWindow:
+				//	osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
+				//	break;
 				default:
 					osres = pdTRUE;
 					assert(!"Fail selector");
@@ -200,22 +203,28 @@ void systemTSK(void *pPrm){
  * @brief	Load parameters from memory
  */
 static void loadParameters(void){
-	prm_state_type stat = prm_load(SYSEEPADR, prmEepSys);
-	if(stat == prm_ok){
-		P_LOGI(logTag, "System settings load ok");
-	}else{
-		P_LOGW(logTag, "System settings load error: %u", stat);
-		prm_loadDefault(prmEepSys);
-		fp.state.sysSettingLoadDefault = 1;
+	const uint16_t systemSettingsAddress = 0;
+	size_t size = Prm::getSerialSize(Prm::Save::savesys);
+	if(size){
+		uint8_t buffer[size];
+		if(eep_read(buffer, systemSettingsAddress, size) == eepOk){
+			if(!Prm::deserialize(Prm::Save::savesys, buffer)){
+				P_LOGW(logTag, "System settings load error");
+				fp.state.sysSettingLoadDefault = 1;
+			}
+		}
 	}
 
-	stat = prm_load(USEREEPADR, prmEep);
-	if(stat == prm_ok){
-		P_LOGI(logTag, "User settings load ok");
-	}else{
-		P_LOGW(logTag, "User settings load error: %u", stat);
-		prm_loadDefault(prmEep);
-		fp.state.userSettingLoadDefault = 1;
+	const uint16_t userSettingsAddress = 512;
+	size = Prm::getSerialSize(Prm::Save::saveuse);
+	if(size){
+		uint8_t buffer[size];
+		if(eep_read(buffer, systemSettingsAddress, size) == eepOk){
+			if(!Prm::deserialize(Prm::Save::saveuse, buffer)){
+				P_LOGW(logTag, "User settings load error");
+				fp.state.userSettingLoadDefault = 1;
+			}
+		}
 	}
 }
 
@@ -223,12 +232,22 @@ static void loadParameters(void){
  * @brief	Save parameters to memory
  */
 static void shutdown(void){
-	P_LOGD(logTag, "System shutdown3");
-	prm_state_type stat = prm_store(USEREEPADR, prmEep);
-	if(stat == prm_ok){
-		P_LOGI(logTag, "System settings store ok");
-	}else{
-		P_LOGE(logTag, "System settings store error: %u", stat);
+	P_LOGD(logTag, "System shutdown");
+
+	const uint16_t systemSettingsAddress = 0;
+	size_t size = Prm::getSerialSize(Prm::Save::savesys);
+	if(size){
+		uint8_t buffer[size];
+		Prm::serialize(Prm::Save::savesys, buffer);
+		eep_write(systemSettingsAddress, buffer, size);
+	}
+
+	const uint16_t userSettingsAddress = 512;
+	size = Prm::getSerialSize(Prm::Save::saveuse);
+	if(size){
+		uint8_t buffer[size];
+		Prm::serialize(Prm::Save::saveuse, buffer);
+		eep_write(userSettingsAddress, buffer, size);
 	}
 
 	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
@@ -301,14 +320,10 @@ void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gat
 /*!****************************************************************************
  */
 void netSettingUpdate(void){
-	ip_addr_t l_ipaddr;
-	ip_addr_t l_netmask;
-	ip_addr_t l_gateway;
-
 	//With convert 32-bits host order to network order
-	l_ipaddr.addr = htonl(fp.fpSettings.ipadr);
-	l_netmask.addr = htonl(fp.fpSettings.netmask);
-	l_gateway.addr = htonl(fp.fpSettings.gateway);
+	ip_addr_t l_ipaddr = { htonl(Prm::ipadr.val) };
+	ip_addr_t l_netmask = { htonl(Prm::netmask.val) };
+	ip_addr_t l_gateway = { htonl(Prm::gateway.val) };
 
 	P_LOGI(logTag, "update IP: %s", ipaddr_ntoa(&l_ipaddr) );
 	netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
@@ -330,7 +345,7 @@ void selWindow(selWindow_type window){
  */
 void timezoneUpdate(void){
 	char str[12];
-	snprintf(str, sizeof(str), "TZ=GMT%i", -fp.fpSettings.timezone);
+	snprintf(str, sizeof(str), "TZ=GMT%i", -Prm::timezone.val);
 	putenv(str);
 	tzset();
 }

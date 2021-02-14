@@ -10,6 +10,11 @@
 #ifndef st7735_H
 #define st7735_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /*!****************************************************************************
  * Include
  */
@@ -90,6 +95,10 @@ void st7735_initB(display_type t, displayRotation_type r);
 void st7735_initR(display_type t, displayRotation_type r);
 void st7735_flush(flushcb_type cb);
 void st7735_setBuffer(const lcd_color_type *color, setbufcb_type cb);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //st7735_H
 /******************************** END OF FILE ********************************/

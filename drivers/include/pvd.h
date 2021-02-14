@@ -9,6 +9,10 @@
 #ifndef pvd_H
 #define pvd_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -19,25 +23,9 @@
 #define PVD_IRQ_Priority	(13)	///< PVD Interrupt priority
 
 /*!****************************************************************************
- * Enumeration
- */
-
-/*!****************************************************************************
  * Typedef
  */
 typedef void (*suplyFaultCallBack_type)(void);
-
-/*!****************************************************************************
- * Exported variables
- */
-
-/*!****************************************************************************
- * Macro functions
- */
-
-/*!****************************************************************************
- * Function declaration
- */
 
 /*!****************************************************************************
  * Prototypes for the functions
@@ -45,6 +33,10 @@ typedef void (*suplyFaultCallBack_type)(void);
 void pvd_init(void);
 void pvd_disable(void);
 void pvd_setSupplyFaultCallBack(suplyFaultCallBack_type callBack);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //pvd_H
 /******************************** END OF FILE ********************************/

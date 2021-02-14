@@ -10,6 +10,10 @@
 #ifndef rng_H
 #define rng_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -20,6 +24,10 @@
  */
 void rng_init(void);
 int32_t rng_get(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //rng_H
 /******************************** END OF FILE ********************************/

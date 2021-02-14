@@ -258,7 +258,7 @@ static void initSpiDMA(void){
 	RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
 	LCD_DMAMEM_STREAM->CR	= 0;
 	//LCD_DMAMEM_STREAM->CR	|= (uint32_t)((LCD_DMA_CHANNEL & 0x03) << 25);	//Channel selection
-	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_PL_0;								//Priority level Medium
+	//LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_PL_0;								//Priority level Medium
 	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_MSIZE_0;							//Memory data size half-word (16-bit)
 	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_PSIZE_0;							//Memory data size half-word (16-bit)
 	LCD_DMAMEM_STREAM->CR	|= DMA_SxCR_MINC;								//Memory increment mode enabled

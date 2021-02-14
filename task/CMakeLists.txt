@@ -1,7 +1,7 @@
 add_library(task STATIC
 	src/monitorTSK.c
 	src/regulatorConnTSK.c
-	src/systemTSK.c
+	src/systemTSK.cpp
 	)
 
 target_include_directories(task PUBLIC

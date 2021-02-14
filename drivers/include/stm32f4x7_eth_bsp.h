@@ -10,7 +10,7 @@
 #define __STM32F4x7_ETH_BSP_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/

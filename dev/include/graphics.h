@@ -8,6 +8,10 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -56,6 +60,10 @@ void grf_fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, gf
 void grf_fillScreen(uint16_t color);
 void grf_triangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, gfx_color_type color);
 void grf_fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, gfx_color_type color);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //GRAPHICS_H
 /******************************** END OF FILE ********************************/

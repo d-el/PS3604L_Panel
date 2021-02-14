@@ -8,6 +8,10 @@
 #ifndef uniqueDeviceId_H
 #define uniqueDeviceId_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -17,14 +21,6 @@
  * Define
  */
 #define UNIQDEVID_BASE	0x1FFF7A10
-
-/*!****************************************************************************
- * Enumeration
- */
-
-/*!****************************************************************************
- * Typedef
- */
 
 /*!****************************************************************************
  * Exported variables
@@ -41,6 +37,10 @@ extern const uint32_t *uniqDevId;
  */
 uint32_t getDid(void);
 uint8_t checkUniqDevId(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //uniqueDeviceId_H
 /******************************** END OF FILE ********************************/

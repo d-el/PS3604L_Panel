@@ -37,14 +37,6 @@ typedef enum {
 } selWindow_type;
 
 typedef struct {
-	uint32_t 	ipadr;
-	uint32_t 	netmask;
-	uint32_t 	gateway;
-	uint16_t 	lcdLight;		///< [X_X %]
-	int8_t		timezone;		///< -12 to +12
-} frontPanelSetting_type;
-
-typedef struct {
 	uint16_t rtcOscillatorError		:1;
 	uint16_t mainOscillatorError	:1;
 
@@ -56,7 +48,6 @@ typedef struct {
 } frontPanelState_type;
 
 typedef struct {
-	frontPanelSetting_type 	fpSettings;
 	frontPanelState_type	state;
 	selWindow_type 			currentSelWindow;
 } frontPanel_type;

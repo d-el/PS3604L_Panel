@@ -147,9 +147,9 @@ void chargeTSK(void *pPrm){
 		}
 		//Print voltage
 		if(stateenable){
-			snprintf(str, sizeof(str), "U:        %02"PRIu32".%03"PRIu32, measV / 1000000, (measV / 1000) % 1000);
+			snprintf(str, sizeof(str), "U:        %02" PRIu32 ".%03"PRIu32, measV / 1000000, (measV / 1000) % 1000);
 		}else{
-			snprintf(str, sizeof(str), "U:        %02"PRIu16".%03"PRIu16, ch.u / 1000, ch.u % 1000);
+			snprintf(str, sizeof(str), "U:        %02" PRIu16 ".%03"PRIu16, ch.u / 1000, ch.u % 1000);
 		}
 		if(varParam == C_VOLT && !stateenable){
 			disp_setColor(black, ui.color.cursor);
@@ -160,9 +160,9 @@ void chargeTSK(void *pPrm){
 
 		//Print current
 		if(stateenable){
-			snprintf(str, sizeof(str), "I:          %01"PRIu32".%03"PRIu32" A", measI / 1000000, (measI / 1000) % 1000);
+			snprintf(str, sizeof(str), "I:          %01" PRIu32 ".%03" PRIu32 " A", measI / 1000000, (measI / 1000) % 1000);
 		}else{
-			snprintf(str, sizeof(str), "I:          %0"PRIu16".%03"PRIu16" A", ch.i / 1000, ch.i % 1000);
+			snprintf(str, sizeof(str), "I:          %0" PRIu16 ".%03" PRIu16 " A", ch.i / 1000, ch.i % 1000);
 		}
 		if(varParam == C_CURR && !stateenable){
 			disp_setColor(black, ui.color.cursor);
@@ -174,13 +174,13 @@ void chargeTSK(void *pPrm){
 		//Time
 		if(ch.mode == ch_modeTime){
 			if(stateenable){
-				snprintf(str, sizeof(str), "Time:  %lum %02"PRIu32"s   ", (ch.t * 60 - regmeas.time) / 60, (ch.t * 60 - regmeas.time) % 60);
+				snprintf(str, sizeof(str), "Time:  %lum %02" PRIu32 "s   ", (ch.t * 60 - regmeas.time) / 60, (ch.t * 60 - regmeas.time) % 60);
 			}else{
-				snprintf(str, sizeof(str), "Time:  %"PRIu16"m 00s     ", ch.t);
+				snprintf(str, sizeof(str), "Time:  %" PRIu16 "m 00s     ", ch.t);
 			}
 		}else{
 			if(stateenable){
-				snprintf(str, sizeof(str), "Time:  %"PRIu32"m %02"PRIu32"s   ", (regmeas.time) / 60, (regmeas.time) % 60);
+				snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02"PRIu32"s   ", (regmeas.time) / 60, (regmeas.time) % 60);
 			}else{
 				snprintf(str, sizeof(str), "Time:  - - -            ");
 			}
@@ -207,7 +207,7 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 60, &arial, 0, str);
 
 		//Print Capacity
-		snprintf(str, sizeof(str), "C:         %01"PRIu32".%03"PRIu32" Ah", regmeas.capacity / 1000, regmeas.capacity % 1000);
+		snprintf(str, sizeof(str), "C:         %01" PRIu32 ".%03" PRIu32 " Ah", regmeas.capacity / 1000, regmeas.capacity % 1000);
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
 

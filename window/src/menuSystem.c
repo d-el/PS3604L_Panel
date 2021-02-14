@@ -581,11 +581,11 @@ void printUsigVar(char *string, const menuItem_type *menuItem, uint32_t var){
 	static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
 
 	if(menuItem->prmHandle->power == 0){
-		sprintf(string, "%"PRIu32"%s", var, menuItem->units);
+		sprintf(string, "%" PRIu32 "%s", var, menuItem->units);
 	}else{
 		uint32_t a = var / pows[menuItem->prmHandle->power];
 		uint32_t b = var % pows[menuItem->prmHandle->power];
-		sprintf(string, "%"PRIu32".%0*"PRIu32"%s", a, menuItem->prmHandle->power, b, menuItem->units);
+		sprintf(string, "%" PRIu32 ".%0*" PRIu32 "%s", a, menuItem->prmHandle->power, b, menuItem->units);
 	}
 }
 
@@ -596,11 +596,11 @@ void printSigVar(char *string, const menuItem_type *menuItem, int32_t var){
 	static const int32_t pows[] = { 1, 10, 100, 1000, 10000, 100000, 1000000 };
 
 	if(menuItem->prmHandle->power == 0){
-		sprintf(string, "%"PRIi32"%s", var, menuItem->units);
+		sprintf(string, "%" PRIi32 "%s", var, menuItem->units);
 	}else{
 		uint32_t a = var / pows[menuItem->prmHandle->power];
 		uint32_t b = abs(var) % pows[menuItem->prmHandle->power];
-		sprintf(string, "%"PRIi32".%0*"PRIu32"%s", a, menuItem->prmHandle->power, b, menuItem->units);
+		sprintf(string, "%" PRIi32 ".%0*" PRIu32 "%s", a, menuItem->prmHandle->power, b, menuItem->units);
 	}
 }
 
@@ -625,7 +625,7 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
 	if(editSectionNumber == 0){
 		*selectionPosition = 0;
 	}
-	nchars += sprintf(string, "%"PRIu32":", (ip >> 24) & 0xFF);
+	nchars += sprintf(string, "%" PRIu32 ":", (ip >> 24) & 0xFF);
 	if(editSectionNumber == 0){
 		*selectionLength = nchars - *selectionPosition - 1;
 	}
@@ -634,7 +634,7 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
 	if(editSectionNumber == 1){
 		*selectionPosition = nchars;
 	}
-	nchars += sprintf(string + nchars, "%"PRIu32":", (ip >> 16) & 0xFF);
+	nchars += sprintf(string + nchars, "%" PRIu32 ":", (ip >> 16) & 0xFF);
 	if(editSectionNumber == 1){
 		*selectionLength = nchars - *selectionPosition - 1;
 	}
@@ -643,7 +643,7 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
 	if(editSectionNumber == 2){
 		*selectionPosition = nchars;
 	}
-	nchars += sprintf(string + nchars, "%"PRIu32":", (ip >> 8) & 0xFF);
+	nchars += sprintf(string + nchars, "%" PRIu32 ":", (ip >> 8) & 0xFF);
 	if(editSectionNumber == 2){
 		*selectionLength = nchars - *selectionPosition - 1;
 	}
@@ -652,7 +652,7 @@ void printIpVar(char *string, const uint32_t ip, uint8_t editSectionNumber, uint
 	if(editSectionNumber == 3){
 		*selectionPosition = nchars;
 	}
-	nchars += sprintf(string + nchars, "%"PRIu32"", (ip >> 0) & 0xFF);
+	nchars += sprintf(string + nchars, "%" PRIu32 "", (ip >> 0) & 0xFF);
 	if(editSectionNumber == 3){
 		*selectionLength = nchars - *selectionPosition;
 	}
@@ -698,7 +698,7 @@ void printDateVar(char *string, const time_t unixTime, uint8_t editSectionNumber
  */
 void printTimeVar(char *string, const time_t unixTime, uint8_t editSectionNumber, uint8_t *selectionPosition, uint8_t *selectionLength){
 	struct tm	tm;
-	gmtime_r(&unixTime, &tm);
+	//gmtime_r(&unixTime, &tm);
 	strftime(string, 16, "%H:%M:%S", &tm);
 
 	switch(editSectionNumber){

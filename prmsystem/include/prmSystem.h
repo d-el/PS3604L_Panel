@@ -1,9 +1,9 @@
 ﻿/*!****************************************************************************
  * @file		prmSystem.h
  * @author		d_el - Storozhenko Roman
- * @version		V1.0
- * @date		08.02.2017
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @version		V2.0
+ * @date		25.01.2021
+ * @copyright	The MIT License (MIT). Copyright (c) 2021 Storozhenko Roman
  * @brief		Parameters system
  */
 #ifndef PRMSYSTEM_H
@@ -13,148 +13,157 @@
  * Include
  */
 #include "stdint.h"
+#include "string.h"
+#include "stdbool.h"
+#include <stddef.h>
+#include <type_traits>
+#include <cmath>
+
+namespace Prm {
 
 /*!****************************************************************************
  * Define
  */
-/*
- * - 0000 -----------------------------------
- * ------------------------------------------
- * ------ User
- * ------------------------------------------
- * ------------------------------------------
- * - 0512 -----------------------------------
- * ------------------------------------------
- * ------ System
- * ------------------------------------------
- * ------------------------------------------
- * - 1023 -----------------------------------
- */
-#define USEREEPADR		((void*)0)
-#define SYSEEPADR		((void*)512)
+enum Save: uint8_t{
+	notsave,
+	savesys,
+	saveuse
+};
 
-#define typeu8Frmt		uint8_t
-#define	types8Frmt		int8_t
-#define	typeu16Frmt		uint16_t
-#define	types16Frmt		int16_t
-#define	typeu32Frmt		uint32_t
-#define	types32Frmt		int32_t
-#define	typesfloatFrmt	float
+template <class T> class ValHandler
+{
+public:
+	constexpr ValHandler(
+			const char *_label, const char *_units,
+			T _def, T _min, T _max, T _step, T _bigstep,
+			uint16_t _addr, uint16_t _arg, uint16_t _power,
+			void (*_callback)(const ValHandler& prm, bool read, void *arg),
+			Save _save) :
+		label(_label),
+		units(_units),
+		def(_def),
+		min(_min),
+		max(_max),
+		step(_step),
+		bigstep(_bigstep),
+		addr(_addr),
+		arg(_arg),
+		power(_power),
+		callback(_callback),
+		save(_save)
+	{};
 
-#define	power0			1
-#define	power1			10
-#define	power2			100
-#define	power3			1000U
-#define	power4			10000U
-#define	power5			100000U
-#define	power6			1000000U
+	const char *label;
+	const char *units;
+	const T def;
+	const T min;
+	const T max;
+	const T step;
+	const T bigstep;
+	const uint16_t addr;
+	constexpr static size_t size = sizeof(T);
+	const uint16_t arg;
+	const uint8_t power :4;
+	const Save save;
+	void (*callback)(const ValHandler& prm, bool read, void *arg);
+};
 
-/*!****************************************************************************
- * Enumeration
- */
+class IVal{
+public:
+	virtual void setdef() = 0;
+	virtual void step(int32_t step) = 0;
+	virtual void bigstep(int32_t step) = 0;
+	virtual const char* getlabel() const = 0;
+	virtual const char* getunit() const = 0;
+	virtual size_t getsize() const = 0;
+	virtual uint16_t getaddress() const = 0;
+	virtual Save getsave() const = 0;
+	virtual void serialize(void *dst) const = 0;
+	virtual bool deserialize(const void *src) = 0;
+	virtual size_t tostring(char *string, size_t size) const = 0;
+};
 
-//! Number parameter handler
-#define parametres(m_label, m_units, m_prm, m_type, m_chmod, m_def, m_min, m_max, m_step, m_bigstep, m_power, m_limtype, m_steptype, m_save)	\
-	N##m_label,
-typedef enum {
-	#include "parametres.h"
-	endOfNumberPrm
-} parametresNum_type;
-#undef parametres
+template <class T> class Val: public IVal
+{
+public:
+	Val(const ValHandler<T> &_handler) :
+		handler(_handler)
+	{ val = handler.def; }
 
-/*!****************************************************************************
- * Typedef
- */
-typedef union {
-	uint8_t		t_u8Frmt;
-	int8_t		t_s8Frmt;
-	uint16_t	t_u16Frmt;
-	int16_t		t_s16Frmt;
-	uint32_t	t_u32Frmt;
-	int32_t		t_s32Frmt;
-	float		t_floatFrmt;
-	uint32_t	t_unixTimeFrmt;
-	uint32_t	t_unixDateFrmt;
-	uint32_t	t_ipAdrFrmt;
-} prmval_type;
+	void setdef(){
+		val = handler.def;
+	}
 
-typedef enum {
-	u8Frmt,
-	s8Frmt,
-	u16Frmt,
-	s16Frmt,
-	u32Frmt,
-	s32Frmt,
-	floatFrmt,
-	unixTimeFrmt,
-	unixDateFrmt,
-	ipAdrFrmt,
-} prmType_type;
+	void step(int32_t step){
+		val += handler.step * step;
+		if(val > handler.max) val = handler.max;
+		if(val < handler.min) val = handler.min;
+	}
 
-typedef enum {
-	chmodNone,
-	chmodAlways,
-} prmChmod_type;
+	void bigstep(int32_t step){
+		val += handler.bigstep * step;
+		if(val > handler.max) val = handler.max;
+		if(val < handler.min) val = handler.min;
+	}
 
-typedef enum {
-	prmNotSave,
-	prmEepSys,
-	prmEep,
-} prmNvSave_type;
+	const char* getlabel() const {
+		return handler.label;
+	}
 
-typedef enum {
-	prmLimConst,
-	prmLimVariable,
-} prmLim_type;
+	const char* getunit() const {
+		return handler.units;
+	}
 
-typedef enum {
-	prmStepConst,
-	prmStepVariable,
-} prmStep_type;
+	size_t getsize() const {
+		return handler.size;
+	}
 
-typedef enum {
-	prm_ok,
-	prm_addrIsNull,
-	prm_signatureError,
-	prm_crcError,
-	prm_errorSizeMem,
-	prm_writeError,
-	prm_readError,
-	prm_error
-} prm_state_type;
+	uint16_t getaddress() const {
+		return handler.addr;
+	}
 
-typedef struct {
-	prmval_type		*prm;			//Pointer to parameter
-	prmval_type		def;
-	prmval_type		*min;
-	prmval_type		*max;
-	prmval_type		*step;
-	prmval_type		bigstep;
-	prmType_type	type	:4;
-	prmChmod_type	chmod	:2;
-	uint8_t			power	:4;
-	prmNvSave_type	save	:2;
-	prmLim_type		limType :1;
-	prmStep_type	stepType:1;
-} prmHandle_type;
+	virtual Save getsave() const {
+		return handler.save;
+	}
 
-/*!****************************************************************************
- * Exported variables
- */
-extern const prmHandle_type prmh[];
-extern const uint16_t prmHandleLen;
+	void serialize(void *dst) const {
+		memcpy(dst, &val, sizeof(val));
+	}
 
-/*!****************************************************************************
- * Macro functions
- */
+	bool deserialize(const void *src){
+		T v = 0;
+		memcpy(&v, src, sizeof(v));
+		if constexpr(std::is_same_v<T, float>){
+			if(std::isnan(v)){
+				return false;
+			}
+		}
+		if(v > handler.max || v < handler.min){
+			return false;
+		}
+		val = v;
+		return true;
+	}
 
-/*!****************************************************************************
- * Function declaration
- */
-void prm_setVal(const prmHandle_type *const prmHandle, const prmval_type *const prmval);
-void prm_loadDefault(prmNvSave_type prmNvSave);
-prm_state_type prm_store(void *pMemory, prmNvSave_type prmNvSave);
-prm_state_type prm_load(void *pMemory, prmNvSave_type prmNvSave);
+	size_t tostring(char *string, size_t size) const;
+
+private:
+	size_t uprintval(char *string, size_t size, uint8_t power, uint32_t var) const;
+	size_t iprintval(char *string, size_t size, uint8_t power, int32_t var) const;
+
+public:
+	T val;
+	const ValHandler<T> &handler;
+};
+
+IVal *getbyaddress(uint16_t address);
+size_t getSerialSize(Save save);
+bool serialize(Save save, uint8_t *dst);
+bool deserialize(Save save, const uint8_t *src);
+
+#include "parameter.dcl"
+
+};
 
 #endif /* PRMSYSTEM_H */
 /******************************** END OF FILE ********************************/
