@@ -1,5 +1,5 @@
 ﻿/*!****************************************************************************
- * @file		prmSystem.h
+ * @file		prmSystem.cpp
  * @author		d_el - Storozhenko Roman
  * @version		V2.0
  * @date		25.01.2021
@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include "crc.h"
 #include "prmSystem.h"
-#include <array>
 
 namespace Prm {
 
@@ -99,6 +98,9 @@ template <> size_t Val<bool>::tostring(char *string, size_t size) const{
 };
 
 template <> size_t Val<char>::tostring(char *string, size_t size) const{
+	if(size < 2){
+		return 0;
+	}
 	string[0] = val;
 	string[1] = '\0';
 	return 1;

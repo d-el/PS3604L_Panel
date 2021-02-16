@@ -50,6 +50,7 @@ group(Base, public)
 	p(baseu2	,"V"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
 	p(basei2	,"A"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
 	p(basem2	,""			,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
+	p(basepreset,""			,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
 	
 group(Charger, public)
 	p(chargeru	,"V"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)

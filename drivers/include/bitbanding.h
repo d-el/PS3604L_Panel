@@ -47,9 +47,9 @@ extern "C" {
 
 #define BIT_BAND_SRAM(RAM,BIT)			(*(volatile uint32_t*)(SRAM_BB_BASE+32*((uint32_t)((void*)(RAM))-SRAM_BASE)+4*((uint32_t)(BIT))))
 
-//Example: BIT_BAND_PER(TIM1->SR, TIM_SR_UIF) = 0; //СЃР±СЂРѕСЃРёС‚СЊ Р±РёС‚ TIM_SR_UIF РІ TIM1->SR
-//Example2: BIT_BAND_SRAM(&a, 13) = 1; //СѓСЃС‚Р°РЅРѕРІРёС‚СЊ 13-Р№ Р±РёС‚ РІ РїРµСЂРµРјРµРЅРЅРѕР№ "a"
-//Example3: BIT_BAND_SRAM(&a, 13) ^= 1; //РёРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ 13-Р№ Р±РёС‚ РІ "a", РЅРµ Р·Р°РґРµРІР°СЏ РґСЂСѓРіРёРµ Р±РёС‚С‹ РїРµСЂРµРјРµРЅРЅРѕР№ (РїСЃРµРІРґРѕ-Р°С‚РѕРјР°СЂРЅРѕСЃС‚СЊ)
+//Example: BIT_BAND_PER(TIM1->SR, TIM_SR_UIF) = 0;
+//Example2: BIT_BAND_SRAM(&a, 13) = 1;
+//Example3: BIT_BAND_SRAM(&a, 13) ^= 1;
 #endif
 
 #ifdef __cplusplus

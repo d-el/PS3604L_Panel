@@ -12,11 +12,13 @@
 /*!****************************************************************************
  * Include
  */
-#include "stdint.h"
-#include "string.h"
-#include "stdbool.h"
-#include <stddef.h>
+#include <array>
 #include <type_traits>
+#include <stdint.h>
+#include <string.h>
+#include <stdbool.h>
+#include <stddef.h>
+
 #include <cmath>
 
 namespace Prm {
@@ -28,6 +30,11 @@ enum Save: uint8_t{
 	notsave,
 	savesys,
 	saveuse
+};
+
+struct Text{
+	const int v;
+	const char *s;
 };
 
 template <class T> class ValHandler
@@ -49,8 +56,8 @@ public:
 		addr(_addr),
 		arg(_arg),
 		power(_power),
-		callback(_callback),
-		save(_save)
+		save(_save),
+		callback(_callback)
 	{};
 
 	const char *label;
@@ -101,9 +108,10 @@ public:
 	}
 
 	void bigstep(int32_t step){
-		val += handler.bigstep * step;
-		if(val > handler.max) val = handler.max;
-		if(val < handler.min) val = handler.min;
+		auto result = val + handler.bigstep * step;
+		if(step > 0 && result > handler.max) result = handler.max;
+		if(step < 0 && result < handler.min) result = handler.min;
+		val = result;
 	}
 
 	const char* getlabel() const {

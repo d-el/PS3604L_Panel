@@ -10,7 +10,7 @@ target_include_directories(prmsystem PUBLIC
 
 add_custom_command(
 	OUTPUT prmsytem2json
-	#COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../tools/prmsytem2json/build.sh
+	COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/../tools/prmsytem2json/build.sh
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 	)
 
