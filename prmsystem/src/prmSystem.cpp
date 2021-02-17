@@ -107,26 +107,56 @@ template <> size_t Val<char>::tostring(char *string, size_t size) const{
 };
 
 template <> size_t Val<int8_t>::tostring(char *string, size_t size) const{
+	if(handler.text){
+		const char *s = handler.text->get(val);
+		if(s) strncpy(string, s, size);
+		return strlen(string);
+	}
 	return iprintval(string, size, handler.power, val);
 };
 
 template <> size_t Val<uint8_t>::tostring(char *string, size_t size) const{
+	if(handler.text){
+		const char *s = handler.text->get(val);
+		if(s) strncpy(string, s, size);
+		return strlen(string);
+	}
 	return uprintval(string, size, handler.power, val);
 };
 
 template <> size_t Val<int16_t>::tostring(char *string, size_t size) const{
+	if(handler.text){
+		const char *s = handler.text->get(val);
+		if(s) strncpy(string, s, size);
+		return strlen(string);
+	}
 	return iprintval(string, size, handler.power, val);
 };
 
 template <> size_t Val<uint16_t>::tostring(char *string, size_t size) const{
+	if(handler.text){
+		const char *s = handler.text->get(val);
+		if(s) strncpy(string, s, size);
+		return strlen(string);
+	}
 	return uprintval(string, size, handler.power, val);
 };
 
 template <> size_t Val<int32_t>::tostring(char *string, size_t size) const{
+	if(handler.text){
+		const char *s = handler.text->get(val);
+		if(s) strncpy(string, s, size);
+		return strlen(string);
+	}
 	return iprintval(string, size, handler.power, val);
 };
 
 template <> size_t Val<uint32_t>::tostring(char *string, size_t size) const{
+	if(handler.text){
+		const char *s = handler.text->get(val);
+		if(s) strncpy(string, s, size);
+		return strlen(string);
+	}
 	return uprintval(string, size, handler.power, val);
 };
 

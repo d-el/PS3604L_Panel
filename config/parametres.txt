@@ -1,13 +1,8 @@
 ﻿
-text(dvalue, value,
-	1: value1,
-	2: value2,
-	3: value3,
-	4: value4,
-	5: value5,
-	6: value6,
-	7: value7,
-	8: value8
+text(basemode, value,
+	0: Imax,
+	1: Limiting,
+	2: Unprotected
 	)
 
 text(dmask, mask,
@@ -20,40 +15,42 @@ text(dmask, mask,
 	)
 
 group(Debug, public)
-	p(d0		,""			,bool		,chmodRW	,NULL	,0	,0xFF00	,1			,0			,1			,1		,1			,0	,notsave)
-	p(d1		,""			,char		,chmodRW	,NULL	,0	,0xFF01	,48			,48			,90			,1		,1			,0	,notsave)
-	p(d2		,""			,int8_t		,chmodRW	,NULL	,0	,0xFF02	,5.5		,-5.5		,5.5		,0.1	,1			,1	,notsave)
-	p(d3		,""			,uint8_t	,chmodRW	,NULL	,0	,0xFF03	,5.5		,0			,25.5		,0.1	,1			,1	,notsave)
-	p(d4		,""			,int16_t	,chmodRW	,NULL	,0	,0xFF04	,-555.5		,-3276.8	,3276.7		,0.1	,1			,1	,notsave)
-	p(d5		,""			,uint16_t	,chmodRW	,NULL	,0	,0xFF05	,555.5		,0			,6553.5		,0.1	,1			,1	,notsave)
-	p(d6		,""			,int32_t	,chmodRW	,NULL	,0	,0xFF06	,-55555.5	,0			,6553.5		,0.1	,1			,1	,notsave)
-	p(d7		,""			,uint32_t	,chmodRW	,NULL	,0	,0xFF08	,55555.		,0			,6553.5		,0.1	,1			,1	,notsave)
-	p(d8		,""			,float		,chmodRW	,NULL	,0	,0xFF0A	,5.5555		,-10e6		,10e6		,0.01	,1			,0	,notsave)
+	p(d0			,""		,bool		,chmodRW	,NULL	,0	,0xFF00	,1			,0			,1			,1		,1			,0	,notsave)
+	p(d1			,""		,char		,chmodRW	,NULL	,0	,0xFF01	,48			,48			,90			,1		,1			,0	,notsave)
+	p(d2			,""		,int8_t		,chmodRW	,NULL	,0	,0xFF02	,5.5		,-5.5		,5.5		,0.1	,1			,1	,notsave)
+	p(d3			,""		,uint8_t	,chmodRW	,NULL	,0	,0xFF03	,5.5		,0			,25.5		,0.1	,1			,1	,notsave)
+	p(d4			,""		,int16_t	,chmodRW	,NULL	,0	,0xFF04	,-555.5		,-3276.8	,3276.7		,0.1	,1			,1	,notsave)
+	p(d5			,""		,uint16_t	,chmodRW	,NULL	,0	,0xFF05	,555.5		,0			,6553.5		,0.1	,1			,1	,notsave)
+	p(d6			,""		,int32_t	,chmodRW	,NULL	,0	,0xFF06	,-55555.5	,0			,6553.5		,0.1	,1			,1	,notsave)
+	p(d7			,""		,uint32_t	,chmodRW	,NULL	,0	,0xFF08	,55555.		,0			,6553.5		,0.1	,1			,1	,notsave)
+	p(d8			,""		,float		,chmodRW	,NULL	,0	,0xFF0A	,5.5555		,-10e6		,10e6		,0.01	,1			,0	,notsave)
 
 group(Settings, public)
-	p(utcTime	,""			,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0x58684680	,0x58684680	,0xFFFFFFFF	,86400	,1728000	,0	,notsave)
-	p(utcTime2	,""			,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0x58684680	,0x58684680	,0xFFFFFFFF	,86400	,1728000	,0	,notsave)
-	p(timezone	,""			,int8_t		,chmodRW	,NULL	,0	,0x0000	,0			,-12		,12			,1		,1			,0	,notsave)
-	p(startcnt	,""			,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,0xFFFFFFFF	,1		,1			,0	,saveuse)
-	p(brightness,""			,uint16_t	,chmodRW	,NULL	,0	,0x0000	,60.0		,10.0		,100.0		,1.0	,10.0		,1	,savesys)
-	p(ipadr,	""			,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0xC0A8010A	,0			,0xFFFFFFFF	,1		,1			,0	,savesys)
-	p(netmask,	""			,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0xC0A8010A	,0			,0xFFFFFF00	,1		,1			,0	,savesys)
-	p(gateway,	""			,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0xC0A8010A	,0			,0xC0A80101	,1		,1			,0	,savesys)
+	p(utcTime		,""		,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0x58684680	,0x58684680	,0xFFFFFFFF	,86400	,1728000	,0	,notsave)
+	p(utcTime2		,""		,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0x58684680	,0x58684680	,0xFFFFFFFF	,86400	,1728000	,0	,notsave)
+	p(timezone		,""		,int8_t		,chmodRW	,NULL	,0	,0x0000	,0			,-12		,12			,1		,1			,0	,notsave)
+	p(startcnt		,""		,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,0xFFFFFFFF	,1		,1			,0	,saveuse)
+	p(brightness	,""		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,60.0		,10.0		,100.0		,1.0	,10.0		,1	,savesys)
+	p(ipadr			,""		,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0xC0A8010A	,0			,0xFFFFFFFF	,1		,1			,0	,savesys)
+	p(netmask		,""		,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0xC0A8010A	,0			,0xFFFFFF00	,1		,1			,0	,savesys)
+	p(gateway		,""		,uint32_t	,chmodRW	,NULL	,0	,0x0000	,0xC0A8010A	,0			,0xC0A80101	,1		,1			,0	,savesys)
 
 group(Base, public)
-	p(baseu0	,"V"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
-	p(basei0	,"A"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
-	p(basem0	,""			,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
-	p(baseu1	,"V"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
-	p(basei1	,"A"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
-	p(basem1	,""			,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
-	p(baseu2	,"V"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
-	p(basei2	,"A"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
-	p(basem2	,""			,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
-	p(basepreset,""			,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
-	
+	p(baseu0		,"V"	,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
+	p(basei0		,"A"	,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
+	p(basemode0		,""		,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
+	p(baseu1		,"V"	,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
+	p(basei1		,"A"	,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
+	p(basemode1		,""		,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
+	p(baseu2		,"V"	,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
+	p(basei2		,"A"	,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
+	p(basemode2		,""		,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
+	p(basepreset	,""		,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,2			,1		,1			,0	,saveuse)
+
 group(Charger, public)
-	p(chargeru	,"V"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
-	p(chargeri	,"A"		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
-	p(chargerm	,""			,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,1			,1		,1			,0	,saveuse)
-	p(chargert	,""			,uint16_t	,chmodRW	,NULL	,0	,0x0000	,1			,1			,3600		,1		,60			,0	,saveuse)
+	p(chargeru		,"V"	,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,36.000		,0.010	,1.000		,3	,saveuse)
+	p(chargeri		,"A"	,uint16_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,4.000		,0.001	,0.500		,3	,saveuse)
+	p(chargermode	,""		,uint8_t	,chmodRW	,NULL	,0	,0x0000	,0			,0			,1			,1		,1			,0	,saveuse)
+	p(chargert		,""		,uint16_t	,chmodRW	,NULL	,0	,0x0000	,1			,1			,3600		,1		,60			,0	,saveuse)
+
+

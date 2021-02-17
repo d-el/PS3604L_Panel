@@ -32,9 +32,31 @@ enum Save: uint8_t{
 	saveuse
 };
 
-struct Text{
-	const int v;
-	const char *s;
+class IText{
+public:
+    virtual const char* get(int i) const = 0;
+};
+
+template<size_t n>
+class Text: public IText
+{
+public:
+    template <typename... Types>
+    constexpr Text(Types... ts) : textvalues{ { ts... } } {}
+
+    const char* get(int i) const {
+        for(auto &t : textvalues){
+            if(t.v == i) return t.t;
+        }
+        return nullptr;
+    }
+
+private:
+    struct TextVal{
+        int v;
+        const char *t;
+    };
+    const std::array<TextVal, n> textvalues;
 };
 
 template <class T> class ValHandler
@@ -44,7 +66,7 @@ public:
 			const char *_label, const char *_units,
 			T _def, T _min, T _max, T _step, T _bigstep,
 			uint16_t _addr, uint16_t _arg, uint16_t _power,
-			void (*_callback)(const ValHandler& prm, bool read, void *arg),
+			void (*_callback)(const ValHandler& prm, bool read, void *arg), const IText *_text,
 			Save _save) :
 		label(_label),
 		units(_units),
@@ -57,7 +79,8 @@ public:
 		arg(_arg),
 		power(_power),
 		save(_save),
-		callback(_callback)
+		callback(_callback),
+		text(_text)
 	{};
 
 	const char *label;
@@ -73,6 +96,7 @@ public:
 	const uint8_t power :4;
 	const Save save;
 	void (*callback)(const ValHandler& prm, bool read, void *arg);
+	const IText *text;
 };
 
 class IVal{
@@ -102,9 +126,10 @@ public:
 	}
 
 	void step(int32_t step){
-		val += handler.step * step;
-		if(val > handler.max) val = handler.max;
-		if(val < handler.min) val = handler.min;
+		auto result = val + handler.step * step;
+		if(step > 0 && result > handler.max) result = handler.max;
+		if(step < 0 && result < handler.min) result = handler.min;
+		val = result;
 	}
 
 	void bigstep(int32_t step){

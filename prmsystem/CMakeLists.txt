@@ -32,7 +32,7 @@ add_custom_target(prmsystemobj
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 	DEPENDS ${PARAMETER_FILE}
 	DEPENDS prmsytem2json
-	COMMENT "Generate parametrestype.h from parametres.h"
+	COMMENT "Generate prmsystem file"
 )
 
 add_custom_target(parameters.json

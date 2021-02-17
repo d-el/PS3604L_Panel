@@ -29,6 +29,7 @@
 #include "sysTimeMeas.h"
 #include "baseTSK.h"
 #include <prmSystem.h>
+#include <enco.h>
 
 /******************************************************************************
  * Memory
@@ -64,15 +65,15 @@ void baseTSK(void *pPrm){
 	char 					str[30];
 
 	Prm::IVal *parameters[VAR_NUMBER][NPRESET] = {
-		{ &Prm::baseu0, &Prm::basei0, &Prm::basem0 },
-		{ &Prm::baseu1, &Prm::basei1, &Prm::basem1 },
-		{ &Prm::baseu2, &Prm::basei2, &Prm::basem2 },
+		{ &Prm::baseu0, &Prm::basei0, &Prm::basemode0 },
+		{ &Prm::baseu1, &Prm::basei1, &Prm::basemode1 },
+		{ &Prm::baseu2, &Prm::basei2, &Prm::basemode2 },
 	};
 
 	disp_setColor(black, red);
 	disp_fillScreen(black);
 	ksSet(30, 5, kUp | kDown);
-	//prmEditorSetNtic(3);
+	enco_settic(3);
 
 	while(1){
 		regMeas_t regmeas = {};
@@ -125,10 +126,12 @@ void baseTSK(void *pPrm){
 				parameters[Prm::basepreset.val][varParam]->setdef();
 			}
 		}
-//
-//		/***************************************
-//		 * Encoder process
-//		 */
+
+		/***************************************
+		 * Encoder process
+		 */
+		int32_t step = enco_update();
+		parameters[Prm::basepreset.val][varParam]->step(step);
 //		sHandle = pHandle + (bs.curPreSet * 3) + varParam;
 //		if(bigstepUp != 0){
 //			status = prmEditorBigStepUp(sHandle);
@@ -148,7 +151,7 @@ void baseTSK(void *pPrm){
 //		}else if((status == enTransitionDown) || (status == enTransitionUp)){
 //			BeepTime(ui.beep.encoTransition.time, ui.beep.encoTransition.freq);
 //		}
-//
+
 //		/***************************************
 //		 * Task for regulator
 //		 */
@@ -180,9 +183,9 @@ void baseTSK(void *pPrm){
 		}*/
 
 		uint32_t measI = regmeas.current;
-		if(measI > 9999999){
+		/*if(measI > 9999999){
 			measI = 9999999;
-		}
+		}*/
 
 		/**************************************
 		 * Output data to display
@@ -191,7 +194,6 @@ void baseTSK(void *pPrm){
 		if(regenable){
 			snprintf(str, sizeof(str), "%02" PRIu32 ".%02" PRIu32 "0", measV / 1000, ((measV + 5) / 10) % 100);
 		}else{
-			//snprintf(str, sizeof(str), "%02"PRIu16".%02"PRIu16"0", bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u / 10 % 100);
 			parameters[Prm::basepreset.val][VAR_VOLT]->tostring(str, sizeof(str));
 		}
 		if(varParam == VAR_VOLT){
@@ -208,24 +210,24 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.current);
 		}
-//
-//		if(regenable){
-//			if(measI < 99000){
-//				snprintf(str, sizeof(str), "%02"PRIu32".%02"PRIu32, measI / 1000, (measI + 5) / 10 % 100);
-//				disp_putChar(150, 36, &font8x12, 'm');
-//				disp_putChar(150, 49, &font8x12, 'A');
-//			}else{
-//				snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32, measI / 1000000, (measI / 1000) % 1000);
-//				disp_putChar(150, 36, &font8x12, ' ');
-//				disp_putChar(150, 49, &font8x12, 'A');
-//			}
-//
-//		}else{
-//			strcpy(str, "--.---");
-//			disp_putChar(150, 36, &font8x12, ' ');
-//			disp_putChar(150, 49, &font8x12, 'A');
-//		}
-//		disp_putStr(16, 36, &dSegBold, 6, str);
+
+		if(regenable){
+			if(measI < 99000){
+				snprintf(str, sizeof(str), "%02" PRIu32 ".%02" PRIu32, measI / 1000, (measI + 5) / 10 % 100);
+				disp_putChar(150, 36, &font8x12, 'm');
+				disp_putChar(150, 49, &font8x12, 'A');
+			}else{
+				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000000, (measI / 1000) % 1000);
+				disp_putChar(150, 36, &font8x12, ' ');
+				disp_putChar(150, 49, &font8x12, 'A');
+			}
+
+		}else{
+			strcpy(str, "--.---");
+			disp_putChar(150, 36, &font8x12, ' ');
+			disp_putChar(150, 49, &font8x12, 'A');
+		}
+		disp_putStr(16, 36, &dSegBold, 6, str);
 
 		//Print current settings
 		switch(Prm::basepreset.val){
@@ -249,7 +251,6 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.imax);
 		}
-		//snprintf(str, sizeof(str), "%2"PRIu16".%03"PRIu16, bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
 		parameters[Prm::basepreset.val][VAR_CURR]->tostring(str, sizeof(str));
 		disp_putStr(16, 70, &arial, 0, str);
 		disp_putChar(64, 72, &font8x12, 'A');
@@ -260,25 +261,14 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.mode);
 		}
-//		if(bs.set[bs.curPreSet].mode == baseImax){
-//			disp_putStr(16, 88, &arial, 0, "I max");
-//		}
-//		if(bs.set[bs.curPreSet].mode == baseILimitation){
-//			disp_putStr(16, 88, &arial, 0, "Limiting");
-//		}
-//		if(bs.set[bs.curPreSet].mode == baseUnprotected){
-//			disp_putStr(16, 88, &arial, 0, "Unprotected");
-//		}
+		parameters[Prm::basepreset.val][VAR_MODE]->tostring(str, sizeof(str));
+		disp_putStr(16, 88, &arial, 0, str);
 
 		//Print line
 		grf_line(0, 107, 159, 107, halfLightGray);
 
 		//Print status bar
 		printStatusBar();
-//
-//		//Measure time
-//		sysTimeMeasStop(sysTimeBs);
-//		timebs_us = sysTimeMeasTo_us(sysTimeMeasGet_cycles(sysTimeBs));
 
 		disp_flushfill(&ui.color.background);
 

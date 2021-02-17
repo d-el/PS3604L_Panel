@@ -23,6 +23,8 @@ extern "C" {
  */
 void enco_init(void);
 int16_t enco_read(void);
+int32_t enco_update(void);
+void enco_settic(uint16_t n);
 
 #ifdef __cplusplus
 }
