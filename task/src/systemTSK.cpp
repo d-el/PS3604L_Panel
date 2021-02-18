@@ -32,7 +32,7 @@
 #include "ui.h"
 #include "regulatorConnTSK.h"
 #include "startupTSK.h"
-//#include "settingTSK.h"
+#include "settingTSK.h"
 #include "chargeTSK.h"
 #include "httpServerTSK.h"
 #include "baseTSK.h"
@@ -53,7 +53,6 @@ static uint8_t			shutdownFlag;
  */
 extern "C" int _write(int fd, const void *buf, size_t count);
 static void loadParameters(void);
-static void shutdown(void);
 static void pvdCallback(void);
 static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
 
@@ -112,7 +111,15 @@ void systemTSK(void *pPrm){
 		regMeas_t state;
 		bool regulatorConnected = reg_getState(&state);
 		if((regulatorConnected && state.state.m_lowInputVoltage) || shutdownFlag != 0){
-			shutdown();
+			P_LOGD(logTag, "System saveparameters");
+			saveparameters();
+			BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
+			LED_ON();
+			if(windowTskHandle != NULL){
+				vTaskDelete(windowTskHandle);	//Delete window
+			}
+			vTaskDelay(pdMS_TO_TICKS(10000));
+			NVIC_SystemReset();
 		}
 
 		if(selWindowPrev != fp.currentSelWindow){
@@ -128,15 +135,15 @@ void systemTSK(void *pPrm){
 				case startupWindow:
 					osres = xTaskCreate(startupTSK, "startupTSK", STARTUP_TSK_SZ_STACK, NULL, STARTUP_TSK_PRIO, &windowTskHandle);
 					break;
-				//case settingWindow:
-				//	osres = xTaskCreate(settingTSK, "settingTSK", SETT_TSK_SZ_STACK, NULL, SETT_TSK_PRIO, &windowTskHandle);
-				//	break;
+				case settingWindow:
+					osres = xTaskCreate(settingTSK, "settingTSK", SETT_TSK_SZ_STACK, NULL, SETT_TSK_PRIO, &windowTskHandle);
+					break;
 				case baseWindow:
 					osres = xTaskCreate(baseTSK, "baseTSK", BASE_TSK_SZ_STACK, NULL, BASE_TSK_PRIO, &windowTskHandle);
 					break;
-				//case chargerWindow:
-				//	osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
-				//	break;
+				case chargerWindow:
+					osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
+					break;
 				default:
 					osres = pdTRUE;
 					assert(!"Fail selector");
@@ -231,9 +238,7 @@ static void loadParameters(void){
 /*!****************************************************************************
  * @brief	Save parameters to memory
  */
-static void shutdown(void){
-	P_LOGD(logTag, "System shutdown");
-
+void saveparameters(void){
 	const uint16_t systemSettingsAddress = 0;
 	size_t size = Prm::getSerialSize(Prm::Save::savesys);
 	if(size){
@@ -249,14 +254,6 @@ static void shutdown(void){
 		Prm::serialize(Prm::Save::saveuse, buffer);
 		eep_write(userSettingsAddress, buffer, size);
 	}
-
-	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
-	LED_ON();
-	if(windowTskHandle != NULL){
-		vTaskDelete(windowTskHandle);	//Delete window
-	}
-	vTaskDelay(pdMS_TO_TICKS(10000));
-	NVIC_SystemReset();
 }
 
 /*!****************************************************************************

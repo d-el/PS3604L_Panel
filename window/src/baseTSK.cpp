@@ -32,42 +32,37 @@
 #include <enco.h>
 
 /******************************************************************************
- * Memory
- */
-//base_type	bs;
-//uint32_t 	timebs_us __attribute((used));
-
-/******************************************************************************
  * Base task
  */
 
-typedef enum {
+enum {
 	VAR_VOLT = 0,
 	VAR_CURR,
 	VAR_MODE,
 	VAR_NUMBER
-} baseVar_type;
-
-#define NPRESET (3)
+};
 
 void baseTSK(void *pPrm){
 	(void)pPrm;
-	TickType_t 				xLastWakeTime = xTaskGetTickCount();
-//	const prmHandle_type 	*sHandle = &prmh[NbsSet0u];
-//	const prmHandle_type 	*pHandle = &prmh[NbsSet0u];
-	uint8_t 				varParam = VAR_VOLT;
-//	uint32_t 				measV;	//[uV]
-//	uint32_t 				measI;	//[uA]
-//	uint8_t 				bigstepUp = 0;
-//	uint8_t 				bigstepDown = 0;
-//	uint8_t 				setDef = 0;
-//	prmEditorStatus_type 	status;
-	char 					str[30];
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	uint8_t varParam = VAR_VOLT;
+	char str[30];
 
-	Prm::IVal *parameters[VAR_NUMBER][NPRESET] = {
-		{ &Prm::baseu0, &Prm::basei0, &Prm::basemode0 },
-		{ &Prm::baseu1, &Prm::basei1, &Prm::basemode1 },
-		{ &Prm::baseu2, &Prm::basei2, &Prm::basemode2 },
+	struct BaeParameter{
+		union{
+			struct{
+				Prm::Val<uint16_t> *voltage;
+				Prm::Val<uint16_t> *current;
+				Prm::Val<uint8_t> *mode;
+			};
+			Prm::IVal *p[3];
+		};
+	};
+
+	const std::array<BaeParameter, 3> params = {
+			&Prm::baseu0, &Prm::basei0, &Prm::basemode0,
+			&Prm::baseu1, &Prm::basei1, &Prm::basemode1,
+			&Prm::baseu2, &Prm::basei2, &Prm::basemode2
 	};
 
 	disp_setColor(black, red);
@@ -94,7 +89,7 @@ void baseTSK(void *pPrm){
 				}
 			}else if(keyState(kMode)){
 				if(!regenable){
-//					selWindow(chargerWindow);
+					selWindow(chargerWindow);
 				}else{
 					BeepTime(ui.beep.error.time, ui.beep.error.freq);
 				}
@@ -119,60 +114,41 @@ void baseTSK(void *pPrm){
 					vTaskDelay(1000);
 				}
 			}else if(keyState(kUp)){
-				parameters[Prm::basepreset.val][varParam]->bigstep(1);
+				params[Prm::basepreset.val].p[varParam]->bigstep(1);
 			}else if(keyState(kDown)){
-				parameters[Prm::basepreset.val][varParam]->bigstep(-1);
+				params[Prm::basepreset.val].p[varParam]->bigstep(-1);
 			}else if(keyState(kZero)){
-				parameters[Prm::basepreset.val][varParam]->setdef();
+				params[Prm::basepreset.val].p[varParam]->setdef();
 			}
 		}
 
 		/***************************************
 		 * Encoder process
 		 */
-		int32_t step = enco_update();
-		parameters[Prm::basepreset.val][varParam]->step(step);
-//		sHandle = pHandle + (bs.curPreSet * 3) + varParam;
-//		if(bigstepUp != 0){
-//			status = prmEditorBigStepUp(sHandle);
-//			bigstepUp = 0;
-//		}else if(bigstepDown != 0){
-//			status = prmEditorBigStepDown(sHandle);
-//			bigstepDown = 0;
-//		}else if(setDef != 0){
-//			prmEditorWriteVal(sHandle, &(sHandle)->def);
-//			status = enCharge;
-//			setDef = 0;
-//		}else{
-//			status = prmEditorUpDate(sHandle);
-//		}
-//		if((status == enLimDown) || (status == enLimUp)){
-//			BeepTime(ui.beep.encoLim.time, ui.beep.encoLim.freq);
-//		}else if((status == enTransitionDown) || (status == enTransitionUp)){
-//			BeepTime(ui.beep.encoTransition.time, ui.beep.encoTransition.freq);
-//		}
+		params[Prm::basepreset.val].p[varParam]->step(enco_update());
 
-//		/***************************************
-//		 * Task for regulator
-//		 */
-//		reg_setVoltage(bs.set[bs.curPreSet].u * 1000);
-//		switch(bs.set[bs.curPreSet].mode){
-//			case (baseImax): {
-//				reg_setMode(reg_overcurrentShutdown);
-//				reg_setCurrent(bs.set[bs.curPreSet].i * 1000);
-//			}
-//				break;
-//			case (baseILimitation): {
-//				reg_setMode(reg_limitation);
-//				reg_setCurrent(bs.set[bs.curPreSet].i * 1000);
-//			}
-//				break;
-//			case (baseUnprotected): {
-//				reg_setMode(reg_limitation);
-//				reg_setCurrent(I_SHORT_CIRCUIT);
-//			}
-//				break;
-//		}
+		/***************************************
+		 * Task for regulator
+		 */
+
+		reg_setVoltage(params[Prm::basepreset.val].voltage->val * 1000);
+		uint32_t currentval = params[Prm::basepreset.val].current->val * 1000;
+		switch(params[Prm::basepreset.val].mode->val){
+			case Prm::mask_basemode::Imax:
+				reg_setMode(reg_overcurrentShutdown);
+				reg_setCurrent(currentval);
+				break;
+
+			case Prm::mask_basemode::Limiting:
+				reg_setMode(reg_limitation);
+				reg_setCurrent(currentval);
+				break;
+
+			case Prm::mask_basemode::Unprotected:
+				reg_setMode(reg_limitation);
+				reg_setCurrent(I_SHORT_CIRCUIT);
+				break;
+		}
 
 		/**************************************
 		 * Copy measure data
@@ -194,7 +170,7 @@ void baseTSK(void *pPrm){
 		if(regenable){
 			snprintf(str, sizeof(str), "%02" PRIu32 ".%02" PRIu32 "0", measV / 1000, ((measV + 5) / 10) % 100);
 		}else{
-			parameters[Prm::basepreset.val][VAR_VOLT]->tostring(str, sizeof(str));
+			params[Prm::basepreset.val].voltage->tostring(str, sizeof(str));
 		}
 		if(varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
@@ -251,7 +227,7 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.imax);
 		}
-		parameters[Prm::basepreset.val][VAR_CURR]->tostring(str, sizeof(str));
+		params[Prm::basepreset.val].current->tostring(str, sizeof(str));
 		disp_putStr(16, 70, &arial, 0, str);
 		disp_putChar(64, 72, &font8x12, 'A');
 
@@ -261,7 +237,7 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.mode);
 		}
-		parameters[Prm::basepreset.val][VAR_MODE]->tostring(str, sizeof(str));
+		params[Prm::basepreset.val].mode->tostring(str, sizeof(str));
 		disp_putStr(16, 88, &arial, 0, str);
 
 		//Print line

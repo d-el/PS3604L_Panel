@@ -69,6 +69,7 @@ void netSettingUpdate(void);
 void selWindow(selWindow_type window);
 void timezoneUpdate(void);
 void OSinit(void);
+void saveparameters(void);
 
 #endif //systemTSK_H
 /******************************** END OF FILE ********************************/

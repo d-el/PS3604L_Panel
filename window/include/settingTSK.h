@@ -13,29 +13,8 @@
  * Include
  */
 #include <stdint.h>
-#include "menuSystem.h"
+//#include "menuSystem.h"
 #include "time.h"
-
-/*!****************************************************************************
- * Typedef
- */
-typedef struct {
-	uint32_t u;
-	uint32_t i;
-	uint16_t dacu;
-	uint16_t daci;
-	uint16_t adcu;
-	uint16_t adci;
-	uint32_t measu;
-	uint32_t measi;
-	uint8_t calibratePoint;
-	time_t unixTime;	//At 00:00 hours, Jan 1, 1970 UTC
-} settingSct_type;
-
-/*!****************************************************************************
- * Exported variables
- */
-extern settingSct_type settingSct;
 
 /*!****************************************************************************
  * Function declaration
@@ -46,15 +25,15 @@ void settingTSK(void *pPrm);
 extern "C" {
 #endif
 
-itemState_type PrepareU(const menuItem_type *item);
-itemState_type PrepareI(const menuItem_type *item);
-itemState_type savePointU(const menuItem_type *item);
-itemState_type savePointI(const menuItem_type *item);
-itemState_type calibrExit(const menuItem_type *item);
-itemState_type setBright(const menuItem_type *item);
-itemState_type rtcSelect(const menuItem_type *item);
-itemState_type rtcUnselect(const menuItem_type *item);
-itemState_type netUpdate(const menuItem_type *item);
+//itemState_type PrepareU(const menuItem_type *item);
+//itemState_type PrepareI(const menuItem_type *item);
+//itemState_type savePointU(const menuItem_type *item);
+//itemState_type savePointI(const menuItem_type *item);
+//itemState_type calibrExit(const menuItem_type *item);
+//itemState_type setBright(const menuItem_type *item);
+//itemState_type rtcSelect(const menuItem_type *item);
+//itemState_type rtcUnselect(const menuItem_type *item);
+//itemState_type netUpdate(const menuItem_type *item);
 
 #ifdef __cplusplus
 }

@@ -281,11 +281,11 @@ int main(int argc, char *argv[]) {
 	if(mode == "type"){
 		// Mask
 		for(auto text = texts.begin(); text != texts.end(); text++){
-			out << "typedef enum {\n";
+			out << "enum mask_" << text->name << "{\n";
 			for(auto value = text->value.begin(); value != text->value.end(); value++){
 				out << "\t" << value->name << " = " << value->value << ",\n";
 			}
-			out << "} mask" << text->name << "_type;\n\n";
+			out << "};\n\n";
 		}
 
 		for(auto group = parameterstree.begin(); group != parameterstree.end(); group++){
