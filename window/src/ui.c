@@ -29,7 +29,7 @@ const ui_type ui = {
 
 	.beep = {
 		.welcome		= { 4100, 250 },
-		.goodbye		= { 4100, 50 },
+		.shutdown		= { 4100, 50 },
 		.key			= { 4100, 30 },
 		.vallim			= { 4100, 500 },
 		.cvToCc			= { 3000, 50 },

@@ -1,7 +1,7 @@
 ﻿/*!****************************************************************************
  * @file		crc.c
  * @author		d_el - Storozhenko Roman
- * @version		V2.0
+ * @version		V2.1
  * @date		12.12.2017
  * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
@@ -18,7 +18,7 @@
  * @param[in] len - number of bytes to calculate
  * @return CRC16 result
  */
-uint16_t crc16Calc(crc16Struct_type *dat, void *src, uint32_t len){
+uint16_t crc16Calc(crc16Struct_type *dat, const void *src, uint32_t len){
 	uint16_t	*table = dat->table;
 	uint16_t	crc = dat->initVal;
 	uint8_t		*pBuf = (uint8_t*)src;
@@ -42,7 +42,7 @@ uint16_t crc16Calc(crc16Struct_type *dat, void *src, uint32_t len){
  * @param[in] initVal - initial value
  * @return CRC16 result
  */
-uint16_t crc16CalcWithInit(crc16Struct_type *dat, void *src, uint32_t len, uint16_t initVal){
+uint16_t crc16CalcWithInit(crc16Struct_type *dat, const void *src, uint32_t len, uint16_t initVal){
 	uint16_t	*table = dat->table;
 	uint16_t	crc = initVal;
 	uint8_t		*pBuf = (uint8_t*)src;
@@ -65,7 +65,7 @@ uint16_t crc16CalcWithInit(crc16Struct_type *dat, void *src, uint32_t len, uint1
  * @param[in] len - number of bytes to calculate
  * @return CRC8 result
  */
-uint8_t crc8Calc(crc8Struct_type *dat, void *src, uint32_t len){
+uint8_t crc8Calc(crc8Struct_type *dat, const void *src, uint32_t len){
 	uint8_t	   *table = dat->table;
 	uint8_t		crc = dat->initVal;
 	uint8_t		*pBuf = (uint8_t*)src;

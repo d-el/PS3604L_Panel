@@ -67,9 +67,10 @@ extern frontPanel_type fp;
 void systemTSK(void *pPrm);
 void netSettingUpdate(void);
 void selWindow(selWindow_type window);
-void timezoneUpdate(void);
+void timezoneUpdate(int8_t timezone);
 void OSinit(void);
-void saveparameters(void);
+void saveparametersSystem(void);
+void saveparametersUser(void);
 
 #endif //systemTSK_H
 /******************************** END OF FILE ********************************/

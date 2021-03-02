@@ -192,7 +192,7 @@ public:
 IVal *getbyaddress(uint16_t address);
 size_t getSerialSize(Save save);
 bool serialize(Save save, uint8_t *dst);
-bool deserialize(Save save, const uint8_t *src);
+bool deserialize(Save save, const uint8_t *src, size_t size);
 
 #include "parameter.dcl"
 

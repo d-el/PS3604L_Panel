@@ -17,42 +17,21 @@
 
 namespace Menu {
 
-//typedef enum {
-//	menuItemOk,
-//	menuItemMessage,
-//	menuItemWarning,
-//	menuItemError
-//} menuItemState_type;
-//
-//typedef enum {
-//    menuItemUnselect,
-//    menuItemSelect,
-//    menuItemUnselectUnchangeable,
-//    menuItemSelectUnchangeable
-//} menuItemSelect_type;
-//
-//typedef union {
-//	struct {
-//		int16_t istext :1;
-//		chmodMenu_type chmod :2;
-//		int16_t pfParamert :4;
-//	} bit;
-//	int16_t all;
-//} menuFlags_type;
-
 struct ItemState{
 	bool state;
-	char *string;
+	const char *string;
 };
 
 class MenuItem{
 public:
 	using Callcack = ItemState (*)(const MenuItem*);
+	using Editor = ItemState (*)(const MenuItem* history[], uint8_t historyIndex);
 
 public:
-	constexpr MenuItem(const char *_label, Prm::IVal *_prm, bool _change, uint16_t _arg,
+	constexpr MenuItem(const char *_label, Prm::IVal*_prm, bool _change, uint16_t _arg,
 			Callcack _pChange, Callcack _pSelect, Callcack _pUnselect, Callcack _pPeriod,
-			const MenuItem* _next, const MenuItem* _previous, const MenuItem* _parent, const MenuItem* _child
+			const MenuItem* _next, const MenuItem* _previous, const MenuItem* _child,
+			Editor _editor = nullptr
 			):
 	label(_label),
 	prm(_prm),
@@ -64,8 +43,8 @@ public:
 	pPeriod(_pPeriod),
 	next(_next),
 	previous(_previous),
-	parent(_parent),
-	child(_child)
+	child(_child),
+	editor(_editor)
 	{};
 
 public:
@@ -81,11 +60,14 @@ public:
 
 	const MenuItem* next;
 	const MenuItem* previous;
-	const MenuItem* parent;
 	const MenuItem* child;
+
+	const Editor editor;
 };
 
 bool run(const MenuItem *m);
+ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex);
+ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex);
 
 };
 

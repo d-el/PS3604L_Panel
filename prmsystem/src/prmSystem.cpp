@@ -19,13 +19,9 @@
 
 namespace Prm {
 
-/*!****************************************************************************
- * MEMORY
- */
+using crc_t = uint16_t;
+constexpr uint16_t magic = 0x2805;
 
-void callback1(const ValHandler<int16_t>& prm, bool read, void *arg){
-	prm.label;
-}
 
 #include "parameter.def"
 
@@ -45,20 +41,30 @@ size_t getSerialSize(Save save){
 			size += p->getsize();
 		}
 	}
-	return size;
+	return size + sizeof(magic) + sizeof(crc_t);
 }
 
 bool serialize(Save save, uint8_t *dst){
+	const uint8_t *dstentry = dst;
+	memcpy(dst, &magic, sizeof(magic));
+	dst += sizeof(magic);
 	for(auto *p : valuearray){
 		if(save == p->getsave()){
 			p->serialize(dst);
 			dst += p->getsize();
 		}
 	}
+	crc_t crc = crc16Calc(&crcModBus, dstentry, dst - dstentry);
+	memcpy(dst, &crc, sizeof(crc));
 	return true;
 }
 
-bool deserialize(Save save, const uint8_t *src){
+bool deserialize(Save save, const uint8_t *src, size_t size){
+	std::remove_cv_t<decltype(magic)> readmagic;
+	memcpy(&readmagic, src, sizeof(readmagic));
+	if(readmagic != magic) return false;
+	if(crc16Calc(&crcModBus, src, size)) return false;
+	src += sizeof(magic);
 	for(auto *p : valuearray){
 		if(save == p->getsave()){
 			p->deserialize(src);

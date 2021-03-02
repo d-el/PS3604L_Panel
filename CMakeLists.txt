@@ -31,8 +31,7 @@ set(CMAKE_CXX_FLAGS "${CPUFLAGS} ${COMMONFLAGS} -fno-rtti -fno-exceptions")
 set(CMAKE_C_FLAGS "${CPUFLAGS} ${COMMONFLAGS}")
 
 set(FUSED "\
-	-u _IQ14mpy \
-	-u _IQ14div \
+	-u HardFault_Handler \
 	")
 
 set(CMAKE_EXE_LINKER_FLAGS "\

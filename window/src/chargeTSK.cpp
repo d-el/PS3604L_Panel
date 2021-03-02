@@ -55,10 +55,10 @@ void chargeTSK(void *pPrm){
 	struct BaeParameter{
 		union{
 			struct{
-				Prm::Val<uint16_t> *voltage;
-				Prm::Val<uint16_t> *current;
-				Prm::Val<uint16_t> *time;
-				Prm::Val<uint8_t> *mode;
+				const Prm::Val<uint16_t> *voltage;
+				const Prm::Val<uint16_t> *current;
+				const Prm::Val<uint16_t> *time;
+				const Prm::Val<uint8_t> *mode;
 			};
 			Prm::IVal *p[4];
 		};

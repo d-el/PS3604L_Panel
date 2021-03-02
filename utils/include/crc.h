@@ -1,7 +1,7 @@
 ﻿/*!****************************************************************************
  * @file		crc.h
  * @author		d_el - Storozhenko Roman
- * @version		V2.0
+ * @version		V2.1
  * @date		12.12.2017
  * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
  */
@@ -52,9 +52,9 @@ extern crc8Struct_type crc1Wire;
 /*!****************************************************************************
  * Function declaration
  */
-uint16_t crc16Calc(crc16Struct_type *dat, void *src, uint32_t len);
-uint16_t crc16CalcWithInit(crc16Struct_type *dat, void *src, uint32_t len, uint16_t initVal);
-uint8_t crc8Calc(crc8Struct_type *dat, void *src, uint32_t len);
+uint16_t crc16Calc(crc16Struct_type *dat, const void *src, uint32_t len);
+uint16_t crc16CalcWithInit(crc16Struct_type *dat, const void *src, uint32_t len, uint16_t initVal);
+uint8_t crc8Calc(crc8Struct_type *dat, const void *src, uint32_t len);
 
 #ifdef __cplusplus
 }

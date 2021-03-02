@@ -16,27 +16,17 @@ extern "C" {
 /*!****************************************************************************
  * Include
  */
-#include "time.h"
-#include "stdint.h"
-
-/*!****************************************************************************
- * Typedef
- */
-typedef enum {
-	rtc_Ok,
-	rtc_wasOn,
-	rtc_initOk,
-	rtc_setOk,
-	rtc_error,
-} rtcStatus_type;
+#include <time.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 /*!****************************************************************************
  * Function declaration
  */
-rtcStatus_type rtc_init(void);
-rtcStatus_type rtc_setTime(const struct tm *t);
-rtcStatus_type rtc_setTimeUnix(time_t time);
-rtcStatus_type rtc_setTimeUnixLocal(time_t time);
+bool rtc_init(void);
+bool rtc_setTime(const struct tm *t);
+bool rtc_setTimeUnix(time_t time);
+bool rtc_setTimeUnixLocal(time_t time);
 
 #ifdef __cplusplus
 }
