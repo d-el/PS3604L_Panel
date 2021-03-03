@@ -93,7 +93,7 @@ void _error_print(modbus_t *ctx, const char *context)
 
 static void _sleep_response_timeout(modbus_t *ctx)
 {
-
+	(void)ctx;
 }
 
 int modbus_flush(modbus_t *ctx)

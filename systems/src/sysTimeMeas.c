@@ -56,9 +56,8 @@ uint64_t sysTimeMeasTo_ms(uint64_t cycles){
  * @param[in] 	cycles - time in counter cycles
  * @return		time in microseconds
  */
-#warning
 uint64_t sysTimeMeasTo_us(uint64_t cycles){
-	return  0;//(cycles * 1000000) / CORE_FREQUENCY;
+	return  (cycles * 1000000) / CORE_FREQUENCY;
 }
 
 /******************************** END OF FILE ********************************/

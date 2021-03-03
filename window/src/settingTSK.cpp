@@ -58,10 +58,12 @@ ItemState PrepareU(const MenuItem* m){
 	static uint32_t pointU[4] = { 10000, 100000, 19000000, 30000000 };
 	Prm::point.val = m->arg;
 	Prm::Ureal.val = pointU[Prm::point.val];
-	bool regstate = reg_setDacCurrent(2048);
-	reg_setDacVoltage(Prm::Ureal.val);
+	Prm::Udac.val = 0;
+	Prm::Idac.val = 2048;
 	reg_setMode(reg_raw);
 	reg_setEnable(true);
+	reg_setDacCurrent(Prm::Idac.val);
+	bool regstate = reg_setDacVoltage(Prm::Udac.val);
 	if(regstate){
 		return ItemState { true, "" };
 	}else{
@@ -76,10 +78,12 @@ ItemState PrepareI(const MenuItem* m){
 	static uint32_t pointI[4] = { 10000, 100000, 1500000, 3000000 };
 	Prm::point.val = m->arg;
 	Prm::Ireal.val = pointI[Prm::point.val];
-	reg_setDacCurrent(Prm::Ireal.val);
-	bool regstate = reg_setDacVoltage(2048);
+	Prm::Udac.val = 2048;
+	Prm::Idac.val = 0;
 	reg_setMode(reg_raw);
 	reg_setEnable(true);
+	reg_setDacCurrent(Prm::Idac.val);
+	bool regstate = reg_setDacVoltage(Prm::Udac.val);
 	if(regstate){
 		return ItemState { true, "" };
 	}else{

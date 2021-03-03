@@ -281,7 +281,10 @@ bool run(const MenuItem *m){
 
 		if(m->change){
 			auto step = enco_update();
-			if(m->prm) m->prm->step(step);
+			if(step && m->prm){
+				m->prm->step(step);
+				change = true;
+			}
 		}
 
 		if(change) callChanges(m);

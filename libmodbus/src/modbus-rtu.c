@@ -133,6 +133,7 @@ static uint16_t crc16(uint8_t *buffer, uint16_t buffer_length)
 
 static int _modbus_rtu_prepare_response_tid(const uint8_t *req, int *req_length)
 {
+	(void)req;
     (*req_length) -= _MODBUS_RTU_CHECKSUM_LENGTH;
     /* No TID */
     return 0;
@@ -149,6 +150,7 @@ static int _modbus_rtu_send_msg_pre(uint8_t *req, int req_length)
 
 static ssize_t _modbus_rtu_send(modbus_t *ctx, const uint8_t *req, int req_length)
 {
+	(void)ctx;
 	return modbus_serial_send(req, req_length);
 }
 
@@ -193,6 +195,7 @@ static int _modbus_rtu_flush(modbus_t *);
 static int _modbus_rtu_pre_check_confirmation(modbus_t *ctx, const uint8_t *req,
                                               const uint8_t *rsp, int rsp_length)
 {
+	(void)rsp_length;
     /* Check responding slave is the slave we requested (except for broacast
      * request) */
     if (req[0] != rsp[0] && req[0] != MODBUS_BROADCAST_ADDRESS) {
@@ -277,6 +280,7 @@ int modbus_rtu_get_rts(modbus_t *ctx)
 
 int modbus_rtu_set_rts(modbus_t *ctx, int mode)
 {
+	(void)mode;
     if (ctx == NULL) {
         libmodbuserrno = EINVAL;
         return -1;
@@ -300,12 +304,17 @@ static void _modbus_rtu_close(modbus_t *ctx)
 
 static int _modbus_rtu_flush(modbus_t *ctx)
 {
+	(void)ctx;
     return 0;
 }
 
 static int _modbus_rtu_select(modbus_t *ctx, fd_set *rset,
                               struct timeval *tv, int length_to_read)
 {
+	(void)ctx;
+	(void)rset;
+	(void)tv;
+	(void)length_to_read;
     return 0;
 }
 
@@ -314,7 +323,6 @@ static void _modbus_rtu_free(modbus_t *ctx) {
         //free(((modbus_rtu_t *)ctx->backend_data)->device);
         //free(ctx->backend_data);
     }
-
     //free(ctx);
 }
 

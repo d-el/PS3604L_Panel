@@ -167,11 +167,8 @@ void baseTSK(void *pPrm){
 		 * Output data to display
 		 */
 		//Print voltage
-		if(regenable){
-			snprintf(str, sizeof(str), "%02" PRIu32 ".%02" PRIu32 "0", measV / 1000, ((measV + 5) / 10) % 100);
-		}else{
-			params[Prm::basepreset.val].voltage->tostring(str, sizeof(str));
-		}
+		uint32_t viewvoltage = regenable ? measV : params[Prm::basepreset.val].voltage->val;
+		snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, viewvoltage / 1000, viewvoltage % 1000);
 		if(varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
 		}else{
@@ -189,7 +186,7 @@ void baseTSK(void *pPrm){
 
 		if(regenable){
 			if(measI < 99000){
-				snprintf(str, sizeof(str), "%02" PRIu32 ".%02" PRIu32, measI / 1000, (measI + 5) / 10 % 100);
+				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000, measI % 1000);
 				disp_putChar(150, 36, &font8x12, 'm');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}else{
@@ -279,8 +276,7 @@ void printStatusBar(void){
 	}
 	ovfCurrent = regmeas.state.m_overCurrent;
 
-	//if(regmeas.state.m_errorTemperatureSensor || regmeas.state.m_overheated || regmeas.state.m_reverseVoltage || !regstate){
-	if(0){
+	if(regmeas.state.m_errorTemperatureSensor || regmeas.state.m_overheated || regmeas.state.m_reverseVoltage || !regstate){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
 		if(errPrev == 0){

@@ -75,7 +75,7 @@ int32_t enco_update(void){
 			step = step * 5; //Accelerator
 		}
 		ntic = 0;
-		return -step;
+		return step;
 	}else{
 		ntic++;
 	}

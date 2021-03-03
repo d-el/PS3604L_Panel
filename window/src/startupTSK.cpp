@@ -57,9 +57,9 @@ void startupTSK(void *pPrm){
 
 		for(uint16_t i = 0; i < Prm::brightness.val * 10; i++){
 			setLcdBrightness(i);
-			vTaskDelay(pdMS_TO_TICKS(3));
+			vTaskDelay(pdMS_TO_TICKS(2));
 		}
-		vTaskDelay(pdMS_TO_TICKS(500));
+		vTaskDelay(pdMS_TO_TICKS(150));
 
 		//Run key process
 		for(uint32_t cnt = 0; cnt < KEY_SAMPLES * 2; cnt++){
