@@ -42,7 +42,7 @@ typedef struct {
 
 typedef struct {
 	beepmem_type welcome;
-	beepmem_type goodbye;
+	beepmem_type shutdown;
 	beepmem_type key;
 	beepmem_type vallim;
 	beepmem_type cvToCc;

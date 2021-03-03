@@ -14,29 +14,24 @@
 #include <stdio.h>
 #include <FreeRTOS.h>
 #include <task.h>
-#include "display.h"
-#include "ledpwm.h"
-#include "key.h"
-#include "board.h"
-#include "beep.h"
+#include <display.h>
+#include <ledpwm.h>
+#include <key.h>
+#include <board.h>
+#include <beep.h>
+#include <version.h>
+#include <systemTSK.h>
+#include <prmSystem.h>
 #include "ui.h"
-#include "version.h"
-#include "systemTSK.h"
-
-/*!****************************************************************************
- * MEMORY
- */
-uint32_t startCounter;	///< Device start counter
 
 /*!****************************************************************************
  * @brief	GUI invitation program task
  */
 void startupTSK(void *pPrm){
 	(void)pPrm;
-	char str[30];
 
 	while(1){
-		startCounter++;
+		Prm::startcnt.val++;
 
 		//Start Beep
 		BeepTime(ui.beep.welcome.time, ui.beep.welcome.freq);
@@ -48,26 +43,23 @@ void startupTSK(void *pPrm){
 		disp_fillScreen(black);
 		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, &ImageLogo);  //Logo
 
+		char str[30];
 		if(fp.state.sysSettingLoadDefault == 0){
-			sprintf(str, "COUNT %"PRIu32, startCounter);
+			sprintf(str, "COUNT %" PRIu32, Prm::startcnt.val);
 		}else{
 			sprintf(str, "COUNT -");
 		}
 
 		disp_putStr(00, 70, &arial, 0, str);
 		disp_putStr(0, 90, &arial, 0, fwinfoVersion);
-		disp_putStr(0, 110, &arial, 0, "2012 - 2020");
+		disp_putStr(0, 110, &arial, 0, "2012 - 2021");
 		disp_flush();
 
-		if(fp.fpSettings.lcdLight < 10){
-			fp.fpSettings.lcdLight = 10;
-		}
-		for(uint16_t i = 0; i < fp.fpSettings.lcdLight; i++){
+		for(uint16_t i = 0; i < Prm::brightness.val * 10; i++){
 			setLcdBrightness(i);
 			vTaskDelay(pdMS_TO_TICKS(3));
 		}
-		vTaskDelay(pdMS_TO_TICKS(150));
-		setLcdBrightness(fp.fpSettings.lcdLight);
+		vTaskDelay(pdMS_TO_TICKS(500));
 
 		//Run key process
 		for(uint32_t cnt = 0; cnt < KEY_SAMPLES * 2; cnt++){

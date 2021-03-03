@@ -9,6 +9,10 @@
 #ifndef e24AAxx_H
 #define e24AAxx_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
 * Include
 */
@@ -54,19 +58,15 @@ typedef union{
 }eepAddress_type;
 
 /*!****************************************************************************
-* External variables
-*/
-
-/*!****************************************************************************
-* Macro functions
-*/
-
-/*!****************************************************************************
 * Prototypes for the functions
 */
 void eep_init(void);
 eepStatus_type eep_write(uint16_t dst, void *src, uint16_t len);
 eepStatus_type eep_read(void *dst, uint16_t src, uint16_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //e24AAxx_H
 /******************************** END OF FILE ********************************/

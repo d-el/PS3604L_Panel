@@ -9,6 +9,10 @@
 #ifndef uartTSK_H
 #define uartTSK_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -90,6 +94,10 @@ bool reg_setCurrentPoint(uint32_t uA, uint8_t number);
 bool reg_getTarget(regTarget_t *target);
 bool reg_getEnable(bool *state);
 bool reg_getState(regMeas_t *state);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //uartTSK_H
 /******************************** END OF FILE ********************************/

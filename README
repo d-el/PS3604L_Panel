@@ -3,5 +3,5 @@ MCU: STM32F407VG.
 
 mkdir build
 cd build
-cmake ..
+cmake .. -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake
 make -j8

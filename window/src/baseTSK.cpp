@@ -22,44 +22,55 @@
 #include "rtc.h"
 #include "beep.h"
 #include "key.h"
-#include "prmEditor.h"
 #include "display.h"
 #include "graphics.h"
 #include "systemTSK.h"
 #include "regulatorConnTSK.h"
 #include "sysTimeMeas.h"
 #include "baseTSK.h"
-
-/******************************************************************************
- * Memory
- */
-base_type	bs;
-uint32_t 	timebs_us __attribute((used));
+#include <prmSystem.h>
+#include <enco.h>
 
 /******************************************************************************
  * Base task
  */
+
+enum {
+	VAR_VOLT = 0,
+	VAR_CURR,
+	VAR_MODE,
+	VAR_NUMBER
+};
+
 void baseTSK(void *pPrm){
 	(void)pPrm;
-	TickType_t 				xLastWakeTime = xTaskGetTickCount();
-	const prmHandle_type 	*sHandle = &prmh[NbsSet0u];
-	const prmHandle_type 	*pHandle = &prmh[NbsSet0u];
-	baseVar_type 			varParam = VAR_VOLT;
-	uint32_t 				measV;	//[uV]
-	uint32_t 				measI;	//[uA]
-	uint8_t 				bigstepUp = 0;
-	uint8_t 				bigstepDown = 0;
-	uint8_t 				setDef = 0;
-	prmEditorStatus_type 	status;
-	char 					str[30];
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	uint8_t varParam = VAR_VOLT;
+	char str[30];
+
+	struct BaeParameter{
+		union{
+			struct{
+				const Prm::Val<uint16_t> *voltage;
+				const Prm::Val<uint16_t> *current;
+				const Prm::Val<uint8_t> *mode;
+			};
+			Prm::IVal *p[3];
+		};
+	};
+
+	const std::array<BaeParameter, 3> params = {
+			&Prm::baseu0, &Prm::basei0, &Prm::basemode0,
+			&Prm::baseu1, &Prm::basei1, &Prm::basemode1,
+			&Prm::baseu2, &Prm::basei2, &Prm::basemode2
+	};
 
 	disp_setColor(black, red);
 	disp_fillScreen(black);
 	ksSet(30, 5, kUp | kDown);
-	prmEditorSetNtic(3);
+	enco_settic(3);
 
 	while(1){
-		sysTimeMeasStart(sysTimeBs);
 		regMeas_t regmeas = {};
 		reg_getState(&regmeas);
 		bool regenable = false;
@@ -73,7 +84,7 @@ void baseTSK(void *pPrm){
 
 			if(keyState(kSet)){
 				varParam++;
-				if(varParam >= 3){
+				if(varParam >= VAR_NUMBER){
 					varParam = VAR_VOLT;
 				}
 			}else if(keyState(kMode)){
@@ -84,10 +95,10 @@ void baseTSK(void *pPrm){
 				}
 			}else if(keyState(kView)){					//Next preset
 				if(!regenable){
-					bs.curPreSet++;
-					if(bs.curPreSet >= NPRESET){
-						bs.curPreSet = 0;
-					}
+					if(Prm::basepreset.val < VAR_MODE)
+						Prm::basepreset.val++;
+					else
+						Prm::basepreset.val = 0;
 				}else{
 					BeepTime(ui.beep.error.time, ui.beep.error.freq);
 				}
@@ -103,80 +114,63 @@ void baseTSK(void *pPrm){
 					vTaskDelay(1000);
 				}
 			}else if(keyState(kUp)){
-				bigstepUp = 1;
+				params[Prm::basepreset.val].p[varParam]->bigstep(1);
 			}else if(keyState(kDown)){
-				bigstepDown = 1;
+				params[Prm::basepreset.val].p[varParam]->bigstep(-1);
 			}else if(keyState(kZero)){
-				setDef = 1;
+				params[Prm::basepreset.val].p[varParam]->setdef();
 			}
 		}
 
 		/***************************************
 		 * Encoder process
 		 */
-		sHandle = pHandle + (bs.curPreSet * 3) + varParam;
-		if(bigstepUp != 0){
-			status = prmEditorBigStepUp(sHandle);
-			bigstepUp = 0;
-		}else if(bigstepDown != 0){
-			status = prmEditorBigStepDown(sHandle);
-			bigstepDown = 0;
-		}else if(setDef != 0){
-			prmEditorWriteVal(sHandle, &(sHandle)->def);
-			status = enCharge;
-			setDef = 0;
-		}else{
-			status = prmEditorUpDate(sHandle);
-		}
-		if((status == enLimDown) || (status == enLimUp)){
-			BeepTime(ui.beep.encoLim.time, ui.beep.encoLim.freq);
-		}else if((status == enTransitionDown) || (status == enTransitionUp)){
-			BeepTime(ui.beep.encoTransition.time, ui.beep.encoTransition.freq);
-		}
+		params[Prm::basepreset.val].p[varParam]->step(enco_update());
 
 		/***************************************
 		 * Task for regulator
 		 */
-		reg_setVoltage(bs.set[bs.curPreSet].u * 1000);
-		switch(bs.set[bs.curPreSet].mode){
-			case (baseImax): {
+
+		reg_setVoltage(params[Prm::basepreset.val].voltage->val * 1000);
+		uint32_t currentval = params[Prm::basepreset.val].current->val * 1000;
+		switch(params[Prm::basepreset.val].mode->val){
+			case Prm::mask_basemode::Imax:
 				reg_setMode(reg_overcurrentShutdown);
-				reg_setCurrent(bs.set[bs.curPreSet].i * 1000);
-			}
+				reg_setCurrent(currentval);
 				break;
-			case (baseILimitation): {
+
+			case Prm::mask_basemode::Limiting:
 				reg_setMode(reg_limitation);
-				reg_setCurrent(bs.set[bs.curPreSet].i * 1000);
-			}
+				reg_setCurrent(currentval);
 				break;
-			case (baseUnprotected): {
+
+			case Prm::mask_basemode::Unprotected:
 				reg_setMode(reg_limitation);
 				reg_setCurrent(I_SHORT_CIRCUIT);
-			}
 				break;
 		}
 
 		/**************************************
 		 * Copy measure data
 		 */
-		measV = (regmeas.voltage + 500) / 1000; // uV to mV
+		uint32_t measV = (regmeas.voltage + 500) / 1000; // uV to mV
 		/*if(measV > 99999999){
 			measV = 99999999;
 		}*/
 
-		measI = regmeas.current;
-		if(measI > 9999999){
+		uint32_t measI = regmeas.current;
+		/*if(measI > 9999999){
 			measI = 9999999;
-		}
+		}*/
 
 		/**************************************
 		 * Output data to display
 		 */
 		//Print voltage
 		if(regenable){
-			snprintf(str, sizeof(str), "%02"PRIu32".%02"PRIu32"0", measV / 1000, ((measV + 5) / 10) % 100);
+			snprintf(str, sizeof(str), "%02" PRIu32 ".%02" PRIu32 "0", measV / 1000, ((measV + 5) / 10) % 100);
 		}else{
-			snprintf(str, sizeof(str), "%02"PRIu16".%02"PRIu16"0", bs.set[bs.curPreSet].u / 1000, bs.set[bs.curPreSet].u / 10 % 100);
+			params[Prm::basepreset.val].voltage->tostring(str, sizeof(str));
 		}
 		if(varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
@@ -195,11 +189,11 @@ void baseTSK(void *pPrm){
 
 		if(regenable){
 			if(measI < 99000){
-				snprintf(str, sizeof(str), "%02"PRIu32".%02"PRIu32, measI / 1000, (measI + 5) / 10 % 100);
+				snprintf(str, sizeof(str), "%02" PRIu32 ".%02" PRIu32, measI / 1000, (measI + 5) / 10 % 100);
 				disp_putChar(150, 36, &font8x12, 'm');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}else{
-				snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32, measI / 1000000, (measI / 1000) % 1000);
+				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000000, (measI / 1000) % 1000);
 				disp_putChar(150, 36, &font8x12, ' ');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}
@@ -212,7 +206,7 @@ void baseTSK(void *pPrm){
 		disp_putStr(16, 36, &dSegBold, 6, str);
 
 		//Print current settings
-		switch(bs.curPreSet){
+		switch(Prm::basepreset.val){
 			case 0:
 				grf_fillRect(0, 104, 53, 3, white);
 				grf_fillRect(105, 104, 55, 3, black);
@@ -233,7 +227,7 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.imax);
 		}
-		snprintf(str, sizeof(str), "%2"PRIu16".%03"PRIu16, bs.set[bs.curPreSet].i / 1000, bs.set[bs.curPreSet].i % 1000);
+		params[Prm::basepreset.val].current->tostring(str, sizeof(str));
 		disp_putStr(16, 70, &arial, 0, str);
 		disp_putChar(64, 72, &font8x12, 'A');
 
@@ -243,25 +237,14 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.mode);
 		}
-		if(bs.set[bs.curPreSet].mode == baseImax){
-			disp_putStr(16, 88, &arial, 0, "I max");
-		}
-		if(bs.set[bs.curPreSet].mode == baseILimitation){
-			disp_putStr(16, 88, &arial, 0, "Limiting");
-		}
-		if(bs.set[bs.curPreSet].mode == baseUnprotected){
-			disp_putStr(16, 88, &arial, 0, "Unprotected");
-		}
+		params[Prm::basepreset.val].mode->tostring(str, sizeof(str));
+		disp_putStr(16, 88, &arial, 0, str);
 
 		//Print line
 		grf_line(0, 107, 159, 107, halfLightGray);
 
 		//Print status bar
 		printStatusBar();
-
-		//Measure time
-		sysTimeMeasStop(sysTimeBs);
-		timebs_us = sysTimeMeasTo_us(sysTimeMeasGet_cycles(sysTimeBs));
 
 		disp_flushfill(&ui.color.background);
 
@@ -296,7 +279,8 @@ void printStatusBar(void){
 	}
 	ovfCurrent = regmeas.state.m_overCurrent;
 
-	if(regmeas.state.m_errorTemperatureSensor || regmeas.state.m_overheated || regmeas.state.m_reverseVoltage || !regstate){
+	//if(regmeas.state.m_errorTemperatureSensor || regmeas.state.m_overheated || regmeas.state.m_reverseVoltage || !regstate){
+	if(0){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
 		if(errPrev == 0){
@@ -323,7 +307,7 @@ void printStatusBar(void){
 		disp_setColor(black, white);
 
 		//Print output power
-		snprintf(str, sizeof(str), "%02"PRIu32".%03"PRIu32" W", regmeas.power / 1000, regmeas.power % 1000);
+		snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32 " W", regmeas.power / 1000, regmeas.power % 1000);
 		disp_putStr(0, 110, &font6x8, 0, str);
 
 		//Print load resistance
@@ -340,7 +324,7 @@ void printStatusBar(void){
 		}
 
 		//Print regulator temperature
-		snprintf(str, sizeof(str), "%02"PRIu16".%"PRIu16"\xB0\x43", regmeas.temperature / 10, regmeas.temperature % 10);
+		snprintf(str, sizeof(str), "%02" PRIu16 ".%" PRIu16 "\xB0\x43", regmeas.temperature / 10, regmeas.temperature % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
 		//Print time
@@ -383,4 +367,4 @@ void printStatusBar(void){
 	}
 }
 
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

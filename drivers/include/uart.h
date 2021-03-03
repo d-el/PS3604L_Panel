@@ -10,6 +10,10 @@
 #ifndef UART_H
 #define UART_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -53,10 +57,6 @@
 #define		UART4_PINAFRX				(8)
 #define		UART4_HALFDUPLEX			(0)
 #define		UART4_RX_IDLE_LINE_MODE		(1)
-
-/*!****************************************************************************
- * Enumeration
- */
 
 /******************************************************************************
  * Typedef
@@ -131,6 +131,10 @@ void uart_setCallback(uart_type *uartx, uartCallback_type txHoock, uartCallback_
 void uart_write(uart_type *uartx, void const *src, uint16_t len);
 void uart_read(uart_type *uartx, void *dst, uint16_t len);
 void uart_stopRead(uart_type *uartStruct);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //UART_H
 /******************************** END OF FILE ********************************/

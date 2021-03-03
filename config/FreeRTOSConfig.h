@@ -140,7 +140,7 @@ unsigned long vGetTimerForRunTimeStats(void);
 #define BASE_TSK_SZ_STACK		512
 #define CHARG_TSK_SZ_STACK		512
 #define OSMONITOR_TSK_SZ_STACK	512
-#define SETT_TSK_SZ_STACK		512
+#define SETT_TSK_SZ_STACK		1024
 
 #endif /* FREERTOS_CONFIG_H */
 /*************** LGPL ************** END OF FILE *********** D_EL ************/

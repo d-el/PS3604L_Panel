@@ -1,24 +1,8 @@
 cmake_minimum_required(VERSION 3.6)
 
-PROJECT(PS3604LF CXX C ASM)
+project(PS3604LF CXX C)
 set(CMAKE_CXX_STANDARD 17)
-
-SET(CMAKE_CROSSCOMPILING TRUE)
-set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_SYSTEM_PROCESSOR ARM)
-
-set(CMAKE_ASM_COMPILER  arm-none-eabi-gcc)
-set(CMAKE_C_COMPILER    arm-none-eabi-gcc)
-set(CMAKE_CXX_COMPILER  arm-none-eabi-g++)
-set(CMAKE_OBJCOPY		arm-none-eabi-objcopy)
-set(CMAKE_SIZE			arm-none-eabi-size)
-
-set(AR                  arm-none-eabi-ar)
-set(OBJCOPY             arm-none-eabi-objcopy)
-set(OBJDUMP             arm-none-eabi-objdump)
-set(SIZE                arm-none-eabi-size)
-set(GDB                 arm-none-eabi-gdb)
-set(SIZE                arm-none-eabi-size)
+set(CMAKE_C_STANDARD 11)
 
 set(CPUFLAGS "\
 	-mcpu=cortex-m4 \
@@ -41,16 +25,12 @@ set(COMMONFLAGS "\
 	-Wall \
 	")
 
-add_compile_options(
-	-DSTM32F407xx
-	)
+add_compile_options(-DSTM32F407xx)
 
-set(CMAKE_CXX_FLAGS "${CPUFLAGS} ${COMMONFLAGS} -std=c++17 -fno-rtti -fno-exceptions")
-set(CMAKE_C_FLAGS "${CPUFLAGS} ${COMMONFLAGS} -std=gnu11")
+set(CMAKE_CXX_FLAGS "${CPUFLAGS} ${COMMONFLAGS} -fno-rtti -fno-exceptions")
+set(CMAKE_C_FLAGS "${CPUFLAGS} ${COMMONFLAGS}")
 
 set(FUSED "\
-	-u netconn_recv \
-	-u _write \
 	-u HardFault_Handler \
 	")
 
@@ -63,6 +43,7 @@ set(CMAKE_EXE_LINKER_FLAGS "\
 	-Wl,--print-memory-usage \
 	-Wl,--undefined=uxTopUsedPriority \
 	-Wl,-Map=${PROJECT_SOURCE_DIR}/build/${PROJECT_NAME}.map \
+	${CMAKE_CURRENT_SOURCE_DIR}/lib/IQmathLib-cm4/IQmathLib-cm4.a \
 	 ")
 
 set(PROJECT_EMBED_FILES
@@ -72,7 +53,6 @@ set(PROJECT_EMBED_FILES
 	net/resource/overall.js
 	net/resource/styles.css
 	)
-
 include(embeddedfiles.cmake)
 
 add_subdirectory(config)
@@ -92,14 +72,10 @@ add_subdirectory(utils)
 add_subdirectory(window)
 
 set(SOURCE_FILES
-	app/src/main.c
+	main.cpp
 	)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCE_FILES} ${PROJECT_EMBED_OBJ_FILES})
-
-include_directories(btnet PUBLIC
-	app/inc
-	)
 
 target_link_libraries(${PROJECT_NAME}.elf
 	systems

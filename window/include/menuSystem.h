@@ -1,9 +1,9 @@
 ﻿/*!****************************************************************************
  * @file		menuSystem.h
  * @author		Storozhenko Roman - D_EL
- * @version		V1.4
- * @date		04.09.2018
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @version		V2.0
+ * @date		17.02.2021
+ * @copyright	The MIT License (MIT). Copyright (c) 2021 Storozhenko Roman
  * @brief		menu system
  */
 #ifndef MENUSYSTEM_H
@@ -15,87 +15,61 @@
 #include "stdint.h"
 #include "prmSystem.h"
 
-/*!****************************************************************************
- * Define
- */
-#define MENU_PERIOD	  20	//[ms]
+namespace Menu {
 
-/*!****************************************************************************
- * User enum
- */
+struct ItemState{
+	bool state;
+	const char *string;
+};
 
-/*!****************************************************************************
- * User typedef
- */
-#define MENU_ITEM(_name, _label, _units, _prmHandle, _chmod, _pfPrm, _pfChanges, _pfSelect, _pfUnselect, _pfPeriod, _previous, _next, _parent , _child) \
-	mN_##_name,
-typedef enum{
-	#include "menuTree.h"
-}menuItemNumber_type;
-#undef MENU_ITEM
+class MenuItem{
+public:
+	using Callcack = ItemState (*)(const MenuItem*);
+	using Editor = ItemState (*)(const MenuItem* history[], uint8_t historyIndex);
 
-typedef enum {
-	chmodMenuNone,
-	chmodMenuAlways,
-} chmodMenu_type;
+public:
+	constexpr MenuItem(const char *_label, Prm::IVal*_prm, bool _change, uint16_t _arg,
+			Callcack _pChange, Callcack _pSelect, Callcack _pUnselect, Callcack _pPeriod,
+			const MenuItem* _next, const MenuItem* _previous, const MenuItem* _child,
+			Editor _editor = nullptr
+			):
+	label(_label),
+	prm(_prm),
+	change(_change),
+	arg(_arg),
+	pChange(_pChange),
+	pSelect(_pSelect),
+	pUnselect(_pUnselect),
+	pPeriod(_pPeriod),
+	next(_next),
+	previous(_previous),
+	child(_child),
+	editor(_editor)
+	{};
 
-typedef enum {
-	menuItemOk,
-	menuItemMessage,
-	menuItemWarning,
-	menuItemError
-} menuItemState_type;
+public:
+	const char *label;
+	Prm::IVal *prm;
+	bool change;
+	uint16_t arg;
 
-typedef enum {
-    menuItemUnselect,
-    menuItemSelect,
-    menuItemUnselectUnchangeable,
-    menuItemSelectUnchangeable
-} menuItemSelect_type;
+	Callcack pChange;
+	Callcack pSelect;
+	Callcack pUnselect;
+	Callcack pPeriod;
 
-typedef union {
-	struct {
-		int16_t istext :1;
-		chmodMenu_type chmod :2;
-		int16_t pfParamert :4;
-	} bit;
-	int16_t all;
-} menuFlags_type;
+	const MenuItem* next;
+	const MenuItem* previous;
+	const MenuItem* child;
 
-typedef struct itemState{
-	uint8_t state;
-	char *string;
-}itemState_type;
+	const Editor editor;
+};
 
-typedef struct menuItem{
-	char *label;
-	char *units;
-	const prmHandle_type *prmHandle;
-	itemState_type (*pfChanges)(const struct menuItem*);
-	itemState_type (*pfSelect)(const struct menuItem*);		/**< Pointer to the optional menu-specific select callback of this menu item */
-	itemState_type (*pfUnselect)(const struct menuItem*);	/**< Pointer to the optional menu-specific unselect callback of this menu item */
-	itemState_type (*pfPeriod)(const struct menuItem*);		/**< Pointer to the optional menu-specific periodic callback of this menu item */
+bool run(const MenuItem *m);
+ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex);
+ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex);
 
-	const struct menuItem *next;		/**< Pointer to the next menu item of this menu item */
-	const struct menuItem *previous;	/**< Pointer to the previous menu item of this menu item */
-	const struct menuItem *parent;		/**< Pointer to the parent menu item of this menu item */
-	const struct menuItem *child;		/**< Pointer to the child menu item of this menu item */
-
-	menuFlags_type flags;
-} menuItem_type;
-
-/*!****************************************************************************
- * External variables
- */
-
-/*!****************************************************************************
- * Macro functions
- */
-
-/*!****************************************************************************
- * Prototypes for the functions
- */
-void menuEngine(menuItemNumber_type menuItemNumber);
+};
 
 #endif /* MENUSYSTEM_H */
-/*************** LGPL ************** END OF FILE *********** D_EL ************/
+/******************************** END OF FILE ********************************/

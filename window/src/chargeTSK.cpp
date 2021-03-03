@@ -23,15 +23,24 @@
 #include <ui.h>
 #include <graphics.h>
 #include <prmSystem.h>
-#include <prmEditor.h>
 #include <systemTSK.h>
 #include "chargeTSK.h"
 #include "baseTSK.h"
+#include <prmSystem.h>
+#include <enco.h>
 
-/******************************************************************************
- * Memory
- */
-charge_type ch;
+enum {
+	C_VOLT,
+	C_CURR,
+	C_TIME,
+	C_MODE,
+	mode_number
+};
+
+enum {
+	ch_modeTime = 0,
+	ch_modeCurrent = 1,
+};
 
 /******************************************************************************
  * Charger task
@@ -39,15 +48,32 @@ charge_type ch;
 void chargeTSK(void *pPrm){
 	(void)pPrm;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
-	const prmHandle_type *sHandle = &prmh[Nchu];
-	const prmHandle_type *pHandle = &prmh[Nchu];
 	uint8_t varParam = 0;
 	bool switchStatePrev = false;
 	char str[30];
 
+	struct BaeParameter{
+		union{
+			struct{
+				const Prm::Val<uint16_t> *voltage;
+				const Prm::Val<uint16_t> *current;
+				const Prm::Val<uint16_t> *time;
+				const Prm::Val<uint8_t> *mode;
+			};
+			Prm::IVal *p[4];
+		};
+	};
+
+	const BaeParameter params = {
+			&Prm::chargeru,
+			&Prm::chargeri,
+			&Prm::chargert,
+			&Prm::chargermode
+	};
+
 	disp_fillScreen(black);
 	ksSet(30, 10, kUp | kDown);
-	prmEditorSetNtic(5);
+	enco_settic(5);
 
 	while(1){
 		regMeas_t regmeas = {};
@@ -63,7 +89,7 @@ void chargeTSK(void *pPrm){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			if(keyState(kSet)){
 				varParam++;
-				if(varParam == 4)
+				if(varParam == mode_number)
 					varParam = 0;
 			}else if(keyState(kMode)){
 				if(!stateenable){
@@ -78,49 +104,30 @@ void chargeTSK(void *pPrm){
 					reg_setEnable(false);
 				}
 			}else if(keyState(kUp)){
-				bigstepUp = 1;
+				params.p[varParam]->bigstep(1);
 			}else if(keyState(kDown)){
-				bigstepDown = 1;
+				params.p[varParam]->bigstep(-1);
 			}else if(keyState(kZero)){
-				setDef = 1;
+				params.p[varParam]->setdef();
 			}
 		}
 
+		/***************************************
+		 * Encoder process
+		 */
 		if(!stateenable){
-			/***************************************
-			 * Encoder process
-			 */
-			prmEditorStatus_type enstatus;
-			sHandle = pHandle + varParam;
-			if(bigstepUp != 0){
-				enstatus = prmEditorBigStepUp(sHandle);
-				bigstepUp = 0;
-			}else if(bigstepDown != 0){
-				enstatus = prmEditorBigStepDown(sHandle);
-				bigstepDown = 0;
-			}else if(setDef != 0){
-				prmEditorWriteVal(sHandle, &(sHandle)->def);
-				enstatus = enCharge;
-				setDef = 0;
-			}else{
-				enstatus = prmEditorUpDate(sHandle);
-			}
-			if((enstatus == enLimDown) || (enstatus == enLimUp)){
-				BeepTime(ui.beep.encoLim.time, ui.beep.encoLim.freq);
-			}else if((enstatus == enTransitionDown) || (enstatus == enTransitionUp)){
-				BeepTime(ui.beep.encoTransition.time, ui.beep.encoTransition.freq);
-			}
+			params.p[varParam]->step(enco_update());
 		}
 
 		/***************************************
 		 * Task for regulator
 		 */
-		reg_setVoltage(ch.u * 1000);
-		reg_setCurrent(ch.i * 1000);
-		switch(ch.mode){
+		reg_setVoltage(params.voltage->val * 1000);
+		reg_setCurrent(params.current->val * 1000);
+		switch(params.mode->val){
 			case (ch_modeTime):
 				reg_setMode(reg_timeShutdown);
-				reg_setTime(ch.t * 60);
+				reg_setTime(params.time->val * 60);
 				break;
 			case (ch_modeCurrent):
 				reg_setMode(reg_lowCurrentShutdown);
@@ -142,14 +149,14 @@ void chargeTSK(void *pPrm){
 		 * Output data to display
 		 */
 		//Skip time
-		if((ch.mode == ch_modeCurrent) && (varParam == C_TIME)){
+		if((params.mode->val == ch_modeCurrent) && (varParam == C_TIME)){
 			varParam++;
 		}
 		//Print voltage
 		if(stateenable){
-			snprintf(str, sizeof(str), "U:        %02"PRIu32".%03"PRIu32, measV / 1000000, (measV / 1000) % 1000);
+			snprintf(str, sizeof(str), "U:        %02" PRIu32 ".%03" PRIu32, measV / 1000000, (measV / 1000) % 1000);
 		}else{
-			snprintf(str, sizeof(str), "U:        %02"PRIu16".%03"PRIu16, ch.u / 1000, ch.u % 1000);
+			snprintf(str, sizeof(str), "U:        %02" PRIu16 ".%03" PRIu16, params.voltage->val / 1000, params.voltage->val % 1000);
 		}
 		if(varParam == C_VOLT && !stateenable){
 			disp_setColor(black, ui.color.cursor);
@@ -160,9 +167,9 @@ void chargeTSK(void *pPrm){
 
 		//Print current
 		if(stateenable){
-			snprintf(str, sizeof(str), "I:          %01"PRIu32".%03"PRIu32" A", measI / 1000000, (measI / 1000) % 1000);
+			snprintf(str, sizeof(str), "I:          %01" PRIu32 ".%03" PRIu32 " A", measI / 1000000, (measI / 1000) % 1000);
 		}else{
-			snprintf(str, sizeof(str), "I:          %0"PRIu16".%03"PRIu16" A", ch.i / 1000, ch.i % 1000);
+			snprintf(str, sizeof(str), "I:          %0" PRIu16 ".%03" PRIu16 " A", params.current->val / 1000, params.current->val % 1000);
 		}
 		if(varParam == C_CURR && !stateenable){
 			disp_setColor(black, ui.color.cursor);
@@ -172,15 +179,15 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 20, &arial, 0, str);
 
 		//Time
-		if(ch.mode == ch_modeTime){
+		if(params.mode->val == ch_modeTime){
 			if(stateenable){
-				snprintf(str, sizeof(str), "Time:  %lum %02"PRIu32"s   ", (ch.t * 60 - regmeas.time) / 60, (ch.t * 60 - regmeas.time) % 60);
+				snprintf(str, sizeof(str), "Time:  %lum %02" PRIu32 "s   ", (params.time->val * 60 - regmeas.time) / 60, (params.time->val * 60 - regmeas.time) % 60);
 			}else{
-				snprintf(str, sizeof(str), "Time:  %"PRIu16"m 00s     ", ch.t);
+				snprintf(str, sizeof(str), "Time:  %" PRIu16 "m 00s     ", params.time->val);
 			}
 		}else{
 			if(stateenable){
-				snprintf(str, sizeof(str), "Time:  %"PRIu32"m %02"PRIu32"s   ", (regmeas.time) / 60, (regmeas.time) % 60);
+				snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02" PRIu32 "s   ", (regmeas.time) / 60, (regmeas.time) % 60);
 			}else{
 				snprintf(str, sizeof(str), "Time:  - - -            ");
 			}
@@ -193,8 +200,8 @@ void chargeTSK(void *pPrm){
 		}
 		disp_putStr(10, 40, &arial, 0, str);
 
-		//Print Mode
-		if(ch.mode == ch_modeTime){
+		// Print Mode
+		if(params.mode->val == ch_modeTime){
 			snprintf(str, sizeof(str), "Mode: TIME         ");
 		}else{
 			snprintf(str, sizeof(str), "Mode: VOLTAGE");
@@ -207,14 +214,14 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 60, &arial, 0, str);
 
 		//Print Capacity
-		snprintf(str, sizeof(str), "C:         %01"PRIu32".%03"PRIu32" Ah", regmeas.capacity / 1000, regmeas.capacity % 1000);
+		snprintf(str, sizeof(str), "C:         %01" PRIu32 ".%03" PRIu32 " Ah", regmeas.capacity / 1000, regmeas.capacity % 1000);
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
 
 		grf_line(0, 107, 159, 107, halfLightGray);
 
 
-		if(switchStatePrev && !stateenable && ch.t * 60 == regmeas.time){
+		if(switchStatePrev && !stateenable && params.time->val * 60 == regmeas.time){
 			BeepTime(ui.beep.chargeReady.time, ui.beep.chargeReady.freq);
 		}
 		switchStatePrev = stateenable;

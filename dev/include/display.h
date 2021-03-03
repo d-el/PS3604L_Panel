@@ -8,6 +8,10 @@
 #ifndef display_H
 #define display_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -19,10 +23,6 @@
  */
 #define DISP_W	ST7735_W
 #define DISP_H	ST7735_H
-
-/*!****************************************************************************
- * Enumeration
- */
 
 /*!****************************************************************************
  * Typedef
@@ -57,10 +57,6 @@ extern const image_type ImageLogo;
 extern const font_type dSegBold8x14;
 
 /*!****************************************************************************
- * Macro functions
- */
-
-/*!****************************************************************************
  * Function declaration
  */
 void disp_init(void);
@@ -75,6 +71,10 @@ void disp_fillRect(int16_t x, int16_t y, int16_t w, int16_t h, lcd_color_type co
 void disp_putChar(uint16_t x, uint16_t y, const font_type *font, char c);
 void disp_putStr(uint16_t x, uint16_t y, const font_type *font, uint8_t distance, const char *s);
 void disp_PrintImageMonochrome(uint8_t x, uint8_t y, const image_type *image);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //display_H
 /******************************** END OF FILE ********************************/

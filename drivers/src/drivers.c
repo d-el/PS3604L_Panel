@@ -63,8 +63,7 @@ void hardInit(void){
 	beep_init();
 	ledPwm_init();
 	st7735_initR(JD_T18003, ST7735_R270);
-	rtcStatus_type rtcStatus = rtc_init();
-	if((rtcStatus == rtc_Ok)&&(rtcStatus == rtc_wasOn)){
+	if(rtc_init()){
 		fp.state.rtcOscillatorError = 0;
 	}else{
 		fp.state.rtcOscillatorError = 1;

@@ -17,6 +17,7 @@
 /******************************************************************************
  * MEMORY
  */
+static uint16_t enco_tic;
 
 /*!****************************************************************************
  * @brief  Initialize peripheral for incremental encoder
@@ -62,6 +63,29 @@ int16_t enco_read(void){
 	}
 
 	return step;
+}
+
+/*!****************************************************************************
+ */
+int32_t enco_update(void){
+	static uint16_t ntic = 0;
+	if(ntic >= enco_tic){
+		int32_t step = enco_read();
+		if((step > 2) || (step < -2)){
+			step = step * 5; //Accelerator
+		}
+		ntic = 0;
+		return -step;
+	}else{
+		ntic++;
+	}
+	return 0;
+}
+
+/*!****************************************************************************
+ */
+void enco_settic(uint16_t n){
+	enco_tic = n;
 }
 
 /******************************** END OF FILE ********************************/

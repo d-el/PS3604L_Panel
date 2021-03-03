@@ -1,14 +1,17 @@
 ﻿/*!****************************************************************************
  * @file		crc.h
- * @author		Storozhenko Roman
+ * @author		d_el - Storozhenko Roman
  * @version		V2.1
- * @date		15.01.2018
+ * @date		12.12.2017
  * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
- * @brief		CRC counting module
  */
 
 #ifndef crc_H
 #define crc_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*!****************************************************************************
 * Include
@@ -42,16 +45,20 @@ typedef struct{
 /*!****************************************************************************
  * Exported variables
  */
-extern const crc16Struct_type crcModBus;
-extern const crc16Struct_type crcCan;
-extern const crc8Struct_type crc1Wire;
+extern crc16Struct_type crcModBus;
+extern crc16Struct_type crcCan;
+extern crc8Struct_type crc1Wire;
 
 /*!****************************************************************************
  * Function declaration
  */
-uint16_t crc16Calc(const crc16Struct_type *dat, void *src, uint32_t len);
-uint16_t crc16CalcWithInit(const crc16Struct_type *dat, void *src, uint32_t len, uint16_t initVal);
-uint8_t crc8Calc(const crc8Struct_type *dat, void *src, uint32_t len);
+uint16_t crc16Calc(crc16Struct_type *dat, const void *src, uint32_t len);
+uint16_t crc16CalcWithInit(crc16Struct_type *dat, const void *src, uint32_t len, uint16_t initVal);
+uint8_t crc8Calc(crc8Struct_type *dat, const void *src, uint32_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	//crc_H
 /******************************** END OF FILE ********************************/

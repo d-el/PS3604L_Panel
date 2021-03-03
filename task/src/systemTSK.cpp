@@ -13,44 +13,46 @@
 #include <inttypes.h>
 #include <stdlib.h>
 #include <assert.h>
-#include "plog.h"
-#include "prmSystem.h"
-#include "sntp.h"
-#include "stm32f4x7_eth_bsp.h"
-#include "stm32f4x7_eth.h"
-#include "ethernetif.h"
+#include <time.h>
+
+#include <plog.h>
+#include <prmSystem.h>
+#include <sntp.h>
+#include <stm32f4x7_eth_bsp.h>
+#include <stm32f4x7_eth.h>
+#include <ethernetif.h>
 #include <lwip/tcpip.h>
 #include <lwip/dns.h>
-#include "write.h"
-#include "display.h"
+#include <display.h>
 #include <beep.h>
 #include <pvd.h>
 #include <ledpwm.h>
 #include <board.h>
-#include "ui.h"
+#include <ui.h>
+#include <startupTSK.h>
+#include <settingTSK.h>
+#include <chargeTSK.h>
+#include <baseTSK.h>
+#include <monitorTSK.h>
+#include <24AAxx.h>
 #include "regulatorConnTSK.h"
-#include "startupTSK.h"
-#include "settingTSK.h"
-#include "chargeTSK.h"
-#include "httpServerTSK.h"
-#include "baseTSK.h"
-#include "monitorTSK.h"
 #include "systemTSK.h"
+#include <write.h>
+#include "httpServerTSK.h"
 
 /*!****************************************************************************
  * Memory
  */
-frontPanel_type			fp;					///< Data structure front panel
-static TaskHandle_t		windowTskHandle;	///< Program task handler
-static struct netif		xnetif; 			///< Network interface structure
-static uint8_t			shutdownFlag;
+frontPanel_type fp;					///< Data structure front panel
+static TaskHandle_t windowTskHandle;	///< Program task handler
+static struct netif xnetif; 			///< Network interface structure
+static SemaphoreHandle_t lowPowerSem;
 
 /*!****************************************************************************
  * Local prototypes for the functions
  */
-int _write(int fd, const void *buf, size_t count);
+extern "C" int _write(int fd, const void *buf, size_t count);
 static void loadParameters(void);
-static void shutdown(void);
 static void pvdCallback(void);
 static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
 
@@ -63,7 +65,7 @@ static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint3
 #else
 	#define LOG_LOCAL_LEVEL P_LOG_NONE
 #endif
-static char *logTag = "SYS";
+static const char *logTag = "SYS";
 
 /*!****************************************************************************
  * @brief
@@ -82,11 +84,15 @@ void systemTSK(void *pPrm){
 	P_LOGI(logTag, "\n\nStarted systemTSK");
 
 	loadParameters();												// Load panel settings and user parameters
-	timezoneUpdate();
-	pvd_setSupplyFaultCallBack(pvdCallback);							// Setup callback for Supply Fault
+	timezoneUpdate(Prm::timezone.val);
+	pvd_setSupplyFaultCallBack(pvdCallback);						// Setup callback for Supply Fault
 	disp_init();
-	LwIP_Init(fp.fpSettings.ipadr, fp.fpSettings.netmask, fp.fpSettings.gateway);	// Initialize the LwIP stack
+	LwIP_Init(Prm::ipadr.val, Prm::netmask.val, Prm::gateway.val);	// Initialize the LwIP stack
 	sntp_init();													// Initialize service SNTP
+
+	vSemaphoreCreateBinary(lowPowerSem);
+	assert(lowPowerSem != NULL);
+	xSemaphoreTake(lowPowerSem, portMAX_DELAY);
 
 	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
@@ -108,9 +114,6 @@ void systemTSK(void *pPrm){
 	while(1){
 		regMeas_t state;
 		bool regulatorConnected = reg_getState(&state);
-		if((regulatorConnected && state.state.m_lowInputVoltage) || shutdownFlag != 0){
-			shutdown();
-		}
 
 		if(selWindowPrev != fp.currentSelWindow){
 			if(windowTskHandle != NULL){
@@ -192,7 +195,18 @@ void systemTSK(void *pPrm){
 			linkRequest = httpServer.numberRequest;
 		}
 
-		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));
+		BaseType_t res = xSemaphoreTake(lowPowerSem, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));
+		if((regulatorConnected && state.state.m_lowInputVoltage) || res == pdTRUE){
+			P_LOGD(logTag, "System saveparameters");
+			saveparametersUser();
+			BeepTime(ui.beep.shutdown.time, ui.beep.shutdown.freq);
+			LED_ON();
+			if(windowTskHandle != NULL){
+				vTaskDelete(windowTskHandle);	//Delete window
+			}
+			vTaskDelay(pdMS_TO_TICKS(10000));
+			NVIC_SystemReset();
+		}
 	}
 }
 
@@ -200,44 +214,55 @@ void systemTSK(void *pPrm){
  * @brief	Load parameters from memory
  */
 static void loadParameters(void){
-	prm_state_type stat = prm_load(SYSEEPADR, prmEepSys);
-	if(stat == prm_ok){
-		P_LOGI(logTag, "System settings load ok");
-	}else{
-		P_LOGW(logTag, "System settings load error: %u", stat);
-		prm_loadDefault(prmEepSys);
-		fp.state.sysSettingLoadDefault = 1;
+	size_t size = Prm::getSerialSize(Prm::Save::savesys);
+	if(size){
+		uint8_t buffer[size];
+		const uint16_t systemSettingsAddress = 0;
+		if(eep_read(buffer, systemSettingsAddress, size) == eepOk){
+			if(!Prm::deserialize(Prm::Save::savesys, buffer, size)){
+				P_LOGW(logTag, "System settings load error");
+				fp.state.sysSettingLoadDefault = 1;
+			}
+		}
 	}
 
-	stat = prm_load(USEREEPADR, prmEep);
-	if(stat == prm_ok){
-		P_LOGI(logTag, "User settings load ok");
-	}else{
-		P_LOGW(logTag, "User settings load error: %u", stat);
-		prm_loadDefault(prmEep);
-		fp.state.userSettingLoadDefault = 1;
+	size = Prm::getSerialSize(Prm::Save::saveuse);
+	if(size){
+		uint8_t buffer[size];
+		const uint16_t userSettingsAddress = 512;
+		if(eep_read(buffer, userSettingsAddress, size) == eepOk){
+			if(!Prm::deserialize(Prm::Save::saveuse, buffer, size)){
+				P_LOGW(logTag, "User settings load error");
+				fp.state.userSettingLoadDefault = 1;
+			}
+		}
 	}
 }
 
 /*!****************************************************************************
  * @brief	Save parameters to memory
  */
-static void shutdown(void){
-	P_LOGD(logTag, "System shutdown3");
-	prm_state_type stat = prm_store(USEREEPADR, prmEep);
-	if(stat == prm_ok){
-		P_LOGI(logTag, "System settings store ok");
-	}else{
-		P_LOGE(logTag, "System settings store error: %u", stat);
+void saveparametersSystem(void){
+	const uint16_t systemSettingsAddress = 0;
+	size_t size = Prm::getSerialSize(Prm::Save::savesys);
+	if(size){
+		uint8_t buffer[size];
+		Prm::serialize(Prm::Save::savesys, buffer);
+		eep_write(systemSettingsAddress, buffer, size);
 	}
+}
 
-	BeepTime(ui.beep.goodbye.time, ui.beep.goodbye.freq);
-	LED_ON();
-	if(windowTskHandle != NULL){
-		vTaskDelete(windowTskHandle);	//Delete window
+/*!****************************************************************************
+ * @brief	Save parameters to memory
+ */
+void saveparametersUser(void){
+	const uint16_t userSettingsAddress = 512;
+	size_t size = Prm::getSerialSize(Prm::Save::saveuse);
+	if(size){
+		uint8_t buffer[size];
+		Prm::serialize(Prm::Save::saveuse, buffer);
+		eep_write(userSettingsAddress, buffer, size);
 	}
-	vTaskDelay(pdMS_TO_TICKS(10000));
-	NVIC_SystemReset();
 }
 
 /*!****************************************************************************
@@ -247,7 +272,10 @@ static void pvdCallback(void){
 	setLcdBrightness(0);
 	LED_OFF();
 	ETH_BSP_Deinit();
-	shutdownFlag = 1;
+
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	xSemaphoreGiveFromISR(lowPowerSem, &xHigherPriorityTaskWoken);
+	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
 /*!****************************************************************************
@@ -291,25 +319,14 @@ void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gat
 	dns_setserver(0, &ipaddrs);
 	IP4_ADDR(&ipaddrs, 1, 1, 1, 1);
 	dns_setserver(1, &ipaddrs);
-
-	/*
-	 * Далее производится детектирование Link и Negotiation, перенастройка
-	 * MAC под текущее физическое подключение, netif_set_up
-	 */
 }
 
 /*!****************************************************************************
  */
 void netSettingUpdate(void){
-	ip_addr_t l_ipaddr;
-	ip_addr_t l_netmask;
-	ip_addr_t l_gateway;
-
-	//With convert 32-bits host order to network order
-	l_ipaddr.addr = htonl(fp.fpSettings.ipadr);
-	l_netmask.addr = htonl(fp.fpSettings.netmask);
-	l_gateway.addr = htonl(fp.fpSettings.gateway);
-
+	ip_addr_t l_ipaddr = { htonl(Prm::ipadr.val) };
+	ip_addr_t l_netmask = { htonl(Prm::netmask.val) };
+	ip_addr_t l_gateway = { htonl(Prm::gateway.val) };
 	P_LOGI(logTag, "update IP: %s", ipaddr_ntoa(&l_ipaddr) );
 	netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
 }
@@ -328,9 +345,9 @@ void selWindow(selWindow_type window){
 
 /*!****************************************************************************
  */
-void timezoneUpdate(void){
+void timezoneUpdate(int8_t timezone){
 	char str[12];
-	snprintf(str, sizeof(str), "TZ=GMT%i", -fp.fpSettings.timezone);
+	snprintf(str, sizeof(str), "TZ=GMT%i", -timezone);
 	putenv(str);
 	tzset();
 }

@@ -66,8 +66,8 @@ void uart_init(uart_type *uartx, uint32_t baudRate){
 		uartx->pDmaStreamRx		= DMA2_Stream2;
 		uartx->dmaIfcrTx		= &DMA2->HIFCR;
 		uartx->dmaIfcrRx		= &DMA2->LIFCR;
-		uartx->dmaIfcrMaskTx	= DMA_HIFCR_CTCIF7;
-		uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF2 | DMA_LIFCR_CTEIF2;
+		uartx->dmaIfcrMaskTx	= DMA_HIFCR_CTCIF7/* | DMA_HIFCR_CTEIF7*/;
+		uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF2/* | DMA_LIFCR_CTEIF2*/;
 		uartx->frequency        = APB2_FREQ;
 
 		#if(UART1_RX_IDLE_LINE_MODE > 0)
@@ -133,8 +133,8 @@ void uart_init(uart_type *uartx, uint32_t baudRate){
 		/************************************************
 		 * IO
 		 */
-		gppin_init(GPIOD, 8, alternateFunctionPushPull, pullDisable, 0, UART3_PINAFTX);		//PD8, PC10 USART3_TX
-		#if(UART1_HALFDUPLEX == 0)
+		gppin_init(GPIOD, 8, alternateFunctionOpenDrain, pullDisable, 0, UART3_PINAFTX);		//PD8, PC10 USART3_TX
+		#if(UART3_HALFDUPLEX == 0)
 		gppin_init(GPIOD, 9, alternateFunctionPushPull, pullUp, 0, UART3_PINAFRX);			//PD9, PC11 USART3_RX
 		#else
 		uartx->halfDuplex = 1;
@@ -190,7 +190,7 @@ void uart_init(uart_type *uartx, uint32_t baudRate){
 		 * IO
 		 */
 		gppin_init(GPIOC, 10, alternateFunctionPushPull, pullDisable, 0, UART4_PINAFTX);		//PC10 USART4_TX
-		#if(UART1_HALFDUPLEX == 0)
+		#if(UART4_HALFDUPLEX == 0)
 		gppin_init(GPIOC, 11, alternateFunctionPushPull, pullUp, 0, UART4_PINAFRX);				//PC11 USART4_RX
 		#else
 		uartx->halfDuplex = 1;
@@ -305,6 +305,7 @@ void uart_setCallback(uart_type *uartx, uartCallback_type txHoock, uartCallback_
  */
 void uart_write(uart_type *uartx, void const *src, uint16_t len){
 	uartx->pDmaStreamTx->CR		&= ~DMA_SxCR_EN;									//Channel disabled
+	uartx->pUart->SR = 0;
 	uartx->pDmaStreamTx->M0AR	= (uint32_t)src;									//Memory address
 	uartx->pDmaStreamTx->NDTR	= len;												//Number of data
 	uartx->pDmaStreamTx->CR		|= DMA_SxCR_EN;										//Channel enabled
@@ -316,6 +317,7 @@ void uart_write(uart_type *uartx, void const *src, uint16_t len){
  */
 void uart_read(uart_type *uartx, void *dst, uint16_t len){
 	uartx->pDmaStreamRx->CR		&= ~DMA_SxCR_EN;									//Channel disabled
+	uartx->pUart->SR = 0;
 	uartx->pDmaStreamRx->M0AR	= (uint32_t)dst;									//Memory address
 	uartx->pDmaStreamRx->NDTR	= len;												//Number of data.
 	uartx->pDmaStreamRx->CR		|= DMA_SxCR_EN;										//Channel enabled
@@ -363,7 +365,6 @@ void USART_IRQHandler(uart_type *uartx){
 		//Clear IDLE flag by sequence (read USART_SR register followed by a read to the USART_DR register)
 		(void)uartx->pUart->SR;
 		(void)uartx->pUart->DR;
-
 	}
 }
 

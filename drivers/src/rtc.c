@@ -97,7 +97,7 @@ static time_t tmToUnixTime(struct tm *tm){
  * @param
  * @retval
  */
-rtcStatus_type rtc_init(void){
+bool rtc_init(void){
 	volatile uint32_t timeout;
 
 	if((RCC->BDCR & RCC_BDCR_RTCEN) == 0){					//RTC clock is enable
@@ -117,7 +117,7 @@ rtcStatus_type rtc_init(void){
 		}
 		if(timeout == 0){
 			RCC->BDCR &= ~RCC_BDCR_RTCEN;
-			return rtc_error;
+			return false;
 		}
 
 		while((RTC->ISR & RTC_ISR_RSF) == 0)
@@ -132,17 +132,15 @@ rtcStatus_type rtc_init(void){
 			;		  //Wait for calendar registers update is allowed
 
 		RTC->TR		= 0x000000;								//Setting time to 00.00.00
-		RTC->DR		= 0x180101;								//Set date to  2018-01-01
+		RTC->DR		= 0x210101;								//Set date
 		RTC->CR		&= ~RTC_CR_FMT;							//Set FMT 24H format
 
 		RTC->ISR	&= ~RTC_ISR_INIT;						//Exit initialization mode
 
 		RTC->WPR	= 0xFF;									//Enable the write protection for RTC registers
 		PWR->CR		&= ~PWR_CR_DBP;							//Disable Backup Domain write protection
-		return rtc_Ok;
-	}else{
-		return rtc_wasOn;
 	}
+	return true;
 }
 
 /*!****************************************************************************
@@ -177,16 +175,16 @@ time_t time(time_t *arg){
  * @param
  * @retval
  */
-rtcStatus_type rtc_setTime(const struct tm *t){
+bool rtc_setTime(const struct tm *t){
 	uint32_t rtctr = 0;
 	uint32_t rtcdr = 0;
 
 	if((RCC->BDCR & RCC_BDCR_RTCEN) == 0 || (RCC->BDCR & RCC_BDCR_LSERDY) == 0){
-		return rtc_error;
+		return false;
 	}
 
 	if((t->tm_sec > 59) || (t->tm_min > 59) || (t->tm_hour > 23) || (t->tm_mday > 31) || (t->tm_mon > 12) || (t->tm_year < 100) || (t->tm_year > 200)){
-		return rtc_error;
+		return false;
 	}
 
 	rtctr |= binToBcd(t->tm_sec) << RTC_TR_SU_Pos;
@@ -213,7 +211,7 @@ rtcStatus_type rtc_setTime(const struct tm *t){
 	RTC->WPR = 0xFF;								//Enable the write protection for RTC registers
 	PWR->CR &= ~PWR_CR_DBP;							//Lock Backup
 
-	return rtc_setOk;
+	return true;
 }
 
 /*!****************************************************************************
@@ -221,7 +219,7 @@ rtcStatus_type rtc_setTime(const struct tm *t){
  * @param
  * @retval
  */
-rtcStatus_type rtc_setTimeUnix(time_t timeUnix){
+bool rtc_setTimeUnix(time_t timeUnix){
 	struct tm tm;
 	gmtime_r(&timeUnix, &tm);
 	return rtc_setTime(&tm);

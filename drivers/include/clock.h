@@ -9,6 +9,10 @@
 #ifndef clock_H
 #define clock_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -41,6 +45,10 @@ typedef enum {
  * Function declaration
  */
 clockState_type clock_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //clock_H
 /******************************** END OF FILE ********************************/

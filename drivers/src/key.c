@@ -106,7 +106,7 @@ uint32_t keyState(kKey_type keyMask){
  * @param toReiteration
  * @param autoPress
  */
-void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, kKey_type reiterationKeyMask){
+void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, uint16_t reiterationKeyMask){
 	key.toFirstReiteration = toFirstReiteration;
 	key.toReiteration = toReiteration;
 	key.reiterationSelect = reiterationKeyMask;

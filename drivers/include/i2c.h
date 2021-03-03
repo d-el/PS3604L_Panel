@@ -9,6 +9,10 @@
 #ifndef i2c_H
 #define i2c_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -96,18 +100,14 @@ typedef struct i2cStruct{
 typedef void (*i2cCallback_type)(i2c_type *i2cx);
 
 /******************************************************************************
-* User enum
-*/
-
-/******************************************************************************
-* Extern viriables
+* External variables
 */
 /*
 * i2c1 memory
 */
 #if (I2C1_USE == 1)
 extern i2c_type		   *i2c1;
-#endif //UART1_USE
+#endif //I2C1_USE
 
 /******************************************************************************
 * Macro functions
@@ -121,6 +121,10 @@ void i2c_reInit(i2c_type *i2cx);
 void i2c_setCallback(i2c_type *i2cx, i2cCallback_type tcHook);
 void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode);
 void i2c_read(i2c_type *i2cx, void *dst, uint16_t len, uint8_t slaveAdr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //i2c_H
 /******************************** END OF FILE ********************************/
