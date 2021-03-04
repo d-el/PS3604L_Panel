@@ -14,12 +14,11 @@
  */
 #include <array>
 #include <type_traits>
+#include <cmath>
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stddef.h>
-
-#include <cmath>
 
 namespace Prm {
 
@@ -126,17 +125,11 @@ public:
 	}
 
 	void step(int32_t step){
-		auto result = val + handler.step * step;
-		if(step > 0 && result > handler.max) result = handler.max;
-		if(step < 0 && result < handler.min) result = handler.min;
-		val = result;
+		stepsize(step, handler.step);
 	}
 
 	void bigstep(int32_t step){
-		auto result = val + handler.bigstep * step;
-		if(step > 0 && result > handler.max) result = handler.max;
-		if(step < 0 && result < handler.min) result = handler.min;
-		val = result;
+		stepsize(step, handler.bigstep);
 	}
 
 	const char* getlabel() const {
@@ -181,6 +174,18 @@ public:
 	size_t tostring(char *string, size_t size) const;
 
 private:
+	void stepsize(int32_t step, T stepsize){
+		T result = stepsize * abs(step);
+		if(step < 0)
+			val = result > val - handler.min
+				? handler.min
+				: val - result;
+		else
+			val = result > handler.max - val
+				? handler.max
+				: val + result;
+	}
+
 	size_t uprintval(char *string, size_t size, uint8_t power, uint32_t var) const;
 	size_t iprintval(char *string, size_t size, uint8_t power, int32_t var) const;
 

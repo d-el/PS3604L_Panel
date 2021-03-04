@@ -67,7 +67,7 @@ ItemState PrepareU(const MenuItem* m){
 	if(regstate){
 		return ItemState { true, "" };
 	}else{
-		return ItemState { true, "error connect" };
+		return ItemState { false, "error connect" };
 	}
 }
 
@@ -87,7 +87,7 @@ ItemState PrepareI(const MenuItem* m){
 	if(regstate){
 		return ItemState { true, "" };
 	}else{
-		return ItemState { true, "error connect" };
+		return ItemState { false, "error connect" };
 	}
 }
 
@@ -151,69 +151,68 @@ ItemState calibrExit(const MenuItem* m){
 	}
 }
 
-extern const MenuItem m1;
-	extern const MenuItem m00;
-	extern const MenuItem m01;
-	extern const MenuItem m02;
-	extern const MenuItem m03;
-		extern const MenuItem m000;
-		extern const MenuItem m001;
-		extern const MenuItem m002;
-		extern const MenuItem m003;
-		extern const MenuItem m004;
+extern const MenuItem
+m1,
+	m00,
+	m01,
+	m02,
+	m03,
+		m000,
+		m001,
+		m002,
+		m003,
+		m004,
+	m10,
+	m11,
+	m12,
+	m13,
+		m100,
+		m101,
+		m102,
+		m103,
+		m104,
+m2,
+	m20,
+	m21,
+m3,
+	m30,
+	m31,
+	m32,
+m4;
 
-	extern const MenuItem m10;
-	extern const MenuItem m11;
-	extern const MenuItem m12;
-	extern const MenuItem m13;
-		extern const MenuItem m100;
-		extern const MenuItem m101;
-		extern const MenuItem m102;
-		extern const MenuItem m103;
-		extern const MenuItem m104;
+const MenuItem
+m0("Vmeter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m1, nullptr, &m00),
+	m00("Point1", nullptr, true, 0, nullptr, PrepareU, calibrExit, nullptr, &m01, nullptr, &m000),
+	m01("Point2", nullptr, true, 1, nullptr, PrepareU, calibrExit, nullptr, &m02, &m00, &m000),
+	m02("Point3", nullptr, true, 2, nullptr, PrepareU, calibrExit, nullptr, &m03, &m01, &m000),
+	m03("Point4", nullptr, true, 3, nullptr, PrepareU, calibrExit, nullptr, nullptr, &m02, &m000),
+		m000("Ureal", &Prm::Ureal, true, 0, savePointU, nullptr, nullptr, updateReg, &m001, nullptr, nullptr),
+		m001("DacU", &Prm::Udac, true, 0, savePointU, nullptr, nullptr, updateReg, &m002, &m000, nullptr),
+		m002("AdcU", &Prm::Uadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m003, &m001, nullptr),
+		m003("AdcI", &Prm::Iadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m004, &m002, nullptr),
+		m004("Umeas", &Prm::Umeas, false, 0, savePointU, nullptr, nullptr, updateReg, nullptr, &m003, nullptr),
 
-extern const MenuItem m2;
-	extern const MenuItem m20;
-	extern const MenuItem m21;
+m1("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, &m0, &m10),
+	m10("Point1", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m11, nullptr, &m100),
+	m11("Point2", nullptr, true, 1, nullptr, PrepareI, calibrExit, nullptr, &m12, &m10, &m100),
+	m12("Point3", nullptr, true, 2, nullptr, PrepareI, calibrExit, nullptr, &m13, &m11, &m100),
+	m13("Point4", nullptr, true, 3, nullptr, PrepareI, calibrExit, nullptr, nullptr, &m12, &m100),
+		m100("Ireal", &Prm::Ireal, true, 0, savePointI, nullptr, nullptr, nullptr, &m101, nullptr, nullptr),
+		m101("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m102, &m100, nullptr),
+		m102("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m103, &m101, nullptr),
+		m103("AdcI", &Prm::Iadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m104, &m102, nullptr),
+		m104("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m103, nullptr),
 
-extern const MenuItem m3;
-	extern const MenuItem m30;
-	extern const MenuItem m31;
-	extern const MenuItem m32;
-extern const MenuItem m4;
+m2("Date & Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
+	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),
+	m21("Time Zone", &Prm::timezone, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m20, nullptr),
 
-const MenuItem m0("Vmeter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m1, nullptr, &m00);
-	const MenuItem m00("Point1", nullptr, true, 0, nullptr, PrepareU, calibrExit, nullptr, &m01, nullptr, &m000);
-	const MenuItem m01("Point2", nullptr, true, 1, nullptr, PrepareU, calibrExit, nullptr, &m02, &m00, &m000);
-	const MenuItem m02("Point3", nullptr, true, 2, nullptr, PrepareU, calibrExit, nullptr, &m03, &m01, &m000);
-	const MenuItem m03("Point4", nullptr, true, 3, nullptr, PrepareU, calibrExit, nullptr, nullptr, &m02, &m000);
-		const MenuItem m000("Ureal", &Prm::Ureal, true, 0, savePointU, nullptr, nullptr, updateReg, &m001, nullptr, nullptr);
-		const MenuItem m001("DacU", &Prm::Udac, true, 0, savePointU, nullptr, nullptr, updateReg, &m002, &m000, nullptr);
-		const MenuItem m002("AdcU", &Prm::Uadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m003, &m001, nullptr);
-		const MenuItem m003("AdcI", &Prm::Iadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m004, &m002, nullptr);
-		const MenuItem m004("Umeas", &Prm::Umeas, false, 0, savePointU, nullptr, nullptr, updateReg, nullptr, &m003, nullptr);
+m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30),
+	m30("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr, ipAddressEditor),
+	m31("subnet mask", &Prm::netmask, true, 0, nullptr, nullptr, nullptr, nullptr, &m32, &m30, nullptr, ipAddressEditor),
+	m32("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, ipAddressEditor),
 
-const MenuItem m1("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, &m0, &m10);
-	const MenuItem m10("Point1", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m11, nullptr, &m100);
-	const MenuItem m11("Point2", nullptr, true, 1, nullptr, PrepareI, calibrExit, nullptr, &m12, &m10, &m100);
-	const MenuItem m12("Point3", nullptr, true, 2, nullptr, PrepareI, calibrExit, nullptr, &m13, &m11, &m100);
-	const MenuItem m13("Point4", nullptr, true, 3, nullptr, PrepareI, calibrExit, nullptr, nullptr, &m12, &m100);
-		const MenuItem m100("Ireal", &Prm::Ireal, true, 0, savePointI, nullptr, nullptr, nullptr, &m101, nullptr, nullptr);
-		const MenuItem m101("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m102, &m100, nullptr);
-		const MenuItem m102("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m103, &m101, nullptr);
-		const MenuItem m103("AdcI", &Prm::Iadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m104, &m102, nullptr);
-		const MenuItem m104("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m103, nullptr);
-
-const MenuItem m2("Date & Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20);
-	const MenuItem m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor);
-	const MenuItem m21("Time Zone", &Prm::timezone, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m20, nullptr);
-
-const MenuItem m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30);
-	const MenuItem m30("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr, ipAddressEditor);
-	const MenuItem m31("subnet mask", &Prm::netmask, true, 0, nullptr, nullptr, nullptr, nullptr, &m32, &m30, nullptr, ipAddressEditor);
-	const MenuItem m32("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, ipAddressEditor);
-
-const MenuItem m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, nullptr, &m3, nullptr);
+m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, nullptr, &m3, nullptr);
 
 /*!****************************************************************************
  * @brief    Setting system task

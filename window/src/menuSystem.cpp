@@ -79,13 +79,15 @@ void callExit(const MenuItem *m){
 /*!****************************************************************************
  * @brief	Call function on Enter
  */
-void callEnter(const MenuItem *m){
+bool callEnter(const MenuItem *m){
 	if(m->pSelect){
 		ItemState res = m->pSelect(m);
 		if(!res.state){
 			printMessageWindow(res.string);
+			return false;
 		}
 	}
+	return true;
 }
 
 /*!****************************************************************************
@@ -269,12 +271,12 @@ bool run(const MenuItem *m){
 					historyIndex--;
 				}
 				else if(m->child){
-					//callExit(m);
-					callEnter(m);
-					history[historyIndex++] = m;
-					m = m->child;
-					top = m;
-					callSelect(m);
+					if(callEnter(m)){
+						history[historyIndex++] = m;
+						m = m->child;
+						top = m;
+						callSelect(m);
+					}
 				}
 			}
 		}
