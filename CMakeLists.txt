@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.6)
 
-project(PS3604LF CXX C)
+project(PS3604LF
+	VERSION 2.2.1.0
+	LANGUAGES CXX C
+	)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
@@ -45,6 +49,8 @@ set(CMAKE_EXE_LINKER_FLAGS "\
 	-Wl,-Map=${PROJECT_SOURCE_DIR}/build/${PROJECT_NAME}.map \
 	${CMAKE_CURRENT_SOURCE_DIR}/lib/IQmathLib-cm4/IQmathLib-cm4.a \
 	 ")
+
+configure_file(utils/include/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/utils/include/version.h @ONLY)
 
 set(PROJECT_EMBED_FILES
 	net/resource/404.html

@@ -5,23 +5,23 @@
 */
 
 inline const char* getVersion(){
-	return "2.2.1.0";
+	return "@PROJECT_VERSION@";
 }
 
 inline unsigned getVersionMajor(){
-	return 2;
+	return @PROJECT_VERSION_MAJOR@;
 }
 
 inline unsigned getVersionMinor(){
-	return 2 +0;
+	return @PROJECT_VERSION_MINOR@ +0;
 }
 
 inline unsigned getVersionPatch(){
-	return 1 +0;
+	return @PROJECT_VERSION_PATCH@ +0;
 }
 
 inline unsigned getVersionTweak(){
-	return 0 +0;
+	return @PROJECT_VERSION_TWEAK@ +0;
 }
 
 /******************************** END OF FILE ********************************/

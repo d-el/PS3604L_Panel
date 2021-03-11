@@ -2,3 +2,5 @@
 /build
 /doc
 !/doc/Doxyfile
+prmsystem/generated/*
+tools/prmsytem2json/build
