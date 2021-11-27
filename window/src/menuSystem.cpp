@@ -10,6 +10,7 @@
 /*!****************************************************************************
  * Include
  */
+#include <stdio.h>
 #include <time.h>
 #include <inttypes.h>
 #include <FreeRTOS.h>
@@ -103,24 +104,24 @@ void callChanges(const MenuItem *m){
 }
 
 typedef enum {
-    menuItemUnselect,
-    menuItemSelect,
-    menuItemUnselectUnchangeable,
-    menuItemSelectUnchangeable
+	menuItemUnselect,
+	menuItemSelect,
+	menuItemUnselectUnchangeable,
+	menuItemSelectUnchangeable
 } menuItemSelect_type;
 
 static const disp_color_type colorLabel[] = {
-    [menuItemUnselect] = white,
-    [menuItemSelect] = red,
-    [menuItemUnselectUnchangeable] = white,
-    [menuItemSelectUnchangeable] = red,
+	[menuItemUnselect] = white,
+	[menuItemSelect] = red,
+	[menuItemUnselectUnchangeable] = white,
+	[menuItemSelectUnchangeable] = red,
 };
 
 static const disp_color_type colorValue[] = {
-    [menuItemUnselect] = white,
-    [menuItemSelect] = red,
-    [menuItemUnselectUnchangeable] = white,
-    [menuItemSelectUnchangeable] = white,
+	[menuItemUnselect] = white,
+	[menuItemSelect] = red,
+	[menuItemUnselectUnchangeable] = white,
+	[menuItemSelectUnchangeable] = white,
 };
 
 /*!****************************************************************************
@@ -159,11 +160,11 @@ void outItemString(const MenuItem *m, uint8_t itemNumber, bool select){
     disp_setContentColor(colorLabel[sel]);
     disp_putStr(0, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
 
-    // Value
-    if(!m->editor){
-    	disp_setContentColor(colorValue[sel]);
+	// Value
+	if(!m->editor){
+		disp_setContentColor(colorValue[sel]);
 		disp_putStr(MENU_ITEM_CHAR_W * strlen(string), MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, value);
-    }
+	}
 }
 
 /*!****************************************************************************
@@ -173,7 +174,7 @@ void outItemString(const char *string, uint8_t itemNumber, uint8_t selectPositio
 	uint8_t offset = 0;
 
 	grf_line(0, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1,
-		            MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
+				MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
 
 	memset(s, '\0', sizeof(s));
 	strncpy(s, string, selectPosition);

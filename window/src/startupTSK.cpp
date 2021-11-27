@@ -22,6 +22,7 @@
 #include <version.h>
 #include <systemTSK.h>
 #include <prmSystem.h>
+#include <regulatorConnTSK.h>
 #include "ui.h"
 
 /*!****************************************************************************
@@ -43,17 +44,23 @@ void startupTSK(void *pPrm){
 		disp_fillScreen(black);
 		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 3, &ImageLogo);  //Logo
 
-		char str[30];
+		char str[64];
+		regVersion_t regVersion;
+		reg_getVersion(&regVersion);
+		sprintf(str, "P%s : R%" PRIu16 ".%" PRIu16 ".%" PRIu16,
+				getVersion(),
+				regVersion.major, regVersion.minor, regVersion.patch);
+		disp_putStr(0, 70, &arial, 0, str);
+		
 		if(fp.state.sysSettingLoadDefault == 0){
-			sprintf(str, "COUNT %" PRIu32, Prm::startcnt.val);
+			sprintf(str, "%" PRIu32, Prm::startcnt.val);
 		}else{
-			sprintf(str, "COUNT -");
+			sprintf(str, "-");
 		}
-
-		disp_putStr(00, 70, &arial, 0, str);
-		disp_putStr(0, 90, &arial, 0, getVersion());
+		disp_putStr(0, 90, &arial, 0, str);
 		disp_putStr(0, 110, &arial, 0, "2012 - 2021");
 		disp_flush();
+
 
 		for(uint16_t i = 0; i < Prm::brightness.val * 10; i++){
 			setLcdBrightness(i);

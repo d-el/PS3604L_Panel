@@ -64,78 +64,66 @@ using parameterstree_t = std::list< Group >;
 
 namespace string_parsing {
 inline void trim(std::string &str) {
-    auto space_is_it = [] (char c) {
-        return c > '\0' && c <= ' ';
-    };
-
-    for(auto rit = str.rbegin(); rit != str.rend(); ++rit) {
-        if(!space_is_it(*rit)) {
-            if(rit != str.rbegin()) {
-                str.erase(&*rit - &*str.begin() + 1);
-            }
-            for(auto fit=str.begin(); fit != str.end(); ++fit) {
-                if(!space_is_it(*fit)) {
-                    if(fit != str.begin()) {
-                        str.erase(str.begin(), fit);
-                    }
-                    return;
-    }   }   }   }
-    str.clear();
+	auto space_is_it = [] (char c) {
+		return c > '\0' && c <= ' ';
+	};
+		
+	for(auto rit = str.rbegin(); rit != str.rend(); ++rit) {
+		if(!space_is_it(*rit)) {
+			if(rit != str.rbegin()) {
+				str.erase(&*rit - &*str.begin() + 1);
+			}
+			for(auto fit=str.begin(); fit != str.end(); ++fit) {
+				if(!space_is_it(*fit)) {
+					if(fit != str.begin()) {
+						str.erase(str.begin(), fit);
+					}
+					return;
+	}	}	}	}
+str.clear();
 }
 
 template <typename D>
 inline std::string get_to(std::string& str, D&& delimiters, char& found_delimiter) {
-    const auto pos = str.find_first_of(std::forward<D>(delimiters));
-    if(pos == std::string::npos) {
-        found_delimiter = '\0';
-        std::string result;
-        std::swap(result, str);
-        trim(result);
-        return result;
-    }
-    found_delimiter = str[pos];
-    auto left = str.substr(0, pos);
-    trim(left);
-    str.erase(0, pos + 1);
-    return left;
+	const auto pos = str.find_first_of(std::forward<D>(delimiters));
+	if(pos == std::string::npos) {
+		found_delimiter = '\0';
+		std::string result;
+		std::swap(result, str);
+		trim(result);
+		return result;
+	}
+	found_delimiter = str[pos];
+	auto left = str.substr(0, pos);
+	trim(left);
+	str.erase(0, pos + 1);
+return left;
 }
 
 template <typename D>
 inline std::string get_to(std::string& str, D&& delimiters) {
-    char discarded_delimiter;
-    return get_to(str, std::forward<D>(delimiters), discarded_delimiter);
+		char discarded_delimiter;
+		return get_to(str, std::forward<D>(delimiters), discarded_delimiter);
 }
 
 inline std::string pad_right(const std::string&     str,
                              std::string::size_type min_length,
                              char                   pad_char=' ')
 {
-    if(str.length() >= min_length ) return str;
-    return str + std::string(min_length - str.length(), pad_char);
+	if(str.length() >= min_length ) return str;
+	return str + std::string(min_length - str.length(), pad_char);
 }
 
-inline void tokenize(std::string source) {
-    std::cout << source << "\n\n";
-    bool quote_opened = false;
-    while(!source.empty()) {
-        const char* delimiter_set = quote_opened ? "'" : ",:{}";
-        char delimiter;
-        auto token = get_to(source, delimiter_set, delimiter);
-        quote_opened = delimiter == '\'' && !quote_opened;
-        std::cout << "    " << pad_right('[' + token + ']', 16)
-            << "   " << delimiter << '\n';
-    }
-    std::cout << '\n';
-}
 }
 
 int main(int argc, char *argv[]) {
 	setvbuf(stdout, NULL, _IONBF, 0);	//not buffered
-    std::string fileName = argv[1];
-    std::string outfileName = argv[2];
-    std::string mode = argv[3];
-
-    // Read file
+	std::string fileName = argv[1];
+	std::string outfileName = argv[2];
+	std::string mode = argv[3];
+	std::cout << "generate '" << mode << "' > " << outfileName << "\n";
+	
+// Read file
 	std::ifstream file(fileName.c_str());
 	if(!file){
 		std::cerr << "Cannot open the File : " << fileName << "\n";
@@ -153,39 +141,38 @@ int main(int argc, char *argv[]) {
 
 	// Tokenize
 	tokens_t tokens;
-    bool quote_opened = false;
-    while(!buffer.empty()) {
-        const char* delimiter_set = quote_opened ? "'" : ",:()";
-        char delimiter;
-        auto token = string_parsing::get_to(buffer, delimiter_set, delimiter);
-        quote_opened = delimiter == '\'' && !quote_opened;
-        tokens.push_back(Token(token, delimiter));
-    }
-    std::cout << '\n';
+	bool quote_opened = false;
+	while(!buffer.empty()) {
+		const char* delimiter_set = quote_opened ? "'" : ",:()";
+		char delimiter;
+		auto token = string_parsing::get_to(buffer, delimiter_set, delimiter);
+		quote_opened = delimiter == '\'' && !quote_opened;
+		tokens.push_back(Token(token, delimiter));
+}
 
-    // Parse
-    masks_t texts;
-    parameterstree_t parameterstree;
-   	for(auto t = tokens.begin(); t != tokens.end(); ){
-    	if(t->token == "text"){
-    		t++;
-    		Mask mask;
-    		mask.name = t++->token;
-    		mask.type = t++->token;
-    		while(1){
-    			std::string value = t++->token;
-    			std::string name = t->token;
-    			mask.value.push_back(Mask::Value(name, value));
-    			if(t->delimiter == ')'){
-    				t++;
-    				break;
-    			}
-    			t++;
-    		}
-    		texts.push_back(mask);
-    	}
-    	else if(t->token == "group"){
-    		t++;
+	// Parse
+	masks_t texts;
+	parameterstree_t parameterstree;
+	for(auto t = tokens.begin(); t != tokens.end(); ){
+		if(t->token == "text"){
+			t++;
+			Mask mask;
+			mask.name = t++->token;
+			mask.type = t++->token;
+			while(1){
+				std::string value = t++->token;
+				std::string name = t->token;
+				mask.value.push_back(Mask::Value(name, value));
+				if(t->delimiter == ')'){
+					t++;
+					break;
+				}
+				t++;
+			}
+			texts.push_back(mask);
+		}
+		else if(t->token == "group"){
+		t++;
 			groupProperties_t groupProp = { { "name", t++->token }, { "access", t++->token } };
 			parameters_t parameters;
 			while(t->token == "p"){
@@ -337,7 +324,7 @@ int main(int argc, char *argv[]) {
 					<< param.param << ", "
 					<< param.pow << ", "
 					<< param.callback << ", "
-					<< (text != texts.end() ? '&' + text->name : "NULL") << ", "
+					<< (text != texts.end() ? '&' + text->name : "nullptr") << ", "
 					<< param.savetype
 					<< ");\n";
 
@@ -360,5 +347,5 @@ int main(int argc, char *argv[]) {
 
 	out.close();	//Close The File
 
-    return 0;
+	return 0;
 }

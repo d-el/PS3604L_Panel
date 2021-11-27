@@ -48,7 +48,7 @@ typedef struct {
 	beepmem_type cvToCc;
 	beepmem_type ccToCv;
 	beepmem_type ovfCurrent;
-	beepmem_type chargeReady;
+	beepmem_type chargeFinish;
 	beepmem_type error;
 	beepmem_type encoLim;
 	beepmem_type encoTransition;

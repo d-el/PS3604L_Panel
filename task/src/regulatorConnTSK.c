@@ -1,8 +1,8 @@
 ﻿/*!****************************************************************************
  * @file		regulatorTSK.c
  * @author		d_el
- * @version		V2.0
- * @date		07.01.2021
+ * @version		V2.1
+ * @date		27.11.2021
  * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
  * @brief		connect interface with regulator
  */
@@ -50,10 +50,11 @@ typedef struct{
 
 SemaphoreHandle_t regulatorMutex;
 QueueHandle_t commandQueue;
+static regVersion_t regVersion;
 uint16_t enabled;
 bool connected;
 regTarget_t regTarget;
-regMeas_t regMeas;
+regState_t regMeas;
 
 bool reg_setVoltage(uint32_t uV){
 	xSemaphoreTake(regulatorMutex, portMAX_DELAY);
@@ -136,12 +137,57 @@ bool reg_getEnable(bool *state){
 	return connected;
 }
 
-bool reg_getState(regMeas_t *state){
+bool reg_getState(regState_t *state){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	*state = regMeas;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
+
+bool reg_getVersion(regVersion_t *v){
+	*v = regVersion;
+	return true;
+}
+
+bool writeReg(modbus_t *ctx, uint16_t addr, uint16_t value){
+	uint8_t try = 3;
+	while(try--){
+		int mbstatus = modbus_write_register(ctx, addr, value);
+		if(mbstatus == 1){
+			return true;
+		}else{
+			P_LOGW(logTag, "error write [%" PRIu16 "], %s", addr, modbus_strerror(libmodbuserrno));
+		}
+	}
+	return false;
+}
+
+bool writeRegs(modbus_t *ctx, uint16_t addr, void *src, uint16_t len){
+	uint8_t try = 3;
+	while(try--){
+		int mbstatus = modbus_write_registers(ctx, addr, len, (uint16_t*)src);
+		if(mbstatus == len){
+			return true;
+		}else{
+			P_LOGW(logTag, "error write [%" PRIu16 "], %s", addr, modbus_strerror(libmodbuserrno));
+		}
+	}
+	return false;
+}
+
+bool readRegs(modbus_t *ctx, uint16_t addr, void *dst, uint16_t len){
+	uint8_t try = 3;
+	while(try--){
+		int mbstatus = modbus_read_registers(ctx, addr, len, (void*)dst);
+		if(mbstatus == len){
+			return true;
+		}else{
+			P_LOGW(logTag, "error read [%" PRIu16 "], %s", addr, modbus_strerror(libmodbuserrno));
+		}
+	}
+	return false;
+}
+
 
 /*!****************************************************************************
  * @brief
@@ -160,19 +206,19 @@ void regulatorConnTSK(void *pPrm){
 
 	uint8_t errorCount = 0;
 	const uint8_t errorThreshold = 5;
+	readRegs(ctx, 0x0000, &regVersion, 3);
+	
 	while(1){
-		xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+		xSemaphoreTake(regulatorMutex, portMAX_DELAY);
 		regTarget_t lpcalRegTarget = regTarget;
 		xSemaphoreGive(regulatorMutex);
 
 		// Set target value
 		int32_t number = sizeof(lpcalRegTarget)/sizeof(uint16_t);
-		int mbstatus = modbus_write_registers(ctx, 0x0100, number, (uint16_t*)&lpcalRegTarget);
-		if(mbstatus == number){
+		if(writeRegs(ctx, 0x0100, &lpcalRegTarget, number)){
 			errorCount = 0;
 		}
 		else{
-			P_LOGW(logTag, "error write target, %s", modbus_strerror(libmodbuserrno));
 			if(errorCount < errorThreshold)
 				errorCount++;
 		}
@@ -182,36 +228,30 @@ void regulatorConnTSK(void *pPrm){
 		if(xQueuePeek(commandQueue, &command, 0) == pdPASS ){
 			switch(command.command){
 				case cmd_enable:{
-					int status = modbus_write_register(ctx, 0x0109, command.enable);
-					if(status == 1){
+					if(writeReg(ctx, 0x0109, command.enable)){
 						xQueueReceive(commandQueue, &command, 0);
 						errorCount = 0;
 					}else{
-						P_LOGW(logTag, "error write enable, %s", modbus_strerror(libmodbuserrno));
 						if(errorCount < errorThreshold)
 							errorCount++;
 					}
 				}break;
 
 				case cmd_calibrateV:{
-					int status = modbus_write_registers(ctx, 0x0500 + 2 * command.calibratePoint.number, 2, (uint16_t*)&command.calibratePoint.value);
-					if(status == 2){
+					if(writeRegs(ctx, 0x0500 + 2 * command.calibratePoint.number, &command.calibratePoint.value, 2)){
 						xQueueReceive(commandQueue, &command, 0);
 						errorCount = 0;
 					}else{
-						P_LOGW(logTag, "error write save V, %s", modbus_strerror(libmodbuserrno));
 						if(errorCount < errorThreshold)
 							errorCount++;
 					}
 				}break;
 
 				case cmd_calibrateI:{
-					int status = modbus_write_registers(ctx, 0x0600 + 2 * command.calibratePoint.number, 2, (uint16_t*)&command.calibratePoint.value);
-					if(status == 2){
+					if(writeRegs(ctx, 0x0600 + 2 * command.calibratePoint.number, &command.calibratePoint.value, 2)){
 						errorCount = 0;
 						xQueueReceive(commandQueue, &command, 0);
 					}else{
-						P_LOGW(logTag, "error write save I, %s", modbus_strerror(libmodbuserrno));
 						if(errorCount < errorThreshold)
 							errorCount++;
 					}
@@ -223,33 +263,28 @@ void regulatorConnTSK(void *pPrm){
 		}
 
 		// Read enable state
-		mbstatus = modbus_read_registers(ctx, 0x0109, 1, (void*)&enabled);
-		if(mbstatus == 1){
+		if(readRegs(ctx, 0x0109, &enabled, 1)){
 			errorCount = 0;
 		}else{
-			P_LOGW(logTag, "error read enable, %s", modbus_strerror(libmodbuserrno));
 			if(errorCount < errorThreshold)
 				errorCount++;
 		}
 
 		// Read measure
-		regMeas_t localRegMeas;
+		regState_t localRegMeas;
 		number = sizeof(localRegMeas)/sizeof(uint16_t);
-		mbstatus = modbus_read_registers(ctx, 0x0200, number, (void*)&localRegMeas);
-		if(mbstatus == number){
+		if(readRegs(ctx, 0x0200, &localRegMeas, number)){
 			xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 			regMeas = localRegMeas;
 			xSemaphoreGive(regulatorMutex);
 			errorCount = 0;
 		}
 		else{
-			P_LOGW(logTag, "error read meas data, %s", modbus_strerror(libmodbuserrno));
 			if(errorCount < errorThreshold)
 				errorCount++;
 		}
 
 		connected = errorCount < errorThreshold ? true : false;
-
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(20));
 	}
 }

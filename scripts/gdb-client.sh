@@ -3,7 +3,7 @@
 function usage()
 {
 	cat << HEREDOC
-	 Usage: $progname [-h|--help] [-g|--gdbinitfile file]]
+	Usage: $progname [-h|--help] [-g|--gdbinitfile file]]
 	optional arguments:
 	-h, --help			show this help message and exit
 	-g, --gdbinitfile	set GDB init file
@@ -28,7 +28,7 @@ eval set -- "$OPTS"
 while true; do
 	case "$1" in
 	-h | --help 		) usage; exit; ;;
-	-g | --gdbinitfile  ) GDBINITFILE="$2"; shift 2 ;;
+	-g | --gdbinitfile  ) GDBINITFILE=$cwd/"$2"; shift 2 ;;
 	--			 		) shift; break ;;
 	*					) break ;;
 	esac

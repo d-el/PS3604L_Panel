@@ -96,7 +96,7 @@ ItemState PrepareI(const MenuItem* m){
  */
 ItemState updateReg(const MenuItem* m){
 	(void)m;
-	regMeas_t regmeas;
+	regState_t regmeas;
 	bool regstate = reg_getState(&regmeas);
 	if(regstate){
 		Prm::Iadc.val = regmeas.iadc;

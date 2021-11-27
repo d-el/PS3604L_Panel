@@ -5,7 +5,7 @@
 */
 
 inline const char* getVersion(){
-	return "2.2.1.0";
+	return "2.2.2";
 }
 
 inline unsigned getVersionMajor(){
@@ -17,11 +17,11 @@ inline unsigned getVersionMinor(){
 }
 
 inline unsigned getVersionPatch(){
-	return 1 +0;
+	return 2 +0;
 }
 
 inline unsigned getVersionTweak(){
-	return 0 +0;
+	return  +0;
 }
 
 /******************************** END OF FILE ********************************/

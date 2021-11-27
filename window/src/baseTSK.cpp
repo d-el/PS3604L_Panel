@@ -71,7 +71,7 @@ void baseTSK(void *pPrm){
 	enco_settic(3);
 
 	while(1){
-		regMeas_t regmeas = {};
+		regState_t regmeas = {};
 		reg_getState(&regmeas);
 		bool regenable = false;
 		reg_getEnable(&regenable);
@@ -142,11 +142,6 @@ void baseTSK(void *pPrm){
 			case Prm::mask_basemode::Limiting:
 				reg_setMode(reg_limitation);
 				reg_setCurrent(currentval);
-				break;
-
-			case Prm::mask_basemode::Unprotected:
-				reg_setMode(reg_limitation);
-				reg_setCurrent(I_SHORT_CIRCUIT);
 				break;
 		}
 
@@ -256,27 +251,30 @@ void baseTSK(void *pPrm){
 void printStatusBar(void){
 	static uint8_t errPrev = 0;
 	static uint8_t modeIlimPrev = 0;
-	static uint8_t ovfCurrent = 0;
+	static bool enablePrev = 0;
 	static char str[30];
 
-	regMeas_t regmeas = {};
+	regState_t regmeas = {};
 	bool regstate = reg_getState(&regmeas);
+	bool enable;
+	reg_getEnable(&enable);
 
-	if(modeIlimPrev != regmeas.state.m_limitation){
-		if(regmeas.state.m_limitation != 0){
+	if(modeIlimPrev != regmeas.status.m_limitation){
+		if(regmeas.status.m_limitation != 0){
 			BeepTime(ui.beep.cvToCc.time, ui.beep.cvToCc.freq);
 		}else{
 			BeepTime(ui.beep.ccToCv.time, ui.beep.ccToCv.freq);
 		}
-		modeIlimPrev = regmeas.state.m_limitation;
+		modeIlimPrev = regmeas.status.m_limitation;
 	}
 
-	if((regmeas.state.m_overCurrent != 0) && (ovfCurrent == 0)){
+	if(enablePrev && !enable && regmeas.disablecause == v_overCurrent){
 		BeepTime(ui.beep.ovfCurrent.time, ui.beep.ovfCurrent.freq);
 	}
-	ovfCurrent = regmeas.state.m_overCurrent;
+	enablePrev = enable;
 
-	if(regmeas.state.m_errorTemperatureSensor || regmeas.state.m_overheated || regmeas.state.m_reverseVoltage || !regstate){
+	if(regmeas.status.m_errorTemperatureSensor || regmeas.status.m_overheated || regmeas.status.m_reverseVoltage ||
+			regmeas.status.m_errorExternalIAdc || !regstate){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
 		if(errPrev == 0){
@@ -284,13 +282,19 @@ void printStatusBar(void){
 			errPrev = 0;
 		}
 
-		if(regmeas.state.m_errorTemperatureSensor){
+		if(regmeas.status.m_errorTemperatureSensor){
 			disp_putStr(16, 112, &arial, 0, "Err Temp Sensor");
-		}else if(regmeas.state.m_overheated != 0){
+		}
+		else if(regmeas.status.m_overheated != 0){
 			disp_putStr(16, 112, &arial, 0, "Overflow Temp");
-		}else if(regmeas.state.m_reverseVoltage != 0){
+		}
+		else if(regmeas.status.m_reverseVoltage != 0){
 			disp_putStr(16, 112, &arial, 0, "Reverse Voltage");
-		}else if(!regstate){
+		}
+		else if(regmeas.status.m_errorExternalIAdc){
+			disp_putStr(16, 112, &arial, 0, "Error External IAdc");
+		}
+		else if(!regstate){
 			disp_putStr(35, 112, &arial, 0, "No Connect");
 		}
 

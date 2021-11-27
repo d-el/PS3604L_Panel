@@ -49,9 +49,9 @@ void chargeTSK(void *pPrm){
 	(void)pPrm;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	uint8_t varParam = 0;
-	bool switchStatePrev = false;
 	char str[30];
-
+	bool finishBeep = false;
+	
 	struct BaeParameter{
 		union{
 			struct{
@@ -76,7 +76,7 @@ void chargeTSK(void *pPrm){
 	enco_settic(5);
 
 	while(1){
-		regMeas_t regmeas = {};
+		regState_t regmeas = {};
 		reg_getState(&regmeas);
 		bool stateenable = false;
 		reg_getEnable(&stateenable);
@@ -84,7 +84,6 @@ void chargeTSK(void *pPrm){
 		/**************************************
 		 * Key process
 		 */
-		uint8_t bigstepUp = 0, bigstepDown = 0, setDef = 0;
 		if(keyProc() != 0){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			if(keyState(kSet)){
@@ -220,11 +219,13 @@ void chargeTSK(void *pPrm){
 
 		grf_line(0, 107, 159, 107, halfLightGray);
 
-
-		if(switchStatePrev && !stateenable && params.time->val * 60 == regmeas.time){
-			BeepTime(ui.beep.chargeReady.time, ui.beep.chargeReady.freq);
+		if(finishBeep && (regmeas.disablecause == v_timeShutdown || regmeas.disablecause == v_lowCurrentShutdown)){
+			BeepTime(ui.beep.chargeFinish.time, ui.beep.chargeFinish.freq);
+			finishBeep = false;
 		}
-		switchStatePrev = stateenable;
+		if(stateenable){
+			finishBeep = true;
+		}
 
 		//Print status bar
 		printStatusBar();

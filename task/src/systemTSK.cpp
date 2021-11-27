@@ -112,7 +112,7 @@ void systemTSK(void *pPrm){
 	selWindow(startupWindow);
 
 	while(1){
-		regMeas_t state;
+		regState_t state;
 		bool regulatorConnected = reg_getState(&state);
 
 		if(selWindowPrev != fp.currentSelWindow){
@@ -196,7 +196,7 @@ void systemTSK(void *pPrm){
 		}
 
 		BaseType_t res = xSemaphoreTake(lowPowerSem, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));
-		if((regulatorConnected && state.state.m_lowInputVoltage) || res == pdTRUE){
+		if((regulatorConnected && state.status.m_lowInputVoltage) || res == pdTRUE){
 			P_LOGD(logTag, "System saveparameters");
 			saveparametersUser();
 			BeepTime(ui.beep.shutdown.time, ui.beep.shutdown.freq);

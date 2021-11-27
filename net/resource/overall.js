@@ -63,18 +63,30 @@ function updateInfo() {
 			{name: 'temperature', val: x.getUint16(30, true) / 10.0 + ' °C'}
 		]);
 
-		// State
-		var state = x.getUint16(32, true);
+		// Status
+		var status = x.getUint16(32, true);
+		var disablecause = x.getUint16(34, true);
+		let disablecause2string = new Map([
+			[0, 'none'],
+			[1, 'Error Temperature Sensor'],
+			[2, 'Overheated'],
+			[3, 'Low Input Voltage'],
+			[4, 'Reverse Voltage'],
+			[5, 'OverCurrent'],
+			[6, 'Time Shutdown'],
+			[7, 'Low Current Shutdown'],
+			[8, 'Request']
+		]);
 		updateTable('.table1', [
-			{name: 'overcurrent', val: (state & 1) ? '<p style="color:red;">YES</p>' : 'NO'},
-			{name: 'switch', val: (enable != 0) ? '<p style="color:red;">ON</p>' : 'OFF'},
-			{name: 'output', val: (state & 2) ? 'CC' : 'CV'}
+			{name: 'output', val: (status & 64) ? 'CC' : 'CV'},
+			{name: 'disablecause', val: disablecause2string.get(disablecause)},
+			{name: 'switch', val: (enable != 0) ? '<p style="color:red;">ON</p>' : 'OFF'}
 		]);
 
 		// Settings
 		updateTable('.table3', [
-			{name: 'u', val: x.getUint32(34, true) / 1000000.0 + ' V'},
-			{name: 'i', val: x.getUint32(38, true) / 1000000.0 + ' A'},
+			{name: 'u', val: x.getUint32(36, true) / 1000000.0 + ' V'},
+			{name: 'i', val: x.getUint32(40, true) / 1000000.0 + ' A'},
 		]);
 	};
 	oReq.send(null);

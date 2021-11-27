@@ -28,10 +28,12 @@ void enco_init(void){
 
 	//Timer init
 	RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;							//Clock enable
+	RCC->APB1RSTR |= RCC_APB1RSTR_TIM4RST;
+	RCC->APB1RSTR &= ~RCC_APB1RSTR_TIM4RST;
 
 	TIM4->CCMR1 = TIM_CCMR1_CC2S_0 | TIM_CCMR1_CC1S_0;			//Capture/Compare  selection T2, T1
 	TIM4->CCMR1 |= TIM_CCMR1_IC2PSC_1 | TIM_CCMR1_IC1PSC_1;		//Capture is done once every 4 events
-	TIM4->CCMR1 |= TIM_CCMR1_IC1F | TIM_CCMR1_IC2F;				//Input capture 1 filter fSAMPLING=fDTS/32, N=8
+	TIM4->CCMR1 |= TIM_CCMR1_IC1F | TIM_CCMR1_IC2F;				//Input capture 1 and 2 filter fSAMPLING=fDTS/32, N=8
 
 	TIM4->CCER |= TIM_CCER_CC1P;								//Capture/Compare output polarity - inverted/falling edge
 	TIM4->CCER |= TIM_CCER_CC2P;								//Capture/Compare output polarity - inverted/falling edge
@@ -85,6 +87,7 @@ int32_t enco_update(void){
 /*!****************************************************************************
  */
 void enco_settic(uint16_t n){
+	TIM4->CNT = 0xFFFF / 4;
 	enco_tic = n;
 }
 
