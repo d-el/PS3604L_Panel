@@ -51,15 +51,17 @@ function updateInfo() {
 		// Enable
 		var enable = x.getUint8(1, true);
 
+		function round(x, dig) { return Number.parseFloat(x).toFixed(dig); }
+
 		// Meas
 		updateTable('.table2', [
-			{name: 'u', val: x.getUint32(2, true) / 1000000.0 + ' V'},
-			{name: 'i', val: x.getUint32(6, true) / 1000000.0 + ' A'},
+			{name: 'u', val: round(x.getUint32(2, true) / 1000000.0, 3) + ' V'},
+			{name: 'i', val: round(x.getUint32(6, true) / 1000000.0, 3) + ' A'},
 			{name: 'power', val: x.getUint32(10, true) / 1000.0 + ' W'},
 			{name: 'resistance', val: x.getUint32(14, true) / 1000.0 + ' Ohm'},
 			{name: 'time', val: x.getUint32(18, true) + ' s'},
 			{name: 'capacity', val: x.getUint32(22, true) / 1000.0 + ' Ah'},
-			{name: 'uin', val: Math.round(x.getUint32(26, true) / 100000) / 10 + ' V'},
+			{name: 'uin', val: round((x.getUint32(26, true) / 100000) / 10, 1) + ' V'},
 			{name: 'temperature', val: x.getUint16(30, true) / 10.0 + ' °C'}
 		]);
 
