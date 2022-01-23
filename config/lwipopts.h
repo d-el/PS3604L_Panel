@@ -99,7 +99,7 @@
 /**
  *	MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP connections
  */
-#define MEMP_NUM_TCP_PCB_LISTEN 1
+#define MEMP_NUM_TCP_PCB_LISTEN 2
 
 /**
  * MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP segments
@@ -115,7 +115,7 @@
  * MEMP_NUM_NETBUF: the number of struct netbufs.
  * (only needed if you use the sequential API, like api_lib.c)
  */
-#define MEMP_NUM_NETBUF			1
+#define MEMP_NUM_NETBUF			2
 
 /**
  * MEMP_NUM_NETCONN: the number of struct netconns.
@@ -128,7 +128,7 @@
  * for callback/timeout API communication.
  * (only needed if you use tcpip.c)
  */
-#define MEMP_NUM_TCPIP_MSG_API			1
+#define MEMP_NUM_TCPIP_MSG_API			2
 
 /**
  * MEMP_NUM_TCPIP_MSG_INPKT: the number of struct tcpip_msg, which are used

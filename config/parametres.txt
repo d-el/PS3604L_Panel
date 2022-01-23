@@ -40,6 +40,7 @@ group(Settings2, private)
 	p(Idac			,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,4095		,1		,100		,0	,notsave)
 	p(Uadc			,""		,uint32_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,0			,0		,0			,0	,notsave)
 	p(Iadc			,""		,uint32_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,0			,0		,0			,0	,notsave)
+	p(IadcEx		,""		,int32_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,0			,0		,0			,0	,notsave)
 	p(point			,""		,uint32_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,0			,0		,0			,0	,notsave)
 
 group(Common, public)

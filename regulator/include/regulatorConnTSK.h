@@ -23,10 +23,6 @@ extern "C" {
  * Define
  */
 
-/*!****************************************************************************
- * Enumeration
- */
-
 /******************************************************************************
  * Typedef
  */
@@ -92,7 +88,7 @@ typedef struct __attribute__ ((packed)){
 	uint16_t disablecause;
 	uint16_t vadc;			///< [LSB]
 	uint16_t iadc;			///< [LSB]
-	uint16_t iexternaladc;	///< [LSB]
+	int32_t iexternaladc;	///< [LSB]
 } regState_t;
 
 /******************************************************************************
@@ -114,6 +110,11 @@ bool reg_getTarget(regTarget_t *target);
 bool reg_getEnable(bool *state);
 bool reg_getState(regState_t *state);
 bool reg_getVersion(regVersion_t *v);
+
+void reg_setremote(bool rem);
+bool reg_modbusRequest(uint8_t *req, uint16_t *req_length);
+
+void modbusServerTSK(void *pPrm);
 
 #ifdef __cplusplus
 }

@@ -98,7 +98,7 @@ void monitorTSK(void *pPrm){
 
 				taskTimePrev[task] = buffer[task].ulRunTimeCounter;
 
-				P_LOGI(logTag, "%20s: %9s, %"PRIu32", %6"PRIu16", %"PRIu32" us",
+				P_LOGI(logTag, "%20s: %9s, %"PRIu32", %6"PRIu16" B, %"PRIu32" us",
 				buffer[task].pcTaskName,
 				stateToChar[buffer[task].eCurrentState],
 				buffer[task].uxCurrentPriority,

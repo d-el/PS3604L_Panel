@@ -1,7 +1,7 @@
 ﻿/*!****************************************************************************
  * @file		settingTSK.c
  * @author		d_el - Storozhenko Roman
- * @version		V1.0
+ * @version		V1.1
  * @date		01.01.2016
  * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
  * @brief		This task create start screen
@@ -55,12 +55,13 @@ ItemState rtcUnselect(const MenuItem* m){
  * @brief    setup regulator
  */
 ItemState PrepareU(const MenuItem* m){
-	static uint32_t pointU[4] = { 10000, 100000, 19000000, 30000000 };
+	static uint32_t pointU[4] = { 10'000, 100'000, 19'000'000, 30'000'000 }; // uV
 	Prm::point.val = m->arg;
 	Prm::Ureal.val = pointU[Prm::point.val];
 	Prm::Udac.val = 0;
 	Prm::Idac.val = 2048;
 	reg_setMode(reg_raw);
+	vTaskDelay(10);
 	reg_setEnable(true);
 	reg_setDacCurrent(Prm::Idac.val);
 	bool regstate = reg_setDacVoltage(Prm::Udac.val);
@@ -75,12 +76,13 @@ ItemState PrepareU(const MenuItem* m){
  * @brief    setup regulator
  */
 ItemState PrepareI(const MenuItem* m){
-	static uint32_t pointI[4] = { 10000, 100000, 1500000, 3000000 };
+	static uint32_t pointI[4] = { 1000, 10'000, 50'0000, 3'000'000 }; // uA
 	Prm::point.val = m->arg;
 	Prm::Ireal.val = pointI[Prm::point.val];
 	Prm::Udac.val = 2048;
 	Prm::Idac.val = 0;
 	reg_setMode(reg_raw);
+	vTaskDelay(10);
 	reg_setEnable(true);
 	reg_setDacCurrent(Prm::Idac.val);
 	bool regstate = reg_setDacVoltage(Prm::Udac.val);
@@ -100,6 +102,7 @@ ItemState updateReg(const MenuItem* m){
 	bool regstate = reg_getState(&regmeas);
 	if(regstate){
 		Prm::Iadc.val = regmeas.iadc;
+		Prm::IadcEx.val = regmeas.iexternaladc;
 		Prm::Uadc.val = regmeas.vadc;
 		Prm::Umeas.val = regmeas.voltage;
 		Prm::Imeas.val = regmeas.current;
@@ -114,8 +117,8 @@ ItemState updateReg(const MenuItem* m){
  */
 ItemState savePointU(const MenuItem* m){
 	(void)m;
-	reg_setVoltagePoint(Prm::Ureal.val, Prm::point.val);
 	reg_setDacVoltage(Prm::Udac.val);
+	reg_setVoltagePoint(Prm::Ureal.val, Prm::point.val);
 	return ItemState { true, "" };
 }
 
@@ -124,8 +127,8 @@ ItemState savePointU(const MenuItem* m){
  */
 ItemState savePointI(const MenuItem* m){
 	(void)m;
-	reg_setCurrentPoint(Prm::Ireal.val, Prm::point.val);
 	reg_setDacCurrent(Prm::Idac.val);
+	reg_setCurrentPoint(Prm::Ireal.val, Prm::point.val);
 	return ItemState { true, "" };
 }
 
@@ -171,6 +174,7 @@ m1,
 		m102,
 		m103,
 		m104,
+		m105,
 m2,
 	m20,
 	m21,
@@ -201,7 +205,8 @@ m1("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, &m0, &m1
 		m101("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m102, &m100, nullptr),
 		m102("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m103, &m101, nullptr),
 		m103("AdcI", &Prm::Iadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m104, &m102, nullptr),
-		m104("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m103, nullptr),
+		m104("AdcIEx", &Prm::IadcEx, false, 0, savePointI, nullptr, nullptr, updateReg, &m105, &m103, nullptr),
+		m105("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m104, nullptr),
 
 m2("Date & Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
 	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),

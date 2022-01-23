@@ -219,6 +219,7 @@ bool run(const MenuItem *m){
 	enco_settic(3);
 
 	while(1){
+		change = false;
 		if(keyProc() != 0){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			if(keyState(kUp)){

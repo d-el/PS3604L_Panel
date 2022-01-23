@@ -9,6 +9,10 @@
 #ifndef monitor_H
 #define monitor_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*!****************************************************************************
  * Include
  */
@@ -37,6 +41,10 @@
  * Function declaration
  */
 void monitorTSK(void *pPrm);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //monitor_H
 /******************************** END OF FILE ********************************/

@@ -10,7 +10,6 @@ target_include_directories(libmodbus
 
 target_compile_definitions(libmodbus PUBLIC -DMCU)
 
-target_compile_options(libmodbus PUBLIC "-Wno-unused-variable")
+target_compile_options(libmodbus PUBLIC "-Wno-unused-variable -O0")
 
 target_link_libraries(libmodbus libmodbusport)
-	

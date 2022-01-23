@@ -20,13 +20,13 @@
 #include <crc.h>
 #include <uart.h>
 #include <modbus.h>
+#include <modbus-private.h> // For TCP bridge
 #include <plog.h>
 #include "regulatorConnTSK.h"
 
 /*!****************************************************************************
  * MEMORY
  */
-#define uartTskUse (uart1)
 #define LOG_LOCAL_LEVEL P_LOG_VERBOSE
 static char *logTag = "regulator";
 
@@ -50,11 +50,17 @@ typedef struct{
 
 SemaphoreHandle_t regulatorMutex;
 QueueHandle_t commandQueue;
+SemaphoreHandle_t tcpSem;
 static regVersion_t regVersion;
 uint16_t enabled;
-bool connected;
+bool connected = true;
 regTarget_t regTarget;
 regState_t regMeas;
+uint8_t *mobusRequstData;
+uint16_t *mobusRequstLen;
+bool mobusRequstResult;
+bool gremote;
+static const uint16_t defaultslave = 1;
 
 bool reg_setVoltage(uint32_t uV){
 	xSemaphoreTake(regulatorMutex, portMAX_DELAY);
@@ -149,7 +155,7 @@ bool reg_getVersion(regVersion_t *v){
 	return true;
 }
 
-bool writeReg(modbus_t *ctx, uint16_t addr, uint16_t value){
+static bool writeReg(modbus_t *ctx, uint16_t addr, uint16_t value){
 	uint8_t try = 3;
 	while(try--){
 		int mbstatus = modbus_write_register(ctx, addr, value);
@@ -162,7 +168,7 @@ bool writeReg(modbus_t *ctx, uint16_t addr, uint16_t value){
 	return false;
 }
 
-bool writeRegs(modbus_t *ctx, uint16_t addr, void *src, uint16_t len){
+static bool writeRegs(modbus_t *ctx, uint16_t addr, void *src, uint16_t len){
 	uint8_t try = 3;
 	while(try--){
 		int mbstatus = modbus_write_registers(ctx, addr, len, (uint16_t*)src);
@@ -175,7 +181,7 @@ bool writeRegs(modbus_t *ctx, uint16_t addr, void *src, uint16_t len){
 	return false;
 }
 
-bool readRegs(modbus_t *ctx, uint16_t addr, void *dst, uint16_t len){
+static bool readRegs(modbus_t *ctx, uint16_t addr, void *dst, uint16_t len){
 	uint8_t try = 3;
 	while(try--){
 		int mbstatus = modbus_read_registers(ctx, addr, len, (void*)dst);
@@ -188,39 +194,79 @@ bool readRegs(modbus_t *ctx, uint16_t addr, void *dst, uint16_t len){
 	return false;
 }
 
+static bool rawModbusMessage(modbus_t *ctx, uint8_t *req, uint16_t *req_length){
+	uint8_t try = 3;
+	while(try--){
+		req[0] = defaultslave;
+		ssize_t msg_length = ctx->backend->send_msg_pre(req, *req_length);
+		ssize_t rc = ctx->backend->send(ctx, req, msg_length);
+		//int rc = modbus_send_raw_request(ctx, req, *req_length);
+		rc = modbus_receive_confirmation(ctx, req);
+		if(rc < 3){
+			P_LOGW(logTag, "error read");
+			return false;
+		}
+		*req_length = rc - 2;
+		return true;
+	}
+	return false;
+}
+
+bool reg_modbusRequest(uint8_t *req, uint16_t *req_length){
+	mobusRequstData = req;
+	mobusRequstLen = req_length;
+	BaseType_t osres = xSemaphoreTake(tcpSem, 1000);
+	if(osres != pdTRUE){
+		return false;
+	}
+	return mobusRequstResult;
+}
+
+void reg_setremote(bool rem){
+	gremote = rem;
+}
 
 /*!****************************************************************************
  * @brief
  */
 void regulatorConnTSK(void *pPrm){
 	(void)pPrm;
+
+	BaseType_t osres = xTaskCreate(modbusServerTSK, "modbusServerTSK", TCPMODBUS_TSK_SZ_STACK, NULL, TCPMODBUS_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
+	P_LOGI(logTag, "Started TCPmodbusServer");
+
 	regulatorMutex = xSemaphoreCreateMutex();
 	commandQueue = xQueueCreate(8, sizeof(command_t));
 	TickType_t	xLastWakeTime = xTaskGetTickCount();
 
-	modbus_t *ctx;
-	ctx = modbus_new_rtu("USART1", 115200, 'N', 8, 1);
-	modbus_set_slave(ctx, 0x01);
+	tcpSem = xSemaphoreCreateBinary();
+	xSemaphoreTake(tcpSem, 0);
+
+	modbus_t *ctx = modbus_new_rtu("USART1", 230400, 'N', 8, 1);
+	modbus_set_slave(ctx, defaultslave);
 	modbus_set_debug(ctx, FALSE);
 	modbus_connect(ctx);
 
 	uint8_t errorCount = 0;
 	const uint8_t errorThreshold = 5;
 	readRegs(ctx, 0x0000, &regVersion, 3);
-	
+
 	while(1){
 		xSemaphoreTake(regulatorMutex, portMAX_DELAY);
 		regTarget_t lpcalRegTarget = regTarget;
 		xSemaphoreGive(regulatorMutex);
 
 		// Set target value
-		int32_t number = sizeof(lpcalRegTarget)/sizeof(uint16_t);
-		if(writeRegs(ctx, 0x0100, &lpcalRegTarget, number)){
-			errorCount = 0;
-		}
-		else{
-			if(errorCount < errorThreshold)
-				errorCount++;
+		if(gremote == false){
+			int32_t number = sizeof(lpcalRegTarget)/sizeof(uint16_t);
+			if(writeRegs(ctx, 0x0100, &lpcalRegTarget, number)){
+				errorCount = 0;
+			}
+			else{
+				if(errorCount < errorThreshold)
+					errorCount++;
+			}
 		}
 
 		// Process command
@@ -272,7 +318,7 @@ void regulatorConnTSK(void *pPrm){
 
 		// Read measure
 		regState_t localRegMeas;
-		number = sizeof(localRegMeas)/sizeof(uint16_t);
+		int32_t number = sizeof(localRegMeas)/sizeof(uint16_t);
 		if(readRegs(ctx, 0x0200, &localRegMeas, number)){
 			xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 			regMeas = localRegMeas;
@@ -285,7 +331,13 @@ void regulatorConnTSK(void *pPrm){
 		}
 
 		connected = errorCount < errorThreshold ? true : false;
-		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(20));
+
+		if(mobusRequstData){
+			mobusRequstResult = rawModbusMessage(ctx, mobusRequstData, mobusRequstLen);
+			mobusRequstData = NULL;
+			xSemaphoreGive(tcpSem);
+		}
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(6));
 	}
 }
 

@@ -4,10 +4,13 @@ HISTORY
 
   * [Enter new changes just after this line - do not remove this line]
 
+(2.2.3)
+  Add TCP ModBus TCP server on port 502
+
 (2.2.2)
-	Add rounding in web
-	Add memory management wrapper
-	Change stock heap to 0 byte
+  Add rounding in web
+  Add memory management wrapper
+  Change stock heap to 0 byte
 
 (2.2.2)
   Fix finish beep in charger

@@ -51,7 +51,7 @@ void chargeTSK(void *pPrm){
 	uint8_t varParam = 0;
 	char str[30];
 	bool finishBeep = false;
-	
+
 	struct BaeParameter{
 		union{
 			struct{
@@ -72,7 +72,7 @@ void chargeTSK(void *pPrm){
 	};
 
 	disp_fillScreen(black);
-	ksSet(30, 10, kUp | kDown);
+	ksSet(30, 5, kUp | kDown);
 	enco_settic(5);
 
 	while(1){

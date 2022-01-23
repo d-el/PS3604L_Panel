@@ -65,7 +65,7 @@ void http_server_serve(struct netconn *conn){
 	}
 	else{ //res == ERR_OK
 		netbuf_data(inbuf, (void**)&buf, &buflen);
-		P_LOGD(logTag, "Netbuf_data: 0x%p (%"PRIu16")", buf, buflen);
+		P_LOGD(logTag, "Netbuf_data: %p (%"PRIu16")", buf, buflen);
 
 		if(httpStrcmp(buf, "GET /")){
 			const httpResource_type *urlres = NULL;

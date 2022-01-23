@@ -23,7 +23,7 @@
 #define configCPU_CLOCK_HZ                      ( 168000000 )
 #define configTICK_RATE_HZ                      ( 1000 )
 #define configMAX_PRIORITIES                    ( 10 )
-#define configMINIMAL_STACK_SIZE                ( 128 )
+#define configMINIMAL_STACK_SIZE                ( 256 )
 #define configMAX_TASK_NAME_LEN                 ( 16 )
 #define configUSE_16_BIT_TICKS                  ( 0 )
 #define configIDLE_SHOULD_YIELD                 ( 1 )
@@ -42,7 +42,7 @@
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION         ( 1 )
 #define configSUPPORT_DYNAMIC_ALLOCATION        ( 1 )
-#define configTOTAL_HEAP_SIZE                   ( 32 * 1024 )
+#define configTOTAL_HEAP_SIZE                   ( 36 * 1024 )
 #define configAPPLICATION_ALLOCATED_HEAP        ( 0 )
 
 /* Hook function related definitions. */
@@ -120,10 +120,11 @@ unsigned long vGetTimerForRunTimeStats(void);
 
 /*!**** NAME ****************** priority [1 - configMAX_PRIORITIES] **********/
 #define SYSTEM_TSK_PRIO			7
-#define UART_TSK_PRIO			6
+#define REG_TSK_PRIO			6
 //#define NETIF_TSK_PRIO			5
 //#define TCPIP_TSK_PRIO			4
 #define HTTP_TSK_PRIO			3
+#define TCPMODBUS_TSK_PRIO		3
 #define OSMONITOR_TSK_PRIO		1
 #define STARTUP_TSK_PRIO		1
 #define BASE_TSK_PRIO			1
@@ -132,10 +133,11 @@ unsigned long vGetTimerForRunTimeStats(void);
 
 /*!**** NAME ****************** size [4byte Word] ****************************/
 #define SYSTEM_TSK_SZ_STACK		512
-#define UART_TSK_SZ_STACK		1024
+#define REG_TSK_SZ_STACK		1024
 //#define NETIF_SZ_STACK			512
 //#define TCPIP_SZ_STACK			512
 #define HTTP_TSK_SZ_STACK		512
+#define TCPMODBUS_TSK_SZ_STACK	512
 #define STARTUP_TSK_SZ_STACK	512
 #define BASE_TSK_SZ_STACK		512
 #define CHARG_TSK_SZ_STACK		512

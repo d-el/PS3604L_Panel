@@ -115,4 +115,45 @@ uint32_t plog_timestamp(void){
 	}
 }
 
+/*!****************************************************************************
+ * @brief
+ *
+ */
+void hexdump(const void *buffer, size_t length){
+	if(!length) return;
+	const uint8_t *bbuffer = (uint8_t*)buffer;
+	size_t len = 0;
+	for(size_t i = 0; i < length; i++){
+		len += snprintf(log_buf + len, sizeof(log_buf) - len, "%02X ", bbuffer[i]);
+	}
+	len += snprintf(log_buf + len, sizeof(log_buf) - len, "\r\n");
+	if(log_write != NULL){
+		len = log_write(log_fd, log_buf, len);
+	}else{
+		len = write(log_fd, log_buf, len);
+	}
+}
+
+/*!****************************************************************************
+ * @brief
+ *
+ */
+void hexdumpcolumn(const void *buffer, size_t length, size_t column){
+	if(!length) return;
+	const uint8_t *bbuffer = (uint8_t*)buffer;
+	size_t len = 0;
+	while(length){
+		for(size_t i = 0; i < column && length; i++){
+			len += snprintf(log_buf + len, sizeof(log_buf) - len, "%02X ", bbuffer[i]);
+			length--;
+		}
+		len += snprintf(log_buf + len, sizeof(log_buf) - len, "\r\n");
+	}
+	if(log_write != NULL){
+		len = log_write(log_fd, log_buf, len);
+	}else{
+		len = write(log_fd, log_buf, len);
+	}
+}
+
 /******************************** END OF FILE ********************************/

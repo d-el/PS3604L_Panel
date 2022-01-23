@@ -1,7 +1,7 @@
 ﻿/*!****************************************************************************
  * @file		settingTSK.h
  * @author		d_el - Storozhenko Roman
- * @version		V1.0
+ * @version		V1.1
  * @date		01.01.2016
  * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
  * @brief		This task create start screen

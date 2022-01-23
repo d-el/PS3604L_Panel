@@ -67,12 +67,14 @@ static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint3
 #endif
 static const char *logTag = "SYS";
 
+//void modbusServerTSK(void *pPrm);
+
 /*!****************************************************************************
  * @brief
  */
 void systemTSK(void *pPrm){
 	(void)pPrm;
-	TickType_t 		xLastWakeTime = xTaskGetTickCount();
+	//TickType_t 		xLastWakeTime = xTaskGetTickCount();
 	selWindow_type 	selWindowPrev = noneWindow;
 
 	//Init log system
@@ -94,7 +96,7 @@ void systemTSK(void *pPrm){
 	assert(lowPowerSem != NULL);
 	xSemaphoreTake(lowPowerSem, portMAX_DELAY);
 
-	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", UART_TSK_SZ_STACK, NULL, UART_TSK_PRIO, NULL);
+	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", REG_TSK_SZ_STACK, NULL, REG_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started regulatorConnTSK");
 
@@ -103,6 +105,10 @@ void systemTSK(void *pPrm){
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started httpServerTSK");
+
+	//osres = xTaskCreate(modbusServerTSK, "modbusServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
+	//assert(osres == pdTRUE);
+	//P_LOGI(logTag, "Started modbusServerTSK");
 
 #if(TASK_MONITOR_EN > 0)
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);

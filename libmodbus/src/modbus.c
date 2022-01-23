@@ -84,16 +84,16 @@ void _error_print(modbus_t *ctx, const char *context)
 {
     if (ctx->debug) {
         if (context != NULL) {
-        	modbus_printf("ERROR %s : %s\r\n", modbus_strerror(libmodbuserrno), context);
+            modbus_printf("ERROR %s : %s\r\n", modbus_strerror(libmodbuserrno), context);
         } else {
-        	modbus_printf("ERROR %s\r\n", modbus_strerror(libmodbuserrno));
+            modbus_printf("ERROR %s\r\n", modbus_strerror(libmodbuserrno));
         }
     }
 }
 
 static void _sleep_response_timeout(modbus_t *ctx)
 {
-	(void)ctx;
+    (void)ctx;
 }
 
 int modbus_flush(modbus_t *ctx)
@@ -159,14 +159,14 @@ static int send_msg(modbus_t *ctx, uint8_t *msg, int msg_length)
     msg_length = ctx->backend->send_msg_pre(msg, msg_length);
 
     if (ctx->debug) {
-    	char string[4 + msg_length * 3 + 3];
-    	size_t len = 0;
-    	len += snprintf(&string[len], sizeof(string) - len, "Tx: ");
-    	for (i = 0; i < msg_length; i++){
-    		len += snprintf(&string[len], sizeof(string) - len, "%02X ", msg[i]);
-    	}
-    	len += snprintf(&string[len], sizeof(string) - len, "\r\n");
-    	modbus_printf(string);
+        char string[4 + msg_length * 3 + 3];
+        size_t len = 0;
+        len += snprintf(&string[len], sizeof(string) - len, "Tx: ");
+        for (i = 0; i < msg_length; i++){
+            len += snprintf(&string[len], sizeof(string) - len, "%02X ", msg[i]);
+        }
+        len += snprintf(&string[len], sizeof(string) - len, "\r\n");
+        modbus_printf(string);
     }
 
     /* In recovery mode, the write command will be issued until to be
