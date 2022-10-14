@@ -185,11 +185,7 @@ void chargeTSK(void *pPrm){
 				snprintf(str, sizeof(str), "Time:  %" PRIu16 "m 00s     ", params.time->val);
 			}
 		}else{
-			if(stateenable){
-				snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02" PRIu32 "s   ", (regmeas.time) / 60, (regmeas.time) % 60);
-			}else{
-				snprintf(str, sizeof(str), "Time:  - - -            ");
-			}
+			snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02" PRIu32 "s   ", (regmeas.time) / 60, (regmeas.time) % 60);
 
 		}
 		if(varParam == C_TIME && !stateenable){
