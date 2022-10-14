@@ -352,8 +352,30 @@ void selWindow(selWindow_type window){
 /*!****************************************************************************
  */
 void timezoneUpdate(int8_t timezone){
-	char str[12];
-	snprintf(str, sizeof(str), "TZ=GMT%i", -timezone);
+	char str[100];
+	if(Prm::dstOnOff.val){
+		snprintf(str, sizeof(str), "TZ=CEST%iCET%i,M%u.%u.%u/%02u:%02u:%02u,M%u.%u.%u/%02u:%02u:%02u",
+				//									| month
+				//										| Week
+				//											| Day
+				//												| Time
+				timezone, timezone - 1,
+				Prm::DSTSMon.val,
+				Prm::DSTSWeek.val,
+				Prm::DSTSDay.val,
+				Prm::DSTSHour.val,
+				Prm::DSTSMin.val,
+				Prm::DSTSSec.val,
+				Prm::DSTEMon.val,
+				Prm::DSTEWeek.val,
+				Prm::DSTEDay.val,
+				Prm::DSTEHour.val,
+				Prm::DSTEMin.val,
+				Prm::DSTESec.val
+				);
+	}else{
+		snprintf(str, sizeof(str), "TZ=GMT%i", timezone);
+	}
 	putenv(str);
 	tzset();
 }

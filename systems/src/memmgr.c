@@ -3,8 +3,7 @@
  * @author		d_el - Storozhenko Roman
  * @version		V1.0
  * @date		12.12.2021
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
- * @brief		Debug utils, HardFault_Handler tracer
+ * @copyright	The MIT License (MIT). Copyright (c) 2021 Storozhenko Roman
  */
 
 #include <string.h>

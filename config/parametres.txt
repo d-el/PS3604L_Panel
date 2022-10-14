@@ -13,6 +13,15 @@ text(dmask, mask,
 	64: mask5
 	)
 
+text(OnOff, value,
+	0: Off,
+	1: On
+	)
+
+text(Day, value,
+	0: Sun, 1: Mon, 2: Tue, 3: Wed, 4: Thu, 5: Fri, 6: Sat
+	)
+
 group(Debug, public)
 	p(d1			,""		,char		,chmodRW	,nullptr	,0	,0xFF01	,48			,48			,90			,1		,1			,0	,notsave)
 	p(d2			,""		,int8_t		,chmodRW	,nullptr	,0	,0xFF02	,5.5		,-5.5		,5.5		,0.1	,1			,1	,notsave)
@@ -29,6 +38,19 @@ group(Settings, public)
 	p(ipadr			,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0xC0A8010A	,0			,0xFFFFFFFF	,1		,1			,0	,savesys)
 	p(netmask		,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0xFFFFFF00	,0			,0xFFFFFF00	,1		,1			,0	,savesys)
 	p(gateway		,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0xC0A80101	,0			,0xC0A80101	,1		,1			,0	,savesys)
+	p(dstOnOff		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,1			,1		,0			,0	,savesys)
+	p(DSTSMon		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,1			,1			,12			,1		,0			,0	,savesys)
+	p(DSTSWeek		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,1			,1			,5			,1		,0			,0	,savesys)
+	p(DSTSDay		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,1			,0			,6			,1		,0			,0	,savesys)
+	p(DSTSHour		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,23			,1		,0			,0	,savesys)
+	p(DSTSMin		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,0			,0	,savesys)
+	p(DSTSSec		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,0			,0	,savesys)
+	p(DSTEMon		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,1			,1			,12			,1		,0			,0	,savesys)
+	p(DSTEWeek		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,1			,1			,5			,1		,0			,0	,savesys)
+	p(DSTEDay		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,1			,0			,6			,1		,0			,0	,savesys)
+	p(DSTEHour		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,23			,1		,0			,0	,savesys)
+	p(DSTEMin		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,0			,0	,savesys)
+	p(DSTESec		,""		,uint8_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,59			,1		,0			,0	,savesys)
 
 group(Settings2, private)
 	p(utcTime		,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0x58684680	,0x58684680	,0xFFFFFFFF	,86400	,1728000	,0	,notsave)

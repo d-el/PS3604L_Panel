@@ -22,18 +22,19 @@
 #include <beep.h>
 #include "menuSystem.h"
 #include "ui.h"
+#include <timegm.h>
 
 namespace Menu {
 
-#define MENU_SCREEN_W       DISP_W
-#define MENU_SCREEN_H       DISP_H
-#define MENU_PATH_FONT      font6x8
-#define MENU_PATH_H         9
-#define MENU_PATH_CHAR_W    6
-#define MENU_ITEM_FONT      font8x12
-#define MENU_ITEM_H         13
-#define MENU_ITEM_CHAR_W    8
-#define MENU_MAXPATH        5
+#define MENU_SCREEN_W		DISP_W
+#define MENU_SCREEN_H		DISP_H
+#define MENU_PATH_FONT		font6x8
+#define MENU_PATH_H			9
+#define MENU_PATH_CHAR_W	6
+#define MENU_ITEM_FONT		font8x12
+#define MENU_ITEM_H			13
+#define MENU_ITEM_CHAR_W	8
+#define MENU_MAXPATH		5
 #define MENU_PERIOD			20
 
 /*!****************************************************************************
@@ -151,14 +152,14 @@ void outItemString(const MenuItem *m, uint8_t itemNumber, bool select){
 
 	// Delimiter
 	grf_line(0, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1,
-	            MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
+				MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
 
 	// Label and spaces
 	strcpy(string, m->label);
 	memset(string + strlen(m->label), ' ', sizeof(string) - 1 - strlen(m->label));
 	string[sizeof(string) -1 - strlen(value)] = 0;
-    disp_setContentColor(colorLabel[sel]);
-    disp_putStr(0, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
+	disp_setContentColor(colorLabel[sel]);
+	disp_putStr(0, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
 
 	// Value
 	if(!m->editor){
@@ -254,10 +255,11 @@ bool run(const MenuItem *m){
 			//Parent
 			if(keyState(kMode)){
 				if(historyIndex){
-					callExit(m);
+					//callExit(m);
 					m = history[--historyIndex];
 					for(top = m; top->previous; top = top->previous);
 					//callEnter(m);
+					callExit(m);
 				}
 				else{
 					return true; //Exit
@@ -349,13 +351,13 @@ ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex){
 		}
 
 		auto isLeapYear = [](int y) -> bool{
-		    return  !( y%4 ) && ( y%100 || !( y%400 ) );
+			return  !( y%4 ) && ( y%100 || !( y%400 ) );
 		};
 
 		auto daysInMonth = [isLeapYear](int month, int year) -> int {
 			static const int daysInMonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 			if (month == 2 && isLeapYear(year))
-			        return 29;
+				return 29;
 			return daysInMonth[month - 1];
 		};
 

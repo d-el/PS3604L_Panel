@@ -33,11 +33,20 @@ ItemState setBright(const MenuItem* m){
 }
 
 /*!****************************************************************************
+ * @brief    set LCD Bright callback
+ */
+ItemState updateDST(const MenuItem* m){
+	(void)m;
+	timezoneUpdate(Prm::timezone.val);
+	return ItemState { true, "" };
+}
+
+/*!****************************************************************************
  * @brief    RTC select callback
  */
 ItemState rtcSelect(const MenuItem* m){
 	(void)m;
-	Prm::utcTime.val = time(NULL) + (3600 * Prm::timezone.val);
+	Prm::utcTime.val = time(NULL);
 	return ItemState { true, "" };
 }
 
@@ -46,8 +55,7 @@ ItemState rtcSelect(const MenuItem* m){
  */
 ItemState rtcUnselect(const MenuItem* m){
 	(void)m;
-	timezoneUpdate(Prm::timezone.val);
-	rtc_setTimeUnix(Prm::utcTime.val - (3600 * Prm::timezone.val));
+	rtc_setTimeUnix(Prm::utcTime.val);
 	return ItemState { true, "" };
 }
 
@@ -178,6 +186,21 @@ m1,
 m2,
 	m20,
 	m21,
+	m22,
+	m23,
+		m230,
+		m231,
+		m232,
+		m233,
+		m234,
+		m235,
+	m24,
+		m240,
+		m241,
+		m242,
+		m243,
+		m244,
+		m245,
 m3,
 	m30,
 	m31,
@@ -208,9 +231,24 @@ m1("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, &m0, &m1
 		m104("AdcIEx", &Prm::IadcEx, false, 0, savePointI, nullptr, nullptr, updateReg, &m105, &m103, nullptr),
 		m105("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m104, nullptr),
 
-m2("Date & Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
+m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
 	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),
-	m21("Time Zone", &Prm::timezone, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m20, nullptr),
+	m21("Time Zone", &Prm::timezone, true, 0, nullptr, nullptr, nullptr, nullptr, &m22, &m20, nullptr),
+	m22("DST", &Prm::dstOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m23, &m21, nullptr),
+	m23("Start", nullptr, true, 0, nullptr, nullptr, updateDST, nullptr, &m24, &m22, &m230),
+		m230("Mon", &Prm::DSTSMon, true, 0, nullptr, nullptr, nullptr, nullptr, &m231, nullptr, nullptr),
+		m231("Week", &Prm::DSTSWeek, true, 0, nullptr, nullptr, nullptr, nullptr, &m232, &m230, nullptr),
+		m232("Day", &Prm::DSTSDay, true, 0, nullptr, nullptr, nullptr, nullptr, &m233, &m231, nullptr),
+		m233("Hour", &Prm::DSTSHour, true, 0, nullptr, nullptr, nullptr, nullptr, &m234, &m232, nullptr),
+		m234("Min", &Prm::DSTSMin, true, 0, nullptr, nullptr, nullptr, nullptr, &m235, &m233, nullptr),
+		m235("Sec", &Prm::DSTSSec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m234, nullptr),
+	m24("End", nullptr, true, 0, nullptr, nullptr, updateDST, nullptr, nullptr, &m23, &m240),
+		m240("Mon", &Prm::DSTEMon, true, 0, nullptr, nullptr, nullptr, nullptr, &m241, nullptr, nullptr),
+		m241("Week", &Prm::DSTEWeek, true, 0, nullptr, nullptr, nullptr, nullptr, &m242, &m240, nullptr),
+		m242("Day", &Prm::DSTEDay, true, 0, nullptr, nullptr, nullptr, nullptr, &m243, &m241, nullptr),
+		m243("Hour", &Prm::DSTEHour, true, 0, nullptr, nullptr, nullptr, nullptr, &m244, &m242, nullptr),
+		m244("Min", &Prm::DSTEMin, true, 0, nullptr, nullptr, nullptr, nullptr, &m245, &m243, nullptr),
+		m245("Sec", &Prm::DSTESec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m244, nullptr),
 
 m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30),
 	m30("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr, ipAddressEditor),
