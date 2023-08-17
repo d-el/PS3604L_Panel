@@ -249,7 +249,6 @@ void baseTSK(void *pPrm){
  *
  */
 void printStatusBar(void){
-	static uint8_t errPrev = 0;
 	static uint8_t modeIlimPrev = 0;
 	static bool enablePrev = 0;
 	static char str[30];
@@ -277,16 +276,15 @@ void printStatusBar(void){
 			regmeas.status.m_errorExternalIAdc || !regstate){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
-		if(errPrev == 0){
-			grf_fillRect(0, 108, 160, 19, black);
-			errPrev = 0;
-		}
 
-		if(regmeas.status.m_errorTemperatureSensor){
+		if(!regstate){
+			disp_putStr(35, 112, &arial, 0, "No Connect");
+		}
+		else if(regmeas.status.m_errorTemperatureSensor){
 			disp_putStr(16, 112, &arial, 0, "Err Temp Sensor");
 		}
 		else if(regmeas.status.m_overheated != 0){
-			disp_putStr(16, 112, &arial, 0, "Overflow Temp");
+			disp_putStr(40, 112, &arial, 0, "Overheat");
 		}
 		else if(regmeas.status.m_reverseVoltage != 0){
 			disp_putStr(16, 112, &arial, 0, "Reverse Voltage");
@@ -294,16 +292,7 @@ void printStatusBar(void){
 		else if(regmeas.status.m_errorExternalIAdc){
 			disp_putStr(16, 112, &arial, 0, "Error External IAdc");
 		}
-		else if(!regstate){
-			disp_putStr(35, 112, &arial, 0, "No Connect");
-		}
-
-		errPrev = 1;
 	}else{	//Not failure
-		if(errPrev != 0){
-			grf_fillRect(0, 108, 160, 19, black);
-			errPrev = 0;
-		}
 		disp_setColor(black, white);
 
 		//Print output power
@@ -362,8 +351,6 @@ void printStatusBar(void){
 			snprintf(str, sizeof(str), "    ");
 			disp_putStr(69, 110, &font6x8, 0, str);
 		}
-
-		errPrev = 0;
 	}
 }
 

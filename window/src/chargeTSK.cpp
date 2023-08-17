@@ -86,28 +86,27 @@ void chargeTSK(void *pPrm){
 		 */
 		if(keyProc() != 0){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
-			if(keyState(kSet)){
-				varParam++;
-				if(varParam == mode_number)
-					varParam = 0;
-			}else if(keyState(kMode)){
-				if(!stateenable){
-					selWindow(baseWindow);
-				}else{
-					BeepTime(ui.beep.error.time, ui.beep.error.freq);
-				}
-			}else if(keyState(kOnOff)){
+			if(keyState(kOnOff)){
 				if(!stateenable){
 					reg_setEnable(true);
 				}else{
 					reg_setEnable(false);
 				}
-			}else if(keyState(kUp)){
-				params.p[varParam]->bigstep(1);
-			}else if(keyState(kDown)){
-				params.p[varParam]->bigstep(-1);
-			}else if(keyState(kZero)){
-				params.p[varParam]->setdef();
+			}
+			if(!stateenable){
+				if(keyState(kSet)){
+					varParam++;
+					if(varParam == mode_number)
+						varParam = 0;
+				}else if(keyState(kMode)){
+						selWindow(baseWindow);
+				}else if(keyState(kUp)){
+					params.p[varParam]->bigstep(1);
+				}else if(keyState(kDown)){
+					params.p[varParam]->bigstep(-1);
+				}else if(keyState(kZero)){
+					params.p[varParam]->setdef();
+				}
 			}
 		}
 
@@ -116,6 +115,8 @@ void chargeTSK(void *pPrm){
 		 */
 		if(!stateenable){
 			params.p[varParam]->step(enco_update());
+		}else{
+			enco_update();
 		}
 
 		/***************************************
