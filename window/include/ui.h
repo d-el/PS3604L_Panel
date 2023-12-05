@@ -13,6 +13,7 @@
  * Include
  */
 #include "stdint.h"
+#include "display.h"
 
 /*!****************************************************************************
  * User define
@@ -26,13 +27,13 @@
  * User typedef
  */
 typedef struct {
-	uint32_t cursor;
-	uint32_t voltage;
-	uint32_t current;
-	uint32_t capacity;
-	uint32_t imax;
-	uint32_t mode;
-	uint32_t background;
+	disp_color_type cursor;
+	disp_color_type voltage;
+	disp_color_type current;
+	disp_color_type capacity;
+	disp_color_type imax;
+	disp_color_type mode;
+	disp_color_type background;
 } uicolor_type;
 
 typedef struct {

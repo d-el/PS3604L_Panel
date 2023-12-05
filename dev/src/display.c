@@ -26,6 +26,7 @@ static SemaphoreHandle_t	dispFlushSem;
  * Initialize display subsystem
  */
 void disp_init(void){
+	st7735_init(JD_T18003, ST7735_R270);
 	vSemaphoreCreateBinary(dispFlushSem);
 	assert(dispFlushSem != NULL);
 	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
@@ -55,7 +56,7 @@ void disp_flush(void){
 void disp_flushfill(const lcd_color_type *color){
 	st7735_flush(disp_cb);
 	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
-	st7735_setBuffer(color, disp_cb);
+	st7735_fillBuffer(color, disp_cb);
 	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
 }
 
