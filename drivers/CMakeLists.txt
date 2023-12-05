@@ -10,7 +10,7 @@ add_library(drivers STATIC
 	src/pvd.c
 	src/rng.c
 	src/rtc.c
-	src/st7735.c
+	src/spi.c
 	src/stm32f4x7_eth_bsp.c
 	src/stm32f4x7_eth.c
 	src/uart.c

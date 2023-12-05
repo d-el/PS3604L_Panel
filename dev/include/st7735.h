@@ -25,11 +25,6 @@ extern "C" {
  */
 #define ST7735_W			160
 #define ST7735_H			128
-#define LCD_SPI				SPI3
-#define LCD_DMA_CHANNEL		0
-#define LCD_DMA_STREAM		DMA1_Stream7
-#define LCD_DMAMEM_STREAM	DMA2_Stream5
-#define LCD_DMA_IRQPrior	15
 
 /*!****************************************************************************
  * Enumeration
@@ -74,16 +69,13 @@ typedef enum {
 	halfLightBlue = 0x861F,
 } color_type;
 
-typedef uint32_t lcd_color_type;
+typedef uint16_t lcd_color_type;
 
 /*!****************************************************************************
  * Exported variables
  */
 extern uint16_t videoBff[ST7735_W * ST7735_H];
 
-/*!****************************************************************************
- * Macro functions
- */
 static inline void st7735_setPixel(uint16_t x, uint16_t y, lcd_color_type color){
 	videoBff[y * ST7735_W + x] = color;
 }
@@ -91,10 +83,9 @@ static inline void st7735_setPixel(uint16_t x, uint16_t y, lcd_color_type color)
 /*!****************************************************************************
  * Function declaration
  */
-void st7735_initB(display_type t, displayRotation_type r);
-void st7735_initR(display_type t, displayRotation_type r);
+void st7735_init(display_type type, displayRotation_type r);
 void st7735_flush(flushcb_type cb);
-void st7735_setBuffer(const lcd_color_type *color, setbufcb_type cb);
+void st7735_fillBuffer(const lcd_color_type *color, setbufcb_type cb);
 
 #ifdef __cplusplus
 }
