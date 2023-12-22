@@ -20,7 +20,7 @@
 #include "httpServerTSK.h"
 
 #define LEN				1024
-#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
+#define LOG_LOCAL_LEVEL P_LOG_WARN
 
 /*!****************************************************************************
  * MEMORY

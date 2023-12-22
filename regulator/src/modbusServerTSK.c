@@ -19,7 +19,7 @@
 #include "lwip/ip.h"
 #include "regulatorConnTSK.h"
 
-#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
+#define LOG_LOCAL_LEVEL P_LOG_INFO
 
 /*!****************************************************************************
  * MEMORY
@@ -49,7 +49,7 @@ void modbus_server_serve(struct netconn *conn){
 	while(1){
 		res = netconn_recv(conn, &inbuf);
 		if(res != ERR_OK){
-			P_LOGI(logTag, "Error in netconn_recv (%u), %s", res, lwip_strerr(res));
+			P_LOGW(logTag, "Error in netconn_recv (%i), %s", res, lwip_strerr(res));
 			break;
 		}
 		else{ //res == ERR_OK
@@ -57,8 +57,8 @@ void modbus_server_serve(struct netconn *conn){
 			u16_t buflen;
 
 			netbuf_data(inbuf, (void**)&readdata, &buflen);
-			P_LOGD(logTag, "Netbuf_data: %p (%"PRIu16")", readdata, buflen);
-			hexdumpcolumn(readdata, buflen, 32);
+			P_LOGI(logTag, "Netbuf_data: %p (%"PRIu16")", readdata, buflen);
+			if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG) hexdumpcolumn(readdata, buflen, 32);
 			tcpModbusPacket_t tcpModbusPacket;
 			memcpy(&tcpModbusPacket, readdata, buflen);
 
@@ -66,8 +66,8 @@ void modbus_server_serve(struct netconn *conn){
 			if(reg_modbusRequest((uint8_t*)&tcpModbusPacket.MBAPheader.UnitIdentifier, &len)){
 				size_t lentowrite = 6 + len;
 				tcpModbusPacket.MBAPheader.Length = __builtin_bswap16(len);
-				P_LOGD(logTag, "transmit to client (%"PRIu16")", lentowrite);
-				hexdumpcolumn(&tcpModbusPacket, lentowrite, 32);
+				P_LOGI(logTag, "send response to client (%"PRIu16")", lentowrite);
+				if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG) hexdumpcolumn(&tcpModbusPacket, lentowrite, 32);
 				len = __builtin_bswap16(len); // hton
 				netconn_write(conn, &tcpModbusPacket, lentowrite, NETCONN_NOCOPY);
 			}
@@ -113,7 +113,7 @@ void modbusServerTSK(void *pPrm){
 		}
 		else{
 			numberRequest++;
-			P_LOGD(logTag, "Connection %"PRIu32", Remote IP address: %s", numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
+			P_LOGI(logTag, "Connection %"PRIu32", Remote IP address: %s", numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
 			reg_setremote(true);
 			modbus_server_serve(newconn);
 			reg_setremote(false);

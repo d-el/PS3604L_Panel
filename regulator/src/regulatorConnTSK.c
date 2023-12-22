@@ -27,7 +27,7 @@
 /*!****************************************************************************
  * MEMORY
  */
-#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
+#define LOG_LOCAL_LEVEL P_LOG_DEBUG
 static char *logTag = "regulator";
 
 typedef struct{
@@ -226,6 +226,10 @@ void reg_setremote(bool rem){
 	gremote = rem;
 }
 
+bool reg_getremote(void){
+	return gremote;
+}
+
 /*!****************************************************************************
  * @brief
  */
@@ -243,7 +247,7 @@ void regulatorConnTSK(void *pPrm){
 	tcpSem = xSemaphoreCreateBinary();
 	xSemaphoreTake(tcpSem, 0);
 
-	modbus_t *ctx = modbus_new_rtu("USART1", 230400, 'N', 8, 1);
+	modbus_t *ctx = modbus_new_rtu("USART1", 921600, 'N', 8, 1);
 	modbus_set_slave(ctx, defaultslave);
 	modbus_set_debug(ctx, FALSE);
 	modbus_connect(ctx);
@@ -257,7 +261,7 @@ void regulatorConnTSK(void *pPrm){
 		regTarget_t lpcalRegTarget = regTarget;
 		xSemaphoreGive(regulatorMutex);
 
-		// Set target value
+		// Set target local value
 		if(gremote == false){
 			int32_t number = sizeof(lpcalRegTarget)/sizeof(uint16_t);
 			if(writeRegs(ctx, 0x0100, &lpcalRegTarget, number)){
@@ -337,7 +341,7 @@ void regulatorConnTSK(void *pPrm){
 			mobusRequstData = NULL;
 			xSemaphoreGive(tcpSem);
 		}
-		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(6));
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(10));
 	}
 }
 

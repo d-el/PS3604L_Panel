@@ -112,6 +112,7 @@ bool reg_getState(regState_t *state);
 bool reg_getVersion(regVersion_t *v);
 
 void reg_setremote(bool rem);
+bool reg_getremote(void);
 bool reg_modbusRequest(uint8_t *req, uint16_t *req_length);
 
 void modbusServerTSK(void *pPrm);

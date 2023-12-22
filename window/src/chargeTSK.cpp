@@ -25,9 +25,9 @@
 #include <prmSystem.h>
 #include <systemTSK.h>
 #include "chargeTSK.h"
-#include "baseTSK.h"
 #include <prmSystem.h>
 #include <enco.h>
+#include "footer.h"
 
 enum {
 	C_VOLT,
@@ -214,8 +214,6 @@ void chargeTSK(void *pPrm){
 		disp_setColor(black, ui.color.capacity);
 		disp_putStr(10, 80, &arial, 0, str);
 
-		grf_line(0, 107, 159, 107, halfLightGray);
-
 		if(finishBeep && (regmeas.disablecause == v_timeShutdown || regmeas.disablecause == v_lowCurrentShutdown)){
 			BeepTime(ui.beep.chargeFinish.time, ui.beep.chargeFinish.freq);
 			finishBeep = false;
@@ -225,7 +223,7 @@ void chargeTSK(void *pPrm){
 		}
 
 		//Print status bar
-		printStatusBar();
+		printFooter();
 
 		disp_flushfill(&ui.color.background);
 		//Cyclic delay

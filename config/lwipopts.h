@@ -12,7 +12,7 @@
 #ifndef LWIPOPTS_L
 #define LWIPOPTS_H
 
-//#include "OSinit.h"
+#include "FreeRTOSConfig.h"
 #include <sys/errno.h>
 
 
@@ -281,20 +281,20 @@
  * The stack size value itself is platform-dependent, but is passed to
  * sys_thread_new() when the thread is created.
  */
-#define TCPIP_THREAD_STACKSIZE			512/*TCPIP_SZ_STACK*/
+#define TCPIP_THREAD_STACKSIZE			TCPIP_SZ_STACK
 
 /**
  * TCPIP_THREAD_PRIO: The priority assigned to the main tcpip thread.
  * The priority value itself is platform-dependent, but is passed to
  * sys_thread_new() when the thread is created.
  */
-#define TCPIP_THREAD_PRIO				4/*TCPIP_TSK_PRIO*/
+#define TCPIP_THREAD_PRIO				TCPIP_TSK_PRIO
 
 /**
  *
  */
-#define netifINTERFACE_TASK_STACK_SIZE	512/*NETIF_SZ_STACK*/
-#define netifINTERFACE_TASK_PRIORITY	5/*NETIF_TSK_PRIO*/
+#define netifINTERFACE_TASK_STACK_SIZE	NETIF_SZ_STACK
+#define netifINTERFACE_TASK_PRIORITY	NETIF_TSK_PRIO
 
 /**
  * TCPIP_MBOX_SIZE: The mailbox size for the tcpip thread messages
@@ -363,24 +363,23 @@
 /**
  * X_STATS==1: Enable link stats.
  */
-#define LINK_STATS						1
-#define ETHARP_STATS					1
-#define IP_STATS						1
-#define IPFRAG_STATS					1
-#define ICMP_STATS						1
-#define IGMP_STATS						1
-#define UDP_STATS						1
-#define TCP_STATS						1
-#define MEM_STATS						1
-#define MEMP_STATS						1
-#define SYS_STATS						1
+#define LINK_STATS						0
+#define ETHARP_STATS					0
+#define IP_STATS						0
+#define IPFRAG_STATS					0
+#define ICMP_STATS						0
+#define IGMP_STATS						0
+#define UDP_STATS						0
+#define TCP_STATS						0
+#define MEM_STATS						0
+#define MEMP_STATS						0
+#define SYS_STATS						0
 #define IP6_STATS						0
 #define ICMP6_STATS						0
 #define IP6_FRAG_STATS					0
 #define MLD6_STATS						0
 #define ND6_STATS						0
 #define MIB2_STATS						0
-
 
 /*---------------------------------------
    ---------- Checksum options ----------

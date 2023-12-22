@@ -6,6 +6,7 @@ add_library(window STATIC
 	src/dSegBold8x14.c
 	src/font6x8.c
 	src/font8x12.c
+	src/footer.cpp
 	src/ico.c
 	src/imageLogo.c
 	src/menuSystem.cpp

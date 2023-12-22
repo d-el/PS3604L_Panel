@@ -44,7 +44,7 @@ typedef struct {
 	uint16_t userSettingLoadDefault	:1;
 
 	uint16_t lanLink				:1;
-	uint16_t lanActive				:1;
+	uint16_t httpactiv				:1;
 } frontPanelState_type;
 
 typedef struct {

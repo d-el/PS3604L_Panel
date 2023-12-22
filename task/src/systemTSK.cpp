@@ -197,7 +197,7 @@ void systemTSK(void *pPrm){
 		}
 		static uint32_t linkRequest = 0;
 		if(linkRequest != httpServer.numberRequest){
-			fp.state.lanActive = 1;
+			fp.state.httpactiv = 1;
 			linkRequest = httpServer.numberRequest;
 		}
 

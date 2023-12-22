@@ -10,7 +10,7 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include "system_stm32f4xx.h"
+//#include "system_stm32f4xx.h"
 
 /* ISR */
 #define xPortSysTickHandler SysTick_Handler
@@ -31,7 +31,6 @@
 #define configUSE_MUTEXES                       ( 1 )
 #define configUSE_RECURSIVE_MUTEXES             ( 0 )
 #define configUSE_COUNTING_SEMAPHORES           ( 1 )
-#define configUSE_ALTERNATIVE_API               ( 0 ) /* Deprecated! */
 #define configQUEUE_REGISTRY_SIZE               ( 10 )
 #define configUSE_QUEUE_SETS                    ( 0 )
 #define configUSE_TIME_SLICING                  ( 0 )
@@ -121,8 +120,8 @@ unsigned long vGetTimerForRunTimeStats(void);
 /*!**** NAME ****************** priority [1 - configMAX_PRIORITIES] **********/
 #define SYSTEM_TSK_PRIO			7
 #define REG_TSK_PRIO			6
-//#define NETIF_TSK_PRIO			5
-//#define TCPIP_TSK_PRIO			4
+#define NETIF_TSK_PRIO			5
+#define TCPIP_TSK_PRIO			4
 #define HTTP_TSK_PRIO			3
 #define TCPMODBUS_TSK_PRIO		3
 #define OSMONITOR_TSK_PRIO		1
@@ -133,9 +132,9 @@ unsigned long vGetTimerForRunTimeStats(void);
 
 /*!**** NAME ****************** size [4byte Word] ****************************/
 #define SYSTEM_TSK_SZ_STACK		512
-#define REG_TSK_SZ_STACK		1024
-//#define NETIF_SZ_STACK			512
-//#define TCPIP_SZ_STACK			512
+#define REG_TSK_SZ_STACK		512
+#define NETIF_SZ_STACK			512
+#define TCPIP_SZ_STACK			512
 #define HTTP_TSK_SZ_STACK		512
 #define TCPMODBUS_TSK_SZ_STACK	512
 #define STARTUP_TSK_SZ_STACK	512
