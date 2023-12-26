@@ -71,7 +71,6 @@ add_library(lwip STATIC
 	src/netif/ppp/vj.c
 	
 	src/netif/ethernet.c
-	src/netif/ethernetif.c
 	src/netif/lowpan6.c
 	src/netif/slipif.c
 	)

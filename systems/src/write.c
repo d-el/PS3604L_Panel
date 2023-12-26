@@ -46,8 +46,8 @@ __attribute__((constructor))
 void writeInit(void){
 	queueCommand = xQueueCreateStatic(qLen, sizeof(xMessage_t), ucQueueStorageArea, &xStaticQueue);
 	assert(queueCommand != NULL);
-    uart_init(debugUart, 460800);
-    uart_setCallback(debugUart, txHandler, NULL);
+	uart_init(debugUart, 921600);
+	uart_setCallback(debugUart, txHandler, NULL);
 }
 
 /*!****************************************************************************

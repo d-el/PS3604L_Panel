@@ -124,26 +124,10 @@ void chargeTSK(void *pPrm){
 		 */
 		reg_setVoltage(params.voltage->val * 1000);
 		reg_setCurrent(params.current->val * 1000);
-		switch(params.mode->val){
-			case (ch_modeTime):
-				reg_setMode(reg_timeShutdown);
-				reg_setTime(params.time->val * 60);
-				break;
-			case (ch_modeCurrent):
-				reg_setMode(reg_lowCurrentShutdown);
-				break;
-			default:
-				break;
-		}
+		reg_setTime(params.mode->val == ch_modeTime ? params.time->val * 60*1000 : 0);
 
-		uint32_t measV = regmeas.voltage; //[uV]
-		if(measV > 99999999){
-			measV = 99999999;
-		}
-		uint32_t measI = regmeas.current; //[uA]
-		if(measI > 9999999){
-			measI = 9999999;
-		}
+		uint32_t measV = (regmeas.voltage + 500) / 1000; // uV to mV
+		uint32_t measI = (regmeas.current + 500) / 1000; // uA to mA
 
 		/**************************************
 		 * Output data to display
@@ -154,7 +138,7 @@ void chargeTSK(void *pPrm){
 		}
 		//Print voltage
 		if(stateenable){
-			snprintf(str, sizeof(str), "U:        %02" PRIu32 ".%03" PRIu32, measV / 1000000, (measV / 1000) % 1000);
+			snprintf(str, sizeof(str), "U:        %02" PRIu32 ".%03" PRIu32, measV / 1000, measV % 1000);
 		}else{
 			snprintf(str, sizeof(str), "U:        %02" PRIu16 ".%03" PRIu16, params.voltage->val / 1000, params.voltage->val % 1000);
 		}
@@ -167,7 +151,7 @@ void chargeTSK(void *pPrm){
 
 		//Print current
 		if(stateenable){
-			snprintf(str, sizeof(str), "I:          %01" PRIu32 ".%03" PRIu32 " A", measI / 1000000, (measI / 1000) % 1000);
+			snprintf(str, sizeof(str), "I:          %01" PRIu32 ".%03" PRIu32 " A", measI / 1000, measI % 1000);
 		}else{
 			snprintf(str, sizeof(str), "I:          %0" PRIu16 ".%03" PRIu16 " A", params.current->val / 1000, params.current->val % 1000);
 		}

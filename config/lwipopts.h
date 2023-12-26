@@ -83,45 +83,45 @@
  * MEMP_NUM_RAW_PCB: Number of raw connection PCBs
  * (requires the LWIP_RAW option)
  */
-#define MEMP_NUM_RAW_PCB		2
+#define MEMP_NUM_RAW_PCB		1
 
 /**
  * MEMP_NUM_UDP_PCB: the number of UDP protocol control blocks. One
  * per active UDP "connection"
  */
-#define MEMP_NUM_UDP_PCB		2
+#define MEMP_NUM_UDP_PCB		4
 
 /**
  * MEMP_NUM_TCP_PCB: the number of simulatenously active TCP connections
  */
-#define MEMP_NUM_TCP_PCB		10
+#define MEMP_NUM_TCP_PCB		8
 
 /**
  *	MEMP_NUM_TCP_PCB_LISTEN: the number of listening TCP connections
  */
-#define MEMP_NUM_TCP_PCB_LISTEN 2
+#define MEMP_NUM_TCP_PCB_LISTEN 3
 
 /**
  * MEMP_NUM_TCP_SEG: the number of simultaneously queued TCP segments
  */
-#define MEMP_NUM_TCP_SEG		16
+#define MEMP_NUM_TCP_SEG		6
 
 /**
  * MEMP_NUM_SYS_TIMEOUT: the number of simulateously active timeouts
  */
-#define MEMP_NUM_SYS_TIMEOUT	6
+#define MEMP_NUM_SYS_TIMEOUT	16
 
 /**
  * MEMP_NUM_NETBUF: the number of struct netbufs.
  * (only needed if you use the sequential API, like api_lib.c)
  */
-#define MEMP_NUM_NETBUF			2
+#define MEMP_NUM_NETBUF			4
 
 /**
  * MEMP_NUM_NETCONN: the number of struct netconns.
  * (only needed if you use the sequential API, like api_lib.c)
  */
-#define MEMP_NUM_NETCONN		6
+#define MEMP_NUM_NETCONN		4
 
 /**
  * MEMP_NUM_TCPIP_MSG_API: the number of struct tcpip_msg, which are used
@@ -141,7 +141,7 @@
  * Pbuf options
  * PBUF_POOL_SIZE: the number of buffers in the pbuf pool
  */
-#define PBUF_POOL_SIZE			15
+#define PBUF_POOL_SIZE			16
 
 /**--------------------------------
    ---------- IP options ----------
@@ -164,7 +164,7 @@
 /**
  * IP_DEFAULT_TTL: Default value for Time-To-Live used by transport layers.
  */
-#define IP_DEFAULT_TTL					64
+#define IP_DEFAULT_TTL					255
 
 /**----------------------------------
    ---------- ICMP options ----------
@@ -261,6 +261,8 @@
  */
 #define TCP_SND_QUEUELEN		(4 * TCP_SND_BUF/TCP_MSS)
 
+#define LWIP_DISABLE_TCP_SANITY_CHECKS 1
+
 /**----------------------------------
    ---------- Pbuf options ----------
    ----------------------------------*/
@@ -335,6 +337,11 @@
  */
 #define LWIP_NETCONN					1
 
+/**
+ * LWIP_SO_RCVTIMEO==1: Enable receive timeout for sockets/netconns and
+ * SO_RCVTIMEO processing.
+ */
+#define LWIP_SO_RCVTIMEO				1
 
 /*-------------------------------------
    ---------- Socket options ----------
@@ -381,34 +388,6 @@
 #define ND6_STATS						0
 #define MIB2_STATS						0
 
-/*---------------------------------------
-   ---------- Checksum options ----------
-   --------------------------------------*/
-
-/**
- * Checksum options
- *
- * The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums by hardware:
- * - To use this feature let the following define uncommented.
- * - To disable it and process by CPU comment the  the checksum.
- */
-
-#define CHECKSUM_BY_HARDWARE
-
-/**
- * CHECKSUM_GEN_X==1: Generate checksums in software for outgoing X packets.
- */
-#define CHECKSUM_GEN_IP					0
-#define CHECKSUM_GEN_UDP				0
-#define CHECKSUM_GEN_TCP				0
-#define CHECKSUM_GEN_ICMP				0
-#define CHECKSUM_GEN_ICMP6				0
-#define CHECKSUM_CHECK_IP				0
-#define CHECKSUM_CHECK_UDP				0
-#define CHECKSUM_CHECK_TCP				0
-#define CHECKSUM_CHECK_ICMP				0
-#define CHECKSUM_CHECK_ICMP6			0
-
 /*----------------------------------------
    ---------- Debugging options ----------
    ---------------------------------------*/
@@ -419,7 +398,7 @@
  * debug messages of certain types.
  * @see debugging_levels
  */
-#define LWIP_DBG_TYPES_ON				LWIP_DBG_ON
+#define LWIP_DBG_TYPES_ON				LWIP_DBG_OFF
 
 /**
  * LWIP_DBG_MIN_LEVEL: After masking, the value of the debug is
@@ -464,6 +443,40 @@
 #define AUTOIP_DEBUG					LWIP_DBG_OFF
 #define DNS_DEBUG						LWIP_DBG_OFF
 #define IP6_DEBUG						LWIP_DBG_OFF
+
+/**
+ * LWIP_NETIF_LINK_CALLBACK==1: Support a callback function from an interface
+ * whenever the link changes (i.e., link down)
+ */
+#define LWIP_NETIF_LINK_CALLBACK		1
+
+/*---------------------------------------
+   ---------- Checksum options ----------
+   --------------------------------------*/
+
+/**
+ * Checksum options
+ *
+ * The STM32F4x7 allows computing and verifying the IP, UDP, TCP and ICMP checksums by hardware:
+ * - To use this feature let the following define uncommented.
+ * - To disable it and process by CPU comment the  the checksum.
+ */
+
+#define CHECKSUM_BY_HARDWARE
+
+/**
+ * CHECKSUM_GEN_X==1: Generate checksums in software for outgoing X packets.
+ */
+#define CHECKSUM_GEN_IP					0
+#define CHECKSUM_GEN_UDP				0
+#define CHECKSUM_GEN_TCP				0
+#define CHECKSUM_GEN_ICMP				0
+#define CHECKSUM_GEN_ICMP6				0
+#define CHECKSUM_CHECK_IP				0
+#define CHECKSUM_CHECK_UDP				0
+#define CHECKSUM_CHECK_TCP				0
+#define CHECKSUM_CHECK_ICMP				0
+#define CHECKSUM_CHECK_ICMP6			0
 
 #endif /*LWIPOPTS_H */
 /******************************** END OF FILE ********************************/

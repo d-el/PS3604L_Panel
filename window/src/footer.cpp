@@ -27,15 +27,12 @@
 #include "systemTSK.h"
 
 /*!****************************************************************************
- * MEMORY
- */
-
-/*!****************************************************************************
  * @brief
  */
 void printFooter(void){
 	static uint8_t modeIlimPrev = 0;
 	static bool enablePrev = 0;
+	static uint16_t disablecausePrev = v_none;
 	static char str[30];
 
 	//Print line
@@ -55,10 +52,10 @@ void printFooter(void){
 		modeIlimPrev = regmeas.status.m_limitation;
 	}
 
-	if(enablePrev && !enable && regmeas.disablecause == v_overCurrent){
+	if(disablecausePrev != regmeas.disablecause && regmeas.disablecause == v_overCurrent){
 		BeepTime(ui.beep.ovfCurrent.time, ui.beep.ovfCurrent.freq);
 	}
-	enablePrev = enable;
+	disablecausePrev = regmeas.disablecause;
 
 	if(regmeas.status.m_errorTemperatureSensor || regmeas.status.m_overheated || regmeas.status.m_reverseVoltage ||
 			regmeas.status.m_errorExternalIAdc || !regstate){
@@ -89,11 +86,11 @@ void printFooter(void){
 
 		//Print load resistance
 		if(regmeas.resistance != 99999000){
-			if(regmeas.resistance < 10000){
+			if(regmeas.resistance < 100000){
 				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32 " \xB1", regmeas.resistance / 1000, regmeas.resistance % 1000);
 				disp_putStr(0, 120, &font6x8, 0, str);
 			}else{
-				snprintf(str, sizeof(str), "%05" PRIu32 " \xB1", regmeas.resistance / 1000);
+				snprintf(str, sizeof(str), "%05" PRIu32 " \xB1", (regmeas.resistance + 500) / 1000);
 				disp_putStr(0, 120, &font6x8, 0, str);
 			}
 		}else{

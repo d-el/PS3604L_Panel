@@ -60,14 +60,8 @@ static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint3
  * SYS_DEBUG_LEVEL: Enable debugging for system task
  */
 #define TASK_MONITOR_EN	0
-#if(TASK_MONITOR_EN == 0)
-	#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
-#else
-	#define LOG_LOCAL_LEVEL P_LOG_NONE
-#endif
+#define LOG_LOCAL_LEVEL P_LOG_INFO
 static const char *logTag = "SYS";
-
-//void modbusServerTSK(void *pPrm);
 
 /*!****************************************************************************
  * @brief
@@ -105,10 +99,6 @@ void systemTSK(void *pPrm){
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started httpServerTSK");
-
-	//osres = xTaskCreate(modbusServerTSK, "modbusServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
-	//assert(osres == pdTRUE);
-	//P_LOGI(logTag, "Started modbusServerTSK");
 
 #if(TASK_MONITOR_EN > 0)
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);
@@ -170,31 +160,6 @@ void systemTSK(void *pPrm){
 			LED_OFF();
 		}
 
-		/*
-		 * Link management
-		 */
-		static uint8_t linkCount = 0;
-		if(linkCount++ == (LINK_DETECT_PERIOD / SYSTEM_TSK_PERIOD)){
-			if(gppin_get(GP_LANnINT) == 0){	//Detect by GPIO
-				ETH_ReadPHYRegister(PHY_ADDRESS, PHY_BSR);
-				if(fp.state.lanLink != 0){
-					netif_set_link_down(&xnetif);
-					netif_set_down(&xnetif);
-					P_LOGI(logTag, "LAN link Down");
-					fp.state.lanLink = 0;
-				}
-			}
-			if(fp.state.lanLink == 0){		//Detect by read status register
-				if(ETH_AutoNegotiation(PHY_ADDRESS, NULL) == ETH_SUCCESS){
-					netif_set_link_up(&xnetif);
-					netif_set_up(&xnetif);	//When the netif is fully configured this function must be called
-					P_LOGI(logTag, "LAN link Up");
-					fp.state.lanLink = 1;
-				}
-			}
-
-			linkCount = 0;
-		}
 		static uint32_t linkRequest = 0;
 		if(linkRequest != httpServer.numberRequest){
 			fp.state.httpactiv = 1;
@@ -202,6 +167,7 @@ void systemTSK(void *pPrm){
 		}
 
 		BaseType_t res = xSemaphoreTake(lowPowerSem, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));
+
 		if((regulatorConnected && state.status.m_lowInputVoltage) || res == pdTRUE){
 			P_LOGD(logTag, "System saveparameters");
 			saveparametersUser();
@@ -325,6 +291,13 @@ void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gat
 	dns_setserver(0, &ipaddrs);
 	IP4_ADDR(&ipaddrs, 1, 1, 1, 1);
 	dns_setserver(1, &ipaddrs);
+
+	auto linkcallback = [](struct netif *netif){
+		fp.state.lanLink = netif_is_link_up(netif) ? 1 : 0;
+		P_LOGI(logTag, "LAN link %s", fp.state.lanLink ? "Up" : "Down");
+	};
+	netif_set_link_callback(&xnetif, linkcallback);
+	netif_set_up(&xnetif);
 }
 
 /*!****************************************************************************

@@ -43,6 +43,7 @@
  * something that better describes your network interface.
  */
 
+#include <stdbool.h>
 #include "lwip/opt.h"
 #include "lwip/def.h"
 #include "lwip/mem.h"
@@ -58,7 +59,7 @@
 #include "string.h"
 
 #define netifMTU                                (1500)
-#define netifGUARD_BLOCK_TIME					( 250 )
+#define netifGUARD_BLOCK_TIME					( 100 )
 /* The time to block waiting for input. */
 #define emacBLOCK_TIME_WAITING_FOR_INPUT		pdMS_TO_TICKS(100)
 
@@ -273,13 +274,25 @@ static struct pbuf * low_level_input(struct netif *netif){
 	DMA_RX_FRAME_infos->Seg_Count = 0;
 
 	/* When Rx Buffer unavailable flag is set: clear it and resume reception */
-	if((ETH->DMASR & ETH_DMASR_RBUS) != (uint32_t) RESET){
-		/* Clear RBUS ETHERNET DMA flag */
-		ETH->DMASR = ETH_DMASR_RBUS;
-
-		/* Resume DMA reception */
-		ETH->DMARPDR = 0;
+	if(ETH_GetDMAFlagStatus(ETH_DMA_FLAG_RBU)){
+		for(uint32_t i = 0; i < ETH_RXBUFNB; i++){
+			ETH_DMADESCTypeDef *DMARxDesc = &DMARxDscrTab[i];
+			DMARxDesc->Status = ETH_DMARxDesc_OWN;
+		}
+		ETH_DMAClearITPendingBit(ETH_DMA_IT_RBU);
+		ETH_ResumeDMAReception();
 	}
+
+	if(ETH_GetDMAFlagStatus(ETH_DMA_FLAG_TBU)){
+		for(uint32_t i = 0; i < ETH_TXBUFNB; i++){
+			ETH_DMADESCTypeDef *DMATxDesc = &DMATxDscrTab[i];
+			DMATxDesc->Status &= ~ETH_DMATxDesc_OWN;
+		}
+		ETH_DMAClearITPendingBit(ETH_DMA_IT_TBU);
+		ETH_ResumeDMATransmission();
+	}
+
+
 	return p;
 }
 
@@ -295,6 +308,7 @@ static struct pbuf * low_level_input(struct netif *netif){
 void ethernetif_input(void * pvParameters){
 	(void)pvParameters;
 	struct pbuf *p;
+	TickType_t lastLinkCheck = xTaskGetTickCount();
 
 	for(;;){
 		if(xSemaphoreTake( s_xSemaphore, emacBLOCK_TIME_WAITING_FOR_INPUT) == pdTRUE){
@@ -302,6 +316,22 @@ void ethernetif_input(void * pvParameters){
 			if(ERR_OK != s_pxNetIf->input(p, s_pxNetIf)){
 				pbuf_free(p);
 				p = NULL;
+			}
+		}
+
+		const TickType_t linkCheckPeriod = pdMS_TO_TICKS(500);
+		if(xTaskGetTickCount() - lastLinkCheck > linkCheckPeriod){
+			lastLinkCheck = xTaskGetTickCount();
+
+			uint16_t ethStatus = ETH_ReadPHYRegister(PHY_ADDRESS, PHY_BSR);
+			bool link = ethStatus & PHY_Linked_Status ? true : false;
+			if(!link && netif_is_link_up(s_pxNetIf)){
+				netif_set_link_down(s_pxNetIf);
+			}
+			if(link && !netif_is_link_up(s_pxNetIf)){
+				if(ETH_AutoNegotiation(PHY_ADDRESS, NULL) == ETH_SUCCESS){
+					netif_set_link_up(s_pxNetIf);
+				}
 			}
 		}
 	}
@@ -324,7 +354,7 @@ err_t ethernetif_init(struct netif *netif){
 
 #if LWIP_NETIF_HOSTNAME
 	/* Initialize interface hostname */
-	netif->hostname = "lwip";
+	netif->hostname = "ps3604l";
 #endif /* LWIP_NETIF_HOSTNAME */
 
 	netif->name[0] = IFNAME0;

@@ -17,9 +17,10 @@
 #include "plog.h"
 #include "lwip/api.h"
 #include "lwip/ip.h"
+#include "lwip/netif.h"
 #include "regulatorConnTSK.h"
 
-#define LOG_LOCAL_LEVEL P_LOG_INFO
+#define LOG_LOCAL_LEVEL P_LOG_WARN
 
 /*!****************************************************************************
  * MEMORY
@@ -46,21 +47,18 @@ void modbus_server_serve(struct netconn *conn){
 	struct netbuf *inbuf;
 	err_t res;
 
+	netconn_set_recvtimeout(conn, 1000/*ms*/);
 	while(1){
 		res = netconn_recv(conn, &inbuf);
-		if(res != ERR_OK){
-			P_LOGW(logTag, "Error in netconn_recv (%i), %s", res, lwip_strerr(res));
-			break;
-		}
-		else{ //res == ERR_OK
+		if(res == ERR_OK){
 			uint8_t *readdata = NULL;
 			u16_t buflen;
 
 			netbuf_data(inbuf, (void**)&readdata, &buflen);
-			P_LOGI(logTag, "Netbuf_data: %p (%"PRIu16")", readdata, buflen);
+			P_LOGI(logTag, "Netbuf_data: %"PRIu32" (%"PRIu16")", numberRequest++, buflen);
 			if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG) hexdumpcolumn(readdata, buflen, 32);
 			tcpModbusPacket_t tcpModbusPacket;
-			memcpy(&tcpModbusPacket, readdata, buflen);
+			memcpy(&tcpModbusPacket, readdata, buflen <= sizeof(tcpModbusPacket_t) ? buflen : 0);
 
 			uint16_t len = __builtin_bswap16/*ntoh*/(tcpModbusPacket.MBAPheader.Length);
 			if(reg_modbusRequest((uint8_t*)&tcpModbusPacket.MBAPheader.UnitIdentifier, &len)){
@@ -71,6 +69,16 @@ void modbus_server_serve(struct netconn *conn){
 				len = __builtin_bswap16(len); // hton
 				netconn_write(conn, &tcpModbusPacket, lentowrite, NETCONN_NOCOPY);
 			}
+		}else if(res == ERR_TIMEOUT){
+			bool up = netif_is_link_up(netif_default) ? true : false;
+			if(!up){
+				P_LOGW(logTag, "Read timeout, link %s", up ? "Up" : "Down");
+				break;
+			}
+		}
+		else{
+			P_LOGW(logTag, "Error in netconn_recv (%i), %s", res, lwip_strerr(res));
+			break;
 		}
 
 		/* Delete the buffer (netconn_recv gives us ownership,
@@ -112,8 +120,7 @@ void modbusServerTSK(void *pPrm){
 			P_LOGW(logTag, "Error %i", err);
 		}
 		else{
-			numberRequest++;
-			P_LOGI(logTag, "Connection %"PRIu32", Remote IP address: %s", numberRequest, ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
+			P_LOGI(logTag, "Connection, Remote IP address: %s", ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
 			reg_setremote(true);
 			modbus_server_serve(newconn);
 			reg_setremote(false);

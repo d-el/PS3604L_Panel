@@ -15,6 +15,7 @@
 #include <portable.h>
 #include "plog.h"
 #include "sysTimeMeas.h"
+#include <lwip/stats.h>
 
 /*!****************************************************************************
  * MEMORY
@@ -32,7 +33,6 @@ static char *logTag = "MONITOR TSK";
  * ``-Wl,--undefined=uxTopUsedPriority'' when using gcc for final
  * linking) to your LDFLAGS; same with all the other symbols you need.
  */
-__attribute__((used)) const int uxTopUsedPriority = configMAX_PRIORITIES - 1;
 uint32_t monitorPeriod = pdMS_TO_TICKS(1000);
 
 /*!****************************************************************************
@@ -122,6 +122,8 @@ void monitorTSK(void *pPrm){
 			}
 		}
 
+		stats_display();
+
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(monitorPeriod));
 	}
 }
@@ -129,7 +131,7 @@ void monitorTSK(void *pPrm){
 /*!****************************************************************************
  *
  */
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char *pcTaskName){
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName){
 	(void)xTask;
 	P_LOGE(logTag, "Stack Overflow on %s", pcTaskName);
 	while(1);

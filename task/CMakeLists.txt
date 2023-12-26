@@ -8,3 +8,5 @@ target_include_directories(task PUBLIC
 	)
 
 target_link_libraries(task freertos drivers utils lwip systems prmsystem window net regulator)
+
+target_link_options(task PUBLIC -Wl,--require-defined=vApplicationMallocFailedHook)

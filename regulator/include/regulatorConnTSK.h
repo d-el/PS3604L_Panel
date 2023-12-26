@@ -38,13 +38,12 @@ typedef struct __attribute__ ((packed)){
 	uint16_t vdac;
 	uint16_t idac;
 	uint16_t mode;
-	uint32_t time_set;
+	uint32_t time_set;	///< [ms]
 } regTarget_t;
 
 typedef enum {
 	reg_overcurrentShutdown,
 	reg_limitation,
-	reg_timeShutdown,
 	reg_lowCurrentShutdown,
 	reg_raw
 } regMode_t;
@@ -80,7 +79,7 @@ typedef struct __attribute__ ((packed)){
 	uint32_t current;		///< [X_XXXXXX A]
 	uint32_t power;			///< [X_XXX Wt]
 	uint32_t resistance;	///< [X_XXX Ohm]
-	uint32_t time;			///< [s]
+	uint32_t time;			///< [ms]
 	uint32_t capacity;		///< [X_XXX Ah]
 	uint32_t input_voltage;	///< [X_XXXXXX V]
 	uint16_t temperature;	///< [X_X °С]
@@ -101,7 +100,7 @@ bool reg_setCurrent(uint32_t uA);
 bool reg_setDacVoltage(uint16_t lsb);
 bool reg_setDacCurrent(uint16_t lsb);
 bool reg_setMode(regMode_t mode);
-bool reg_setTime(uint32_t s);
+bool reg_setTime(uint32_t ms);
 bool reg_setEnable(bool state);
 bool reg_setVoltagePoint(uint32_t uV, uint8_t number);
 bool reg_setCurrentPoint(uint32_t uA, uint8_t number);

@@ -151,6 +151,7 @@ void baseTSK(void *pPrm){
 				reg_setCurrent(currentval);
 				break;
 		}
+		reg_setTime(0);
 
 		/**************************************
 		 * Copy measure data
@@ -185,7 +186,8 @@ void baseTSK(void *pPrm){
 				disp_putChar(150, 36, &font8x12, 'm');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}else{
-				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000000, (measI / 1000) % 1000);
+				measI = (measI + 500) / 1000;
+				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000, measI % 1000);
 				disp_putChar(150, 36, &font8x12, ' ');
 				disp_putChar(150, 49, &font8x12, 'A');
 			}

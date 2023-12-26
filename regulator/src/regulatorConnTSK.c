@@ -97,9 +97,9 @@ bool reg_setMode(regMode_t mode){
 	return connected;
 }
 
-bool reg_setTime(uint32_t s){
+bool reg_setTime(uint32_t ms){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
-	regTarget.time_set = s;
+	regTarget.time_set = ms;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }

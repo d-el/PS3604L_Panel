@@ -21,6 +21,7 @@ sysTimeStruct_type sysTimeStruct;
  * @brief		Enable DWT cycle counter
  */
 void sysTimeMeasEnable(void){
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 	DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;	//Enable the CYCCNT
 	DWT->CYCCNT = 0;
 }
