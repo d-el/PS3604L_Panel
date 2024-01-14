@@ -125,6 +125,7 @@ void chargeTSK(void *pPrm){
 		reg_setVoltage(params.voltage->val * 1000);
 		reg_setCurrent(params.current->val * 1000);
 		reg_setTime(params.mode->val == ch_modeTime ? params.time->val * 60*1000 : 0);
+		reg_setMode(params.mode->val == ch_modeTime ? reg_limitation : reg_lowCurrentShutdown);
 
 		uint32_t measV = (regmeas.voltage + 500) / 1000; // uV to mV
 		uint32_t measI = (regmeas.current + 500) / 1000; // uA to mA
@@ -163,14 +164,15 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 20, &arial, 0, str);
 
 		//Time
+		uint32_t time_s = (regmeas.time + 500) / 1000;
 		if(params.mode->val == ch_modeTime){
 			if(stateenable){
-				snprintf(str, sizeof(str), "Time:  %lum %02" PRIu32 "s   ", (params.time->val * 60 - regmeas.time) / 60, (params.time->val * 60 - regmeas.time) % 60);
+				snprintf(str, sizeof(str), "Time:  %lum %02" PRIu32 "s   ", (params.time->val * 60 - time_s) / 60, (params.time->val * 60 - time_s) % 60);
 			}else{
 				snprintf(str, sizeof(str), "Time:  %" PRIu16 "m 00s     ", params.time->val);
 			}
 		}else{
-			snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02" PRIu32 "s   ", (regmeas.time) / 60, (regmeas.time) % 60);
+			snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02" PRIu32 "s   ", time_s / 60, time_s % 60);
 
 		}
 		if(varParam == C_TIME && !stateenable){
