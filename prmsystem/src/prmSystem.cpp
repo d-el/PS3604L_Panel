@@ -22,7 +22,7 @@ namespace Prm {
 
 static size_t currentIndex;
 using crc_t = uint16_t;
-constexpr uint16_t magic = 0x2805;
+constexpr uint16_t magic = 6;
 
 
 #include "parameter.def"
