@@ -33,9 +33,9 @@ extern "C" {
  */
 typedef enum {
 	kMode =		(1 << 0),
-	kView =		(1 << 1),
+	kFunc =		(1 << 1),
 	kOnOff =	(1 << 2),
-	kSet =		(1 << 3),
+	kNext =		(1 << 3),
 	kZero =		(1 << 4),
 	kUp =		(1 << 5),
 	kDown =		(1 << 6),
@@ -63,6 +63,7 @@ extern key_type key;
  */
 uint32_t keyProc(void);
 uint32_t keyState(kKey_type keyMask);
+uint32_t keyDin(kKey_type keyMask);
 void ksSet(uint16_t toFirstReiteration, uint16_t toReiteration, uint16_t reiterationKeyMask);
 
 #ifdef __cplusplus

@@ -58,7 +58,7 @@ void printFooter(void){
 	disablecausePrev = regmeas.disablecause;
 
 	if(regmeas.status.m_errorTemperatureSensor || regmeas.status.m_overheated || regmeas.status.m_reverseVoltage ||
-			regmeas.status.m_errorExternalIAdc || !regstate){
+			regmeas.status.m_errorExternalIAdc || regmeas.status.m_notCalibrated || !regstate){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
 
@@ -77,6 +77,9 @@ void printFooter(void){
 		else if(regmeas.status.m_errorExternalIAdc){
 			disp_putStr(16, 112, &arial, 0, "Error External IAdc");
 		}
+		else if(regmeas.status.m_notCalibrated){
+			disp_putStr(8, 112, &arial, 0, "Error Not Calibrated");
+		}
 	}else{	//Not failure
 		disp_setColor(black, white);
 
@@ -85,14 +88,16 @@ void printFooter(void){
 		disp_putStr(0, 110, &font6x8, 0, str);
 
 		//Print load resistance
-		if(regmeas.resistance != 99999000){
-			if(regmeas.resistance < 100000){
-				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32 " \xB1", regmeas.resistance / 1000, regmeas.resistance % 1000);
-				disp_putStr(0, 120, &font6x8, 0, str);
+		if(regmeas.resistance != 999990000){
+			if(regmeas.resistance < 9999){
+				snprintf(str, sizeof(str), "%03" PRIu32 ".%01" PRIu32 " m\xB1", regmeas.resistance / 10, regmeas.resistance % 10);
+			}else if(regmeas.resistance < 99'9999){
+				auto resistance = regmeas.resistance / 10;
+				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32 " \xB1", resistance / 1000, resistance % 1000);
 			}else{
-				snprintf(str, sizeof(str), "%05" PRIu32 " \xB1", (regmeas.resistance + 500) / 1000);
-				disp_putStr(0, 120, &font6x8, 0, str);
+				snprintf(str, sizeof(str), "%06" PRIu32 " \xB1", (regmeas.resistance + 5000) / 10000);
 			}
+			disp_putStr(0, 120, &font6x8, 0, str);
 		}else{
 			disp_putStr(0, 120, &font6x8, 0, " ---   \xB1");
 		}

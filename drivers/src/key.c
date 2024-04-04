@@ -90,11 +90,21 @@ uint32_t keyProc(void){
 }
 
 /*!****************************************************************************
- * @param keyNum
- * @return
+ * @param
  */
 uint32_t keyState(kKey_type keyMask){
 	if((key.keyState & keyMask) != 0){
+		return 1;
+	}else{
+		return 0;
+	}
+}
+
+/*!****************************************************************************
+ * @param
+ */
+uint32_t keyDin(kKey_type keyMask){
+	if((key.dInState & keyMask) != 0){
 		return 1;
 	}else{
 		return 0;

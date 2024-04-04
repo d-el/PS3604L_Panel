@@ -30,7 +30,7 @@ public:
 public:
 	constexpr MenuItem(const char *_label, Prm::IVal*_prm, bool _change, uint16_t _arg,
 			Callcack _pChange, Callcack _pSelect, Callcack _pUnselect, Callcack _pPeriod,
-			const MenuItem* _next, const MenuItem* _previous, const MenuItem* _child,
+			const MenuItem* _next, const MenuItem* _previous, const MenuItem* _child = nullptr,
 			Editor _editor = nullptr
 			):
 	label(_label),

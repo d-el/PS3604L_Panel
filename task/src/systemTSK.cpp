@@ -94,7 +94,9 @@ void systemTSK(void *pPrm){
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started regulatorConnTSK");
 
-	vTaskDelay(10);
+	vTaskDelay(1);
+	P_LOGI(logTag, "Set regulator wire resistance");
+	reg_setWireResistance(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
 
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);

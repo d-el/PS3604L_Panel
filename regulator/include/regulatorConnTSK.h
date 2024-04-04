@@ -18,6 +18,7 @@ extern "C" {
  */
 #include <stdint.h>
 #include <stdbool.h>
+#include <time.h>
 
 /*!****************************************************************************
  * Define
@@ -78,7 +79,7 @@ typedef struct __attribute__ ((packed)){
 	uint32_t voltage;		///< [X_XXXXXX V]
 	uint32_t current;		///< [X_XXXXXX A]
 	uint32_t power;			///< [X_XXX Wt]
-	uint32_t resistance;	///< [X_XXX Ohm]
+	uint32_t resistance;	///< [X_XXXX Ohm]
 	uint32_t time;			///< [ms]
 	uint32_t capacity;		///< [X_XXX Ah]
 	uint32_t input_voltage;	///< [X_XXXXXX V]
@@ -102,8 +103,11 @@ bool reg_setDacCurrent(uint16_t lsb);
 bool reg_setMode(regMode_t mode);
 bool reg_setTime(uint32_t ms);
 bool reg_setEnable(bool state);
+bool reg_setWireResistance(uint32_t r);					// X_XXXX Ohm
 bool reg_setVoltagePoint(uint32_t uV, uint8_t number);
 bool reg_setCurrentPoint(uint32_t uA, uint8_t number);
+bool reg_getCalibrationTime(time_t* time);
+bool reg_getDacMaxValue(uint16_t *val);
 
 bool reg_getTarget(regTarget_t *target);
 bool reg_getEnable(bool *state);

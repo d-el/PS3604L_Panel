@@ -85,7 +85,7 @@ void baseTSK(void *pPrm){
 				BeepTime(ui.beep.error.time, ui.beep.error.freq);
 			}else{
 				BeepTime(ui.beep.key.time, ui.beep.key.freq);
-				if(keyState(kSet)){
+				if(keyState(kNext)){
 					varParam++;
 					if(varParam >= VAR_NUMBER){
 						varParam = VAR_VOLT;
@@ -96,7 +96,10 @@ void baseTSK(void *pPrm){
 					}else{
 						BeepTime(ui.beep.error.time, ui.beep.error.freq);
 					}
-				}else if(keyState(kView)){					//Next preset
+				}else if(keyState(kFunc)){					//Next preset
+					if(keyDin(kNext) && !regenable){
+						selWindow(settingWindow);
+					}
 					if(!regenable){
 						if(Prm::basepreset.val < VAR_MODE)
 							Prm::basepreset.val++;
@@ -170,8 +173,8 @@ void baseTSK(void *pPrm){
 		}else{
 			disp_setColor(black, ui.color.voltage);
 		}
-		disp_putStr(16, 0, &dSegBold, 6, str);
-		disp_putChar(150, 18, &font8x12, 'V');
+		disp_putStr(10, 0, &dSegBold, 6, str);
+		disp_putChar(146, 18, &font8x12, 'V');
 
 		//Print current
 		if(varParam == VAR_CURR){
@@ -183,21 +186,21 @@ void baseTSK(void *pPrm){
 		if(regenable){
 			if(measI < 99000){
 				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000, measI % 1000);
-				disp_putChar(150, 36, &font8x12, 'm');
-				disp_putChar(150, 49, &font8x12, 'A');
+				disp_putChar(146, 36, &font8x12, 'm');
+				disp_putChar(146, 49, &font8x12, 'A');
 			}else{
 				measI = (measI + 500) / 1000;
 				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000, measI % 1000);
-				disp_putChar(150, 36, &font8x12, ' ');
-				disp_putChar(150, 49, &font8x12, 'A');
+				disp_putChar(146, 36, &font8x12, ' ');
+				disp_putChar(146, 49, &font8x12, 'A');
 			}
 
 		}else{
 			strcpy(str, "--.---");
-			disp_putChar(150, 36, &font8x12, ' ');
-			disp_putChar(150, 49, &font8x12, 'A');
+			disp_putChar(146, 36, &font8x12, ' ');
+			disp_putChar(146, 49, &font8x12, 'A');
 		}
-		disp_putStr(16, 36, &dSegBold, 6, str);
+		disp_putStr(10, 36, &dSegBold, 6, str);
 
 		//Print current settings
 		switch(Prm::basepreset.val){
@@ -232,7 +235,7 @@ void baseTSK(void *pPrm){
 			disp_setColor(black, ui.color.mode);
 		}
 		params[Prm::basepreset.val].mode->tostring(str, sizeof(str));
-		disp_putStr(16, 88, &arial, 0, str);
+		disp_putStr(10, 88, &arial, 0, str);
 
 		//Print status bar
 		printFooter();

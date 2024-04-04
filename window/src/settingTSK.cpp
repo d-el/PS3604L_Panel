@@ -42,6 +42,26 @@ ItemState updateDST(const MenuItem* m){
 }
 
 /*!****************************************************************************
+ * @brief    Calibrate date select callback
+ */
+ItemState calibrDateSelect(const MenuItem* m){
+	(void)m;
+	time_t time = 0;
+	reg_getCalibrationTime(&time);
+	Prm::utcTime.val = time;
+	return ItemState { true, "" };
+}
+
+/*!****************************************************************************
+ * @brief    Calibrate date unselect callback
+ */
+ItemState calibrDateUnselect(const MenuItem* m){
+	(void)m;
+
+	return ItemState { true, "" };
+}
+
+/*!****************************************************************************
  * @brief    RTC select callback
  */
 ItemState rtcSelect(const MenuItem* m){
@@ -67,13 +87,16 @@ ItemState PrepareU(const MenuItem* m){
 	Prm::point.val = m->arg;
 	Prm::Ureal.val = pointU[Prm::point.val];
 	Prm::Udac.val = 0;
-	Prm::Idac.val = 2048;
-	reg_setMode(reg_raw);
-	vTaskDelay(10);
-	reg_setEnable(true);
-	reg_setDacCurrent(Prm::Idac.val);
-	bool regstate = reg_setDacVoltage(Prm::Udac.val);
-	if(regstate){
+	uint16_t dacMaxValue = 0;
+	bool result = reg_getDacMaxValue(&dacMaxValue);
+	if(result){
+		Prm::Idac.val = dacMaxValue / 4;
+		reg_setMode(reg_raw);
+		reg_setEnable(true);
+		reg_setDacCurrent(Prm::Idac.val);
+		result = reg_setDacVoltage(Prm::Udac.val);
+	}
+	if(result){
 		return ItemState { true, "" };
 	}else{
 		return ItemState { false, "error connect" };
@@ -87,13 +110,32 @@ ItemState PrepareI(const MenuItem* m){
 	static uint32_t pointI[4] = { 1000, 10'000, 50'0000, 3'000'000 }; // uA
 	Prm::point.val = m->arg;
 	Prm::Ireal.val = pointI[Prm::point.val];
-	Prm::Udac.val = 2048;
-	Prm::Idac.val = 0;
-	reg_setMode(reg_raw);
-	vTaskDelay(10);
+	uint16_t dacMaxValue = 0;
+	bool result = reg_getDacMaxValue(&dacMaxValue);
+	if(result){
+		Prm::Udac.val = dacMaxValue / 4;
+		Prm::Idac.val = 0;
+		reg_setMode(reg_raw);
+		reg_setEnable(true);
+		reg_setDacCurrent(Prm::Idac.val);
+		result = reg_setDacVoltage(Prm::Udac.val);
+	}
+	if(result){
+		return ItemState { true, "" };
+	}else{
+		return ItemState { false, "error connect" };
+	}
+}
+
+/*!****************************************************************************
+ * @brief    setup regulator
+ */
+ItemState PrepareWireResistance(const MenuItem* m){
+	(void)m;
+	reg_setMode(reg_limitation);
 	reg_setEnable(true);
-	reg_setDacCurrent(Prm::Idac.val);
-	bool regstate = reg_setDacVoltage(Prm::Udac.val);
+	reg_setCurrent(3000000);
+	bool regstate = reg_setVoltage(5000000);
 	if(regstate){
 		return ItemState { true, "" };
 	}else{
@@ -114,6 +156,7 @@ ItemState updateReg(const MenuItem* m){
 		Prm::Uadc.val = regmeas.vadc;
 		Prm::Umeas.val = regmeas.voltage;
 		Prm::Imeas.val = regmeas.current;
+		Prm::resistance = regmeas.resistance;
 		return ItemState { true, "" };
 	}else{
 		return ItemState { false, "error connect"};
@@ -141,6 +184,15 @@ ItemState savePointI(const MenuItem* m){
 }
 
 /*!****************************************************************************
+ * @brief
+ */
+ItemState setWireresistanse(const MenuItem* m){
+	(void)m;
+	reg_setWireResistance(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
+	return ItemState { true, "" };
+}
+
+/*!****************************************************************************
  * @brief    NET pfUnselect
  */
 ItemState netUpdate(const MenuItem* m){
@@ -164,25 +216,33 @@ ItemState calibrExit(const MenuItem* m){
 
 extern const MenuItem
 m1,
-	m00,
-	m01,
-	m02,
-	m03,
-		m000,
-		m001,
-		m002,
-		m003,
-		m004,
-	m10,
 	m11,
+		m110,
+		m111,
+		m112,
+		m113,
+			m1130,
+			m1131,
+			m1132,
+			m1133,
+			m1134,
 	m12,
+		m120,
+		m121,
+		m122,
+		m123,
+			m1230,
+			m1231,
+			m1232,
+			m1233,
+			m1234,
+			m1235,
 	m13,
-		m100,
-		m101,
-		m102,
-		m103,
-		m104,
-		m105,
+	m14,
+		m140,
+		m141,
+		m142,
+
 m2,
 	m20,
 	m21,
@@ -208,61 +268,69 @@ m3,
 m4;
 
 const MenuItem
-m0("Vmeter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m1, nullptr, &m00),
-	m00("Point1", nullptr, true, 0, nullptr, PrepareU, calibrExit, nullptr, &m01, nullptr, &m000),
-	m01("Point2", nullptr, true, 1, nullptr, PrepareU, calibrExit, nullptr, &m02, &m00, &m000),
-	m02("Point3", nullptr, true, 2, nullptr, PrepareU, calibrExit, nullptr, &m03, &m01, &m000),
-	m03("Point4", nullptr, true, 3, nullptr, PrepareU, calibrExit, nullptr, nullptr, &m02, &m000),
-		m000("Ureal", &Prm::Ureal, true, 0, savePointU, nullptr, nullptr, updateReg, &m001, nullptr, nullptr),
-		m001("DacU", &Prm::Udac, true, 0, savePointU, nullptr, nullptr, updateReg, &m002, &m000, nullptr),
-		m002("AdcU", &Prm::Uadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m003, &m001, nullptr),
-		m003("AdcI", &Prm::Iadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m004, &m002, nullptr),
-		m004("Umeas", &Prm::Umeas, false, 0, savePointU, nullptr, nullptr, updateReg, nullptr, &m003, nullptr),
+m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullptr, &m11),
+	m11("Vmeter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m12, nullptr, &m110),
+		m110("Point1", nullptr, true, 0, nullptr, PrepareU, calibrExit, nullptr, &m111, nullptr, &m1130),
+		m111("Point2", nullptr, true, 1, nullptr, PrepareU, calibrExit, nullptr, &m112, &m110, &m1130),
+		m112("Point3", nullptr, true, 2, nullptr, PrepareU, calibrExit, nullptr, &m113, &m111, &m1130),
+		m113("Point4", nullptr, true, 3, nullptr, PrepareU, calibrExit, nullptr, nullptr, &m112, &m1130),
+			m1130("Ureal", &Prm::Ureal, true, 0, savePointU, nullptr, nullptr, updateReg, &m1131, nullptr),
+			m1131("DacU", &Prm::Udac, true, 0, savePointU, nullptr, nullptr, updateReg, &m1132, &m1130),
+			m1132("AdcU", &Prm::Uadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m1133, &m1131),
+			m1133("AdcI", &Prm::Iadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m1134, &m1132),
+			m1134("Umeas", &Prm::Umeas, false, 0, savePointU, nullptr, nullptr, updateReg, nullptr, &m1133),
 
-m1("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, &m0, &m10),
-	m10("Point1", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m11, nullptr, &m100),
-	m11("Point2", nullptr, true, 1, nullptr, PrepareI, calibrExit, nullptr, &m12, &m10, &m100),
-	m12("Point3", nullptr, true, 2, nullptr, PrepareI, calibrExit, nullptr, &m13, &m11, &m100),
-	m13("Point4", nullptr, true, 3, nullptr, PrepareI, calibrExit, nullptr, nullptr, &m12, &m100),
-		m100("Ireal", &Prm::Ireal, true, 0, savePointI, nullptr, nullptr, nullptr, &m101, nullptr, nullptr),
-		m101("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m102, &m100, nullptr),
-		m102("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m103, &m101, nullptr),
-		m103("AdcI", &Prm::Iadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m104, &m102, nullptr),
-		m104("AdcIEx", &Prm::IadcEx, false, 0, savePointI, nullptr, nullptr, updateReg, &m105, &m103, nullptr),
-		m105("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m104, nullptr),
+	m12("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m13, &m11, &m120),
+		m120("Point1", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m121, nullptr, &m1230),
+		m121("Point2", nullptr, true, 1, nullptr, PrepareI, calibrExit, nullptr, &m122, &m120, &m1230),
+		m122("Point3", nullptr, true, 2, nullptr, PrepareI, calibrExit, nullptr, &m123, &m121, &m1230),
+		m123("Point4", nullptr, true, 3, nullptr, PrepareI, calibrExit, nullptr, nullptr, &m122, &m1230),
+			m1230("Ireal", &Prm::Ireal, true, 0, savePointI, nullptr, nullptr, updateReg, &m1231, nullptr),
+			m1231("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m1232, &m1230),
+			m1232("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1233, &m1231),
+			m1233("AdcI", &Prm::Iadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1234, &m1232),
+			m1234("AdcIEx", &Prm::IadcEx, false, 0, savePointI, nullptr, nullptr, updateReg, &m1235, &m1233),
+			m1235("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m1234),
+
+	m13("CalibrationTime", &Prm::utcTime, false, 0, nullptr, calibrDateSelect, calibrDateUnselect, nullptr, &m14, &m12, nullptr, clockEditor),
+
+	m14("Wire", nullptr, false, 0, nullptr, PrepareWireResistance, calibrExit, nullptr, nullptr, &m12, &m140),
+		m140("Compensation", &Prm::wirecompensateOnOff, true, 0, setWireresistanse, nullptr, nullptr, updateReg, &m141, nullptr),
+		m141("WireRes", &Prm::wireResistance, true, 0, setWireresistanse, nullptr, nullptr, updateReg, &m142, &m140),
+		m142("Resistance", &Prm::resistance, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m141),
 
 m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
 	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),
-	m21("Time Zone", &Prm::timezone, true, 0, nullptr, nullptr, nullptr, nullptr, &m22, &m20, nullptr),
-	m22("DST", &Prm::dstOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m23, &m21, nullptr),
+	m21("Time Zone", &Prm::timezone, true, 0, nullptr, nullptr, nullptr, nullptr, &m22, &m20),
+	m22("DST", &Prm::dstOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m23, &m21),
 	m23("Start", nullptr, true, 0, nullptr, nullptr, updateDST, nullptr, &m24, &m22, &m230),
-		m230("Mon", &Prm::DSTSMon, true, 0, nullptr, nullptr, nullptr, nullptr, &m231, nullptr, nullptr),
-		m231("Week", &Prm::DSTSWeek, true, 0, nullptr, nullptr, nullptr, nullptr, &m232, &m230, nullptr),
-		m232("Day", &Prm::DSTSDay, true, 0, nullptr, nullptr, nullptr, nullptr, &m233, &m231, nullptr),
-		m233("Hour", &Prm::DSTSHour, true, 0, nullptr, nullptr, nullptr, nullptr, &m234, &m232, nullptr),
-		m234("Min", &Prm::DSTSMin, true, 0, nullptr, nullptr, nullptr, nullptr, &m235, &m233, nullptr),
-		m235("Sec", &Prm::DSTSSec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m234, nullptr),
+		m230("Mon", &Prm::DSTSMon, true, 0, nullptr, nullptr, nullptr, nullptr, &m231, nullptr),
+		m231("Week", &Prm::DSTSWeek, true, 0, nullptr, nullptr, nullptr, nullptr, &m232, &m230),
+		m232("Day", &Prm::DSTSDay, true, 0, nullptr, nullptr, nullptr, nullptr, &m233, &m231),
+		m233("Hour", &Prm::DSTSHour, true, 0, nullptr, nullptr, nullptr, nullptr, &m234, &m232),
+		m234("Min", &Prm::DSTSMin, true, 0, nullptr, nullptr, nullptr, nullptr, &m235, &m233),
+		m235("Sec", &Prm::DSTSSec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m234),
 	m24("End", nullptr, true, 0, nullptr, nullptr, updateDST, nullptr, nullptr, &m23, &m240),
-		m240("Mon", &Prm::DSTEMon, true, 0, nullptr, nullptr, nullptr, nullptr, &m241, nullptr, nullptr),
-		m241("Week", &Prm::DSTEWeek, true, 0, nullptr, nullptr, nullptr, nullptr, &m242, &m240, nullptr),
-		m242("Day", &Prm::DSTEDay, true, 0, nullptr, nullptr, nullptr, nullptr, &m243, &m241, nullptr),
-		m243("Hour", &Prm::DSTEHour, true, 0, nullptr, nullptr, nullptr, nullptr, &m244, &m242, nullptr),
-		m244("Min", &Prm::DSTEMin, true, 0, nullptr, nullptr, nullptr, nullptr, &m245, &m243, nullptr),
-		m245("Sec", &Prm::DSTESec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m244, nullptr),
+		m240("Mon", &Prm::DSTEMon, true, 0, nullptr, nullptr, nullptr, nullptr, &m241, nullptr),
+		m241("Week", &Prm::DSTEWeek, true, 0, nullptr, nullptr, nullptr, nullptr, &m242, &m240),
+		m242("Day", &Prm::DSTEDay, true, 0, nullptr, nullptr, nullptr, nullptr, &m243, &m241),
+		m243("Hour", &Prm::DSTEHour, true, 0, nullptr, nullptr, nullptr, nullptr, &m244, &m242),
+		m244("Min", &Prm::DSTEMin, true, 0, nullptr, nullptr, nullptr, nullptr, &m245, &m243),
+		m245("Sec", &Prm::DSTESec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m244),
 
 m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30),
 	m30("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr, ipAddressEditor),
 	m31("subnet mask", &Prm::netmask, true, 0, nullptr, nullptr, nullptr, nullptr, &m32, &m30, nullptr, ipAddressEditor),
 	m32("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, ipAddressEditor),
 
-m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, nullptr, &m3, nullptr);
+m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, nullptr, &m3);
 
 /*!****************************************************************************
  * @brief    Setting system task
  */
 void settingTSK(void *pPrm){
 	(void)pPrm;
-	run(&m0);
+	run(&m1);
 	saveparametersSystem();
 	selWindow(baseWindow);
 	vTaskSuspend(NULL);

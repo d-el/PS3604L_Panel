@@ -143,7 +143,7 @@ void outItemString(const MenuItem *m, uint8_t itemNumber, bool select){
 	char string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
 	char value[64];
 	value[0] = '\0';
-	if(m->prm) m->prm->tostring(value, sizeof(value));
+	if(m->prm && !m->editor) m->prm->tostring(value, sizeof(value));
 
 	menuItemSelect_type sel = select ?
 				m->change ? menuItemSelect: menuItemSelectUnchangeable
@@ -197,7 +197,7 @@ void outItemString(const char *string, uint8_t itemNumber, uint8_t selectPositio
 /*!****************************************************************************
  */
 void printHistory(const MenuItem* history[], uint8_t historyDepth){
-	char s[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1] = "/";
+	char s[MENU_SCREEN_W / MENU_PATH_CHAR_W + 1] = "/";
 	uint8_t offset = 0;
 	for(size_t i = 0; i < historyDepth; i++){
 		offset += snprintf(&s[offset], sizeof(s) - offset, "/%s", history[i]->label);
@@ -237,7 +237,7 @@ bool run(const MenuItem *m){
 			}
 
 			//Previous
-			if(keyState(kView)){
+			if(keyState(kFunc)){
 				if(m->previous){
 					callUnselect(m);
 					m = m->previous;
@@ -245,7 +245,7 @@ bool run(const MenuItem *m){
 				}
 			}
 			//Next
-			if(keyState(kSet)){
+			if(keyState(kNext)){
 				if(m->next){
 					callUnselect(m);
 					m = m->next;
@@ -317,20 +317,19 @@ ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex){
 	uint8_t var = day;
 	struct Limit{ int32_t min, max; };
 	const Limit limits[] = {
-			1,31, 1,12, 21,99, 0,23, 0,59, 0,59
+			1,31, 1,12, 2024,3000, 0,23, 0,59, 0,59
 	};
 
 	struct tm t = {};
 	time_t unixTime = static_cast<Prm::Val<uint32_t>*>(m->prm)->val;
-	///localtime_r(&unixTime, &t);
-	gmtime_r(&unixTime, &t);
+	localtime_r(&unixTime, &t);
 
 	union Val{
 		struct{ int32_t mday, mon, year, hour, min, sec; };
 		int32_t v[6];
 	};
 
-	Val val = { t.tm_mday, t.tm_mon + 1, t.tm_year - 100, t.tm_hour, t.tm_min, t.tm_sec };
+	Val val = { t.tm_mday, t.tm_mon + 1, t.tm_year + 1900, t.tm_hour, t.tm_min, t.tm_sec };
 
 	while(1){
 		if(keyProc() != 0){
@@ -345,7 +344,6 @@ ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex){
 
 			//Parent
 			if(keyState(kMode)){
-				//callExit(m);
 				break;
 			}
 		}
@@ -361,9 +359,11 @@ ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex){
 			return daysInMonth[month - 1];
 		};
 
-		val.v[var] += enco_update();
-		if(val.v[var] < limits[var].min) val.v[var] = limits[var].min;
-		if(val.v[var] > limits[var].max) val.v[var] = limits[var].max;
+		if(m->change){
+			val.v[var] += enco_update();
+			if(val.v[var] < limits[var].min) val.v[var] = limits[var].min;
+			if(val.v[var] > limits[var].max) val.v[var] = limits[var].max;
+		}
 
 		int monlimit = daysInMonth(val.mon, val.year + 2000);
 		if(val.v[day] > monlimit) val.v[day] = monlimit;
@@ -372,25 +372,27 @@ ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex){
 
 		char str[64];
 
-		Limit hilightsDate[6] = { 5,7, 8,10, 11,13, 0,0, 0,0, 0,0 };
-		snprintf(str, sizeof(str), "date %02" PRIi32 ".%02" PRIi32 ".%02" PRIi32, val.mday, val.mon, val.year);
-		outItemString(str, 0, hilightsDate[var].min, hilightsDate[var].max);
+		Limit hilightsDate[7] = { 5,7, 8,10, 11,15, 0,0, 0,0, 0,0, 0,0 };
+		snprintf(str, sizeof(str), "date %02" PRIi32 ".%02" PRIi32 ".%04" PRIi32, val.mday, val.mon, val.year);
+		outItemString(str, 0, hilightsDate[var].min, m->change ? hilightsDate[var].max : hilightsDate[var].min);
 
-		Limit hilightsTime[6] = { 0,0, 0,0, 0,0, 5,7, 8,10, 11,13 };
+		Limit hilightsTime[7] = { 0,0, 0,0, 0,0, 5,7, 8,10, 11,13, 0,0 };
 		snprintf(str, sizeof(str), "time %02" PRIi32 ":%02" PRIi32 ":%02" PRIi32, val.hour, val.min, val.sec);
-		outItemString(str, 1, hilightsTime[var].min, hilightsTime[var].max);
+		outItemString(str, 1, hilightsTime[var].min, m->change ? hilightsTime[var].max : hilightsTime[var].min);
 
 		disp_flushfill(&ui.color.background);
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(MENU_PERIOD));
 	}
 
-	t.tm_mday = val.mday;
-	t.tm_mon = val.mon - 1;
-	t.tm_year = val.year + 100;
-	t.tm_hour = val.hour;
-	t.tm_min = val.min;
-	t.tm_sec = val.sec;
-	static_cast<Prm::Val<uint32_t>*>(m->prm)->val = mktime(&t);
+	if(m->change){
+		t.tm_mday = val.mday;
+		t.tm_mon = val.mon - 1;
+		t.tm_year = val.year - 1900;
+		t.tm_hour = val.hour;
+		t.tm_min = val.min;
+		t.tm_sec = val.sec;
+		static_cast<Prm::Val<uint32_t>*>(m->prm)->val = mktime(&t);
+	}
 	return ItemState{  true, "" };
 }
 

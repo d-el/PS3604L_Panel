@@ -94,7 +94,7 @@ void chargeTSK(void *pPrm){
 				}
 			}
 			if(!stateenable){
-				if(keyState(kSet)){
+				if(keyState(kNext)){
 					varParam++;
 					if(varParam == mode_number)
 						varParam = 0;

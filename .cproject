@@ -89,8 +89,9 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="flash" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="gdb flash" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>bash</buildCommand>
+				<buildArguments/>
 				<buildTarget>scripts/gdb_client_start.sh -g gdbinitflash</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
