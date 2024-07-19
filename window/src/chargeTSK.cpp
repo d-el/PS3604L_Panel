@@ -49,7 +49,7 @@ void chargeTSK(void *pPrm){
 	(void)pPrm;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	uint8_t varParam = 0;
-	char str[30];
+	char str[32];
 	bool finishBeep = false;
 
 	struct BaeParameter{
@@ -57,7 +57,7 @@ void chargeTSK(void *pPrm){
 			struct{
 				const Prm::Val<uint16_t> *voltage;
 				const Prm::Val<uint16_t> *current;
-				const Prm::Val<uint16_t> *time;
+				const Prm::Val<uint32_t> *time;
 				const Prm::Val<uint8_t> *mode;
 			};
 			Prm::IVal *p[4];
@@ -124,7 +124,7 @@ void chargeTSK(void *pPrm){
 		 */
 		reg_setVoltage(params.voltage->val * 1000);
 		reg_setCurrent(params.current->val * 1000);
-		reg_setTime(params.mode->val == ch_modeTime ? params.time->val * 60*1000 : 0);
+		reg_setTime(params.mode->val == ch_modeTime ? params.time->val : 0);
 		reg_setMode(params.mode->val == ch_modeTime ? reg_limitation : reg_lowCurrentShutdown);
 
 		uint32_t measV = (regmeas.voltage + 500) / 1000; // uV to mV
@@ -164,16 +164,20 @@ void chargeTSK(void *pPrm){
 		disp_putStr(10, 20, &arial, 0, str);
 
 		//Time
-		uint32_t time_s = (regmeas.time + 500) / 1000;
-		if(params.mode->val == ch_modeTime){
-			if(stateenable){
-				snprintf(str, sizeof(str), "Time:  %lum %02" PRIu32 "s   ", (params.time->val * 60 - time_s) / 60, (params.time->val * 60 - time_s) % 60);
-			}else{
-				snprintf(str, sizeof(str), "Time:  %" PRIu16 "m 00s     ", params.time->val);
-			}
+		uint32_t reg_time_s = (regmeas.time + 500) / 1000;
+		uint32_t set_time_s = params.time->val / 1000;
+		uint32_t view_time_s = 0;
+		if(stateenable){
+			view_time_s = params.mode->val == ch_modeTime ? set_time_s - reg_time_s : reg_time_s;
 		}else{
-			snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02" PRIu32 "s   ", time_s / 60, time_s % 60);
-
+			view_time_s = params.mode->val == ch_modeTime ? set_time_s : reg_time_s;
+		}
+		if(view_time_s < 60){
+			snprintf(str, sizeof(str), "Time:  %" PRIu32 "s", view_time_s);
+		}else if(view_time_s < 3600){
+			snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02" PRIu32 "s", view_time_s / 60, view_time_s % 60);
+		}else{
+			snprintf(str, sizeof(str), "Time:  %02" PRIu32 "h %02" PRIu32 "m %02" PRIu32 "s", view_time_s / 3600, view_time_s / 60 % 60, view_time_s % 60);
 		}
 		if(varParam == C_TIME && !stateenable){
 			disp_setColor(black, ui.color.cursor);
@@ -184,7 +188,7 @@ void chargeTSK(void *pPrm){
 
 		// Print Mode
 		if(params.mode->val == ch_modeTime){
-			snprintf(str, sizeof(str), "Mode: TIME         ");
+			snprintf(str, sizeof(str), "Mode: TIME");
 		}else{
 			snprintf(str, sizeof(str), "Mode: VOLTAGE");
 		}
