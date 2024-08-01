@@ -159,15 +159,20 @@ void baseTSK(void *pPrm){
 		/**************************************
 		 * Copy measure data
 		 */
-		uint32_t measV = (regmeas.voltage + 500) / 1000; // uV to mV
-		uint32_t measI = regmeas.current;
+		int32_t measV = (regmeas.voltage + 500) / 1000; // uV to mV
+		int32_t measI = regmeas.current;
 
 		/**************************************
 		 * Output data to display
 		 */
 		//Print voltage
-		uint32_t viewvoltage = regenable ? measV : params[Prm::basepreset.val].voltage->val;
-		snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, viewvoltage / 1000, viewvoltage % 1000);
+		int32_t viewvoltage = regenable ? measV : params[Prm::basepreset.val].voltage->val;
+		if(viewvoltage >= 0){
+			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, viewvoltage / 1000, viewvoltage % 1000);
+		}else{
+			viewvoltage = -viewvoltage;
+			snprintf(str, sizeof(str), "-%" PRIi32 ".%03" PRIi32, viewvoltage / 1000, viewvoltage % 1000);
+		}
 		if(varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
 		}else{
@@ -184,17 +189,20 @@ void baseTSK(void *pPrm){
 		}
 
 		if(regenable){
-			if(measI < 99000){
-				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000, measI % 1000);
+			bool minus = false;
+			if(measI < 0) measI = -measI, minus = true;
+
+			if(measI < 9900){
+				snprintf(str, sizeof(str), "%s%" PRIi32 ".%03" PRIi32, minus ? "-" : "0", measI / 1000, measI % 1000);
 				disp_putChar(146, 36, &font8x12, 'm');
-				disp_putChar(146, 49, &font8x12, 'A');
+			}else if(measI < 99000){
+				snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
+				disp_putChar(146, 36, &font8x12, 'm');
 			}else{
 				measI = (measI + 500) / 1000;
-				snprintf(str, sizeof(str), "%02" PRIu32 ".%03" PRIu32, measI / 1000, measI % 1000);
-				disp_putChar(146, 36, &font8x12, ' ');
-				disp_putChar(146, 49, &font8x12, 'A');
+				snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
 			}
-
+			disp_putChar(146, 49, &font8x12, 'A');
 		}else{
 			strcpy(str, "--.---");
 			disp_putChar(146, 36, &font8x12, ' ');
@@ -218,24 +226,26 @@ void baseTSK(void *pPrm){
 				break;
 		}
 
-		//Print limiting value
-		if(varParam == VAR_CURR){
-			disp_setColor(black, ui.color.cursor);
-		}else{
-			disp_setColor(black, ui.color.imax);
-		}
-		params[Prm::basepreset.val].current->tostring(str, sizeof(str));
-		disp_putStr(16, 70, &arial, 0, str);
-		disp_putChar(64, 72, &font8x12, 'A');
+		if(!reg_getremote()){
+			//Print limiting value
+			if(varParam == VAR_CURR){
+				disp_setColor(black, ui.color.cursor);
+			}else{
+				disp_setColor(black, ui.color.imax);
+			}
+			params[Prm::basepreset.val].current->tostring(str, sizeof(str));
+			disp_putStr(16, 70, &arial, 0, str);
+			disp_putChar(64, 72, &font8x12, 'A');
 
-		//Print mode
-		if(varParam == VAR_MODE){
-			disp_setColor(black, ui.color.cursor);
-		}else{
-			disp_setColor(black, ui.color.mode);
+			//Print mode
+			if(varParam == VAR_MODE){
+				disp_setColor(black, ui.color.cursor);
+			}else{
+				disp_setColor(black, ui.color.mode);
+			}
+			params[Prm::basepreset.val].mode->tostring(str, sizeof(str));
+			disp_putStr(10, 88, &arial, 0, str);
 		}
-		params[Prm::basepreset.val].mode->tostring(str, sizeof(str));
-		disp_putStr(10, 88, &arial, 0, str);
 
 		//Print status bar
 		printFooter();

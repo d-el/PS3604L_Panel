@@ -26,19 +26,19 @@ typedef struct __attribute__ ((packed)){
 	uint8_t connect;
 	uint8_t enable;
 
-	uint32_t voltage;		///< [X_XXXXXX V]
-	uint32_t current;		///< [X_XXXXXX A]
+	int32_t voltage;		///< [X_XXXXXX V]
+	int32_t current;		///< [X_XXXXXX A]
 	uint32_t power;			///< [X_XXX Wt]
-	uint32_t resistance;	///< [X_XXX Ohm]
+	int32_t resistance;	///< [X_XXX Ohm]
 	uint32_t time;			///< [s]
 	uint32_t capacity;		///< [X_XXX Ah]
-	uint32_t input_voltage;	///< [X_XXXXXX V]
-	uint16_t temperature;	///< [X_X °С]
+	int32_t input_voltage;	///< [X_XXXXXX V]
+	int16_t temperature;	///< [X_X °С]
 	uint16_t status;
 	uint16_t disablecause;
 
-	uint32_t voltage_set;		///< [X_XXXXXX V]
-	uint32_t current_set;		///< [X_XXXXXX A]
+	int32_t voltage_set;		///< [X_XXXXXX V]
+	int32_t current_set;		///< [X_XXXXXX A]
 } powerSupplyState_t;
 
 powerSupplyState_t bin_statemeastask;

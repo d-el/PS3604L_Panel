@@ -143,7 +143,12 @@ void outItemString(const MenuItem *m, uint8_t itemNumber, bool select){
 	char string[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
 	char value[64];
 	value[0] = '\0';
-	if(m->prm && !m->editor) m->prm->tostring(value, sizeof(value));
+	if(m->prm && !m->editor){
+		size_t len = m->prm->tostring(value, sizeof(value));
+		value[len++] = ' ';
+		strncpy(&value[len], m->prm->getunit(), sizeof(value) - len);
+	}
+
 
 	menuItemSelect_type sel = select ?
 				m->change ? menuItemSelect: menuItemSelectUnchangeable

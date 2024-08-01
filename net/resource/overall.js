@@ -54,15 +54,17 @@ function updateInfo() {
 		function round(x, dig) { return Number.parseFloat(x).toFixed(dig); }
 
 		// Meas
+		resistance_raw = x.getInt32(14, true)
+		resistance = resistance_raw > 0 ? resistance_raw / 10000.0 : '---'
 		updateTable('.table2', [
-			{name: 'u', val: round(x.getUint32(2, true) / 1000000.0, 3) + ' V'},
-			{name: 'i', val: round(x.getUint32(6, true) / 1000000.0, 3) + ' A'},
+			{name: 'u', val: round(x.getInt32(2, true) / 1000000.0, 3) + ' V'},
+			{name: 'i', val: round(x.getInt32(6, true) / 1000000.0, 6) + ' A'},
 			{name: 'power', val: x.getUint32(10, true) / 1000.0 + ' W'},
-			{name: 'resistance', val: x.getUint32(14, true) / 1000.0 + ' Ohm'},
+			{name: 'resistance', val: resistance + ' Ohm'},
 			{name: 'time', val: x.getUint32(18, true) / 1000.0 + ' s'},
 			{name: 'capacity', val: x.getUint32(22, true) / 1000.0 + ' Ah'},
-			{name: 'uin', val: round((x.getUint32(26, true) / 100000) / 10, 1) + ' V'},
-			{name: 'temperature', val: x.getUint16(30, true) / 10.0 + ' °C'}
+			{name: 'uin', val: round((x.getInt32(26, true) / 100000) / 10, 1) + ' V'},
+			{name: 'temperature', val: x.getInt16(30, true) / 10.0 + ' °C'}
 		]);
 
 		// Status

@@ -87,10 +87,34 @@ ItemState PrepareU(const MenuItem* m){
 	Prm::point.val = m->arg;
 	Prm::Ureal.val = pointU[Prm::point.val];
 	Prm::Udac.val = 0;
-	uint16_t dacMaxValue = 0;
+	int32_t dacMaxValue = 0;
 	bool result = reg_getDacMaxValue(&dacMaxValue);
 	if(result){
 		Prm::Idac.val = dacMaxValue / 4;
+		reg_setMode(reg_raw);
+		reg_setEnable(true);
+		reg_setDacCurrent(Prm::Idac.val);
+		result = reg_setDacVoltage(Prm::Udac.val);
+	}
+	if(result){
+		return ItemState { true, "" };
+	}else{
+		return ItemState { false, "error connect" };
+	}
+}
+
+/*!****************************************************************************
+ * @brief    setup regulator
+ */
+ItemState PrepareMicroI(const MenuItem* m){
+	static uint32_t pointI[4] = { 10, 950 }; // uA
+	Prm::point.val = m->arg;
+	Prm::Ireal.val = pointI[Prm::point.val];
+	int32_t dacMaxValue = 0;
+	bool result = reg_getDacMaxValue(&dacMaxValue);
+	if(result){
+		Prm::Idac.val = dacMaxValue / 128;
+		Prm::Udac.val = 0;
 		reg_setMode(reg_raw);
 		reg_setEnable(true);
 		reg_setDacCurrent(Prm::Idac.val);
@@ -110,7 +134,7 @@ ItemState PrepareI(const MenuItem* m){
 	static uint32_t pointI[4] = { 1000, 10'000, 50'0000, 3'000'000 }; // uA
 	Prm::point.val = m->arg;
 	Prm::Ireal.val = pointI[Prm::point.val];
-	uint16_t dacMaxValue = 0;
+	int32_t dacMaxValue = 0;
 	bool result = reg_getDacMaxValue(&dacMaxValue);
 	if(result){
 		Prm::Udac.val = dacMaxValue / 4;
@@ -144,6 +168,19 @@ ItemState PrepareWireResistance(const MenuItem* m){
 }
 
 /*!****************************************************************************
+ * @brief    setup regulator
+ */
+ItemState prepareInfo(const MenuItem* m){
+	(void)m;
+	bool regstate = reg_getSerial(&Prm::reg_serial.val);
+	if(regstate){
+		return ItemState { true, "" };
+	}else{
+		return ItemState { false, "error connect" };
+	}
+}
+
+/*!****************************************************************************
  * @brief
  */
 ItemState updateReg(const MenuItem* m){
@@ -157,6 +194,7 @@ ItemState updateReg(const MenuItem* m){
 		Prm::Umeas.val = regmeas.voltage;
 		Prm::Imeas.val = regmeas.current;
 		Prm::resistance = regmeas.resistance;
+		Prm::inputVoltage = regmeas.input_voltage / 100000;
 		return ItemState { true, "" };
 	}else{
 		return ItemState { false, "error connect"};
@@ -170,6 +208,16 @@ ItemState savePointU(const MenuItem* m){
 	(void)m;
 	reg_setDacVoltage(Prm::Udac.val);
 	reg_setVoltagePoint(Prm::Ureal.val, Prm::point.val);
+	return ItemState { true, "" };
+}
+
+/*!****************************************************************************
+ * @brief
+ */
+ItemState savePointMicroI(const MenuItem* m){
+	(void)m;
+	reg_setDacVoltage(Prm::Udac.val);
+	reg_setMicroCurrentPoint(Prm::Ireal.val, Prm::point.val);
 	return ItemState { true, "" };
 }
 
@@ -229,8 +277,6 @@ m1,
 	m12,
 		m120,
 		m121,
-		m122,
-		m123,
 			m1230,
 			m1231,
 			m1232,
@@ -238,10 +284,24 @@ m1,
 			m1234,
 			m1235,
 	m13,
+		m130,
+		m131,
+		m132,
+		m133,
+			m1330,
+			m1331,
+			m1332,
+			m1333,
+			m1334,
+			m1335,
 	m14,
-		m140,
-		m141,
-		m142,
+	m15,
+		m150,
+		m151,
+		m152,
+	m16,
+		m160,
+		m161,
 
 m2,
 	m20,
@@ -280,24 +340,38 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 			m1133("AdcI", &Prm::Iadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m1134, &m1132),
 			m1134("Umeas", &Prm::Umeas, false, 0, savePointU, nullptr, nullptr, updateReg, nullptr, &m1133),
 
-	m12("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m13, &m11, &m120),
-		m120("Point1", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m121, nullptr, &m1230),
-		m121("Point2", nullptr, true, 1, nullptr, PrepareI, calibrExit, nullptr, &m122, &m120, &m1230),
-		m122("Point3", nullptr, true, 2, nullptr, PrepareI, calibrExit, nullptr, &m123, &m121, &m1230),
-		m123("Point4", nullptr, true, 3, nullptr, PrepareI, calibrExit, nullptr, nullptr, &m122, &m1230),
-			m1230("Ireal", &Prm::Ireal, true, 0, savePointI, nullptr, nullptr, updateReg, &m1231, nullptr),
-			m1231("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m1232, &m1230),
-			m1232("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1233, &m1231),
-			m1233("AdcI", &Prm::Iadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1234, &m1232),
-			m1234("AdcIEx", &Prm::IadcEx, false, 0, savePointI, nullptr, nullptr, updateReg, &m1235, &m1233),
-			m1235("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m1234),
+	m12("MicroAmeter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m13, &m11, &m120),
+		m120("Point1", nullptr, true, 0, nullptr, PrepareMicroI, calibrExit, nullptr, &m121, nullptr, &m1230),
+		m121("Point2", nullptr, true, 1, nullptr, PrepareMicroI, calibrExit, nullptr, nullptr, &m120, &m1230),
+			m1230("Ireal", &Prm::Ireal, true, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1231, nullptr),
+			m1231("DacU", &Prm::Udac, true, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1232, &m1230),
+			m1232("AdcU", &Prm::Uadc, false, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1233, &m1231),
+			m1233("AdcI", &Prm::Iadc, false, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1234, &m1232),
+			m1234("AdcIEx", &Prm::IadcEx, false, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1235, &m1233),
+			m1235("Imeas", &Prm::Imeas, false, 0, savePointMicroI, nullptr, nullptr, updateReg, nullptr, &m1234),
 
-	m13("CalibrationTime", &Prm::utcTime, false, 0, nullptr, calibrDateSelect, calibrDateUnselect, nullptr, &m14, &m12, nullptr, clockEditor),
+	m13("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m14, &m12, &m130),
+		m130("Point1", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m131, nullptr, &m1330),
+		m131("Point2", nullptr, true, 1, nullptr, PrepareI, calibrExit, nullptr, &m132, &m130, &m1330),
+		m132("Point3", nullptr, true, 2, nullptr, PrepareI, calibrExit, nullptr, &m133, &m131, &m1330),
+		m133("Point4", nullptr, true, 3, nullptr, PrepareI, calibrExit, nullptr, nullptr, &m132, &m1330),
+			m1330("Ireal", &Prm::Ireal, true, 0, savePointI, nullptr, nullptr, updateReg, &m1331, nullptr),
+			m1331("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m1332, &m1330),
+			m1332("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1333, &m1331),
+			m1333("AdcI", &Prm::Iadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1334, &m1332),
+			m1334("AdcIEx", &Prm::IadcEx, false, 0, savePointI, nullptr, nullptr, updateReg, &m1335, &m1333),
+			m1335("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m1334),
 
-	m14("Wire", nullptr, false, 0, nullptr, PrepareWireResistance, calibrExit, nullptr, nullptr, &m12, &m140),
-		m140("Compensation", &Prm::wirecompensateOnOff, true, 0, setWireresistanse, nullptr, nullptr, updateReg, &m141, nullptr),
-		m141("WireRes", &Prm::wireResistance, true, 0, setWireresistanse, nullptr, nullptr, updateReg, &m142, &m140),
-		m142("Resistance", &Prm::resistance, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m141),
+	m14("CalibrationTime", &Prm::utcTime, false, 0, nullptr, calibrDateSelect, calibrDateUnselect, nullptr, &m15, &m13, nullptr, clockEditor),
+
+	m15("Wire", nullptr, false, 0, nullptr, PrepareWireResistance, calibrExit, nullptr, &m16, &m14, &m150),
+		m150("Compensation", &Prm::wirecompensateOnOff, true, 0, setWireresistanse, nullptr, nullptr, updateReg, &m151, nullptr),
+		m151("Wire", &Prm::wireResistance, true, 0, setWireresistanse, nullptr, nullptr, updateReg, &m152, &m150),
+		m152("Res", &Prm::resistance, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m151),
+
+	m16("Info", nullptr, false, 0, nullptr, prepareInfo, nullptr, nullptr, nullptr, &m15, &m160),
+		m160("Serial", &Prm::reg_serial, false, 0, nullptr, nullptr, nullptr, updateReg, &m161, nullptr),
+		m161("Input", &Prm::inputVoltage, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m160),
 
 m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
 	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),

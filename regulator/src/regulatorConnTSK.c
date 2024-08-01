@@ -38,44 +38,43 @@ typedef struct{
 	void *src, *dst;
 }command_t;
 
-SemaphoreHandle_t regulatorMutex;
-QueueHandle_t commandQueue;
-SemaphoreHandle_t commandAnswerSem;
-SemaphoreHandle_t tcpSem;
+static SemaphoreHandle_t regulatorMutex;
+static SemaphoreHandle_t commandAnswerSem;
+static SemaphoreHandle_t tcpSem;
+static QueueHandle_t commandQueue;
 static regVersion_t regVersion;
-uint16_t enabled;
-bool connected = true;
-regTarget_t regTarget;
-regState_t regMeas;
-uint8_t *mobusRequstData;
-uint16_t *mobusRequstLen;
-bool mobusRequstResult;
-bool gremote;
+static regTarget_t regTarget;
+static regState_t regMeas;
+static uint16_t enabled;
+static uint8_t *mobusRequstData;
+static uint16_t *mobusRequstLen;
+static bool mobusRequstResult;
+static bool gremote;
+static bool connected = true;
 static const uint16_t defaultslave = 1;
-static time_t calibrationTime;
 
-bool reg_setVoltage(uint32_t uV){
+bool reg_setVoltage(int32_t uV){
 	xSemaphoreTake(regulatorMutex, portMAX_DELAY);
 	regTarget.voltage_set = uV;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setCurrent(uint32_t uA){
+bool reg_setCurrent(int32_t uA){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	regTarget.current_set = uA;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setDacVoltage(uint16_t lsb){
+bool reg_setDacVoltage(int32_t lsb){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	regTarget.vdac = lsb;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setDacCurrent(uint16_t lsb){
+bool reg_setDacCurrent(int32_t lsb){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	regTarget.idac = lsb;
 	xSemaphoreGive(regulatorMutex);
@@ -99,7 +98,7 @@ bool reg_setTime(uint32_t ms){
 bool reg_setEnable(bool state){
 	if(state != enabled){
 		uint16_t enable = state ? 1 : 0;
-		command_t command = { .write = 1, .writeAddr = 0x0109, .src = &enable, .writeNum = 1 };
+		command_t command = { .write = 1, .writeAddr = 0x010B, .src = &enable, .writeNum = 1 };
 		xQueueSend(commandQueue, &command, 0);
 		BaseType_t osres = xSemaphoreTake(commandAnswerSem, 100);
 		if(osres != pdTRUE){
@@ -110,7 +109,7 @@ bool reg_setEnable(bool state){
 }
 
 bool reg_setWireResistance(uint32_t r){
-	command_t command = { .write = 1, .writeAddr = 0x010A, .src = &r, .writeNum = 2 };
+	command_t command = { .write = 1, .writeAddr = 0x010C, .src = &r, .writeNum = 2 };
 	xQueueSend(commandQueue, &command, 0);
 	BaseType_t  osres = xSemaphoreTake(commandAnswerSem, 100);
 	return osres == pdTRUE;
@@ -118,29 +117,29 @@ bool reg_setWireResistance(uint32_t r){
 
 bool reg_setCalibrationTime(void){
 	time_t t = time(NULL);
-	command_t command = { .write = 1, .writeAddr = 0x06A0, .src = &t, .writeNum = 2 };
+	command_t command = { .write = 1, .writeAddr = 0x0300, .src = &t, .writeNum = 2 };
 	xQueueSend(commandQueue, &command, 0);
 	BaseType_t  osres = xSemaphoreTake(commandAnswerSem, 100);
 	return osres == pdTRUE;
 }
 
 bool reg_getCalibrationTime(time_t* time){
-	command_t command = { .read = 1, .readAddr = 0x06A0, .dst = time, .readNum = 2 };
+	command_t command = { .read = 1, .readAddr = 0x0300, .dst = time, .readNum = 2 };
 	xQueueSend(commandQueue, &command, 0);
 	BaseType_t osres = xSemaphoreTake(commandAnswerSem, 100);
 	return osres == pdTRUE;
 }
 
 
-bool reg_getDacMaxValue(uint16_t *val){
-	command_t command = { .read = 1, .readAddr = 0x06A2, .dst = val, .readNum = 1 };
+bool reg_getDacMaxValue(int32_t *val){
+	command_t command = { .read = 1, .readAddr = 0x0302, .dst = val, .readNum = 2 };
 	xQueueSend(commandQueue, &command, 0);
 	BaseType_t osres = xSemaphoreTake(commandAnswerSem, 100);
 	return osres == pdTRUE;
 }
 
-bool reg_setVoltagePoint(uint32_t uV, uint8_t number){
-	command_t command = { .write = 1, .writeAddr = 0x0500 + 2 * number, .src = &uV, .writeNum = 2 };
+bool reg_setVoltagePoint(int32_t uV, uint8_t number){
+	command_t command = { .write = 1, .writeAddr = 0x0310 + 2 * number, .src = &uV, .writeNum = 2 };
 	xQueueSend(commandQueue, &command, 0);
 	BaseType_t osres = xSemaphoreTake(commandAnswerSem, 100);
 	if(osres != pdTRUE){
@@ -149,8 +148,18 @@ bool reg_setVoltagePoint(uint32_t uV, uint8_t number){
 	return reg_setCalibrationTime();
 }
 
-bool reg_setCurrentPoint(uint32_t uA, uint8_t number){
-	command_t command = { .write = 1, .writeAddr = 0x0600 + 2 * number, .src = &uA, .writeNum = 2 };
+bool reg_setMicroCurrentPoint(int32_t uA, uint8_t number){
+	command_t command = { .write = 1, .writeAddr = 0x0330 + 2 * number, .src = &uA, .writeNum = 2 };
+	xQueueSend(commandQueue, &command, 0);
+	BaseType_t osres = xSemaphoreTake(commandAnswerSem, 100);
+	if(osres != pdTRUE){
+		return false;
+	}
+	return reg_setCalibrationTime();
+}
+
+bool reg_setCurrentPoint(int32_t uA, uint8_t number){
+	command_t command = { .write = 1, .writeAddr = 0x0320 + 2 * number, .src = &uA, .writeNum = 2 };
 	xQueueSend(commandQueue, &command, 0);
 	BaseType_t osres = xSemaphoreTake(commandAnswerSem, 100);
 	if(osres != pdTRUE){
@@ -179,6 +188,31 @@ bool reg_getState(regState_t *state){
 bool reg_getVersion(regVersion_t *v){
 	*v = regVersion;
 	return true;
+}
+
+bool reg_getSerial(uint32_t* sn){
+	command_t command = { .read = 1, .readAddr = 0x0004, .dst = sn, .readNum = 2 };
+	xQueueSend(commandQueue, &command, 0);
+	BaseType_t osres = xSemaphoreTake(commandAnswerSem, 100);
+	return osres == pdTRUE;
+}
+
+void reg_setremote(bool rem){
+	gremote = rem;
+}
+
+bool reg_getremote(void){
+	return gremote;
+}
+
+bool reg_modbusRequest(uint8_t *req, uint16_t *req_length){
+	mobusRequstData = req;
+	mobusRequstLen = req_length;
+	BaseType_t osres = xSemaphoreTake(tcpSem, 1000);
+	if(osres != pdTRUE){
+		return false;
+	}
+	return mobusRequstResult;
 }
 
 static bool writeReg(modbus_t *ctx, uint16_t addr, uint16_t value){
@@ -235,24 +269,6 @@ static bool rawModbusMessage(modbus_t *ctx, uint8_t *req, uint16_t *req_length){
 		return true;
 	}
 	return false;
-}
-
-bool reg_modbusRequest(uint8_t *req, uint16_t *req_length){
-	mobusRequstData = req;
-	mobusRequstLen = req_length;
-	BaseType_t osres = xSemaphoreTake(tcpSem, 1000);
-	if(osres != pdTRUE){
-		return false;
-	}
-	return mobusRequstResult;
-}
-
-void reg_setremote(bool rem){
-	gremote = rem;
-}
-
-bool reg_getremote(void){
-	return gremote;
 }
 
 /*!****************************************************************************
@@ -315,56 +331,10 @@ void regulatorConnTSK(void *pPrm){
 				readRegs(ctx, command.readAddr, command.dst, command.readNum);
 			}
 			xSemaphoreGive(commandAnswerSem);
-
-			/*switch(command.command){
-				case cmd_enable:{
-					if(writeReg(ctx, 0x0109, command.enable)){
-						xQueueReceive(commandQueue, &command, 0);
-						errorCount = 0;
-					}else{
-						if(errorCount < errorThreshold)
-							errorCount++;
-					}
-				}break;
-
-				case cmd_calibrateV:{
-					if(writeRegs(ctx, 0x0500 + 2 * command.calibratePoint.number, &command.calibratePoint.value, 2)){
-						xQueueReceive(commandQueue, &command, 0);
-						errorCount = 0;
-					}else{
-						if(errorCount < errorThreshold)
-							errorCount++;
-					}
-				}break;
-
-				case cmd_calibrateI:{
-					if(writeRegs(ctx, 0x0600 + 2 * command.calibratePoint.number, &command.calibratePoint.value, 2)){
-						errorCount = 0;
-						xQueueReceive(commandQueue, &command, 0);
-					}else{
-						if(errorCount < errorThreshold)
-							errorCount++;
-					}
-				}break;
-
-				case cmd_readCalibrateTime:{
-					if(readRegs(ctx, 0x06A0, &calibrationTime, 2)){
-						errorCount = 0;
-						xQueueReceive(commandQueue, &command, 0);
-						xSemaphoreGive(commandAnswerSem);
-					}else{
-						if(errorCount < errorThreshold)
-							errorCount++;
-					}
-				}break;
-
-				default:
-					P_LOGW(logTag, "error command");
-			}*/
 		}
 
 		// Read enable state
-		if(readRegs(ctx, 0x0109, &enabled, 1)){
+		if(readRegs(ctx, 0x010B, &enabled, 1)){
 			errorCount = 0;
 		}else{
 			if(errorCount < errorThreshold)
