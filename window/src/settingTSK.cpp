@@ -83,7 +83,7 @@ ItemState rtcUnselect(const MenuItem* m){
  * @brief    setup regulator
  */
 ItemState PrepareU(const MenuItem* m){
-	static uint32_t pointU[4] = { 10'000, 100'000, 19'000'000, 30'000'000 }; // uV
+	static uint32_t pointU[6] = { 10'000, 8000'000, 16'000'000, 22'000'000, 30'000'000, 35'000'000 }; // uV
 	Prm::point.val = m->arg;
 	Prm::Ureal.val = pointU[Prm::point.val];
 	Prm::Udac.val = 0;
@@ -131,7 +131,7 @@ ItemState PrepareMicroI(const MenuItem* m){
  * @brief    setup regulator
  */
 ItemState PrepareI(const MenuItem* m){
-	static uint32_t pointI[4] = { 1000, 10'000, 50'0000, 3'000'000 }; // uA
+	static uint32_t pointI[6] = { 1000, 10'000, 500'000, 2'200'000, 3'000'000, 3'500'000 }; // uA
 	Prm::point.val = m->arg;
 	Prm::Ireal.val = pointI[Prm::point.val];
 	int32_t dacMaxValue = 0;
@@ -269,6 +269,8 @@ m1,
 		m111,
 		m112,
 		m113,
+		m114,
+		m115,
 			m1130,
 			m1131,
 			m1132,
@@ -288,6 +290,8 @@ m1,
 		m131,
 		m132,
 		m133,
+		m134,
+		m135,
 			m1330,
 			m1331,
 			m1332,
@@ -330,10 +334,12 @@ m4;
 const MenuItem
 m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullptr, &m11),
 	m11("Vmeter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m12, nullptr, &m110),
-		m110("Point1", nullptr, true, 0, nullptr, PrepareU, calibrExit, nullptr, &m111, nullptr, &m1130),
-		m111("Point2", nullptr, true, 1, nullptr, PrepareU, calibrExit, nullptr, &m112, &m110, &m1130),
-		m112("Point3", nullptr, true, 2, nullptr, PrepareU, calibrExit, nullptr, &m113, &m111, &m1130),
-		m113("Point4", nullptr, true, 3, nullptr, PrepareU, calibrExit, nullptr, nullptr, &m112, &m1130),
+		m110("Point0", nullptr, true, 0, nullptr, PrepareU, calibrExit, nullptr, &m111, nullptr, &m1130),
+		m111("Point1", nullptr, true, 1, nullptr, PrepareU, calibrExit, nullptr, &m112, &m110, &m1130),
+		m112("Point2", nullptr, true, 2, nullptr, PrepareU, calibrExit, nullptr, &m113, &m111, &m1130),
+		m113("Point3", nullptr, true, 3, nullptr, PrepareU, calibrExit, nullptr, &m114, &m112, &m1130),
+		m114("Point4", nullptr, true, 4, nullptr, PrepareU, calibrExit, nullptr, &m115, &m113, &m1130),
+		m115("Point5", nullptr, true, 5, nullptr, PrepareU, calibrExit, nullptr, nullptr, &m114, &m1130),
 			m1130("Ureal", &Prm::Ureal, true, 0, savePointU, nullptr, nullptr, updateReg, &m1131, nullptr),
 			m1131("DacU", &Prm::Udac, true, 0, savePointU, nullptr, nullptr, updateReg, &m1132, &m1130),
 			m1132("AdcU", &Prm::Uadc, false, 0, savePointU, nullptr, nullptr, updateReg, &m1133, &m1131),
@@ -351,10 +357,12 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 			m1235("Imeas", &Prm::Imeas, false, 0, savePointMicroI, nullptr, nullptr, updateReg, nullptr, &m1234),
 
 	m13("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m14, &m12, &m130),
-		m130("Point1", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m131, nullptr, &m1330),
-		m131("Point2", nullptr, true, 1, nullptr, PrepareI, calibrExit, nullptr, &m132, &m130, &m1330),
-		m132("Point3", nullptr, true, 2, nullptr, PrepareI, calibrExit, nullptr, &m133, &m131, &m1330),
-		m133("Point4", nullptr, true, 3, nullptr, PrepareI, calibrExit, nullptr, nullptr, &m132, &m1330),
+		m130("Point0", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m131, nullptr, &m1330),
+		m131("Point1", nullptr, true, 1, nullptr, PrepareI, calibrExit, nullptr, &m132, &m130, &m1330),
+		m132("Point2", nullptr, true, 2, nullptr, PrepareI, calibrExit, nullptr, &m133, &m131, &m1330),
+		m133("Point3", nullptr, true, 3, nullptr, PrepareI, calibrExit, nullptr, &m134, &m132, &m1330),
+		m134("Point4", nullptr, true, 4, nullptr, PrepareI, calibrExit, nullptr, &m135, &m133, &m1330),
+		m135("Point5", nullptr, true, 5, nullptr, PrepareI, calibrExit, nullptr, nullptr, &m134, &m1330),
 			m1330("Ireal", &Prm::Ireal, true, 0, savePointI, nullptr, nullptr, updateReg, &m1331, nullptr),
 			m1331("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m1332, &m1330),
 			m1332("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1333, &m1331),
