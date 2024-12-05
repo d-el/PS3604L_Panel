@@ -23,13 +23,17 @@ urlData_type handle_statemeastask(void);
  * MEMORY
  */
 typedef struct __attribute__ ((packed)){
+	uint16_t major;
+	uint16_t minor;
+	uint16_t patch;
+
 	uint8_t connect;
 	uint8_t enable;
 
 	int32_t voltage;		///< [X_XXXXXX V]
 	int32_t current;		///< [X_XXXXXX A]
 	uint32_t power;			///< [X_XXX Wt]
-	int32_t resistance;	///< [X_XXX Ohm]
+	int32_t resistance;		///< [X_XXX Ohm]
 	uint32_t time;			///< [s]
 	uint32_t capacity;		///< [X_XXX Ah]
 	int32_t input_voltage;	///< [X_XXXXXX V]
@@ -126,6 +130,12 @@ urlData_type handle_statemeastask(void){
 		reg_getTarget(&regTarget);
 		bin_statemeastask.voltage_set = regTarget.voltage_set;
 		bin_statemeastask.current_set = regTarget.current_set;
+
+		regVersion_t v;
+		reg_getVersion(&v);
+		bin_statemeastask.major = v.major;
+		bin_statemeastask.minor = v.minor;
+		bin_statemeastask.patch = v.patch;
 	}
 
 	urlData.payload = &bin_statemeastask;

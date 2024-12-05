@@ -53,23 +53,28 @@ function updateInfo() {
 
 		function round(x, dig) { return Number.parseFloat(x).toFixed(dig); }
 
+		// Version
+		major = x.getUint16(0, true);
+		minor = x.getUint16(2, true);
+		patch = x.getUint16(4, true);
+
 		// Meas
-		resistance_raw = x.getInt32(14, true)
+		resistance_raw = x.getInt32(20, true)
 		resistance = resistance_raw > 0 ? resistance_raw / 10000.0 : '---'
 		updateTable('.table2', [
-			{name: 'u', val: round(x.getInt32(2, true) / 1000000.0, 3) + ' V'},
-			{name: 'i', val: round(x.getInt32(6, true) / 1000000.0, 6) + ' A'},
-			{name: 'power', val: x.getUint32(10, true) / 1000.0 + ' W'},
+			{name: 'u', val: round(x.getInt32(8, true) / 1000000.0, 3) + ' V'},
+			{name: 'i', val: round(x.getInt32(12, true) / 1000000.0, 6) + ' A'},
+			{name: 'power', val: x.getUint32(16, true) / 1000.0 + ' W'},
 			{name: 'resistance', val: resistance + ' Ohm'},
-			{name: 'time', val: x.getUint32(18, true) / 1000.0 + ' s'},
-			{name: 'capacity', val: x.getUint32(22, true) / 1000.0 + ' Ah'},
-			{name: 'uin', val: round((x.getInt32(26, true) / 100000) / 10, 1) + ' V'},
-			{name: 'temperature', val: x.getInt16(30, true) / 10.0 + ' °C'}
+			{name: 'time', val: x.getUint32(24, true) / 1000.0 + ' s'},
+			{name: 'capacity', val: x.getUint32(28, true) / 1000.0 + ' Ah'},
+			{name: 'uin', val: round((x.getInt32(32, true) / 100000) / 10, 1) + ' V'},
+			{name: 'temperature', val: x.getInt16(36, true) / 10.0 + ' °C'}
 		]);
 
 		// Status
-		var status = x.getUint16(32, true);
-		var disablecause = x.getUint16(34, true);
+		var status = x.getUint16(38, true);
+		var disablecause = x.getUint16(40, true);
 		let disablecause2string = new Map([
 			[0, 'none'],
 			[1, 'Error Temperature Sensor'],
@@ -89,9 +94,11 @@ function updateInfo() {
 
 		// Settings
 		updateTable('.table3', [
-			{name: 'u', val: x.getUint32(36, true) / 1000000.0 + ' V'},
-			{name: 'i', val: x.getUint32(40, true) / 1000000.0 + ' A'},
+			{name: 'u', val: x.getUint32(42, true) / 1000000.0 + ' V'},
+			{name: 'i', val: x.getUint32(46, true) / 1000000.0 + ' A'},
 		]);
+
+		document.querySelector('footer').innerHTML = '©copyright: 2013-2024 DEL	rv' + major + '.' + minor + '.' + patch;
 	};
 	oReq.send(null);
 }
