@@ -329,6 +329,7 @@ m3,
 	m30,
 	m31,
 	m32,
+	m33,
 m4;
 
 const MenuItem
@@ -403,7 +404,8 @@ m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, 
 m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30),
 	m30("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr, ipAddressEditor),
 	m31("subnet mask", &Prm::netmask, true, 0, nullptr, nullptr, nullptr, nullptr, &m32, &m30, nullptr, ipAddressEditor),
-	m32("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, ipAddressEditor),
+	m32("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, &m33, &m31, nullptr, ipAddressEditor),
+	m33("MAC", &Prm::mac0, false, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m32, nullptr, ipMacEditor),
 
 m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, nullptr, &m3);
 

@@ -12,37 +12,26 @@
 #include "uniqueDeviceId.h"
 
 /*!****************************************************************************
+ * Define
+ */
+#define UNIQDEVID_BASE	0x1FFF7A10
+
+// UID[95:64]: LOT_NUM[55:24] – Lot number (ASCII encoded)
+// UID[39:32]: WAF_NUM[7:0] – Wafer number (8-bit unsigned number)
+// UID[63:40]: LOT_NUM[23:0] – Lot number (ASCII encoded)
+// UID[31:0]: X and Y coordinates on the wafer
+
+/*!****************************************************************************
  * MEMORY
  */
-const uint32_t *uniqDevId = (uint32_t*)UNIQDEVID_BASE;
-
-const uint32_t registerId[] = {
-	makeID(0x9EAA7DF7),
-};
-uint8_t registerIdNum = sizeof(registerId)/sizeof(uint32_t);
+const uint32_t *const uniqDevId = (uint32_t*)UNIQDEVID_BASE;
 
 /*!****************************************************************************
- * @retval	displayed ID
+ * @retval ID
  */
-uint32_t getDid(void){
-	uint32_t dId = makeID(uniqDevId[0] ^ uniqDevId[1] ^ uniqDevId[2] ^ uniqDevId[3] ^ uniqDevId[4]);
+uint32_t uid_get(void){
+	uint32_t dId = uniqDevId[0];
 	return dId;
-}
-
-/*!****************************************************************************
- * @retval	0 - registered, 1 - not registered
- */
-uint8_t checkUniqDevId(void){
-	uint32_t dId = getDid();
-	uint32_t tId = makeID(dId);
-
-	for(uint8_t i = 0; i < registerIdNum; i++){
-		uint32_t fId = registerId[i];
-		if(tId == fId){
-			return 0;
-		}
-	}
-	return 1;
 }
 
 /******************************** END OF FILE ********************************/

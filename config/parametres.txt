@@ -59,6 +59,7 @@ group(Settings2, private)
 	p(resistance	,"Ohm"	,int32_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,214748.3647l,1		,10			,4	,notsave)
 	p(inputVoltage	,"V"	,int16_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,3276.7		,1		,10			,1	,notsave)
 	p(reg_serial	,""		,uint32_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,0xFFFFFFFF	,1		,1			,0	,notsave)
+	p(mac0			,""		,uint64_t	,chmodR		,nullptr	,0	,0x0000	,0			,0			,0xFFFFFFFF	,1		,1			,0	,notsave)
 
 group(Common, public)
 	p(startcnt		,""		,uint32_t	,chmodRW	,nullptr	,0	,0x0000	,0			,0			,0xFFFFFFFF	,1		,1			,0	,saveuse)

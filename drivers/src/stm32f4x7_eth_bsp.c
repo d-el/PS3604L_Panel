@@ -10,6 +10,7 @@
 #include "stm32f4x7_eth.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "gpio.h"
+#include "uniqueDeviceId.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -55,6 +56,21 @@ void  ETH_BSP_Deinit(void){
  */
 void  ETH_BSP_setHandler(ETH_IRQHandler_type h){
 	eth_IRQHandler = h;
+}
+
+/**
+ * @brief  ETH_BSP_getMAC
+ * @param  pointer to mac destination
+ * @retval None
+ */
+void  ETH_BSP_getMAC(uint8_t mac[6]){
+	mac[0] = 0x28;
+	mac[1] = 0x05;
+	uint32_t uid = uid_get();
+	mac[2] = ( uid >> 0)  & 0xFF;
+	mac[3] = ( uid >> 8)  & 0xFF;
+	mac[4] = ( uid >> 16) & 0xFF;
+	mac[5] = ( uid >> 24) & 0xFF;
 }
 
 /**

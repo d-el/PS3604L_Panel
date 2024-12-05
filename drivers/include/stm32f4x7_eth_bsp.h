@@ -29,6 +29,7 @@ typedef void (*ETH_IRQHandler_type)(void *arg);
 void  ETH_BSP_Config(void);
 void  ETH_BSP_Deinit(void);
 void  ETH_BSP_setHandler(ETH_IRQHandler_type h);
+void  ETH_BSP_getMAC(uint8_t mac[6]);
 
 #ifdef __cplusplus
 }

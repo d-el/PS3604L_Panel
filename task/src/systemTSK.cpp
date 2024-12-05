@@ -84,6 +84,9 @@ void systemTSK(void *pPrm){
 	pvd_setSupplyFaultCallBack(pvdCallback);						// Setup callback for Supply Fault
 	disp_init();
 	LwIP_Init(Prm::ipadr.val, Prm::netmask.val, Prm::gateway.val);	// Initialize the LwIP stack
+	uint64_t mac = 0;
+	memcpy(&mac, xnetif.hwaddr, xnetif.hwaddr_len);
+	Prm::mac0.val = mac;
 	sntp_init();													// Initialize service SNTP
 
 	vSemaphoreCreateBinary(lowPowerSem);

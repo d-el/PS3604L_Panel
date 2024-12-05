@@ -18,11 +18,6 @@ extern "C" {
 #include "stdint.h"
 
 /*!****************************************************************************
- * Exported variables
- */
-extern uint8_t macAddress[6];
-
-/*!****************************************************************************
  * Function declaration
  */
 void hardInit(void);

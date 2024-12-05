@@ -68,6 +68,7 @@ public:
 bool run(const MenuItem *m);
 ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex);
 ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex);
+ItemState ipMacEditor(const MenuItem* history[], uint8_t historyIndex);
 
 };
 

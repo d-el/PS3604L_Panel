@@ -1,8 +1,8 @@
-﻿/*!****************************************************************************
+/*!*****************************************************************************
  * @file		prmSystem.cpp
  * @author		d_el - Storozhenko Roman
- * @version		V2.2
- * @date		07.01.2024
+ * @version		V2.3
+ * @date		05.11.2024
  * @copyright	The MIT License (MIT). Copyright (c) 2024 Storozhenko Roman
  * @brief		Parameters system
  */
@@ -22,7 +22,7 @@ namespace Prm {
 
 static size_t currentIndex;
 using crc_t = uint16_t;
-constexpr uint16_t magic = 6;
+constexpr uint16_t magic = 0x2805;
 
 
 #include "parameter.def"
@@ -40,6 +40,9 @@ IVal *getbyaddress(uint16_t address){
 
 IVal *getNext(){
 	currentIndex++;
+	if(currentIndex >= valuearray.size()){
+		return nullptr;
+	}
 	return valuearray[currentIndex];
 }
 
@@ -174,6 +177,20 @@ template <> size_t Val<uint32_t>::tostring(char *string, size_t size) const{
 		return strlen(string);
 	}
 	return uprintval(string, size, handler.power, val);
+};
+
+template <> size_t Val<int64_t>::tostring(char *string, size_t size) const{
+	// Not implemented
+	(void)string;
+	(void)size;
+	return 0;
+};
+
+template <> size_t Val<uint64_t>::tostring(char *string, size_t size) const{
+	// Not implemented
+	(void)string;
+	(void)size;
+	return 0;
 };
 
 template <> size_t Val<float>::tostring(char *string, size_t size) const{

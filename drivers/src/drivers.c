@@ -27,24 +27,6 @@
 #include "24AAxx.h"
 
 /*!****************************************************************************
-* Memory
-*/
-uint8_t macAddress[6];
-
-/*!****************************************************************************
- * @brief	Generate MAC address from MCU uID
- */
-void macAddressGen(void){
-	uint32_t mach = makeID(getDid());
-	macAddress[0] = 0x28;
-	macAddress[1] = 0x05;
-	macAddress[2] = ( mach >> 0)  & 0xFF;
-	macAddress[3] = ( mach >> 8)  & 0xFF;
-	macAddress[4] = ( mach >> 16) & 0xFF;
-	macAddress[5] = ( mach >> 24) & 0xFF;
-}
-
-/*!****************************************************************************
  * MCU peripheral initialization
  */
 void hardInit(void){
@@ -56,7 +38,6 @@ void hardInit(void){
 	}
 	gpio_init();
 	uart_init(uart3, 57600);
-	macAddressGen();
 	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();

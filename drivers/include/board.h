@@ -49,15 +49,6 @@
 #define APB2_FREQ			42000000	//[Hz]
 #define APB2_TIM_FREQ		84000000	//[Hz]
 
-/* MAC ADDRESS*/
-extern uint8_t macAddress[6];
-#define MAC_ADDR0		macAddress[0]
-#define MAC_ADDR1		macAddress[1]
-#define MAC_ADDR2		macAddress[2]
-#define MAC_ADDR3		macAddress[3]
-#define MAC_ADDR4		macAddress[4]
-#define MAC_ADDR5		macAddress[5]
-
 /*!****************************************************************************
  * Macro functions
  */

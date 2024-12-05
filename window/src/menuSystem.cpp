@@ -447,6 +447,37 @@ ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex){
 	return ItemState{  true, "" };
 }
 
+/*!****************************************************************************
+ */
+ItemState ipMacEditor(const MenuItem* history[], uint8_t historyIndex){
+	const MenuItem* m = history[historyIndex - 1];
+	TickType_t xLastWakeTime = xTaskGetTickCount();
+	while(1){
+		if(keyProc() != 0){
+			BeepTime(ui.beep.key.time, ui.beep.key.freq);
+			//Parent
+			if(keyState(kMode)){
+				callExit(m);
+				break;
+			}
+		}
+
+		printHistory(history, historyIndex);
+
+		union {
+			uint64_t mac;
+			uint8_t v[6];
+		} mac = { static_cast<Prm::Val<uint64_t>*>(m->prm)->val };
+
+		char str[64];
+		snprintf(str, sizeof(str), "%02X:%02X:%02X:%02X:%02X:%02X", mac.v[0], mac.v[1], mac.v[2], mac.v[3], mac.v[4], mac.v[5]);
+		outItemString(str, 0, 0, 0);
+		disp_flushfill(&ui.color.background);
+		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(MENU_PERIOD));
+	}
+	return ItemState{  true, "" };
+}
+
 }
 
 /******************************** END OF FILE ********************************/

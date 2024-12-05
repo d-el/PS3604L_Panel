@@ -18,25 +18,9 @@ extern "C" {
 #include "stdint.h"
 
 /*!****************************************************************************
- * Define
- */
-#define UNIQDEVID_BASE	0x1FFF7A10
-
-/*!****************************************************************************
- * Exported variables
- */
-extern const uint32_t *uniqDevId;
-
-/*!****************************************************************************
- * Macro functions
- */
-#define makeID(x)	(((((uint64_t)x) * ((x) - 68)) & 0xFFFFFFFF) ^ 0xAAAAAAAA)
-
-/*!****************************************************************************
  * Function declaration
  */
-uint32_t getDid(void);
-uint8_t checkUniqDevId(void);
+uint32_t uid_get(void);
 
 #ifdef __cplusplus
 }

@@ -53,13 +53,12 @@
 #include "lwip/err.h"
 #include "ethernetif.h"
 #include "lwip/timeouts.h"
-#include "board.h"
 #include "stm32f4x7_eth.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "string.h"
 
-#define netifMTU                                (1500)
-#define netifGUARD_BLOCK_TIME					( 100 )
+#define netifMTU								(1500)
+#define netifGUARD_BLOCK_TIME					(100)
 /* The time to block waiting for input. */
 #define emacBLOCK_TIME_WAITING_FOR_INPUT		pdMS_TO_TICKS(100)
 
@@ -121,15 +120,10 @@ static void low_level_init(struct netif *netif){
 	netif->hwaddr_len = ETHARP_HWADDR_LEN;
 
 	/* set netif MAC hardware address */
-	netif->hwaddr[0] = MAC_ADDR0;
-	netif->hwaddr[1] = MAC_ADDR1;
-	netif->hwaddr[2] = MAC_ADDR2;
-	netif->hwaddr[3] = MAC_ADDR3;
-	netif->hwaddr[4] = MAC_ADDR4;
-	netif->hwaddr[5] = MAC_ADDR5;
+	ETH_BSP_getMAC(&netif->hwaddr[0]);
 
 	/* set netif maximum transfer unit */
-	netif->mtu = 1500;
+	netif->mtu = netifMTU;
 
 	/* Accept broadcast address and ARP traffic */
 	netif->flags = NETIF_FLAG_BROADCAST | NETIF_FLAG_ETHARP;
