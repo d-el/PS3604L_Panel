@@ -169,8 +169,11 @@ bool reg_setCurrentPoint(int32_t uA, uint8_t number){
 }
 
 bool reg_getTarget(regTarget_t *target){
-	*target = regTarget;
-	return connected;
+	uint16_t number = sizeof(regTarget_t)/sizeof(uint16_t);
+	command_t command = { .read = 1, .readAddr = 0x0100, .dst = target, .readNum = number };
+	xQueueSend(commandQueue, &command, 0);
+	BaseType_t osres = xSemaphoreTake(commandAnswerSem, 100);
+	return osres == pdTRUE;
 }
 
 bool reg_getEnable(bool *state){
