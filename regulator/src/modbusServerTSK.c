@@ -20,7 +20,7 @@
 #include "lwip/netif.h"
 #include "regulatorConnTSK.h"
 
-#define LOG_LOCAL_LEVEL P_LOG_WARN
+#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
 
 /*!****************************************************************************
  * MEMORY

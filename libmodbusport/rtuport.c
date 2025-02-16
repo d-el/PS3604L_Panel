@@ -82,9 +82,8 @@ int modbus_serial_connect(const char *device, uint32_t baud, uint8_t parity, uin
 	(void)stop_bit;
 
 	// Create Semaphore for UART
-	vSemaphoreCreateBinary(uartRxSem);
+	uartRxSem = xSemaphoreCreateBinary();
 	assert(uartRxSem != NULL);
-	xSemaphoreTake(uartRxSem, portMAX_DELAY);
 
 	uart_init(LIBMODBUSUART, baud);
 	uart_setCallback(LIBMODBUSUART, NULL, uartRxHandler);

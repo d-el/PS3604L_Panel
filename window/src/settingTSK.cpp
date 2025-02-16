@@ -107,13 +107,13 @@ ItemState PrepareU(const MenuItem* m){
  * @brief    setup regulator
  */
 ItemState PrepareMicroI(const MenuItem* m){
-	static uint32_t pointI[4] = { 10, 950 }; // uA
+	static uint32_t pointI[4] = { 10, 950, 50000 }; // uA
 	Prm::point.val = m->arg;
 	Prm::Ireal.val = pointI[Prm::point.val];
 	int32_t dacMaxValue = 0;
 	bool result = reg_getDacMaxValue(&dacMaxValue);
 	if(result){
-		Prm::Idac.val = dacMaxValue / 128;
+		Prm::Idac.val = dacMaxValue / 32;
 		Prm::Udac.val = 0;
 		reg_setMode(reg_raw);
 		reg_setEnable(true);
@@ -204,6 +204,35 @@ ItemState updateReg(const MenuItem* m){
 /*!****************************************************************************
  * @brief
  */
+ItemState saveSettings(const MenuItem* m){
+	(void)m;
+
+	Prm::save_settings.val = Prm::save_do;
+	if(reg_setSaveSettings(reg_save_do)){
+		return ItemState { true, "" };
+	}else{
+		return ItemState { false, "error connect"};
+	}
+}
+
+/*!****************************************************************************
+ * @brief
+ */
+ItemState updateSaveSettings(const MenuItem* m){
+	(void)m;
+
+	regSave_t save;
+	if(reg_getSaveSettings(&save)){
+		Prm::save_settings.val = save;
+		return ItemState { true, "" };
+	}else{
+		return ItemState { false, "error connect"};
+	}
+}
+
+/*!****************************************************************************
+ * @brief
+ */
 ItemState savePointU(const MenuItem* m){
 	(void)m;
 	reg_setDacVoltage(Prm::Udac.val);
@@ -218,6 +247,15 @@ ItemState savePointMicroI(const MenuItem* m){
 	(void)m;
 	reg_setDacVoltage(Prm::Udac.val);
 	reg_setMicroCurrentPoint(Prm::Ireal.val, Prm::point.val);
+	return ItemState { true, "" };
+}
+
+/*!****************************************************************************
+ * @brief
+ */
+ItemState setCrange(const MenuItem* m){
+	(void)m;
+	reg_setCrange((regCrange_t)Prm::crange_set.val);
 	return ItemState { true, "" };
 }
 
@@ -279,12 +317,14 @@ m1,
 	m12,
 		m120,
 		m121,
+		m122,
 			m1230,
 			m1231,
 			m1232,
 			m1233,
 			m1234,
 			m1235,
+			m1236,
 	m13,
 		m130,
 		m131,
@@ -306,6 +346,8 @@ m1,
 	m16,
 		m160,
 		m161,
+	m17,
+	m18,
 
 m2,
 	m20,
@@ -349,13 +391,15 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 
 	m12("MicroAmeter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m13, &m11, &m120),
 		m120("Point1", nullptr, true, 0, nullptr, PrepareMicroI, calibrExit, nullptr, &m121, nullptr, &m1230),
-		m121("Point2", nullptr, true, 1, nullptr, PrepareMicroI, calibrExit, nullptr, nullptr, &m120, &m1230),
+		m121("Point2", nullptr, true, 1, nullptr, PrepareMicroI, calibrExit, nullptr, &m122, &m120, &m1230),
+		m122("Point3", nullptr, true, 2, nullptr, PrepareMicroI, calibrExit, nullptr, nullptr, &m121, &m1230),
 			m1230("Ireal", &Prm::Ireal, true, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1231, nullptr),
 			m1231("DacU", &Prm::Udac, true, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1232, &m1230),
-			m1232("AdcU", &Prm::Uadc, false, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1233, &m1231),
-			m1233("AdcI", &Prm::Iadc, false, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1234, &m1232),
-			m1234("AdcIEx", &Prm::IadcEx, false, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1235, &m1233),
-			m1235("Imeas", &Prm::Imeas, false, 0, savePointMicroI, nullptr, nullptr, updateReg, nullptr, &m1234),
+			m1232("AdcU", &Prm::Uadc, false, 0, nullptr, nullptr, nullptr, updateReg, &m1233, &m1231),
+			m1233("AdcI", &Prm::Iadc, false, 0, nullptr, nullptr, nullptr, updateReg, &m1234, &m1232),
+			m1234("AdcIEx", &Prm::IadcEx, false, 0, nullptr, nullptr, nullptr, updateReg, &m1235, &m1233),
+			m1235("Imeas", &Prm::Imeas, false, 0, nullptr, nullptr, nullptr, updateReg, &m1236, &m1234),
+			m1236("cRange", &Prm::crange_set, true, 0, setCrange, nullptr, nullptr, updateReg, nullptr, &m1235),
 
 	m13("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m14, &m12, &m130),
 		m130("Point0", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m131, nullptr, &m1330),
@@ -378,9 +422,14 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 		m151("Wire", &Prm::wireResistance, true, 0, setWireresistanse, nullptr, nullptr, updateReg, &m152, &m150),
 		m152("Res", &Prm::resistance, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m151),
 
-	m16("Info", nullptr, false, 0, nullptr, prepareInfo, nullptr, nullptr, nullptr, &m15, &m160),
+	m16("cRange", &Prm::crange_set, true, 0, setCrange, nullptr, nullptr, updateReg, &m17, &m15),
+
+
+	m17("Info", nullptr, false, 0, nullptr, prepareInfo, nullptr, nullptr, &m18, &m16, &m160),
 		m160("Serial", &Prm::reg_serial, false, 0, nullptr, nullptr, nullptr, updateReg, &m161, nullptr),
 		m161("Input", &Prm::inputVoltage, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m160),
+
+	m18("Save", &Prm::save_settings, true, 0, saveSettings, nullptr, nullptr, updateSaveSettings, nullptr, &m17, nullptr),
 
 m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
 	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),

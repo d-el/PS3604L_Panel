@@ -39,7 +39,7 @@
 enum {
 	VAR_VOLT = 0,
 	VAR_CURR,
-	VAR_MODE,
+	/*VAR_MODE,*/
 	VAR_NUMBER
 };
 
@@ -101,7 +101,7 @@ void baseTSK(void *pPrm){
 						selWindow(settingWindow);
 					}
 					if(!regenable){
-						if(Prm::basepreset.val < VAR_MODE)
+						if(Prm::basepreset.val < VAR_CURR)
 							Prm::basepreset.val++;
 						else
 							Prm::basepreset.val = 0;
@@ -166,7 +166,7 @@ void baseTSK(void *pPrm){
 		 * Output data to display
 		 */
 		//Print voltage
-		int32_t viewvoltage = regenable ? measV : params[Prm::basepreset.val].voltage->val;
+		int32_t viewvoltage = /*regenable ? */measV /*: params[Prm::basepreset.val].voltage->val*/;
 		if(viewvoltage >= 0){
 			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, viewvoltage / 1000, viewvoltage % 1000);
 		}else{
@@ -176,10 +176,21 @@ void baseTSK(void *pPrm){
 		if(varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
 		}else{
-			disp_setColor(black, ui.color.voltage);
+		disp_setColor(black, ui.color.voltage);
 		}
 		disp_putStr(10, 0, &dSegBold, 6, str);
 		disp_putChar(146, 18, &font8x12, 'V');
+
+		//Print voltage setting
+		if(varParam == VAR_VOLT){
+			disp_setColor(black, ui.color.cursor);
+		}else{
+			disp_setColor(black, ui.color.voltage);
+		}
+		size_t len = params[Prm::basepreset.val].voltage->tostring(str, sizeof(str));
+		//snprintf(&str[len], sizeof(str) - len, " V");
+		disp_putStr(12, 33, &arial, 0, str);
+//		disp_putChar(60, 35, &font8x12, 'V');
 
 		//Print current
 		if(varParam == VAR_CURR){
@@ -188,27 +199,61 @@ void baseTSK(void *pPrm){
 			disp_setColor(black, ui.color.current);
 		}
 
-		if(regenable){
-			bool minus = false;
-			if(measI < 0) measI = -measI, minus = true;
-
-			if(measI < 9900){
-				snprintf(str, sizeof(str), "%s%" PRIi32 ".%03" PRIi32, minus ? "-" : "0", measI / 1000, measI % 1000);
-				disp_putChar(146, 36, &font8x12, 'm');
-			}else if(measI < 99000){
-				snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
-				disp_putChar(146, 36, &font8x12, 'm');
-			}else{
-				measI = (measI + 500) / 1000;
-				snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
-			}
-			disp_putChar(146, 49, &font8x12, 'A');
+		//if(regenable){
+		bool minus = false;
+		if(measI < 0) measI = -measI, minus = true;
+		if(measI < 9999 && Prm::crange_set.val == Prm::crange_auto){
+			snprintf(str, sizeof(str), "%s%" PRIi32 ".%03" PRIi32, minus ? "-" : "0", measI / 1000, measI % 1000);
+			disp_putChar(146, 61, &font8x12, 'm');
+		}else if(measI < 59000  && Prm::crange_set.val == Prm::crange_auto){
+			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
+			disp_putChar(146, 61, &font8x12, 'm');
 		}else{
-			strcpy(str, "--.---");
-			disp_putChar(146, 36, &font8x12, ' ');
-			disp_putChar(146, 49, &font8x12, 'A');
+			measI = (measI + 500) / 1000;
+			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
 		}
-		disp_putStr(10, 36, &dSegBold, 6, str);
+		disp_putChar(146, 73, &font8x12, 'A');
+//		}else{
+//			strcpy(str, "--.---");
+//			disp_putChar(146, 36, &font8x12, ' ');
+//			disp_putChar(146, 49, &font8x12, 'A');
+//		}
+		disp_putStr(10, 53, &dSegBold, 6, str);
+
+		// Print limiting value
+		if(varParam == VAR_CURR){
+			disp_setColor(black, ui.color.cursor);
+		}else{
+			disp_setColor(black, ui.color.imax);
+		}
+		params[Prm::basepreset.val].current->tostring(str, sizeof(str));
+//		snprintf(&str[len], sizeof(str) - len, " A");
+		disp_putStr(12, 87, &arial, 0, str);
+//		disp_putChar(60, 89, &font8x12, 'A');
+
+		disp_setColor(black, red);
+		if(!regenable){
+			snprintf(str, sizeof(str), "%s", "DIS");
+			disp_putStr(130, 89, &font8x12, 0, str);
+		}
+		else{
+			if(regmeas.status.m_limitation){
+				snprintf(str, sizeof(str), "%s", "CC");
+			}
+			else{
+				snprintf(str, sizeof(str), "%s", "CV");
+			}
+			disp_putStr(106, 89, &font8x12, 0, str);
+		}
+
+		if(Prm::crange_set.val == Prm::crange_auto && regenable){
+			if(regmeas.status.cRangeLoOverflow){
+				snprintf(str, sizeof(str), "%s", "CRH");
+			}else{
+				snprintf(str, sizeof(str), "%s", "CRL");
+			}
+			disp_putStr(75, 89, &font8x12, 0, str);
+		}
 
 		//Print current settings
 		switch(Prm::basepreset.val){
@@ -227,24 +272,15 @@ void baseTSK(void *pPrm){
 		}
 
 		if(!reg_getremote()){
-			//Print limiting value
-			if(varParam == VAR_CURR){
-				disp_setColor(black, ui.color.cursor);
-			}else{
-				disp_setColor(black, ui.color.imax);
-			}
-			params[Prm::basepreset.val].current->tostring(str, sizeof(str));
-			disp_putStr(16, 70, &arial, 0, str);
-			disp_putChar(64, 72, &font8x12, 'A');
 
-			//Print mode
-			if(varParam == VAR_MODE){
-				disp_setColor(black, ui.color.cursor);
-			}else{
-				disp_setColor(black, ui.color.mode);
-			}
-			params[Prm::basepreset.val].mode->tostring(str, sizeof(str));
-			disp_putStr(10, 88, &arial, 0, str);
+//			//Print mode
+//			if(varParam == VAR_MODE){
+//				disp_setColor(black, ui.color.cursor);
+//			}else{
+//				disp_setColor(black, ui.color.mode);
+//			}
+//			params[Prm::basepreset.val].mode->tostring(str, sizeof(str));
+//			disp_putStr(10, 88, &arial, 0, str);
 		}
 
 		//Print status bar

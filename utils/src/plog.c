@@ -13,13 +13,15 @@
 #include <string.h>
 #include "plog.h"
 
+int _write(int file, const void *ptr, unsigned int len);
+
 /*!****************************************************************************
  * MEMORY
  */
 static plog_vprintf_type log_vsprintf;
 static plog_write_type log_write;
 static plog_timestamp_type log_timestamp;
-static char log_buf[256];
+static char log_buf[1024];
 static int log_fd;
 
 /*!****************************************************************************
@@ -124,13 +126,13 @@ void hexdump(const void *buffer, size_t length){
 	const uint8_t *bbuffer = (uint8_t*)buffer;
 	size_t len = 0;
 	for(size_t i = 0; i < length; i++){
-		len += snprintf(log_buf + len, sizeof(log_buf) - len, "%02X ", bbuffer[i]);
+		len += snprintf(log_buf + len, sizeof(log_buf) - len, "%02X ", *bbuffer++);
 	}
 	len += snprintf(log_buf + len, sizeof(log_buf) - len, "\r\n");
 	if(log_write != NULL){
 		len = log_write(log_fd, log_buf, len);
 	}else{
-		len = write(log_fd, log_buf, len);
+		len = _write(log_fd, log_buf, len);
 	}
 }
 
@@ -144,7 +146,7 @@ void hexdumpcolumn(const void *buffer, size_t length, size_t column){
 	size_t len = 0;
 	while(length){
 		for(size_t i = 0; i < column && length; i++){
-			len += snprintf(log_buf + len, sizeof(log_buf) - len, "%02X ", bbuffer[i]);
+			len += snprintf(log_buf + len, sizeof(log_buf) - len, "%02X ", *bbuffer++);
 			length--;
 		}
 		len += snprintf(log_buf + len, sizeof(log_buf) - len, "\r\n");
@@ -152,7 +154,7 @@ void hexdumpcolumn(const void *buffer, size_t length, size_t column){
 	if(log_write != NULL){
 		len = log_write(log_fd, log_buf, len);
 	}else{
-		len = write(log_fd, log_buf, len);
+		len = _write(log_fd, log_buf, len);
 	}
 }
 
