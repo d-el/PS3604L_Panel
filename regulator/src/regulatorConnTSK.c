@@ -61,7 +61,7 @@ static bool reg_waitCommand(command_t* cmd){
 		return false;
 	}
 	xQueueSend(commandQueue, cmd, 0);
-	BaseType_t osres = xSemaphoreTake(cmd->semaphore, 200);
+	BaseType_t osres = xSemaphoreTake(cmd->semaphore, 500);
 	vSemaphoreDelete(cmd->semaphore);
 	return osres == pdTRUE && cmd->result;
 }

@@ -189,12 +189,14 @@ ItemState updateReg(const MenuItem* m){
 	bool regstate = reg_getState(&regmeas);
 	if(regstate){
 		Prm::Iadc.val = regmeas.iadc;
-		Prm::IadcEx.val = regmeas.iexternaladc;
 		Prm::Uadc.val = regmeas.vadc;
 		Prm::Umeas.val = regmeas.voltage;
 		Prm::Imeas.val = regmeas.current;
 		Prm::resistance = regmeas.resistance;
-		Prm::inputVoltage = regmeas.input_voltage / 100000;
+		Prm::Vdc = regmeas.input_voltage / 100000;
+		Prm::temp_heatsink = regmeas.temp_heatsink;
+		Prm::temp_shunt = regmeas.temp_shunt;
+		Prm::temp_ref = regmeas.temp_ref;
 		return ItemState { true, "" };
 	}else{
 		return ItemState { false, "error connect"};
@@ -324,7 +326,6 @@ m1,
 			m1233,
 			m1234,
 			m1235,
-			m1236,
 	m13,
 		m130,
 		m131,
@@ -346,6 +347,9 @@ m1,
 	m16,
 		m160,
 		m161,
+		m162,
+		m163,
+		m164,
 	m17,
 	m18,
 
@@ -397,9 +401,8 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 			m1231("DacU", &Prm::Udac, true, 0, savePointMicroI, nullptr, nullptr, updateReg, &m1232, &m1230),
 			m1232("AdcU", &Prm::Uadc, false, 0, nullptr, nullptr, nullptr, updateReg, &m1233, &m1231),
 			m1233("AdcI", &Prm::Iadc, false, 0, nullptr, nullptr, nullptr, updateReg, &m1234, &m1232),
-			m1234("AdcIEx", &Prm::IadcEx, false, 0, nullptr, nullptr, nullptr, updateReg, &m1235, &m1233),
-			m1235("Imeas", &Prm::Imeas, false, 0, nullptr, nullptr, nullptr, updateReg, &m1236, &m1234),
-			m1236("cRange", &Prm::crange_set, true, 0, setCrange, nullptr, nullptr, updateReg, nullptr, &m1235),
+			m1234("Imeas", &Prm::Imeas, false, 0, nullptr, nullptr, nullptr, updateReg, &m1235, &m1233),
+			m1235("cRange", &Prm::crange_set, true, 0, setCrange, nullptr, nullptr, updateReg, nullptr, &m1234),
 
 	m13("Ameter", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m14, &m12, &m130),
 		m130("Point0", nullptr, true, 0, nullptr, PrepareI, calibrExit, nullptr, &m131, nullptr, &m1330),
@@ -424,10 +427,12 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 
 	m16("cRange", &Prm::crange_set, true, 0, setCrange, nullptr, nullptr, updateReg, &m17, &m15),
 
-
 	m17("Info", nullptr, false, 0, nullptr, prepareInfo, nullptr, nullptr, &m18, &m16, &m160),
 		m160("Serial", &Prm::reg_serial, false, 0, nullptr, nullptr, nullptr, updateReg, &m161, nullptr),
-		m161("Input", &Prm::inputVoltage, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m160),
+		m161("Vdc", &Prm::Vdc, false, 0, nullptr, nullptr, nullptr, updateReg, &m162, &m160),
+		m162("Ths", &Prm::temp_heatsink, false, 0, nullptr, nullptr, nullptr, updateReg, &m163, &m161),
+		m163("Tsh", &Prm::temp_shunt, false, 0, nullptr, nullptr, nullptr, updateReg, &m164, &m162),
+		m164("Tref", &Prm::temp_ref, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m163),
 
 	m18("Save", &Prm::save_settings, true, 0, saveSettings, nullptr, nullptr, updateSaveSettings, nullptr, &m17, nullptr),
 

@@ -15,7 +15,7 @@ target_include_directories(systems PUBLIC
 target_link_libraries(systems drivers freertos)
 
 target_link_options(systems PUBLIC
-	#-u __wrap__malloc_r
+	-u HardFault_Handler
 	-Wl,--wrap,_malloc
 	-Wl,--wrap,_free
 	-Wl,--wrap,_calloc

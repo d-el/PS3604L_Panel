@@ -1,24 +1,26 @@
 /*!****************************************************************************
  * @file		plog.c
  * @author		d_el
- * @version		V1.0
- * @date		25.05.2018
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
- * @brief		Logging library
+ * @version		V1.1
+ * @date		21.03.2025
+ * @copyright	The MIT License (MIT). Copyright (c) 2025 Storozhenko Roman
+ * @brief		Logging utility
  */
 
 /*!****************************************************************************
  * Include
  */
 #include <string.h>
+#include <time.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <ctype.h>
 #include "plog.h"
-
-int _write(int file, const void *ptr, unsigned int len);
 
 /*!****************************************************************************
  * MEMORY
  */
-static plog_vprintf_type log_vsprintf;
+static plog_vsnprintf_type log_vsnprintf;
 static plog_write_type log_write;
 static plog_timestamp_type log_timestamp;
 static char log_buf[1024];
@@ -35,9 +37,9 @@ static int log_fd;
  *
  * @return func old Function used for output.
  */
-plog_vprintf_type plog_setVprintf(plog_vprintf_type func){
-	plog_vprintf_type oldfunc = log_vsprintf;
-	log_vsprintf = func;
+plog_vsnprintf_type plog_setVprintf(plog_vsnprintf_type func){
+	plog_vsnprintf_type oldfunc = log_vsnprintf;
+	log_vsnprintf = func;
 	return oldfunc;
 }
 
@@ -69,9 +71,37 @@ int plog_setWriteFd(int fd){
  * @return
  */
 plog_timestamp_type plog_setTimestamp(plog_timestamp_type func){
-	plog_timestamp_type oldfunc = plog_timestamp;
+	plog_timestamp_type oldfunc = log_timestamp;
 	log_timestamp = func;
 	return oldfunc;
+}
+
+/*!****************************************************************************
+ *
+ */
+static int plog_vprintf(const char* format, va_list arg){
+	plog_vsnprintf_type p_vprintf = log_vsnprintf ? log_vsnprintf : vsnprintf;
+	int len = p_vprintf(log_buf, sizeof(log_buf), format, arg);
+
+	if(log_write != NULL){
+		len = log_write(log_fd, log_buf, len);
+	}else{
+		len = write(log_fd, log_buf, len);
+	}
+
+	return len;
+}
+
+/*!****************************************************************************
+ * @brief
+ *
+ */
+int plog_printf(const char* format, ...){
+	va_list va;
+	va_start(va, format);
+	int len = plog_vprintf(format, va);
+	va_end(va);
+	return len;
 }
 
 /*!****************************************************************************
@@ -82,19 +112,43 @@ plog_timestamp_type plog_setTimestamp(plog_timestamp_type func){
  *
  * This function or these macros should not be used from an interrupt.
  */
-void plog_write(plog_level_t level, const char* tag, const char* format, ...){
+int plog_write(plog_level_t level, const char* tag, const char* format, ...){
 	(void)level;
 	(void)tag;
-	if(log_vsprintf != NULL){
-		va_list va;
-		va_start(va, format);
-		int len = log_vsprintf(log_buf, format, va);
-		va_end(va);
+	va_list va;
+	va_start(va, format);
+	int len = plog_vprintf(format, va);
+	va_end(va);
+	return len;
+}
 
-		if(log_write != NULL){
-			log_write(log_fd, log_buf, len);
+/*!****************************************************************************
+ * @brief
+ *
+ */
+int plog_hexdumpcolumn(const void *buffer, size_t length, size_t column){
+	if(!length) return 0;
+	const uint8_t *bbuffer = (uint8_t*)buffer;
+	size_t plen = 0;
+	while(length){
+		size_t linelen = column < length ? column : length;
+		plen += plog_printf("%p  ", bbuffer);
+		for(size_t i = 0; i < linelen; i++){
+			plen += plog_printf("%02X ", bbuffer[i]);
 		}
+		plen += plog_printf("   ");
+		if(linelen < column){
+			plen += plog_printf("%*c", (column -  linelen) * 3, ' ');
+		}
+		for(size_t i = 0; i < column && length; i++){
+			char c = isalpha(bbuffer[i]) ? bbuffer[i] : '.';
+			plen += plog_printf("%c", c);
+		}
+		plen += plog_printf("\n");
+		bbuffer += linelen;
+		length -= linelen;
 	}
+	return plen;
 }
 
 /*!****************************************************************************
@@ -114,47 +168,6 @@ uint32_t plog_timestamp(void){
 		return log_timestamp();
 	}else{
 		return 0;
-	}
-}
-
-/*!****************************************************************************
- * @brief
- *
- */
-void hexdump(const void *buffer, size_t length){
-	if(!length) return;
-	const uint8_t *bbuffer = (uint8_t*)buffer;
-	size_t len = 0;
-	for(size_t i = 0; i < length; i++){
-		len += snprintf(log_buf + len, sizeof(log_buf) - len, "%02X ", *bbuffer++);
-	}
-	len += snprintf(log_buf + len, sizeof(log_buf) - len, "\r\n");
-	if(log_write != NULL){
-		len = log_write(log_fd, log_buf, len);
-	}else{
-		len = _write(log_fd, log_buf, len);
-	}
-}
-
-/*!****************************************************************************
- * @brief
- *
- */
-void hexdumpcolumn(const void *buffer, size_t length, size_t column){
-	if(!length) return;
-	const uint8_t *bbuffer = (uint8_t*)buffer;
-	size_t len = 0;
-	while(length){
-		for(size_t i = 0; i < column && length; i++){
-			len += snprintf(log_buf + len, sizeof(log_buf) - len, "%02X ", *bbuffer++);
-			length--;
-		}
-		len += snprintf(log_buf + len, sizeof(log_buf) - len, "\r\n");
-	}
-	if(log_write != NULL){
-		len = log_write(log_fd, log_buf, len);
-	}else{
-		len = _write(log_fd, log_buf, len);
 	}
 }
 

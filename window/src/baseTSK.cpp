@@ -209,8 +209,8 @@ void baseTSK(void *pPrm){
 			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
 			disp_putChar(146, 61, &font8x12, 'm');
 		}else{
-			measI = (measI + 500) / 1000;
-			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
+			measI = (measI + 50) / 100;
+			snprintf(str, sizeof(str), "%01" PRIi32 ".%04" PRIi32, measI / 10000, measI % 10000);
 		}
 		disp_putChar(146, 73, &font8x12, 'A');
 //		}else{

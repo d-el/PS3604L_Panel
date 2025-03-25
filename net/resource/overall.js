@@ -64,7 +64,7 @@ function updateInfo() {
 		updateTable('.table2', [
 			{name: 'u', val: round(x.getInt32(8, true) / 1000000.0, 3) + ' V'},
 			{name: 'i', val: round(x.getInt32(12, true) / 1000000.0, 6) + ' A'},
-			{name: 'power', val: x.getUint32(16, true) / 1000.0 + ' W'},
+			{name: 'power', val: x.getUint32(16, true) / 1000000.0 + ' W'},
 			{name: 'resistance', val: resistance + ' Ohm'},
 			{name: 'time', val: x.getUint32(24, true) / 1000.0 + ' s'},
 			{name: 'capacity', val: x.getUint32(28, true) / 1000.0 + ' Ah'},

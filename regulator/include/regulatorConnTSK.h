@@ -97,12 +97,13 @@ typedef struct __attribute__ ((packed)){
 	uint32_t time;			///< [X_XXX s]
 	uint32_t capacity;		///< [X_XXX Ah]
 	int32_t input_voltage;	///< [X_XXXXXX V]
-	int16_t temperature;	///< [X_X °С]
+	int16_t temp_heatsink;	///< [X_X °С]
+	int16_t temp_shunt;		///< [X_X °С]
+	int16_t temp_ref;		///< [X_X °С]
 	regStatus_t status;
 	uint16_t disablecause;
 	int32_t vadc;			///< [LSB]
 	int32_t iadc;			///< [LSB]
-	int32_t iexternaladc;	///< [LSB]
 } regState_t;
 
 /******************************************************************************

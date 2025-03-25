@@ -1,9 +1,9 @@
-﻿/*!****************************************************************************
+﻿/******************************************************************************
  * @file		write.c
  * @author		d_el
- * @version		V1.0
- * @date		06.12.2017
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @version		V2.0
+ * @date		09.02.2025
+ * @copyright	The MIT License (MIT). Copyright (c) 2025 Storozhenko Roman
  * @brief		System control task
  */
 
@@ -16,36 +16,42 @@
 #include <task.h>
 #include <queue.h>
 #include <uart.h>
+#include <stdbool.h>
 
 #define debugUart uart4
+#define BUFFER_LEN 1024*4
 
-#define qLen 64
-#define qElemebtLen 64
+#define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
+#define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
 
-typedef struct{
-	size_t len;
-	char data[qElemebtLen];
-} xMessage_t;
+static char buffer[BUFFER_LEN];
+static char *bffWr = buffer;
+static char *bffRd = buffer;
+static char *bffEnd = &buffer[sizeof(buffer) - 1];
+static size_t bffSize = sizeof(buffer);
 
-xMessage_t workMessage;
-static StaticQueue_t xStaticQueue; /* The variable used to hold the queue's data structure. */
-static uint8_t ucQueueStorageArea[qLen * sizeof(xMessage_t)];
-static QueueHandle_t queueCommand;
-
+/*!****************************************************************************
+ * @brief
+ */
 void txHandler(uart_type *uartx){
 	(void)uartx;
-    if(debugUart->txState != uartTxRun){
-    	BaseType_t res = xQueueReceiveFromISR(queueCommand, &workMessage, 0);
-    	if(res == pdPASS){
-    		uart_write(debugUart, workMessage.data, workMessage.len);
-    	}
-    }
+	if(debugUart->txState != uartTxRun){
+		if(bffRd < bffWr){
+			uart_write(debugUart, bffRd, bffWr - bffRd);
+			bffRd = bffWr;
+		}
+		if(bffRd > bffWr){
+			uart_write(debugUart, bffRd, bffEnd - bffRd);
+			bffRd = &buffer[0];
+		}
+	}
 }
 
+/*!****************************************************************************
+ * @brief
+ */
 __attribute__((constructor))
 void writeInit(void){
-	queueCommand = xQueueCreateStatic(qLen, sizeof(xMessage_t), ucQueueStorageArea, &xStaticQueue);
-	assert(queueCommand != NULL);
 	uart_init(debugUart, 921600);
 	uart_setCallback(debugUart, txHandler, NULL);
 }
@@ -55,61 +61,77 @@ void writeInit(void){
  */
 uint32_t coreInInterruptMode(void){
 	if(SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk){
-		return 1;   // Interrupt is active, not in thread mode
+		return 1;	// Interrupt is active, not in thread mode
 	}else{
-		return 0;   // Interrupt is not active, we are in thread mode
+		return 0;	// Interrupt is not active, we are in thread mode
 	}
 }
 
-int _write(int file, const void *ptr, unsigned int len) {
+/*!****************************************************************************
+ * @brief
+ */
+int _write(int file, const void *ptr, unsigned int len){
 	(void)file;
-    taskENTER_CRITICAL();
 
-    const uint8_t *data = (uint8_t*)ptr;
-    BaseType_t res = pdFAIL;
-    size_t empty;
+	UBaseType_t uxSavedInterruptStatus = 0;
+	if(coreInInterruptMode()){
+		uxSavedInterruptStatus = taskENTER_CRITICAL_FROM_ISR();
+	}else{
+		taskENTER_CRITICAL();
+	}
 
-    if(coreInInterruptMode()){
-    	empty = qLen - uxQueueMessagesWaitingFromISR(queueCommand);
-    }else{
-    	empty = qLen - uxQueueMessagesWaiting(queueCommand);
-    }
+	const char* pData = (char* const)ptr;
+	int numBytes = len;
+	int numBytesToWrite;
+	int numBytesWritten;
 
-    if((empty * qElemebtLen) >= len){
-		size_t index = 0;
-		while(index < len){
-			size_t availableLen = (len - index) < qElemebtLen ? len - index : qElemebtLen;
-			xMessage_t m;
-			memcpy(m.data, &data[index], availableLen);
-			m.len = availableLen;
-			index += availableLen;
-			if(coreInInterruptMode()){
-				res = xQueueSendToBackFromISR(queueCommand, (void*)&m, 0);
-			}else{
-				res = xQueueSendToBack(queueCommand, (void*)&m, 0);
-			}
+	// Write data to buffer and handle wrap-around if necessary
+	numBytesWritten = 0u;
+	do{
+		if(bffRd > bffWr){
+			numBytesToWrite = bffRd - bffWr - 1u;
+		}else{
+			numBytesToWrite = bffSize - (bffWr - bffRd + 1u);
 		}
-
-		if(res == pdPASS && debugUart->txState != uartTxRun){
-			if(coreInInterruptMode()){
-				res = xQueueReceiveFromISR(queueCommand, &workMessage, 0);
-			}else{
-				res = xQueueReceive(queueCommand, &workMessage, 0);
-			}
-
-			if(res == pdPASS){
-				uart_write(debugUart, workMessage.data, workMessage.len);
-			}
+		numBytesToWrite = MIN(numBytesToWrite, (bffEnd - bffWr));	// Number of bytes that can be written until buffer wrap-around
+		numBytesToWrite = MIN(numBytesToWrite, numBytes);
+#if 1
+		numBytesWritten += numBytesToWrite;
+		numBytes        -= numBytesToWrite;
+		while (numBytesToWrite--) {
+			*bffWr++ = *pData++;
+		};
+#else
+		memcpy((void*) pDst, pData, numBytesToWrite);
+		numBytesWritten += numBytesToWrite;
+		pData += numBytesToWrite;
+		numBytes -= numBytesToWrite;
+		bffWr += numBytesToWrite;
+#endif
+		if(bffWr == bffEnd){
+			bffWr = buffer;
 		}
-    }else{
-    	//while(1);
-    }
+	}while(numBytes);
 
-    //while(debugUart->txState == uartTxRun);
-    taskEXIT_CRITICAL();
+	// Send from UART
+	if(debugUart->txState != uartTxRun){
+		if(bffRd < bffWr){
+			uart_write(debugUart, bffRd, bffWr - bffRd);
+			bffRd = bffWr;
+		}
+		if(bffRd > bffWr){
+			uart_write(debugUart, bffRd, bffEnd - bffRd);
+			bffRd = buffer;
+		}
+	}
 
-    return len;
+	if(coreInInterruptMode()){
+		taskEXIT_CRITICAL_FROM_ISR(uxSavedInterruptStatus);
+	}else{
+		taskEXIT_CRITICAL();
+	}
 
+	return numBytesWritten;
 }
 
 /******************************** END OF FILE ********************************/

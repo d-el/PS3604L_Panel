@@ -110,8 +110,8 @@ void printFooter(void){
 
 		//Print regulator temperature
 		bool minus = false;
-		if(regmeas.temperature < 0) regmeas.temperature = -regmeas.temperature, minus = true;
-		snprintf(str, sizeof(str), "%s%02" PRIu16 ".%" PRIu16 "\xB0\x43", minus ? "-" : "", regmeas.temperature / 10, regmeas.temperature % 10);
+		if(regmeas.temp_heatsink < 0) regmeas.temp_heatsink = -regmeas.temp_heatsink, minus = true;
+		snprintf(str, sizeof(str), "%s%02" PRIu16 ".%" PRIu16 "\xB0\x43", minus ? "-" : "", regmeas.temp_heatsink / 10, regmeas.temp_heatsink % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
 		//Print time
