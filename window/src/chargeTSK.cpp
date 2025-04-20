@@ -181,7 +181,7 @@ void chargeTSK(void *pPrm){
 		}else if(view_time_s < 3600){
 			snprintf(str, sizeof(str), "Time:  %" PRIu32 "m %02" PRIu32 "s", view_time_s / 60, view_time_s % 60);
 		}else{
-			snprintf(str, sizeof(str), "Time:  %02" PRIu32 "h %02" PRIu32 "m %02" PRIu32 "s", view_time_s / 3600, view_time_s / 60 % 60, view_time_s % 60);
+			snprintf(str, sizeof(str), "Time:  %02" PRIu32 "h%02" PRIu32 "m%02" PRIu32 "s", view_time_s / 3600, view_time_s / 60 % 60, view_time_s % 60);
 		}
 		if(varParam == C_TIME && !stateenable){
 			disp_setColor(black, ui.color.cursor);

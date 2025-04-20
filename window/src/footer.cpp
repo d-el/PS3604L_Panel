@@ -13,6 +13,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
@@ -110,8 +111,8 @@ void printFooter(void){
 
 		//Print regulator temperature
 		bool minus = false;
-		if(regmeas.temp_heatsink < 0) regmeas.temp_heatsink = -regmeas.temp_heatsink, minus = true;
-		snprintf(str, sizeof(str), "%s%02" PRIu16 ".%" PRIu16 "\xB0\x43", minus ? "-" : "", regmeas.temp_heatsink / 10, regmeas.temp_heatsink % 10);
+		int16_t abst = abs(regmeas.temp_heatsink);
+		snprintf(str, sizeof(str), "%2" PRIi16 ".%" PRIu16 "\xB0\x43", regmeas.temp_heatsink / 10, abst % 10);
 		disp_putStr(60, 120, &font6x8, 0, str);
 
 		//Print time
