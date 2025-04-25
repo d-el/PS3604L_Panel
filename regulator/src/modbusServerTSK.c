@@ -14,13 +14,13 @@
 #include "stdbool.h"
 #include "string.h"
 #include "assert.h"
-#include "plog.h"
 #include "lwip/api.h"
 #include "lwip/ip.h"
 #include "lwip/netif.h"
 #include "regulatorConnTSK.h"
+#include <plog.h>
 
-#define LOG_LOCAL_LEVEL P_LOG_WARN
+#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
 
 /*!****************************************************************************
  * MEMORY
@@ -56,7 +56,9 @@ void modbus_server_serve(struct netconn *conn){
 
 			netbuf_data(inbuf, (void**)&readdata, &buflen);
 			P_LOGI(logTag, "Netbuf_data: %"PRIu32" (%"PRIu16")", numberRequest++, buflen);
-			if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG) hexdumpcolumn(readdata, buflen, 32);
+			if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG){
+				plog_hexdumpcolumn(readdata, buflen, 32);
+			}
 			tcpModbusPacket_t tcpModbusPacket;
 			memcpy(&tcpModbusPacket, readdata, buflen <= sizeof(tcpModbusPacket_t) ? buflen : 0);
 
@@ -65,7 +67,9 @@ void modbus_server_serve(struct netconn *conn){
 				size_t lentowrite = 6 + len;
 				tcpModbusPacket.MBAPheader.Length = __builtin_bswap16(len);
 				P_LOGI(logTag, "send response to client (%"PRIu16")", lentowrite);
-				if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG) hexdumpcolumn(&tcpModbusPacket, lentowrite, 32);
+				if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG){
+					plog_hexdumpcolumn(&tcpModbusPacket, lentowrite, 32);
+				}
 				len = __builtin_bswap16(len); // hton
 				netconn_write(conn, &tcpModbusPacket, lentowrite, NETCONN_NOCOPY);
 			}

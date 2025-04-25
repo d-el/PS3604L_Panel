@@ -181,11 +181,11 @@ static ssize_t _modbus_rtu_recv(modbus_t *ctx, uint8_t *rsp, int rsp_length)
 {
     ssize_t res = modbus_serial_recv(rsp, rsp_length, ctx->response_timeout);
     if(res == -1){
-    	libmodbuserrno = EMBXGTAR;
-		return -1;
+        libmodbuserrno = EMBXGTAR;
+        return -1;
     }else if(res == -2){
-    	libmodbuserrno = ETIMEDOUT;
-		return -1;
+        libmodbuserrno = ETIMEDOUT;
+        return -1;
     }
     return res;
 }
@@ -195,7 +195,7 @@ static int _modbus_rtu_flush(modbus_t *);
 static int _modbus_rtu_pre_check_confirmation(modbus_t *ctx, const uint8_t *req,
                                               const uint8_t *rsp, int rsp_length)
 {
-	(void)rsp_length;
+    (void)rsp_length;
     /* Check responding slave is the slave we requested (except for broacast
      * request) */
     if (req[0] != rsp[0] && req[0] != MODBUS_BROADCAST_ADDRESS) {
@@ -304,7 +304,7 @@ static void _modbus_rtu_close(modbus_t *ctx)
 
 static int _modbus_rtu_flush(modbus_t *ctx)
 {
-	(void)ctx;
+    (void)ctx;
     return 0;
 }
 

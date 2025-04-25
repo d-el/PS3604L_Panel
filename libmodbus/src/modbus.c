@@ -42,6 +42,9 @@ typedef enum {
 } _step_t;
 
 int libmodbuserrno;
+uint8_t req[MAX_MESSAGE_LENGTH];
+uint8_t rsp[MAX_MESSAGE_LENGTH];
+uint8_t rsp[MAX_MESSAGE_LENGTH];
 
 const char *modbus_strerror(int errnum) {
     switch (errnum) {
@@ -203,7 +206,6 @@ static int send_msg(modbus_t *ctx, uint8_t *msg, int msg_length)
 int modbus_send_raw_request(modbus_t *ctx, const uint8_t *raw_req, int raw_req_length)
 {
     sft_t sft;
-    uint8_t req[MAX_MESSAGE_LENGTH];
     int req_length;
 
     if (ctx == NULL) {
@@ -270,6 +272,9 @@ static uint8_t compute_meta_length_after_function(int function,
         case MODBUS_FC_WRITE_MULTIPLE_REGISTERS:
             length = 4;
             break;
+        case MODBUS_FC_FILERECORD_WRITE:
+            length = 1;
+            break;
         case MODBUS_FC_MASK_WRITE_REGISTER:
             length = 6;
             break;
@@ -304,7 +309,8 @@ static int compute_data_length_after_meta(modbus_t *ctx, uint8_t *msg,
         /* MSG_CONFIRMATION */
         if (function <= MODBUS_FC_READ_INPUT_REGISTERS ||
             function == MODBUS_FC_REPORT_SLAVE_ID ||
-            function == MODBUS_FC_WRITE_AND_READ_REGISTERS) {
+            function == MODBUS_FC_WRITE_AND_READ_REGISTERS ||
+            function == MODBUS_FC_FILERECORD_WRITE) {
             length = msg[ctx->backend->header_length + 1];
         } else {
             length = 0;
@@ -602,7 +608,6 @@ int modbus_reply(modbus_t *ctx, const uint8_t *req,
     int slave;
     int function;
     uint16_t address;
-    uint8_t rsp[MAX_MESSAGE_LENGTH];
     int rsp_length = 0;
     sft_t sft;
 
@@ -901,7 +906,6 @@ int modbus_reply_exception(modbus_t *ctx, const uint8_t *req,
     int offset;
     int slave;
     int function;
-    uint8_t rsp[MAX_MESSAGE_LENGTH];
     int rsp_length;
     int dummy_length = 99;
     sft_t sft;
@@ -936,9 +940,6 @@ static int read_io_status(modbus_t *ctx, int function,
 {
     int rc;
     int req_length;
-
-    uint8_t req[_MIN_REQ_LENGTH];
-    uint8_t rsp[MAX_MESSAGE_LENGTH];
 
     req_length = ctx->backend->build_request_basis(ctx, function, addr, nb, req);
 
@@ -1038,8 +1039,6 @@ static int read_registers(modbus_t *ctx, int function, int addr, int nb,
 {
     int rc;
     int req_length;
-    uint8_t req[_MIN_REQ_LENGTH];
-    uint8_t rsp[MAX_MESSAGE_LENGTH];
 
     if (nb > MODBUS_MAX_READ_REGISTERS) {
         if (ctx->debug) {
@@ -1147,8 +1146,6 @@ static int write_single(modbus_t *ctx, int function, int addr, const uint16_t va
     rc = send_msg(ctx, req, req_length);
     if (rc > 0) {
         /* Used by write_bit and write_register */
-        uint8_t rsp[MAX_MESSAGE_LENGTH];
-
         rc = _modbus_receive_msg(ctx, rsp, MSG_CONFIRMATION);
         if (rc == -1)
             return -1;
@@ -1191,7 +1188,6 @@ int modbus_write_bits(modbus_t *ctx, int addr, int nb, const uint8_t *src)
     int req_length;
     int bit_check = 0;
     int pos = 0;
-    uint8_t req[MAX_MESSAGE_LENGTH];
 
     if (ctx == NULL) {
         libmodbuserrno = EINVAL;
@@ -1232,8 +1228,6 @@ int modbus_write_bits(modbus_t *ctx, int addr, int nb, const uint8_t *src)
 
     rc = send_msg(ctx, req, req_length);
     if (rc > 0) {
-        uint8_t rsp[MAX_MESSAGE_LENGTH];
-
         rc = _modbus_receive_msg(ctx, rsp, MSG_CONFIRMATION);
         if (rc == -1)
             return -1;
@@ -1252,7 +1246,6 @@ int modbus_write_registers(modbus_t *ctx, int addr, int nb, const uint16_t *src)
     int i;
     int req_length;
     int byte_count;
-    uint8_t req[MAX_MESSAGE_LENGTH];
 
     if (ctx == NULL) {
         libmodbuserrno = EINVAL;
@@ -1282,8 +1275,6 @@ int modbus_write_registers(modbus_t *ctx, int addr, int nb, const uint16_t *src)
 
     rc = send_msg(ctx, req, req_length);
     if (rc > 0) {
-        uint8_t rsp[MAX_MESSAGE_LENGTH];
-
         rc = _modbus_receive_msg(ctx, rsp, MSG_CONFIRMATION);
         if (rc == -1)
             return -1;
@@ -1318,8 +1309,6 @@ int modbus_mask_write_register(modbus_t *ctx, int addr, uint16_t and_mask, uint1
     rc = send_msg(ctx, req, req_length);
     if (rc > 0) {
         /* Used by write_bit and write_register */
-        uint8_t rsp[MAX_MESSAGE_LENGTH];
-
         rc = _modbus_receive_msg(ctx, rsp, MSG_CONFIRMATION);
         if (rc == -1)
             return -1;
@@ -1343,8 +1332,6 @@ int modbus_write_and_read_registers(modbus_t *ctx,
     int req_length;
     int i;
     int byte_count;
-    uint8_t req[MAX_MESSAGE_LENGTH];
-    uint8_t rsp[MAX_MESSAGE_LENGTH];
 
     if (ctx == NULL) {
         libmodbuserrno = EINVAL;
@@ -1432,8 +1419,6 @@ int modbus_report_slave_id(modbus_t *ctx, int max_dest, uint8_t *dest)
     if (rc > 0) {
         int i;
         int offset;
-        uint8_t rsp[MAX_MESSAGE_LENGTH];
-
         rc = _modbus_receive_msg(ctx, rsp, MSG_CONFIRMATION);
         if (rc == -1)
             return -1;

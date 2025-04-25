@@ -51,10 +51,11 @@ static SemaphoreHandle_t lowPowerSem;
 /*!****************************************************************************
  * Local prototypes for the functions
  */
-extern "C" int _write(int fd, const void *buf, size_t count);
 static void loadParameters(void);
 static void pvdCallback(void);
 static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
+
+extern "C" int _write(int fd, const void *buf, size_t count);
 
 /**
  * SYS_DEBUG_LEVEL: Enable debugging for system task
@@ -68,14 +69,11 @@ static const char *logTag = "SYS";
  */
 void systemTSK(void *pPrm){
 	(void)pPrm;
-	//TickType_t 		xLastWakeTime = xTaskGetTickCount();
 	selWindow_type 	selWindowPrev = noneWindow;
 
 	//Init log system
-	plog_setVprintf(vsprintf);
 	plog_setWrite(_write);
-	plog_setTimestamp(xTaskGetTickCount);
-	plog_setWriteFd(write_uart); // write_semihost, write_uart
+	plog_setTimestamp([]() -> uint32_t { return xTaskGetTickCount(); });
 
 	P_LOGI(logTag, "\n\nStarted systemTSK");
 
@@ -89,21 +87,20 @@ void systemTSK(void *pPrm){
 	Prm::mac0.val = mac;
 	sntp_init();													// Initialize service SNTP
 
-	vSemaphoreCreateBinary(lowPowerSem);
+	lowPowerSem = xSemaphoreCreateBinary();
 	assert(lowPowerSem != NULL);
-	xSemaphoreTake(lowPowerSem, portMAX_DELAY);
 
 	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", REG_TSK_SZ_STACK, NULL, REG_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started regulatorConnTSK");
 
-	vTaskDelay(1);
-	P_LOGI(logTag, "Set regulator wire resistance");
-	reg_setWireResistance(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
-
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started httpServerTSK");
+
+	vTaskDelay(1);
+	P_LOGI(logTag, "Set regulator wire resistance");
+	reg_setWireResistance(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
 
 #if(TASK_MONITOR_EN > 0)
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);

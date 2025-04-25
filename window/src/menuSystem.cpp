@@ -160,7 +160,7 @@ void outItemString(const MenuItem *m, uint8_t itemNumber, bool select){
 				MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
 
 	// Label and spaces
-	strcpy(string, m->label);
+	strncpy(string, m->label, sizeof(string) - 1);
 	memset(string + strlen(m->label), ' ', sizeof(string) - 1 - strlen(m->label));
 	string[sizeof(string) -1 - strlen(value)] = 0;
 	disp_setContentColor(colorLabel[sel]);

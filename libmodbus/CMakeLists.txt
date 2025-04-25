@@ -8,7 +8,7 @@ target_include_directories(libmodbus
 	PUBLIC src
 	)
 
-target_compile_definitions(libmodbus PUBLIC -DMCU)
+target_compile_definitions(libmodbus PUBLIC -DLIB_MODBUS_MCU)
 
 target_compile_options(libmodbus PUBLIC "-Wno-unused-variable")
 

@@ -36,8 +36,8 @@ void _modbus_serial_init(void){
 
 ssize_t modbus_serial_send(const uint8_t *req, int req_length){
 	P_LOGD(logTag, "TX (%"PRIu16")", req_length);
-	if(LOG_LOCAL_LEVEL > P_LOG_DEBUG){
-		hexdumpcolumn(req, req_length, 16);
+	if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG){
+		plog_hexdumpcolumn(req, req_length, 16);
 	}
 	uart_write(LIBMODBUSUART, req, req_length);
 	return req_length;
@@ -54,8 +54,8 @@ ssize_t modbus_serial_recv(uint8_t *rsp, int rsp_length, int response_timeout){
 		if(received == 0){
 			return -1; // I/O error
 		}
-		if(LOG_LOCAL_LEVEL > P_LOG_DEBUG){
-			hexdumpcolumn(rsp, received, 16);
+		if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG){
+			plog_hexdumpcolumn(rsp, received, 16);
 		}
 		return received;
 	}
@@ -68,8 +68,7 @@ ssize_t modbus_serial_recv(uint8_t *rsp, int rsp_length, int response_timeout){
 static void uartRxHandler(uart_type *puart){
 	(void)puart;
 	if(LIBMODBUSUART->rxState == uartRxSuccess){
-		BaseType_t xHigherPriorityTaskWoken;
-		xHigherPriorityTaskWoken = pdFALSE;
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 		xSemaphoreGiveFromISR(uartRxSem, &xHigherPriorityTaskWoken);
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 	}
@@ -82,9 +81,8 @@ int modbus_serial_connect(const char *device, uint32_t baud, uint8_t parity, uin
 	(void)stop_bit;
 
 	// Create Semaphore for UART
-	vSemaphoreCreateBinary(uartRxSem);
+	uartRxSem = xSemaphoreCreateBinary();
 	assert(uartRxSem != NULL);
-	xSemaphoreTake(uartRxSem, portMAX_DELAY);
 
 	uart_init(LIBMODBUSUART, baud);
 	uart_setCallback(LIBMODBUSUART, NULL, uartRxHandler);

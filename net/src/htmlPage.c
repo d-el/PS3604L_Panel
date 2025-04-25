@@ -118,7 +118,7 @@ urlData_type handle_statemeastask(void){
 		bin_statemeastask.time = regMeas.time;
 		bin_statemeastask.capacity = regMeas.capacity;
 		bin_statemeastask.input_voltage = regMeas.input_voltage;
-		bin_statemeastask.temperature = regMeas.temperature;
+		bin_statemeastask.temperature = regMeas.temp_heatsink;
 		bin_statemeastask.status = regMeas.status.all;
 		bin_statemeastask.disablecause = regMeas.disablecause;
 

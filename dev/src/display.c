@@ -27,9 +27,8 @@ static SemaphoreHandle_t	dispFlushSem;
  */
 void disp_init(void){
 	st7735_init(JD_T18003, ST7735_R270);
-	vSemaphoreCreateBinary(dispFlushSem);
+	dispFlushSem = xSemaphoreCreateBinary();
 	assert(dispFlushSem != NULL);
-	xSemaphoreTake(dispFlushSem, portMAX_DELAY);
 }
 
 /*!****************************************************************************

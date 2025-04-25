@@ -44,9 +44,8 @@ static void eep_i2cCallback(i2c_type *i2cx){
 */
 void eep_init(void){
 	// Create Semaphore for I2C
-	vSemaphoreCreateBinary(i2cSem);
+	i2cSem = xSemaphoreCreateBinary();
 	assert(i2cSem != NULL);
-	xSemaphoreTake(i2cSem, portMAX_DELAY);
 
 	i2c_setCallback(usei2c, eep_i2cCallback);
 }

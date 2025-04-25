@@ -49,6 +49,19 @@ typedef enum {
 	reg_raw
 } regMode_t;
 
+typedef enum {
+	reg_save_nop,
+	reg_save_do,
+	reg_save_ok,
+	reg_save_nothing,
+	reg_save_error
+} regSave_t;
+
+typedef enum {
+	reg_crange_hi,
+	reg_crange_auto
+} regCrange_t;
+
 typedef union __attribute__ ((packed)){
 	struct{
 	uint16_t m_errorExternalIAdc :1;
@@ -59,6 +72,7 @@ typedef union __attribute__ ((packed)){
 	uint16_t m_calibrationEmpty :1;
 	uint16_t m_limitation :1;
 	uint16_t m_externaIDac :1;
+	uint16_t cRangeLoOverflow :1;
 	};
 	uint16_t all;
 } regStatus_t;
@@ -83,12 +97,13 @@ typedef struct __attribute__ ((packed)){
 	uint32_t time;			///< [X_XXX s]
 	uint32_t capacity;		///< [X_XXX Ah]
 	int32_t input_voltage;	///< [X_XXXXXX V]
-	int16_t temperature;	///< [X_X °С]
+	int16_t temp_heatsink;	///< [X_X °С]
+	int16_t temp_shunt;		///< [X_X °С]
+	int16_t temp_ref;		///< [X_X °С]
 	regStatus_t status;
 	uint16_t disablecause;
-	uint16_t vadc;			///< [LSB]
-	uint16_t iadc;			///< [LSB]
-	int32_t iexternaladc;	///< [LSB]
+	int32_t vadc;			///< [LSB]
+	int32_t iadc;			///< [LSB]
 } regState_t;
 
 /******************************************************************************
@@ -102,22 +117,30 @@ bool reg_setDacVoltage(int32_t lsb);
 bool reg_setDacCurrent(int32_t lsb);
 bool reg_setMode(regMode_t mode);
 bool reg_setTime(uint32_t ms);
+
 bool reg_setEnable(bool state);
+bool reg_getEnable(bool *state);
+
 bool reg_setWireResistance(uint32_t r);					// X_XXXX Ohm
 bool reg_setVoltagePoint(int32_t uV, uint8_t number);
 bool reg_setMicroCurrentPoint(int32_t uA, uint8_t number);
 bool reg_setCurrentPoint(int32_t uA, uint8_t number);
+
+bool reg_setSaveSettings(regSave_t save);
+bool reg_getSaveSettings(regSave_t *save);
+bool reg_setCrange(regCrange_t crange);
+
 bool reg_getCalibrationTime(time_t* time);
 bool reg_getDacMaxValue(int32_t *val);
 
 bool reg_getTarget(regTarget_t *target);
-bool reg_getEnable(bool *state);
 bool reg_getState(regState_t *state);
 bool reg_getVersion(regVersion_t *v);
 bool reg_getSerial(uint32_t* sn);
 
 void reg_setremote(bool rem);
 bool reg_getremote(void);
+
 bool reg_modbusRequest(uint8_t *req, uint16_t *req_length);
 
 void modbusServerTSK(void *pPrm);
