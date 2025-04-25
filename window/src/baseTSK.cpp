@@ -39,7 +39,6 @@
 enum {
 	VAR_VOLT = 0,
 	VAR_CURR,
-	/*VAR_MODE,*/
 	VAR_NUMBER
 };
 
@@ -96,12 +95,12 @@ void baseTSK(void *pPrm){
 					}else{
 						BeepTime(ui.beep.error.time, ui.beep.error.freq);
 					}
-				}else if(keyState(kFunc)){					//Next preset
+				}else if(keyState(kFunc)){
 					if(keyDin(kNext) && !regenable){
 						selWindow(settingWindow);
 					}
 					if(!regenable){
-						if(Prm::basepreset.val < VAR_CURR)
+						if(Prm::basepreset.val < params.size() - 1)
 							Prm::basepreset.val++;
 						else
 							Prm::basepreset.val = 0;
