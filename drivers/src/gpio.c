@@ -120,7 +120,7 @@ void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_t
 			port->OTYPER	|= GPIO_OPEN_DRAIN << npin;
 			break;
 
-	   case alternateFunctionPushPull:
+		case alternateFunctionPushPull:
 			port->MODER		|= GPIO_AF_MODE << (2 * npin);
 			port->OTYPER	|= GPIO_PUSH_PULL << npin;
 			port->OSPEEDR	|= 3 << (2 * npin);	  //High speed
