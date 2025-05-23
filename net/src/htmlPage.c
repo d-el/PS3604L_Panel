@@ -59,7 +59,7 @@ powerSupplyState_t bin_statemeastask;
 resource_reg(net_resource_index_html)
 resource_reg(net_resource_overall_js)
 resource_reg(net_resource_styles_css)
-resource_reg(net_resource_favico_bmp)
+resource_reg(net_resource_favicon_png)
 resource_reg(net_resource_404_html)
 
 const httpResource_type httpResource[] = {
@@ -88,9 +88,9 @@ const httpResource_type httpResource[] = {
 		.handler = handle_statemeastask
 	},
 	{
-		.url = "/favicon.ico",
+		.url = "/favicon.png",
 		.data.type = urlDataType_ico,
-		resource_add(net_resource_favico_bmp),
+		resource_add(net_resource_favicon_png),
 		.handler = NULL
 	},
 	{

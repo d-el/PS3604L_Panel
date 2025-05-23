@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 project(PS3604LF
-	VERSION 2.4.4
+	VERSION 2.4.5
 	LANGUAGES CXX C
 	)
 
@@ -39,7 +39,7 @@ configure_file(utils/include/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/utils/incl
 
 set(PROJECT_EMBED_FILES
 	net/resource/404.html
-	net/resource/favico.bmp
+	net/resource/favicon.png
 	net/resource/index.html
 	net/resource/overall.js
 	net/resource/styles.css

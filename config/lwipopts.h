@@ -1,4 +1,4 @@
-﻿/******************************************************************************
+﻿/*******************************************************************************
   * @file		lwipopts.h
   * @author	 	Storozhenko Roman
   * @version	V1.0
@@ -61,6 +61,12 @@
  *	byte alignment -> define MEM_ALIGNMENT to 2
  */
 #define MEM_ALIGNMENT			4
+
+
+/**
+ * Use Glibc malloc()/free()
+ */
+#define MEM_LIBC_MALLOC			1
 
 /**
  * MEM_SIZE: the size of the heap memory. If the application will send
@@ -204,7 +210,19 @@
  * interfaces. DHCP is not implemented in lwIP 0.5.1, however, so
  * turning this on does currently not work.
  */
-#define LWIP_DHCP				0
+#define LWIP_DHCP					1
+
+/**
+ * LWIP_DHCP_DOES_ACD_CHECK==1: Perform address conflict detection on the dhcp address.
+ */
+#define LWIP_DHCP_DOES_ACD_CHECK	0
+
+/**
+ * LWIP_DHCP_GETS_NTP==1: Request NTP servers with discover/select. For each
+ * response packet, an callback is called, which has to be provided by the port:
+ * void dhcp_set_ntp_servers(u8_t num_ntp_servers, ip_addr_t* ntp_server_addrs);
+*/
+#define LWIP_DHCP_GET_NTP_SRV		0
 
 /**----------------------------------
    ---------- DNS options -----------
@@ -214,7 +232,7 @@
  * LWIP_DNS==1: Turn on DNS module. UDP must be available for DNS
  * transport.
  */
-#define LWIP_DNS						1
+#define LWIP_DNS				1
 
 /**---------------------------------
    ---------- UDP options ----------
@@ -354,13 +372,21 @@
 #define LWIP_SOCKET						0
 
 /*-----------------------------------------
+   ---------- MQTT options ----------
+   ----------------------------------------*/
+#define LWIP_MQTT_APP					LWIP_TCP
+#define MQTT_OUTPUT_RINGBUF_SIZE		512
+#define MQTT_REQ_MAX_IN_FLIGHT			8
+
+
+/*-----------------------------------------
    ---------- Statistics options ----------
    ----------------------------------------*/
 
 /**
  * LWIP_STATS==1: Enable statistics collection in lwip_stats.
  */
-#define LWIP_STATS						1
+#define LWIP_STATS						0
 
 /**
  * LWIP_STATS_DISPLAY==1: Compile in the statistics output functions.
@@ -391,14 +417,14 @@
 /*----------------------------------------
    ---------- Debugging options ----------
    ---------------------------------------*/
-//#define LWIP_DEBUG					1
+#define LWIP_DEBUG						1
 
 /**
  * LWIP_DBG_TYPES_ON: A mask that can be used to globally enable/disable
  * debug messages of certain types.
  * @see debugging_levels
  */
-#define LWIP_DBG_TYPES_ON				LWIP_DBG_OFF
+#define LWIP_DBG_TYPES_ON				LWIP_DBG_ON
 
 /**
  * LWIP_DBG_MIN_LEVEL: After masking, the value of the debug is
@@ -443,6 +469,7 @@
 #define AUTOIP_DEBUG					LWIP_DBG_OFF
 #define DNS_DEBUG						LWIP_DBG_OFF
 #define IP6_DEBUG						LWIP_DBG_OFF
+#define MQTT_DEBUG						LWIP_DBG_OFF
 
 /**
  * LWIP_NETIF_LINK_CALLBACK==1: Support a callback function from an interface

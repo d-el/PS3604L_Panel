@@ -98,7 +98,7 @@ function updateInfo() {
 			{name: 'i', val: x.getUint32(46, true) / 1000000.0 + ' A'},
 		]);
 
-		document.querySelector('footer').innerHTML = '©copyright: 2013-2024 DEL	rv' + major + '.' + minor + '.' + patch;
+		document.querySelector('footer').innerHTML = '©copyright: 2013-2025 DEL	rv' + major + '.' + minor + '.' + patch;
 	};
 	oReq.send(null);
 }
