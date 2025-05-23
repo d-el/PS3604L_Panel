@@ -45,7 +45,7 @@ const char *http_contentType[urlDataTypeNumber] = {
 /*!****************************************************************************
  *
  */
-uint32_t httpStrcmp(char *s1, char *s2){
+uint32_t httpStrcmp(const char *s1, const char *s2){
 	return !strncmp(s1, s2, strlen(s2));
 }
 
