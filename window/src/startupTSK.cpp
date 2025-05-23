@@ -51,14 +51,14 @@ void startupTSK(void *pPrm){
 				getVersion(),
 				regVersion.major, regVersion.minor, regVersion.patch);
 		disp_putStr(0, 70, &arial, 0, str);
-		
+
 		if(fp.state.sysSettingLoadDefault == 0){
 			sprintf(str, "%" PRIu32, Prm::startcnt.val);
 		}else{
 			sprintf(str, "-");
 		}
 		disp_putStr(0, 90, &arial, 0, str);
-		disp_putStr(0, 110, &arial, 0, "2012 - 2021");
+		disp_putStr(0, 110, &arial, 0, "2012 - 2025");
 		disp_flush();
 
 

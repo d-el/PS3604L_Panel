@@ -322,7 +322,7 @@ ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex){
 	uint8_t var = day;
 	struct Limit{ int32_t min, max; };
 	const Limit limits[] = {
-			1,31, 1,12, 2024,3000, 0,23, 0,59, 0,59
+			1,31, 1,12, 2025,3000, 0,23, 0,59, 0,59
 	};
 
 	struct tm t = {};
