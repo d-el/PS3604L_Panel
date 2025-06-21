@@ -31,9 +31,12 @@ static char *logTag = "port";
  * @brief
  */
 void _modbus_serial_init(void){
-
+	uart_init(uart3, 57600);
 }
 
+/*!****************************************************************************
+ * @brief
+ */
 ssize_t modbus_serial_send(const uint8_t *req, int req_length){
 	P_LOGD(logTag, "TX (%"PRIu16")", req_length);
 	if(LOG_LOCAL_LEVEL >= P_LOG_DEBUG){
@@ -43,6 +46,9 @@ ssize_t modbus_serial_send(const uint8_t *req, int req_length){
 	return req_length;
 }
 
+/*!****************************************************************************
+ * @brief
+ */
 ssize_t modbus_serial_recv(uint8_t *rsp, int rsp_length, int response_timeout){
 	if(LIBMODBUSUART->rxState != uartRxRun){
 		uart_read(LIBMODBUSUART, rsp, rsp_length);
@@ -65,6 +71,9 @@ ssize_t modbus_serial_recv(uint8_t *rsp, int rsp_length, int response_timeout){
 	}
 }
 
+/*!****************************************************************************
+ * @brief
+ */
 static void uartRxHandler(uart_type *puart){
 	(void)puart;
 	if(LIBMODBUSUART->rxState == uartRxSuccess){
@@ -74,6 +83,9 @@ static void uartRxHandler(uart_type *puart){
 	}
 }
 
+/*!****************************************************************************
+ * @brief
+ */
 int modbus_serial_connect(const char *device, uint32_t baud, uint8_t parity, uint8_t data_bit, char stop_bit){
 	(void)device;
 	(void)parity;

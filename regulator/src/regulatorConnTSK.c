@@ -294,10 +294,6 @@ static bool rawModbusMessage(modbus_t *ctx, uint8_t *req, uint16_t *req_length){
 void regulatorConnTSK(void *pPrm){
 	(void)pPrm;
 
-	BaseType_t osres = xTaskCreate(modbusServerTSK, "modbusServerTSK", TCPMODBUS_TSK_SZ_STACK, NULL, TCPMODBUS_TSK_PRIO, NULL);
-	assert(osres == pdTRUE);
-	P_LOGI(logTag, "Started TCPmodbusServer");
-
 	regulatorMutex = xSemaphoreCreateMutex();
 	commandQueue = xQueueCreate(8, sizeof(command_t));
 	TickType_t	xLastWakeTime = xTaskGetTickCount();

@@ -1,6 +1,6 @@
 add_library(regulator STATIC
-	src/modbusServerTSK.c
 	src/regulatorConnTSK.c
+	src/regulatorTcpRequest.c
 	)
 
 target_include_directories(regulator PUBLIC

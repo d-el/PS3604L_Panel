@@ -15,6 +15,7 @@
 extern void __libc_init_array(void);	///initialization c library array
 extern void SystemInit(void);			///System initialization function
 extern int main(void);					///Entry point for the application
+void Reset_Handler(void);
 
 extern uint32_t _estack;				///Highest address of the user mode stack
 extern uint32_t _sdata;					///RAM data start
@@ -62,21 +63,6 @@ void __initializeData(uint32_t *dataStart, uint32_t *dataEnd, uint32_t *src){
 	while(pData < dataEnd){
 		*pData++ = *src++;
 	}
-}
-
-/*!****************************************************************************
- * @brief	Program entry point
- */
-void Reset_Handler(void){
-	__initializeData(&_sdata, &_edata, &_sidata);	//.data
-	__initializeData(&_sccmdata, &_eccmdata, &_siccmdata);	//.ccmdata
-	__initializeBss(&_sbss, &_ebss);	//.bss
-	__initializeBss(&_sccmbss, &_eccmbss);	//.ccmbss
-
-	__libc_init_array();
-
-	SystemInit();
-	main();
 }
 
 /*!****************************************************************************
@@ -295,5 +281,22 @@ intVector_type intVector[] __attribute__ ((section (".isr_vector"))) = {
 	HASH_RNG_IRQHandler,
 	FPU_IRQHandler,
 };
+
+/*!****************************************************************************
+ * @brief	Program entry point
+ */
+void Reset_Handler(void){
+	volatile uint32_t* VTOR = (uint32_t*)0xE000ED08;
+	*VTOR = (uint32_t)&intVector[0];
+	__initializeData(&_sdata, &_edata, &_sidata);	//.data
+	__initializeData(&_sccmdata, &_eccmdata, &_siccmdata);	//.ccmdata
+	__initializeBss(&_sbss, &_ebss);	//.bss
+	__initializeBss(&_sccmbss, &_eccmbss);	//.ccmbss
+
+	__libc_init_array();
+
+	SystemInit();
+	main();
+}
 
 /******************************** END OF FILE ********************************/

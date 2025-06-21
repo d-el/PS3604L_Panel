@@ -37,7 +37,6 @@ void hardInit(void){
 		fp.state.mainOscillatorError = 1;
 	}
 	gpio_init();
-	uart_init(uart3, 57600);
 	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();

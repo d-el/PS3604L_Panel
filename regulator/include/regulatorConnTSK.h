@@ -141,9 +141,9 @@ bool reg_getSerial(uint32_t* sn);
 void reg_setremote(bool rem);
 bool reg_getremote(void);
 
-bool reg_modbusRequest(uint8_t *req, uint16_t *req_length);
-
-void modbusServerTSK(void *pPrm);
+bool reg_modbusRequest(uint8_t* req, uint16_t* req_length);
+bool reg_tcpModbusRequest(void** readdata, uint16_t* buflen);
+bool reg_tcpModbusClosedConnection(void);
 
 #ifdef __cplusplus
 }

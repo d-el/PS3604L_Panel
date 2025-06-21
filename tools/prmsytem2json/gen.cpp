@@ -67,7 +67,7 @@ inline void trim(std::string &str) {
 	auto space_is_it = [] (char c) {
 		return c > '\0' && c <= ' ';
 	};
-		
+
 	for(auto rit = str.rbegin(); rit != str.rend(); ++rit) {
 		if(!space_is_it(*rit)) {
 			if(rit != str.rbegin()) {
@@ -102,8 +102,8 @@ return left;
 
 template <typename D>
 inline std::string get_to(std::string& str, D&& delimiters) {
-		char discarded_delimiter;
-		return get_to(str, std::forward<D>(delimiters), discarded_delimiter);
+	char discarded_delimiter;
+	return get_to(str, std::forward<D>(delimiters), discarded_delimiter);
 }
 
 inline std::string pad_right(const std::string&     str,
@@ -122,8 +122,8 @@ int main(int argc, char *argv[]) {
 	std::string outfileName = argv[2];
 	std::string mode = argv[3];
 	std::cout << "generate '" << mode << "' > " << outfileName << "\n";
-	
-// Read file
+
+	// Read file
 	std::ifstream file(fileName.c_str());
 	if(!file){
 		std::cerr << "Cannot open the File : " << fileName << "\n";
@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 		auto token = string_parsing::get_to(buffer, delimiter_set, delimiter);
 		quote_opened = delimiter == '\'' && !quote_opened;
 		tokens.push_back(Token(token, delimiter));
-}
+	}
 
 	// Parse
 	masks_t texts;
@@ -198,10 +198,10 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			parameterstree.push_back(Group(groupProp, parameters));
-    	}
-    }
+		}
+	}
 
-    // Open the File
+	// Open the File
 	std::ofstream out(outfileName.c_str());
 	// Check if object is valid
 	if(!out){
@@ -289,6 +289,7 @@ int main(int argc, char *argv[]) {
 
 	if(mode == "object"){
 		if(!texts.empty()){
+			out << "namespace nmText {\n";
 			for(auto text = texts.begin(); text != texts.end(); text++){
 				if(text->type != "value") continue;
 				out << "const Text<" << text->value.size() << "> " << text->name << " = {\n";
@@ -297,6 +298,7 @@ int main(int argc, char *argv[]) {
 				}
 				out << "};\n";
 			}
+			out << "}\n";
 			out << "\n";
 		}
 
@@ -311,7 +313,7 @@ int main(int argc, char *argv[]) {
 				int power = std::pow(10, std::stoi(param.pow));
 				const std::string &name = param.name;
 				auto text = std::find_if(texts.begin(), texts.end(),
-						[&name](Mask &m){ return name.find(m.name) != std::string::npos; });
+						[&name](Mask &m){ return name.find(m.name) != std::string::npos && m.type == "value"; });
 				out << "const ValHandler<" << param.type << "> handler_" << param.name << "("
 					<< "\"" << param.name << "\", "
 					<< param.unit << ", "
@@ -321,10 +323,10 @@ int main(int argc, char *argv[]) {
 					<< param.step << "*" << power << ", "
 					<< param.bigstep << "*" << power << ", "
 					<< param.addr << ", "
-					<< param.param << ", "
+					<< "reinterpret_cast<void*>(" << param.param << "), "
 					<< param.pow << ", "
 					<< param.callback << ", "
-					<< (text != texts.end() ? '&' + text->name : "nullptr") << ", "
+					<< (text != texts.end() ? "&nmText::" + text->name : "nullptr") << ", "
 					<< param.savetype
 					<< ");\n";
 

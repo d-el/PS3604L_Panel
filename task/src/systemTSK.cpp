@@ -38,7 +38,8 @@
 #include "regulatorConnTSK.h"
 #include "systemTSK.h"
 #include <write.h>
-#include "httpServerTSK.h"
+#include <httpServerTSK.h>
+#include <modbusServerTSK.h>
 
 /*!****************************************************************************
  * Memory
@@ -90,12 +91,13 @@ void systemTSK(void *pPrm){
 	lowPowerSem = xSemaphoreCreateBinary();
 	assert(lowPowerSem != NULL);
 
-	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", REG_TSK_SZ_STACK, NULL, REG_TSK_PRIO, NULL);
-	assert(osres == pdTRUE);
+	assert(pdTRUE == xTaskCreate(regulatorConnTSK, "regulatorConnTSK", REG_TSK_SZ_STACK, NULL, REG_TSK_PRIO, NULL));
 	P_LOGI(logTag, "Started regulatorConnTSK");
 
-	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
-	assert(osres == pdTRUE);
+	assert(pdTRUE == xTaskCreate(modbusServerTSK, "modbusServerTSK", TCPMODBUS_TSK_SZ_STACK, NULL, TCPMODBUS_TSK_PRIO, NULL));
+	P_LOGI(logTag, "Started httpServerTSK");
+
+	assert(pdTRUE == xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL));
 	P_LOGI(logTag, "Started httpServerTSK");
 
 	vTaskDelay(1);
@@ -108,7 +110,7 @@ void systemTSK(void *pPrm){
 #endif
 
 	selWindow(startupWindow);
-
+	BaseType_t osres = pdTRUE;
 	while(1){
 		regState_t state;
 		bool regulatorConnected = reg_getState(&state);
@@ -169,6 +171,11 @@ void systemTSK(void *pPrm){
 		}
 
 		BaseType_t res = xSemaphoreTake(lowPowerSem, pdMS_TO_TICKS(SYSTEM_TSK_PERIOD));
+
+		if(Prm::reboot.val == Prm::mask_reboot::reboot_do){
+			vTaskDelay(pdMS_TO_TICKS(2));
+			NVIC_SystemReset();
+		}
 
 		if((regulatorConnected && state.status.m_lowInputVoltage) || res == pdTRUE){
 			P_LOGD(logTag, "System saveparameters");
