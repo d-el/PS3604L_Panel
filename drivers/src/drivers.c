@@ -11,6 +11,7 @@
  */
 #include "i2c.h"
 #include "pvd.h"
+#include "htimer.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "beep.h"
 #include "st7735.h"
@@ -36,6 +37,7 @@ void hardInit(void){
 	}else{
 		fp.state.mainOscillatorError = 1;
 	}
+	htimer_init();
 	gpio_init();
 	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();

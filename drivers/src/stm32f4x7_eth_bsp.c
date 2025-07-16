@@ -11,6 +11,7 @@
 #include "stm32f4x7_eth_bsp.h"
 #include "gpio.h"
 #include "uniqueDeviceId.h"
+#include "htimer.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -170,9 +171,11 @@ void ETH_GPIO_Config(void){
 	gppin_init(GPIOB, 11, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TX_EN  -------> PB11
 	gppin_init(GPIOB, 12, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD0	  -------> PB12
 	gppin_init(GPIOB, 13, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD1	  -------> PB13
-	gppin_init(GPIOC, 2, outPushPull, pullDisable, 0, 0);					//ETH_RST_PIN	  -------> PC2
+	gppin_init(GPIOC, 2, outPushPull, pullDisable, 1, 0);					//ETH_RST_PIN	  -------> PC2
 
-	for(i = 0; i < 2000; i++);
+	htimer_delay(10);
+	_gppin_reset(GPIOC, pinm2);
+	htimer_delay(100);
 	_gppin_set(GPIOC, pinm2);
 }
 

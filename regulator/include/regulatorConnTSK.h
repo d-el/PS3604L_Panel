@@ -129,6 +129,7 @@ bool reg_setCurrentPoint(int32_t uA, uint8_t number);
 bool reg_setSaveSettings(regSave_t save);
 bool reg_getSaveSettings(regSave_t *save);
 bool reg_setCrange(regCrange_t crange);
+bool reg_getCrange(regCrange_t* crange);
 
 bool reg_getCalibrationTime(time_t* time);
 bool reg_getDacMaxValue(int32_t *val);

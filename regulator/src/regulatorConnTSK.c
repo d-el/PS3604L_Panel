@@ -192,6 +192,16 @@ bool reg_setCrange(regCrange_t crange){
 	return reg_waitCommand(&command);
 }
 
+bool reg_getCrange(regCrange_t* crange){
+	uint16_t c;
+	command_t command = { .readAddr = 0x0110, .dst = &c, .readNum = 1 };
+	if(!reg_waitCommand(&command)){
+		return false;
+	}
+	*crange = c;
+	return true;
+}
+
 bool reg_getTarget(regTarget_t *target){
 	uint16_t number = sizeof(regTarget_t)/sizeof(uint16_t);
 	command_t command = { .readAddr = 0x0100, .dst = target, .readNum = number };

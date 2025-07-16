@@ -32,9 +32,8 @@
 #include <enco.h>
 #include "footer.h"
 
-/******************************************************************************
- * Base task
- */
+
+#define BASE_TSK_PERIOD		(20) //[ms]
 
 enum {
 	VAR_VOLT = 0,
@@ -42,6 +41,9 @@ enum {
 	VAR_NUMBER
 };
 
+/******************************************************************************
+ * Base task
+ */
 void baseTSK(void *pPrm){
 	(void)pPrm;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
@@ -75,6 +77,10 @@ void baseTSK(void *pPrm){
 		reg_getState(&regmeas);
 		bool regenable = false;
 		reg_getEnable(&regenable);
+		regTarget_t target = {};
+		if(reg_getremote()){
+			reg_getTarget(&target);
+		}
 
 		/**************************************
 		 * Key process
@@ -156,79 +162,57 @@ void baseTSK(void *pPrm){
 		reg_setTime(0);
 
 		/**************************************
-		 * Copy measure data
-		 */
-		int32_t measV = (regmeas.voltage + 500) / 1000; // uV to mV
-		int32_t measI = regmeas.current;
+		* Output data to display
+		*/
+		auto printValue = [](char* str, size_t len, int32_t u){
+			int32_t viewv = (u + 500) / 1000;
+			if(viewv >= 0){
+				return snprintf(str, len, "%02" PRIi32 ".%03" PRIi32, viewv / 1000, viewv % 1000);
+			}else{
+				viewv = -viewv;
+				return snprintf(str, len, "-%" PRIi32 ".%03" PRIi32, viewv / 1000, viewv % 1000);
+			}
+		};
 
-		/**************************************
-		 * Output data to display
-		 */
 		//Print voltage
-		int32_t viewvoltage = /*regenable ? */measV /*: params[Prm::basepreset.val].voltage->val*/;
-		if(viewvoltage >= 0){
-			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, viewvoltage / 1000, viewvoltage % 1000);
-		}else{
-			viewvoltage = -viewvoltage;
-			snprintf(str, sizeof(str), "-%" PRIi32 ".%03" PRIi32, viewvoltage / 1000, viewvoltage % 1000);
-		}
-		if(varParam == VAR_VOLT){
-			disp_setColor(black, ui.color.cursor);
-		}else{
-		disp_setColor(black, ui.color.voltage);
-		}
-		disp_putStr(10, 0, &dSegBold, 6, str);
-		disp_putChar(146, 18, &font8x12, 'V');
-
-		//Print voltage setting
-		if(varParam == VAR_VOLT){
+		printValue(str, sizeof(str), regmeas.voltage);
+		if(!reg_getremote() && varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
 		}else{
 			disp_setColor(black, ui.color.voltage);
 		}
-		size_t len = params[Prm::basepreset.val].voltage->tostring(str, sizeof(str));
-		//snprintf(&str[len], sizeof(str) - len, " V");
+		disp_putStr(10, 0, &dSegBold, 6, str);
+		disp_putChar(146, 14, &arial, 'V');
+		//Print voltage setting
+		int32_t setv = reg_getremote() ? (target.voltage_set + 500) / 1000 : params[Prm::basepreset.val].voltage->val;
+		snprintf(str, sizeof(str), "%2" PRIi32 ".%03" PRIi32 " V", setv / 1000, setv % 1000);
 		disp_putStr(12, 33, &arial, 0, str);
-//		disp_putChar(60, 35, &font8x12, 'V');
 
 		//Print current
-		if(varParam == VAR_CURR){
+		int32_t measI = regmeas.current;
+		if(!reg_getremote() && varParam == VAR_CURR){
 			disp_setColor(black, ui.color.cursor);
 		}else{
 			disp_setColor(black, ui.color.current);
 		}
-
-		//if(regenable){
 		bool minus = false;
 		if(measI < 0) measI = -measI, minus = true;
 		if(measI < 9999 && Prm::crange_set.val == Prm::crange_auto){
 			snprintf(str, sizeof(str), "%s%" PRIi32 ".%03" PRIi32, minus ? "-" : "0", measI / 1000, measI % 1000);
-			disp_putChar(146, 61, &font8x12, 'm');
+			disp_putChar(147, 54, &font8x12, 'm');
 		}else if(measI < 59000  && Prm::crange_set.val == Prm::crange_auto){
 			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
-			disp_putChar(146, 61, &font8x12, 'm');
+			disp_putChar(147, 54, &font8x12, 'm');
 		}else{
 			measI = (measI + 50) / 100;
 			snprintf(str, sizeof(str), "%01" PRIi32 ".%04" PRIi32, measI / 10000, measI % 10000);
 		}
-		disp_putChar(146, 73, &font8x12, 'A');
-//		}else{
-//			strcpy(str, "--.---");
-//			disp_putChar(146, 36, &font8x12, ' ');
-//			disp_putChar(146, 49, &font8x12, 'A');
-//		}
+		disp_putChar(146, 69, &arial, 'A');
 		disp_putStr(10, 53, &dSegBold, 6, str);
-
 		// Print limiting value
-		if(varParam == VAR_CURR){
-			disp_setColor(black, ui.color.cursor);
-		}else{
-			disp_setColor(black, ui.color.imax);
-		}
-		params[Prm::basepreset.val].current->tostring(str, sizeof(str));
-//		snprintf(&str[len], sizeof(str) - len, " A");
+		int32_t limi = reg_getremote() ? (target.current_set + 500) / 1000 : params[Prm::basepreset.val].current->val;
+		snprintf(str, sizeof(str), "%1" PRIi32 ".%03" PRIi32 " A", limi / 1000, limi % 1000);
 		disp_putStr(12, 87, &arial, 0, str);
-//		disp_putChar(60, 89, &font8x12, 'A');
 
 		disp_setColor(black, red);
 		if(!regenable){
@@ -245,7 +229,10 @@ void baseTSK(void *pPrm){
 			disp_putStr(106, 89, &font8x12, 0, str);
 		}
 
-		if(Prm::crange_set.val == Prm::crange_auto && regenable){
+		regCrange_t crange;
+		if(regenable &&
+		((!reg_getremote() && Prm::crange_set.val == Prm::crange_auto) ||
+		(reg_getremote() && reg_getCrange(&crange) && crange == reg_crange_auto))){
 			if(regmeas.status.cRangeLoOverflow){
 				snprintf(str, sizeof(str), "%s", "CRH");
 			}else{
@@ -268,18 +255,6 @@ void baseTSK(void *pPrm){
 				grf_fillRect(105, 104, 55, 3, white);
 				grf_fillRect(53, 104, 53, 3, black);
 				break;
-		}
-
-		if(!reg_getremote()){
-
-//			//Print mode
-//			if(varParam == VAR_MODE){
-//				disp_setColor(black, ui.color.cursor);
-//			}else{
-//				disp_setColor(black, ui.color.mode);
-//			}
-//			params[Prm::basepreset.val].mode->tostring(str, sizeof(str));
-//			disp_putStr(10, 88, &arial, 0, str);
 		}
 
 		//Print status bar

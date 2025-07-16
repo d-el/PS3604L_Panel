@@ -6,6 +6,7 @@ add_library(drivers STATIC
 	src/enco.c
 	src/flash.c
 	src/gpio.c
+	src/htimer.c
 	src/i2c.c
 	src/key.c
 	src/ledpwm.c
