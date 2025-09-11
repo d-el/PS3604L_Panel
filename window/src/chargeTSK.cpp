@@ -79,7 +79,7 @@ void chargeTSK(void *pPrm){
 		regState_t regmeas = {};
 		reg_getState(&regmeas);
 		bool stateenable = false;
-		reg_getEnable(&stateenable);
+		reg_enableGet(&stateenable);
 
 		/**************************************
 		 * Key process
@@ -88,9 +88,9 @@ void chargeTSK(void *pPrm){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 			if(keyState(kOnOff)){
 				if(!stateenable){
-					reg_setEnable(true);
+					reg_enableSet(true);
 				}else{
-					reg_setEnable(false);
+					reg_enableSet(false);
 				}
 			}
 			if(!stateenable){
@@ -122,10 +122,10 @@ void chargeTSK(void *pPrm){
 		/***************************************
 		 * Task for regulator
 		 */
-		reg_setVoltage(params.voltage->val * 1000);
-		reg_setCurrent(params.current->val * 1000);
-		reg_setTime(params.mode->val == ch_modeTime ? params.time->val : 0);
-		reg_setMode(params.mode->val == ch_modeTime ? reg_limitation : reg_lowCurrentShutdown);
+		reg_voltageSet(params.voltage->val * 1000);
+		reg_currentSet(params.current->val * 1000);
+		reg_timeSet(params.mode->val == ch_modeTime ? params.time->val : 0);
+		reg_modeSet(params.mode->val == ch_modeTime ? reg_limitation : reg_lowCurrentShutdown);
 
 		int32_t measV = (regmeas.voltage + 500) / 1000; // uV to mV
 		int32_t measI = (regmeas.current + 500) / 1000; // uA to mA

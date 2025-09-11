@@ -123,7 +123,7 @@ urlData_type handle_statemeastask(void){
 		bin_statemeastask.disablecause = regMeas.disablecause;
 
 		bool regenable = false;
-		reg_getEnable(&regenable);
+		reg_enableGet(&regenable);
 		bin_statemeastask.enable = regenable ? 1 : 0;
 
 		regTarget_t regTarget = {};
@@ -132,7 +132,7 @@ urlData_type handle_statemeastask(void){
 		bin_statemeastask.current_set = regTarget.current_set;
 
 		regVersion_t v;
-		reg_getVersion(&v);
+		reg_versionGet(&v);
 		bin_statemeastask.major = v.major;
 		bin_statemeastask.minor = v.minor;
 		bin_statemeastask.patch = v.patch;

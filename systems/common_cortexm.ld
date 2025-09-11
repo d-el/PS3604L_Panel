@@ -6,7 +6,7 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
-  .isr_vector :
+  .isr_vector (READONLY):
   {
     . = ALIGN(4);
     _isr_vector_start = .;        /* create a global symbol at vector start */
@@ -15,7 +15,7 @@ SECTIONS
   } >FLASH =0xFF
 
   /* The program code and other data goes into FLASH */
-  .text :
+  .text (READONLY):
   {
     . = ALIGN(4);
     *(.text)           /* .text sections (code) */
@@ -30,7 +30,7 @@ SECTIONS
   } >FLASH =0xFF
 
   /* Constant data goes into FLASH */
-  .rodata :
+  .rodata (READONLY):
   {
     . = ALIGN(4);
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
@@ -38,26 +38,26 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH =0xFF
 
-  .ARM.extab :
+  .ARM.extab (READONLY):
   {
     *(.ARM.extab* .gnu.linkonce.armextab.*)
   } >FLASH =0xFF
 
-  .ARM :
+  .ARM (READONLY):
   {
     __exidx_start = .;
     *(.ARM.exidx*)
     __exidx_end = .;
   } >FLASH =0xFF
 
-  .preinit_array :
+  .preinit_array (READONLY):
   {
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
     PROVIDE_HIDDEN (__preinit_array_end = .);
   } >FLASH =0xFF
   
-  .init_array :
+  .init_array (READONLY):
   {
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT(.init_array.*)))
@@ -65,7 +65,7 @@ SECTIONS
     PROVIDE_HIDDEN (__init_array_end = .);
   } >FLASH =0xFF
   
-  .fini_array :
+  .fini_array (READONLY):
   {
     PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(SORT(.fini_array.*)))

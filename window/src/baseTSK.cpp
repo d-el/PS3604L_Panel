@@ -69,18 +69,20 @@ void baseTSK(void *pPrm){
 
 	disp_setColor(black, red);
 	disp_fillScreen(black);
-	ksSet(30, 5, kUp | kDown);
+	ksSet(30, 3, kUp | kDown);
 	enco_settic(3);
 
 	while(1){
 		regState_t regmeas = {};
 		reg_getState(&regmeas);
 		bool regenable = false;
-		reg_getEnable(&regenable);
+		reg_enableGet(&regenable);
 		regTarget_t target = {};
 		if(reg_getremote()){
 			reg_getTarget(&target);
 		}
+		regCrange_t crange;
+		reg_crangeGet(&crange);
 
 		/**************************************
 		 * Key process
@@ -116,9 +118,9 @@ void baseTSK(void *pPrm){
 				}else if(keyState(kOnOff)){
 					uint8_t result = 0;
 					if(!regenable){
-						reg_setEnable(true);
+						reg_enableSet(true);
 					}else{
-						reg_setEnable(false);
+						reg_enableSet(false);
 					}
 					if(result != 0){
 						disp_putStr(0, 0, &arial, 0, "Error Connect");
@@ -146,20 +148,20 @@ void baseTSK(void *pPrm){
 		/***************************************
 		 * Task for regulator
 		 */
-		reg_setVoltage(params[Prm::basepreset.val].voltage->val * 1000);
+		reg_voltageSet(params[Prm::basepreset.val].voltage->val * 1000);
 		uint32_t currentval = params[Prm::basepreset.val].current->val * 1000;
 		switch(params[Prm::basepreset.val].mode->val){
 			case Prm::mask_basemode::Imax:
-				reg_setMode(reg_overcurrentShutdown);
-				reg_setCurrent(currentval);
+				reg_modeSet(reg_overcurrentShutdown);
+				reg_currentSet(currentval);
 				break;
 
 			case Prm::mask_basemode::Limiting:
-				reg_setMode(reg_limitation);
-				reg_setCurrent(currentval);
+				reg_modeSet(reg_limitation);
+				reg_currentSet(currentval);
 				break;
 		}
-		reg_setTime(0);
+		reg_timeSet(0);
 
 		/**************************************
 		* Output data to display
@@ -174,7 +176,7 @@ void baseTSK(void *pPrm){
 			}
 		};
 
-		//Print voltage
+		// Print voltage
 		printValue(str, sizeof(str), regmeas.voltage);
 		if(!reg_getremote() && varParam == VAR_VOLT){
 			disp_setColor(black, ui.color.cursor);
@@ -183,7 +185,7 @@ void baseTSK(void *pPrm){
 		}
 		disp_putStr(10, 0, &dSegBold, 6, str);
 		disp_putChar(146, 14, &arial, 'V');
-		//Print voltage setting
+		// Print voltage setting
 		int32_t setv = reg_getremote() ? (target.voltage_set + 500) / 1000 : params[Prm::basepreset.val].voltage->val;
 		snprintf(str, sizeof(str), "%2" PRIi32 ".%03" PRIi32 " V", setv / 1000, setv % 1000);
 		disp_putStr(12, 33, &arial, 0, str);
@@ -197,10 +199,10 @@ void baseTSK(void *pPrm){
 		}
 		bool minus = false;
 		if(measI < 0) measI = -measI, minus = true;
-		if(measI < 9999 && Prm::crange_set.val == Prm::crange_auto){
+		if(measI < 9999 && crange == reg_crange_auto){
 			snprintf(str, sizeof(str), "%s%" PRIi32 ".%03" PRIi32, minus ? "-" : "0", measI / 1000, measI % 1000);
 			disp_putChar(147, 54, &font8x12, 'm');
-		}else if(measI < 59000  && Prm::crange_set.val == Prm::crange_auto){
+		}else if(measI < 59000  && crange == reg_crange_auto){
 			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
 			disp_putChar(147, 54, &font8x12, 'm');
 		}else{
@@ -229,10 +231,7 @@ void baseTSK(void *pPrm){
 			disp_putStr(106, 89, &font8x12, 0, str);
 		}
 
-		regCrange_t crange;
-		if(regenable &&
-		((!reg_getremote() && Prm::crange_set.val == Prm::crange_auto) ||
-		(reg_getremote() && reg_getCrange(&crange) && crange == reg_crange_auto))){
+		if((!reg_getremote() && crange == reg_crange_auto)){
 			if(regmeas.status.cRangeLoOverflow){
 				snprintf(str, sizeof(str), "%s", "CRH");
 			}else{
@@ -241,7 +240,7 @@ void baseTSK(void *pPrm){
 			disp_putStr(75, 89, &font8x12, 0, str);
 		}
 
-		//Print current settings
+		// Print current settings
 		switch(Prm::basepreset.val){
 			case 0:
 				grf_fillRect(0, 104, 53, 3, white);
@@ -257,12 +256,12 @@ void baseTSK(void *pPrm){
 				break;
 		}
 
-		//Print status bar
+		// Print status bar
 		printFooter();
 
 		disp_flushfill(&ui.color.background);
 
-		//Cyclic delay
+		// Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));
 	}
 }

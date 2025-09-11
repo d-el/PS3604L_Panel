@@ -46,7 +46,7 @@ void startupTSK(void *pPrm){
 
 		char str[64];
 		regVersion_t regVersion;
-		reg_getVersion(&regVersion);
+		reg_versionGet(&regVersion);
 		sprintf(str, "P%s : R%" PRIu16 ".%" PRIu16 ".%" PRIu16,
 				getVersion(),
 				regVersion.major, regVersion.minor, regVersion.patch);

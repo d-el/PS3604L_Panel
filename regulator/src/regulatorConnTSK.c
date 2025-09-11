@@ -3,7 +3,7 @@
  * @author		d_el
  * @version		V2.1
  * @date		27.11.2021
- * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
+ * @copyright	The MIT License (MIT). Copyright (c) 2025 Storozhenko Roman
  * @brief		connect interface with regulator
  */
 
@@ -66,49 +66,75 @@ static bool reg_waitCommand(command_t* cmd){
 	return osres == pdTRUE && cmd->result;
 }
 
-bool reg_setVoltage(int32_t uV){
+bool reg_versionGet(regVersion_t *v){
+	*v = regVersion;
+	return true;
+}
+
+bool reg_serialGet(uint32_t* sn){
+	command_t command = { .readAddr = 0x0004, .dst = sn, .readNum = 2 };
+	return reg_waitCommand(&command);
+}
+
+bool reg_calibrationTimeGet(time_t* time){
+	command_t command = { .readAddr = 0x0300, .dst = time, .readNum = 2 };
+	return reg_waitCommand(&command);
+}
+
+bool reg_dacMaxValueGet(int32_t *val){
+	command_t command = { .readAddr = 0x0302, .dst = val, .readNum = 2 };
+	return reg_waitCommand(&command);
+}
+
+bool reg_getTarget(regTarget_t *target){
+	uint16_t number = sizeof(regTarget_t)/sizeof(uint16_t);
+	command_t command = { .readAddr = 0x0100, .dst = target, .readNum = number };
+	return reg_waitCommand(&command);
+}
+
+bool reg_voltageSet(int32_t uV){
 	xSemaphoreTake(regulatorMutex, portMAX_DELAY);
 	regTarget.voltage_set = uV;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setCurrent(int32_t uA){
+bool reg_currentSet(int32_t uA){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	regTarget.current_set = uA;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setDacVoltage(int32_t lsb){
+bool reg_dacVoltageSet(int32_t lsb){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	regTarget.vdac = lsb;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setDacCurrent(int32_t lsb){
+bool reg_dacCurrentSet(int32_t lsb){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	regTarget.idac = lsb;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setMode(regMode_t mode){
+bool reg_modeSet(regMode_t mode){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	regTarget.mode = mode;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setTime(uint32_t ms){
+bool reg_timeSet(uint32_t ms){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	regTarget.time_set = ms;
 	xSemaphoreGive(regulatorMutex);
 	return connected;
 }
 
-bool reg_setEnable(bool state){
+bool reg_enableSet(bool state){
 	if(state != enabled){
 		uint16_t enable = state ? 1 : 0;
 		command_t command = { .writeAddr = 0x010B, .src = &enable, .writeNum = 1 };
@@ -119,12 +145,12 @@ bool reg_setEnable(bool state){
 	return true;
 }
 
-bool reg_getEnable(bool *state){
+bool reg_enableGet(bool *state){
 	*state = enabled != 0;
 	return connected;
 }
 
-bool reg_setWireResistance(uint32_t r){
+bool reg_wireResistanceSet(uint32_t r){
 	command_t command = { .writeAddr = 0x010C, .src = &r, .writeNum = 2 };
 	return reg_waitCommand(&command);
 }
@@ -135,15 +161,43 @@ bool reg_setCalibrationTime(void){
 	return reg_waitCommand(&command);
 }
 
-bool reg_getCalibrationTime(time_t* time){
-	command_t command = { .readAddr = 0x0300, .dst = time, .readNum = 2 };
+bool reg_saveSettingsSet(regSave_t save){
+	uint16_t s = save;
+	command_t command = { .writeAddr = 0x010F, .src = &s, .writeNum = 1 };
 	return reg_waitCommand(&command);
 }
 
+bool reg_saveSettingsGet(regSave_t *save){
+	uint16_t s;
+	command_t command = { .readAddr = 0x010F, .dst = &s, .readNum = 1 };
+	if(!reg_waitCommand(&command)){
+		return false;
+	}
+	*save = s;
+	return true;
+}
 
-bool reg_getDacMaxValue(int32_t *val){
-	command_t command = { .readAddr = 0x0302, .dst = val, .readNum = 2 };
+bool reg_crangeSet(regCrange_t crange){
+	uint16_t c = crange;
+	command_t command = { .writeAddr = 0x0110, .src = &c, .writeNum = 1 };
 	return reg_waitCommand(&command);
+}
+
+bool reg_crangeGet(regCrange_t* crange){
+	uint16_t c;
+	command_t command = { .readAddr = 0x0110, .dst = &c, .readNum = 1 };
+	if(!reg_waitCommand(&command)){
+		return false;
+	}
+	*crange = c;
+	return true;
+}
+
+bool reg_getState(regState_t *state){
+	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
+	*state = regMeas;
+	xSemaphoreGive(regulatorMutex);
+	return connected;
 }
 
 bool reg_setVoltagePoint(int32_t uV, uint8_t number){
@@ -170,69 +224,6 @@ bool reg_setCurrentPoint(int32_t uA, uint8_t number){
 	return reg_setCalibrationTime();
 }
 
-bool reg_setSaveSettings(regSave_t save){
-	uint16_t s = save;
-	command_t command = { .writeAddr = 0x010F, .src = &s, .writeNum = 1 };
-	return reg_waitCommand(&command);
-}
-
-bool reg_getSaveSettings(regSave_t *save){
-	uint16_t s;
-	command_t command = { .readAddr = 0x010F, .dst = &s, .readNum = 1 };
-	if(!reg_waitCommand(&command)){
-		return false;
-	}
-	*save = s;
-	return true;
-}
-
-bool reg_setCrange(regCrange_t crange){
-	uint16_t c = crange;
-	command_t command = { .writeAddr = 0x0110, .src = &c, .writeNum = 1 };
-	return reg_waitCommand(&command);
-}
-
-bool reg_getCrange(regCrange_t* crange){
-	uint16_t c;
-	command_t command = { .readAddr = 0x0110, .dst = &c, .readNum = 1 };
-	if(!reg_waitCommand(&command)){
-		return false;
-	}
-	*crange = c;
-	return true;
-}
-
-bool reg_getTarget(regTarget_t *target){
-	uint16_t number = sizeof(regTarget_t)/sizeof(uint16_t);
-	command_t command = { .readAddr = 0x0100, .dst = target, .readNum = number };
-	return reg_waitCommand(&command);
-}
-
-bool reg_getState(regState_t *state){
-	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
-	*state = regMeas;
-	xSemaphoreGive(regulatorMutex);
-	return connected;
-}
-
-bool reg_getVersion(regVersion_t *v){
-	*v = regVersion;
-	return true;
-}
-
-bool reg_getSerial(uint32_t* sn){
-	command_t command = { .readAddr = 0x0004, .dst = sn, .readNum = 2 };
-	return reg_waitCommand(&command);
-}
-
-void reg_setremote(bool rem){
-	gremote = rem;
-}
-
-bool reg_getremote(void){
-	return gremote;
-}
-
 bool reg_modbusRequest(uint8_t *req, uint16_t *req_length){
 	mobusRequstData = req;
 	mobusRequstLen = req_length;
@@ -241,6 +232,14 @@ bool reg_modbusRequest(uint8_t *req, uint16_t *req_length){
 		return false;
 	}
 	return mobusRequstResult;
+}
+
+void reg_setremote(bool rem){
+	gremote = rem;
+}
+
+bool reg_getremote(void){
+	return gremote;
 }
 
 static bool writeReg(modbus_t *ctx, uint16_t addr, uint16_t value){

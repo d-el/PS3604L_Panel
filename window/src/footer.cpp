@@ -42,7 +42,7 @@ void printFooter(void){
 	regState_t regmeas = {};
 	bool regstate = reg_getState(&regmeas);
 	bool enable;
-	reg_getEnable(&enable);
+	reg_enableGet(&enable);
 
 	if(modeIlimPrev != regmeas.status.m_limitation){
 		if(regmeas.status.m_limitation != 0){
@@ -58,7 +58,7 @@ void printFooter(void){
 	}
 	disablecausePrev = regmeas.disablecause;
 
-	if(regmeas.status.m_errorTemperatureSensor || regmeas.status.m_overheated || regmeas.status.m_reverseVoltage ||
+	if(regmeas.status.m_errorTemperatureSensor || regmeas.status.m_overheated ||
 			regmeas.status.m_errorExternalIAdc || regmeas.status.m_calibrationEmpty || !regstate){
 		BeepTime(ui.beep.error.time, ui.beep.error.freq);
 		disp_setColor(black, white);
@@ -71,9 +71,6 @@ void printFooter(void){
 		}
 		else if(regmeas.status.m_overheated != 0){
 			disp_putStr(40, 112, &arial, 0, "Overheat");
-		}
-		else if(regmeas.status.m_reverseVoltage != 0){
-			disp_putStr(16, 112, &arial, 0, "Reverse Voltage");
 		}
 		else if(regmeas.status.m_errorExternalIAdc){
 			disp_putStr(2, 112, &arial, 0, "Error External ADC");

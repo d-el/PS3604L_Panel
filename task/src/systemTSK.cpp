@@ -102,7 +102,8 @@ void systemTSK(void *pPrm){
 
 	vTaskDelay(1);
 	P_LOGI(logTag, "Set regulator wire resistance");
-	reg_setWireResistance(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
+	reg_wireResistanceSet(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
+	reg_crangeSet(Prm::crange_set.val ? reg_crange_auto : reg_crange_hi);
 
 #if(TASK_MONITOR_EN > 0)
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);

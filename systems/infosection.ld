@@ -2,7 +2,7 @@ _header_magic = 0x38272585;
 
 SECTIONS
 {
-  .imageheader :
+  .imageheader (READONLY):
   {
     . = ALIGN(4);
     _imageheader_start = .;

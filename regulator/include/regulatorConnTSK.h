@@ -3,7 +3,7 @@
  * @author		d_el
  * @version		V2.1
  * @date		27.11.2021
- * @copyright	The MIT License (MIT). Copyright (c) 2020 Storozhenko Roman
+ * @copyright	The MIT License (MIT). Copyright (c) 2025 Storozhenko Roman
  * @brief		connect interface with regulator
  */
 #ifndef uartTSK_H
@@ -68,7 +68,7 @@ typedef union __attribute__ ((packed)){
 	uint16_t m_errorTemperatureSensor :1;
 	uint16_t m_overheated :1;
 	uint16_t m_lowInputVoltage :1;
-	uint16_t m_reverseVoltage :1;
+	uint16_t m_reserved :1;
 	uint16_t m_calibrationEmpty :1;
 	uint16_t m_limitation :1;
 	uint16_t m_externaIDac :1;
@@ -111,40 +111,37 @@ typedef struct __attribute__ ((packed)){
  */
 void regulatorConnTSK(void *pPrm);
 
-bool reg_setVoltage(int32_t uV);
-bool reg_setCurrent(int32_t uA);
-bool reg_setDacVoltage(int32_t lsb);
-bool reg_setDacCurrent(int32_t lsb);
-bool reg_setMode(regMode_t mode);
-bool reg_setTime(uint32_t ms);
+bool reg_versionGet(regVersion_t *v);
+bool reg_serialGet(uint32_t* sn);
+bool reg_calibrationTimeGet(time_t* time);
+bool reg_dacMaxValueGet(int32_t *val);
 
-bool reg_setEnable(bool state);
-bool reg_getEnable(bool *state);
+bool reg_getTarget(regTarget_t *target);
+bool reg_voltageSet(int32_t uV);
+bool reg_currentSet(int32_t uA);
+bool reg_dacVoltageSet(int32_t lsb);
+bool reg_dacCurrentSet(int32_t lsb);
+bool reg_modeSet(regMode_t mode);
+bool reg_timeSet(uint32_t ms);
+bool reg_enableSet(bool state);
+bool reg_enableGet(bool *state);
+bool reg_wireResistanceSet(uint32_t r);					// X_XXXX Ohm
+bool reg_saveSettingsSet(regSave_t save);
+bool reg_saveSettingsGet(regSave_t *save);
+bool reg_crangeSet(regCrange_t crange);
+bool reg_crangeGet(regCrange_t* crange);
 
-bool reg_setWireResistance(uint32_t r);					// X_XXXX Ohm
+bool reg_getState(regState_t *state);
+
 bool reg_setVoltagePoint(int32_t uV, uint8_t number);
 bool reg_setMicroCurrentPoint(int32_t uA, uint8_t number);
 bool reg_setCurrentPoint(int32_t uA, uint8_t number);
 
-bool reg_setSaveSettings(regSave_t save);
-bool reg_getSaveSettings(regSave_t *save);
-bool reg_setCrange(regCrange_t crange);
-bool reg_getCrange(regCrange_t* crange);
-
-bool reg_getCalibrationTime(time_t* time);
-bool reg_getDacMaxValue(int32_t *val);
-
-bool reg_getTarget(regTarget_t *target);
-bool reg_getState(regState_t *state);
-bool reg_getVersion(regVersion_t *v);
-bool reg_getSerial(uint32_t* sn);
-
-void reg_setremote(bool rem);
-bool reg_getremote(void);
-
 bool reg_modbusRequest(uint8_t* req, uint16_t* req_length);
 bool reg_tcpModbusRequest(void** readdata, uint16_t* buflen);
 bool reg_tcpModbusClosedConnection(void);
+void reg_setremote(bool rem);
+bool reg_getremote(void);
 
 #ifdef __cplusplus
 }

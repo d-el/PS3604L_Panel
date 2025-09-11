@@ -47,7 +47,7 @@ ItemState updateDST(const MenuItem* m){
 ItemState calibrDateSelect(const MenuItem* m){
 	(void)m;
 	time_t time = 0;
-	reg_getCalibrationTime(&time);
+	reg_calibrationTimeGet(&time);
 	Prm::utcTime.val = time;
 	return ItemState { true, "" };
 }
@@ -88,13 +88,13 @@ ItemState PrepareU(const MenuItem* m){
 	Prm::Ureal.val = pointU[Prm::point.val];
 	Prm::Udac.val = 0;
 	int32_t dacMaxValue = 0;
-	bool result = reg_getDacMaxValue(&dacMaxValue);
+	bool result = reg_dacMaxValueGet(&dacMaxValue);
 	if(result){
 		Prm::Idac.val = dacMaxValue / 4;
-		reg_setMode(reg_raw);
-		reg_setEnable(true);
-		reg_setDacCurrent(Prm::Idac.val);
-		result = reg_setDacVoltage(Prm::Udac.val);
+		reg_modeSet(reg_raw);
+		reg_enableSet(true);
+		reg_dacCurrentSet(Prm::Idac.val);
+		result = reg_dacVoltageSet(Prm::Udac.val);
 	}
 	if(result){
 		return ItemState { true, "" };
@@ -111,14 +111,14 @@ ItemState PrepareMicroI(const MenuItem* m){
 	Prm::point.val = m->arg;
 	Prm::Ireal.val = pointI[Prm::point.val];
 	int32_t dacMaxValue = 0;
-	bool result = reg_getDacMaxValue(&dacMaxValue);
+	bool result = reg_dacMaxValueGet(&dacMaxValue);
 	if(result){
 		Prm::Idac.val = dacMaxValue / 32;
 		Prm::Udac.val = 0;
-		reg_setMode(reg_raw);
-		reg_setEnable(true);
-		reg_setDacCurrent(Prm::Idac.val);
-		result = reg_setDacVoltage(Prm::Udac.val);
+		reg_modeSet(reg_raw);
+		reg_enableSet(true);
+		reg_dacCurrentSet(Prm::Idac.val);
+		result = reg_dacVoltageSet(Prm::Udac.val);
 	}
 	if(result){
 		return ItemState { true, "" };
@@ -135,14 +135,14 @@ ItemState PrepareI(const MenuItem* m){
 	Prm::point.val = m->arg;
 	Prm::Ireal.val = pointI[Prm::point.val];
 	int32_t dacMaxValue = 0;
-	bool result = reg_getDacMaxValue(&dacMaxValue);
+	bool result = reg_dacMaxValueGet(&dacMaxValue);
 	if(result){
 		Prm::Udac.val = dacMaxValue / 4;
 		Prm::Idac.val = 0;
-		reg_setMode(reg_raw);
-		reg_setEnable(true);
-		reg_setDacCurrent(Prm::Idac.val);
-		result = reg_setDacVoltage(Prm::Udac.val);
+		reg_modeSet(reg_raw);
+		reg_enableSet(true);
+		reg_dacCurrentSet(Prm::Idac.val);
+		result = reg_dacVoltageSet(Prm::Udac.val);
 	}
 	if(result){
 		return ItemState { true, "" };
@@ -156,10 +156,10 @@ ItemState PrepareI(const MenuItem* m){
  */
 ItemState PrepareWireResistance(const MenuItem* m){
 	(void)m;
-	reg_setMode(reg_limitation);
-	reg_setEnable(true);
-	reg_setCurrent(3000000);
-	bool regstate = reg_setVoltage(5000000);
+	reg_modeSet(reg_limitation);
+	reg_enableSet(true);
+	reg_currentSet(3000000);
+	bool regstate = reg_voltageSet(5000000);
 	if(regstate){
 		return ItemState { true, "" };
 	}else{
@@ -172,7 +172,7 @@ ItemState PrepareWireResistance(const MenuItem* m){
  */
 ItemState prepareInfo(const MenuItem* m){
 	(void)m;
-	bool regstate = reg_getSerial(&Prm::reg_serial.val);
+	bool regstate = reg_serialGet(&Prm::reg_serial.val);
 	if(regstate){
 		return ItemState { true, "" };
 	}else{
@@ -210,7 +210,7 @@ ItemState saveSettings(const MenuItem* m){
 	(void)m;
 
 	Prm::save_settings.val = Prm::save_do;
-	if(reg_setSaveSettings(reg_save_do)){
+	if(reg_saveSettingsSet(reg_save_do)){
 		return ItemState { true, "" };
 	}else{
 		return ItemState { false, "error connect"};
@@ -224,7 +224,7 @@ ItemState updateSaveSettings(const MenuItem* m){
 	(void)m;
 
 	regSave_t save;
-	if(reg_getSaveSettings(&save)){
+	if(reg_saveSettingsGet(&save)){
 		Prm::save_settings.val = save;
 		return ItemState { true, "" };
 	}else{
@@ -237,7 +237,7 @@ ItemState updateSaveSettings(const MenuItem* m){
  */
 ItemState savePointU(const MenuItem* m){
 	(void)m;
-	reg_setDacVoltage(Prm::Udac.val);
+	reg_dacVoltageSet(Prm::Udac.val);
 	reg_setVoltagePoint(Prm::Ureal.val, Prm::point.val);
 	return ItemState { true, "" };
 }
@@ -247,7 +247,7 @@ ItemState savePointU(const MenuItem* m){
  */
 ItemState savePointMicroI(const MenuItem* m){
 	(void)m;
-	reg_setDacVoltage(Prm::Udac.val);
+	reg_dacVoltageSet(Prm::Udac.val);
 	reg_setMicroCurrentPoint(Prm::Ireal.val, Prm::point.val);
 	return ItemState { true, "" };
 }
@@ -257,7 +257,7 @@ ItemState savePointMicroI(const MenuItem* m){
  */
 ItemState setCrange(const MenuItem* m){
 	(void)m;
-	reg_setCrange((regCrange_t)Prm::crange_set.val);
+	reg_crangeSet(Prm::crange_set.val ? reg_crange_auto : reg_crange_hi);
 	return ItemState { true, "" };
 }
 
@@ -266,7 +266,7 @@ ItemState setCrange(const MenuItem* m){
  */
 ItemState savePointI(const MenuItem* m){
 	(void)m;
-	reg_setDacCurrent(Prm::Idac.val);
+	reg_dacCurrentSet(Prm::Idac.val);
 	reg_setCurrentPoint(Prm::Ireal.val, Prm::point.val);
 	return ItemState { true, "" };
 }
@@ -276,7 +276,7 @@ ItemState savePointI(const MenuItem* m){
  */
 ItemState setWireresistanse(const MenuItem* m){
 	(void)m;
-	reg_setWireResistance(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
+	reg_wireResistanceSet(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
 	return ItemState { true, "" };
 }
 
@@ -294,7 +294,7 @@ ItemState netUpdate(const MenuItem* m){
  */
 ItemState calibrExit(const MenuItem* m){
 	(void)m;
-	bool regstate = reg_setEnable(false);
+	bool regstate = reg_enableSet(false);
 	if(regstate){
 		return ItemState { true, "" };
 	}else{
@@ -338,7 +338,6 @@ m1,
 			m1332,
 			m1333,
 			m1334,
-			m1335,
 	m14,
 	m15,
 		m150,
@@ -415,8 +414,7 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 			m1331("DacI", &Prm::Idac, true, 0, savePointI, nullptr, nullptr, updateReg, &m1332, &m1330),
 			m1332("AdcU", &Prm::Uadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1333, &m1331),
 			m1333("AdcI", &Prm::Iadc, false, 0, savePointI, nullptr, nullptr, updateReg, &m1334, &m1332),
-			m1334("AdcIEx", &Prm::IadcEx, false, 0, savePointI, nullptr, nullptr, updateReg, &m1335, &m1333),
-			m1335("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m1334),
+			m1334("Imeas", &Prm::Imeas, false, 0, savePointI, nullptr, nullptr, updateReg, nullptr, &m1333),
 
 	m14("CalibrationTime", &Prm::utcTime, false, 0, nullptr, calibrDateSelect, calibrDateUnselect, nullptr, &m15, &m13, nullptr, clockEditor),
 
