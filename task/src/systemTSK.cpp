@@ -91,13 +91,16 @@ void systemTSK(void *pPrm){
 	lowPowerSem = xSemaphoreCreateBinary();
 	assert(lowPowerSem != NULL);
 
-	assert(pdTRUE == xTaskCreate(regulatorConnTSK, "regulatorConnTSK", REG_TSK_SZ_STACK, NULL, REG_TSK_PRIO, NULL));
+	BaseType_t osres = xTaskCreate(regulatorConnTSK, "regulatorConnTSK", REG_TSK_SZ_STACK, NULL, REG_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started regulatorConnTSK");
 
-	assert(pdTRUE == xTaskCreate(modbusServerTSK, "modbusServerTSK", TCPMODBUS_TSK_SZ_STACK, NULL, TCPMODBUS_TSK_PRIO, NULL));
+	osres = xTaskCreate(modbusServerTSK, "modbusServerTSK", TCPMODBUS_TSK_SZ_STACK, NULL, TCPMODBUS_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started httpServerTSK");
 
-	assert(pdTRUE == xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL));
+	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
+	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started httpServerTSK");
 
 	vTaskDelay(1);
@@ -111,7 +114,7 @@ void systemTSK(void *pPrm){
 #endif
 
 	selWindow(startupWindow);
-	BaseType_t osres = pdTRUE;
+	osres = pdTRUE;
 	while(1){
 		regState_t state;
 		bool regulatorConnected = reg_getState(&state);
