@@ -80,16 +80,16 @@ function updateInfo() {
 			[1, 'Error Temperature Sensor'],
 			[2, 'Overheated'],
 			[3, 'Low Input Voltage'],
-			[4, 'Reverse Voltage'],
+			[4, 'Reserved'],
 			[5, 'OverCurrent'],
 			[6, 'Time Shutdown'],
 			[7, 'Low Current Shutdown'],
 			[8, 'Request']
 		]);
 		updateTable('.table1', [
-			{name: 'output', val: (status & 64) ? 'CC' : 'CV'},
+			{name: 'mode', val: (status & 64) ? 'CC' : 'CV'},
 			{name: 'disablecause', val: disablecause2string.get(disablecause)},
-			{name: 'switch', val: (enable != 0) ? '<p style="color:red;">ON</p>' : 'OFF'}
+			{name: 'output', val: (enable != 0) ? '<p style="color:red;">ON</p>' : 'OFF'}
 		]);
 
 		// Settings
