@@ -143,10 +143,6 @@ void printFooter(void){
 			snprintf(str, sizeof(str), "LAN");
 			disp_putStr(60, 110, &font6x8, 0, str);
 		}
-		else{
-			snprintf(str, sizeof(str), "    ");
-			disp_putStr(69, 110, &font6x8, 0, str);
-		}
 
 		if(reg_getremote()){
 			disp_setColor(black, white);
