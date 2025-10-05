@@ -141,7 +141,7 @@ int plog_hexdumpcolumn(const void *buffer, size_t length, size_t column){
 			plen += plog_printf("%*c", (column -  linelen) * 3, ' ');
 		}
 		for(size_t i = 0; i < column && length; i++){
-			char c = isalpha(bbuffer[i]) ? bbuffer[i] : '.';
+			char c = isprint(bbuffer[i]) ? bbuffer[i] : '.';
 			plen += plog_printf("%c", c);
 		}
 		plen += plog_printf("\n");
