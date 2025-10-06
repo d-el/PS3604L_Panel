@@ -168,7 +168,7 @@ void i2c_setCallback(i2c_type *i2cx, i2cCallback_type tcHook){
 /******************************************************************************
  *
  */
-void i2c_write(i2c_type *i2cx, void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode){
+void i2c_write(i2c_type *i2cx, const void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode){
 	i2cx->pDmaStreamTx->CR		&= ~DMA_SxCR_EN;
 	i2cx->pDmaStreamTx->M0AR	= (uint32_t)src;
 	i2cx->pDmaStreamTx->NDTR	= len;
