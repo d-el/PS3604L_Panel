@@ -193,6 +193,30 @@ bool reg_crangeGet(regCrange_t* crange){
 	return true;
 }
 
+bool reg_vFilterSizeSet(uint16_t size){
+	uint16_t c = size;
+	command_t command = { .writeAddr = 0x0112, .src = &c, .writeNum = 1 };
+	return reg_waitCommand(&command);
+}
+
+bool reg_iFilterSizeSet(uint16_t size){
+	uint16_t c = size;
+	command_t command = { .writeAddr = 0x0113, .src = &c, .writeNum = 1 };
+	return reg_waitCommand(&command);
+}
+
+bool reg_vIntegrationSizeSet(uint16_t size){
+	uint16_t c = size;
+	command_t command = { .writeAddr = 0x0114, .src = &c, .writeNum = 1 };
+	return reg_waitCommand(&command);
+}
+
+bool reg_iIntegrationSizeSet(uint16_t size){
+	uint16_t c = size;
+	command_t command = { .writeAddr = 0x0115, .src = &c, .writeNum = 1 };
+	return reg_waitCommand(&command);
+}
+
 bool reg_getState(regState_t *state){
 	xSemaphoreTake( regulatorMutex, portMAX_DELAY);
 	*state = regMeas;

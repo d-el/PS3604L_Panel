@@ -62,6 +62,18 @@ ItemState calibrDateUnselect(const MenuItem* m){
 }
 
 /*!****************************************************************************
+ * @brief    Calibrate date unselect callback
+ */
+ItemState setAcquisition(const MenuItem* m){
+	(void)m;
+	bool res = reg_vFilterSizeSet(Prm::vfilter.val);
+	res = res & reg_iFilterSizeSet(Prm::ifilter.val);
+	res = res & reg_vIntegrationSizeSet(Prm::vintegration.val);
+	res = res & reg_iIntegrationSizeSet(Prm::iintegration.val);
+	return ItemState { res, "Error setVintegration" };
+}
+
+/*!****************************************************************************
  * @brief    RTC select callback
  */
 ItemState rtcSelect(const MenuItem* m){
@@ -347,6 +359,11 @@ m1,
 		m164,
 		m165,
 	m17,
+		m170,
+		m171,
+		m172,
+		m173,
+	m18,
 
 m2,
 	m20,
@@ -422,7 +439,13 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 		m164("Tsh", &Prm::temp_shunt, false, 0, nullptr, nullptr, nullptr, updateReg, &m165, &m163),
 		m165("Tref", &Prm::temp_ref, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m164),
 
-	m17("Save", &Prm::save_settings, true, 0, saveSettings, nullptr, nullptr, updateSaveSettings, nullptr, &m16, nullptr),
+	m17("Acquisition", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m18, &m16, &m170),
+		m170("vIntegration", &Prm::vintegration, true, 0, setAcquisition, nullptr, nullptr, nullptr, &m171, nullptr),
+		m171("vFilter", &Prm::vfilter, true, 0, setAcquisition, nullptr, nullptr, nullptr, &m172, &m170),
+		m172("iIntegration", &Prm::iintegration, true, 0, setAcquisition, nullptr, nullptr, nullptr, &m173, &m171),
+		m173("iFilter", &Prm::ifilter, true, 0, setAcquisition, nullptr, nullptr, nullptr, nullptr, &m172),
+
+	m18("Save", &Prm::save_settings, true, 0, saveSettings, nullptr, nullptr, updateSaveSettings, nullptr, &m16, nullptr),
 
 m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
 	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),

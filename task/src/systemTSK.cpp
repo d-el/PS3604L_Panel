@@ -44,7 +44,7 @@
 /*!****************************************************************************
  * Memory
  */
-frontPanel_type fp;					///< Data structure front panel
+frontPanel_type fp;						///< Data structure front panel
 static TaskHandle_t windowTskHandle;	///< Program task handler
 static struct netif xnetif; 			///< Network interface structure
 static SemaphoreHandle_t lowPowerSem;
@@ -72,7 +72,7 @@ void systemTSK(void *pPrm){
 	(void)pPrm;
 	selWindow_type 	selWindowPrev = noneWindow;
 
-	//Init log system
+	// Init log system
 	plog_setWrite(_write);
 	plog_setTimestamp([]() -> uint32_t { return xTaskGetTickCount(); });
 
@@ -104,9 +104,23 @@ void systemTSK(void *pPrm){
 	P_LOGI(logTag, "Started httpServerTSK");
 
 	vTaskDelay(1);
-	P_LOGI(logTag, "Set regulator wire resistance");
-	reg_wireResistanceSet(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
-	reg_crangeSet(Prm::crange_set.val ? reg_crange_auto : reg_crange_hi);
+
+	// Regulator initialization
+	bool regres = reg_wireResistanceSet(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
+	if(!regres){
+		P_LOGE(logTag, "Fail set regulator wire resistance");
+	}
+	regres = reg_crangeSet(Prm::crange_set.val ? reg_crange_auto : reg_crange_hi);
+	if(!regres){
+		P_LOGE(logTag, "Fail set regulator crangeSet");
+	}
+	regres = reg_vFilterSizeSet(Prm::vfilter.val);
+	regres = regres & reg_iFilterSizeSet(Prm::ifilter.val);
+	regres = regres & reg_vIntegrationSizeSet(Prm::vintegration.val);
+	regres = regres & reg_iIntegrationSizeSet(Prm::iintegration.val);
+	if(!regres){
+		P_LOGE(logTag, "Fail set regulator acquisition settings");
+	}
 
 #if(TASK_MONITOR_EN > 0)
 	osres = xTaskCreate(monitorTSK, "monitorTSK", OSMONITOR_TSK_SZ_STACK, NULL, OSMONITOR_TSK_PRIO, NULL);

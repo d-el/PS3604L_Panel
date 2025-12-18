@@ -130,6 +130,10 @@ bool reg_saveSettingsSet(regSave_t save);
 bool reg_saveSettingsGet(regSave_t *save);
 bool reg_crangeSet(regCrange_t crange);
 bool reg_crangeGet(regCrange_t* crange);
+bool reg_vFilterSizeSet(uint16_t size);
+bool reg_iFilterSizeSet(uint16_t size);
+bool reg_vIntegrationSizeSet(uint16_t size);
+bool reg_iIntegrationSizeSet(uint16_t size);
 
 bool reg_getState(regState_t *state);
 
