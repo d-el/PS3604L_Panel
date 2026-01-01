@@ -71,6 +71,7 @@ void baseTSK(void *pPrm){
 	disp_fillScreen(black);
 	ksSet(30, 3, kUp | kDown);
 	enco_settic(3);
+	bool func = false;
 
 	while(1){
 		regState_t regmeas = {};
@@ -84,6 +85,13 @@ void baseTSK(void *pPrm){
 		regCrange_t crange;
 		reg_crangeGet(&crange);
 
+		auto nextPreset = [&params](){
+			if(Prm::basepreset.val < params.size() - 1)
+				Prm::basepreset.val++;
+			else
+				Prm::basepreset.val = 0;
+		};
+
 		/**************************************
 		 * Key process
 		 */
@@ -92,46 +100,62 @@ void baseTSK(void *pPrm){
 				BeepTime(ui.beep.error.time, ui.beep.error.freq);
 			}else{
 				BeepTime(ui.beep.key.time, ui.beep.key.freq);
-				if(keyState(kNext)){
-					varParam++;
-					if(varParam >= VAR_NUMBER){
-						varParam = VAR_VOLT;
+				if(func == false){
+					if(keyState(kNext)){
+						varParam++;
+						if(varParam >= VAR_NUMBER){
+							varParam = VAR_VOLT;
+						}
+					}else if(keyState(kMode)){
+						if(!regenable){
+							selWindow(chargerWindow);
+						}else{
+							BeepTime(ui.beep.error.time, ui.beep.error.freq);
+						}
+					}else if(keyState(kFunc)){
+						func = true;
+					}else if(keyState(kOnOff)){
+						uint8_t result = 0;
+						if(!regenable){
+							reg_enableSet(true);
+						}else{
+							reg_enableSet(false);
+						}
+						if(result != 0){
+							disp_putStr(0, 0, &arial, 0, "Error Connect");
+							vTaskDelay(1000);
+						}
+					}else if(keyState(kUp)){
+						params[Prm::basepreset.val].p[varParam]->bigstep(1);
+					}else if(keyState(kDown)){
+						params[Prm::basepreset.val].p[varParam]->bigstep(-1);
+					}else if(keyState(kZero)){
+						params[Prm::basepreset.val].p[varParam]->setdef();
 					}
-				}else if(keyState(kMode)){
-					if(!regenable){
-						selWindow(chargerWindow);
-					}else{
-						BeepTime(ui.beep.error.time, ui.beep.error.freq);
+				}
+				else{ // func == true
+					func = false;
+					if(keyState(kNext)){
+						if(!regenable){
+							nextPreset();
+						}else{
+							BeepTime(ui.beep.error.time, ui.beep.error.freq);
+						}
 					}
-				}else if(keyState(kFunc)){
-					if(keyDin(kNext) && !regenable){
+					else if(keyState(kMode)){
 						selWindow(settingWindow);
 					}
-					if(!regenable){
-						if(Prm::basepreset.val < params.size() - 1)
-							Prm::basepreset.val++;
-						else
-							Prm::basepreset.val = 0;
-					}else{
-						BeepTime(ui.beep.error.time, ui.beep.error.freq);
+					else if(keyState(kFunc)){
+						func = false;
 					}
-				}else if(keyState(kOnOff)){
-					uint8_t result = 0;
-					if(!regenable){
-						reg_enableSet(true);
-					}else{
-						reg_enableSet(false);
+					else if(keyState(kUp)){
+						Prm::crange_set.val = Prm::mask_crange::crange_hi;
+						reg_crangeSet(reg_crange_hi);
 					}
-					if(result != 0){
-						disp_putStr(0, 0, &arial, 0, "Error Connect");
-						vTaskDelay(1000);
+					else if(keyState(kDown)){
+						Prm::crange_set.val = Prm::mask_crange::crange_auto;
+						reg_crangeSet(reg_crange_auto);
 					}
-				}else if(keyState(kUp)){
-					params[Prm::basepreset.val].p[varParam]->bigstep(1);
-				}else if(keyState(kDown)){
-					params[Prm::basepreset.val].p[varParam]->bigstep(-1);
-				}else if(keyState(kZero)){
-					params[Prm::basepreset.val].p[varParam]->setdef();
 				}
 			}
 		}
@@ -254,6 +278,10 @@ void baseTSK(void *pPrm){
 				grf_fillRect(105, 104, 55, 3, white);
 				grf_fillRect(53, 104, 53, 3, black);
 				break;
+		}
+
+		if(func){
+			grf_fillRoundRect(0, 8, 6, 12, 2, red);
 		}
 
 		// Print status bar
