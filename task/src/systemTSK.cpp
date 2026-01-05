@@ -23,6 +23,7 @@
 #include <ethernetif.h>
 #include <lwip/tcpip.h>
 #include <lwip/dns.h>
+#include <lwip/dhcp.h>
 #include <display.h>
 #include <beep.h>
 #include <pvd.h>
@@ -54,7 +55,7 @@ static SemaphoreHandle_t lowPowerSem;
  */
 static void loadParameters(void);
 static void pvdCallback(void);
-static void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway);
+static void LwIP_Init(void);
 
 extern "C" int _write(int fd, const void *buf, size_t count);
 
@@ -82,7 +83,7 @@ void systemTSK(void *pPrm){
 	timezoneUpdate(Prm::timezone.val);
 	pvd_setSupplyFaultCallBack(pvdCallback);						// Setup callback for Supply Fault
 	disp_init();
-	LwIP_Init(Prm::ipadr.val, Prm::netmask.val, Prm::gateway.val);	// Initialize the LwIP stack
+	LwIP_Init();	// Initialize the LwIP stack
 	uint64_t mac = 0;
 	memcpy(&mac, xnetif.hwaddr, xnetif.hwaddr_len);
 	Prm::mac0.val = mac;
@@ -97,7 +98,7 @@ void systemTSK(void *pPrm){
 
 	osres = xTaskCreate(modbusServerTSK, "modbusServerTSK", TCPMODBUS_TSK_SZ_STACK, NULL, TCPMODBUS_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
-	P_LOGI(logTag, "Started httpServerTSK");
+	P_LOGI(logTag, "Started modbusServerTSK");
 
 	osres = xTaskCreate(httpServerTSK, "httpServerTSK", HTTP_TSK_SZ_STACK, NULL, HTTP_TSK_PRIO, NULL);
 	assert(osres == pdTRUE);
@@ -278,63 +279,102 @@ static void pvdCallback(void){
 }
 
 /*!****************************************************************************
+ *
+ */
+void dhcp_set_ntp_servers(u8_t num_ntp_servers, const ip4_addr_t* ntp_server_addrs){
+	for(uint8_t i = 0; i < num_ntp_servers; i++){
+		P_LOGI(logTag, "set NTP[%u]: %s", i, ipaddr_ntoa(&ntp_server_addrs[i]));
+	}
+}
+
+/*!****************************************************************************
+ *
+ */
+void netif_status_callback(struct netif *nif) {
+	if(netif_is_up(nif) && !ip4_addr_isany(&nif->ip_addr)){
+		char cip[16], cnm[16], cgw[16];
+		ip4addr_ntoa_r(&nif->ip_addr, cip, sizeof(cip));
+		ip4addr_ntoa_r(&nif->netmask, cnm, sizeof(cnm));
+		ip4addr_ntoa_r(&nif->gw, cgw, sizeof(cgw));
+		P_LOGI(logTag, "DHCP supplied address\n"
+				"\tIP: %s\n"
+				"\tNM: %s\n"
+				"\tGW: %s",
+				cip, cnm, cgw
+				);
+		Prm::currIpadr.val = ntohl(netif_ip_addr4(&xnetif)->addr);
+		Prm::currNetmask.val = ntohl(netif_ip_netmask4(&xnetif)->addr);
+		Prm::currGateway.val = ntohl(netif_ip_gw4(&xnetif)->addr);
+	}else if(!netif_is_up(nif)) {
+		P_LOGI(logTag, "Network Interface is DOWN");
+	}
+}
+
+/*!****************************************************************************
  * @param ip:		 Internet Protocol address
  * @param netmask:
  * @param gateway
  */
-void LwIP_Init(const uint32_t ipaddr, const uint32_t netmask, const uint32_t gateway){
-	ip_addr_t l_ipaddr;
-	ip_addr_t l_netmask;
-	ip_addr_t l_gateway;
-
-	//With convert 32-bits host order to network order
-	l_ipaddr.addr = htonl(ipaddr);
-	l_netmask.addr = htonl(netmask);
-	l_gateway.addr = htonl(gateway);
-
+void LwIP_Init(void){
 	/* Create tcp_ip stack thread */
-	tcpip_init( NULL, NULL);
+	tcpip_init(NULL, NULL);
+	ip_addr_t l_ipaddr = { .addr = htonl(Prm::dhcpOnOff.val ? IPADDR_ANY : Prm::ipadr.val) };
+	ip_addr_t l_netmask = { .addr = htonl(Prm::dhcpOnOff.val ? IPADDR_ANY : Prm::netmask.val) };
+	ip_addr_t l_gateway = { .addr = htonl(Prm::dhcpOnOff.val ? IPADDR_ANY : Prm::gateway.val) };
+	ip_addr_t l_dns = { .addr = htonl(Prm::dhcpOnOff.val ? IPADDR_ANY : Prm::dnsServip.val) };
+	netif_add(&xnetif, &l_ipaddr, &l_netmask, &l_gateway, NULL, &ethernetif_init, &tcpip_input); // Adds network interface to the netif_list
+	netif_set_default(&xnetif); // Registers the default network interface
+	if(!Prm::dhcpOnOff.val){
+		P_LOGI(logTag, "set static IP: %s", ipaddr_ntoa(&l_ipaddr));
+		dns_setserver(0, &l_dns); // Set DNS server address
+	}
 
-	/*
-	 * Adds your network interface to the netif_list. Allocate a struct
-	 * netif and pass a pointer to this structure as the first argument.
-	 * Give pointers to cleared ip_addr structures when using DHCP,
-	 * or fill them with sane numbers otherwise. The state pointer may be NULL.
-	 *
-	 * The init function pointer must point to a initialization function for
-	 * your ethernet netif interface. The following code illustrates it's use.
-	 */
-	P_LOGI(logTag, "set IP: %s", ipaddr_ntoa(&l_ipaddr) );
-	netif_add(&xnetif, &l_ipaddr, &l_netmask, &l_gateway, NULL, &ethernetif_init, &tcpip_input);
-
-	/*  Registers the default network interface. */
-	netif_set_default(&xnetif);
-
-	/*
-	 * Set DNS server address
-	 */
-	ip_addr_t ipaddrs;
-	IP4_ADDR(&ipaddrs, 8, 8, 8, 8);
-	dns_setserver(0, &ipaddrs);
-	IP4_ADDR(&ipaddrs, 1, 1, 1, 1);
-	dns_setserver(1, &ipaddrs);
-
+	// Link UP callback
 	auto linkcallback = [](struct netif *netif){
 		fp.state.lanLink = netif_is_link_up(netif) ? 1 : 0;
 		P_LOGI(logTag, "LAN link %s", fp.state.lanLink ? "Up" : "Down");
+		if(!fp.state.lanLink){
+			ip_addr_t ipaddr = { .addr = htonl(IPADDR_ANY) };
+			ip_addr_t netmask = { .addr = htonl(IPADDR_NONE) };
+			ip_addr_t gateway  = { .addr = htonl(IPADDR_ANY) };
+			netif_set_addr(&xnetif, &ipaddr, &netmask, &gateway);
+			Prm::currIpadr.val = 0;
+			Prm::currNetmask.val = 0;
+			Prm::currGateway.val = 0;
+		}
 	};
+
 	netif_set_link_callback(&xnetif, linkcallback);
 	netif_set_up(&xnetif);
+
+	dhcp_network_changed_link_up(&xnetif);
+	P_LOGI(logTag, "DHCP start");
+	err_t err = dhcp_start(&xnetif);
+	if(err != ERR_OK){
+		P_LOGW(logTag, "Error DHCP start");
+	}
+
+	netif_set_status_callback(&xnetif, netif_status_callback);
 }
 
 /*!****************************************************************************
  */
 void netSettingUpdate(void){
-	ip_addr_t l_ipaddr = { htonl(Prm::ipadr.val) };
-	ip_addr_t l_netmask = { htonl(Prm::netmask.val) };
-	ip_addr_t l_gateway = { htonl(Prm::gateway.val) };
-	P_LOGI(logTag, "update IP: %s", ipaddr_ntoa(&l_ipaddr) );
-	netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
+	if(!Prm::dhcpOnOff.val){
+		ip_addr_t l_ipaddr = { htonl(Prm::ipadr.val) };
+		ip_addr_t l_netmask = { htonl(Prm::netmask.val) };
+		ip_addr_t l_gateway = { htonl(Prm::gateway.val) };
+		P_LOGI(logTag, "update IP: %s", ipaddr_ntoa(&l_ipaddr) );
+		netif_set_addr(&xnetif, &l_ipaddr, &l_netmask, &l_gateway);
+		ip_addr_t l_dns = { htonl(Prm::dnsServip.val) };
+		dns_setserver(0, &l_dns); // Set DNS server address
+		dhcp_inform(&xnetif);
+	}else{
+		err_t err = dhcp_renew(&xnetif);
+		if(err != ERR_OK){
+			P_LOGW(logTag, "Error DHCP renew");
+		}
+	}
 }
 
 /*!****************************************************************************

@@ -408,6 +408,7 @@ ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex){
 	const MenuItem* m = history[historyIndex - 1];
 	enum { min = 0, max = 3 };
 	uint8_t var = min;
+	bool editable = m->change;
 	union { uint32_t ip; uint8_t v[4]; } ip = { static_cast<Prm::Val<uint32_t>*>(m->prm)->val };
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	while(1){
@@ -428,16 +429,18 @@ ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex){
 			}
 		}
 
-		ip.v[max - var] += enco_update();
+		if(editable){
+			ip.v[max - var] += enco_update();
+		}
 
 		printHistory(history, historyIndex);
 
 		char str[64];
 		size_t select = 0, unselect = 0, offset = 0;
 		for(size_t i = 0; i < 4; i++){
-			if(var == i) select = offset + (i == 0 ? 0 : 1);
+			if(editable && var == i) select = offset + (i == 0 ? 0 : 1);
 			offset += snprintf(&str[offset], sizeof(str) - offset, i == 0 ? "%u" : ":%u", ip.v[max - i]);
-			if(var == i) unselect = offset;
+			if(editable && var == i) unselect = offset;
 		}
 
 		outItemString(str, 0, select, unselect);

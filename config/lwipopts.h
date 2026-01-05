@@ -222,7 +222,12 @@
  * response packet, an callback is called, which has to be provided by the port:
  * void dhcp_set_ntp_servers(u8_t num_ntp_servers, ip_addr_t* ntp_server_addrs);
 */
-#define LWIP_DHCP_GET_NTP_SRV		0
+#define LWIP_DHCP_GET_NTP_SRV		1
+
+/**
+ * The maximum of NTP servers requested
+ */
+#define LWIP_DHCP_MAX_NTP_SERVERS	1
 
 /**----------------------------------
    ---------- DNS options -----------
@@ -476,6 +481,12 @@
  * whenever the link changes (i.e., link down)
  */
 #define LWIP_NETIF_LINK_CALLBACK		1
+
+/**
+ * LWIP_NETIF_STATUS_CALLBACK==1: Support a callback function whenever an interface
+ * changes its up/down status (i.e., due to DHCP IP acquisition)
+ */
+#define LWIP_NETIF_STATUS_CALLBACK		1
 
 /*---------------------------------------
    ---------- Checksum options ----------

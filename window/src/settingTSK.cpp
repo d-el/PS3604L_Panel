@@ -388,6 +388,13 @@ m3,
 	m31,
 	m32,
 	m33,
+	m34,
+	m35,
+		m350,
+		m351,
+		m352,
+		m353,
+		m354,
 m4;
 
 const MenuItem
@@ -467,10 +474,17 @@ m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, 
 		m245("Sec", &Prm::DSTESec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m244),
 
 m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30),
-	m30("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr, ipAddressEditor),
-	m31("subnet mask", &Prm::netmask, true, 0, nullptr, nullptr, nullptr, nullptr, &m32, &m30, nullptr, ipAddressEditor),
-	m32("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, &m33, &m31, nullptr, ipAddressEditor),
-	m33("MAC", &Prm::mac0, false, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m32, nullptr, ipMacEditor),
+	m30("DHCP", &Prm::dhcpOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr),
+	m31("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m32, &m30, nullptr, ipAddressEditor),
+	m32("subnet mask", &Prm::netmask, true, 0, nullptr, nullptr, nullptr, nullptr, &m33, &m31, nullptr, ipAddressEditor),
+	m33("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, &m34, &m32, nullptr, ipAddressEditor),
+	m34("DNS IP", &Prm::dnsServip, true, 0, nullptr, nullptr, nullptr, nullptr, &m35, &m33, nullptr, ipAddressEditor),
+	m35("Info", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m34, &m350),
+		m350("IP address", &Prm::currIpadr, false, 0, nullptr, nullptr, nullptr, nullptr, &m351, nullptr, nullptr, ipAddressEditor),
+		m351("subnet mask", &Prm::currNetmask, false, 0, nullptr, nullptr, nullptr, nullptr, &m352, &m350, nullptr, ipAddressEditor),
+		m352("gateway", &Prm::currGateway, false, 0, nullptr, nullptr, nullptr, nullptr, &m353, &m351, nullptr, ipAddressEditor),
+		m353("DNS IP", &Prm::dnsServip, false, 0, nullptr, nullptr, nullptr, nullptr, &m354, &m352, nullptr, ipAddressEditor),
+		m354("MAC address", &Prm::mac0, false, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m353, nullptr, ipMacEditor),
 
 m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, nullptr, &m3);
 
