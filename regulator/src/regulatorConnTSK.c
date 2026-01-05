@@ -42,7 +42,7 @@ static SemaphoreHandle_t regulatorMutex;
 static SemaphoreHandle_t tcpSem;
 static QueueHandle_t commandQueue;
 static regVersion_t regVersion;
-static regTarget_t regTarget;
+static regTarget_t regTarget = { .current_set = 100, .mode = reg_limitation };
 static regState_t regMeas;
 static uint16_t enabled;
 static uint8_t *mobusRequstData;
