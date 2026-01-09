@@ -80,13 +80,15 @@ void startupTSK(void *pPrm){
 		if((fp.state.sysSettingLoadDefault != 0)||((fp.state.userSettingLoadDefault != 0))){
 			disp_fillScreen(black);
 			if(fp.state.sysSettingLoadDefault != 0){
-				disp_putStr(00, 00, &arial, 0, "Load default system");
-				disp_putStr(00, 20, &arial, 0, "setting");
+				disp_putStrCenter(00, &arial, 0, "Load default system");
+				disp_putStrCenter(16, &arial, 0, "setting");
 			}
 			if(fp.state.userSettingLoadDefault != 0){
-				disp_putStr(00, 40, &arial, 0, "Load default user");
-				disp_putStr(00, 60, &arial, 0, "setting");
+				disp_putStrCenter(40, &arial, 0, "Load default user");
+				disp_putStrCenter(56, &arial, 0, "setting");
 			}
+			saveparametersSystem();
+			disp_putStr(00, 112, &arial, 0, "Press any key");
 			disp_flush();
 			while(keyProc() == 0){
 				vTaskDelay(pdMS_TO_TICKS(10));
@@ -94,11 +96,7 @@ void startupTSK(void *pPrm){
 			BeepTime(ui.beep.key.time, ui.beep.key.freq);
 		}
 
-		if(keyState(kMode)){
-			selWindow(settingWindow);
-		}else{
-			selWindow(baseWindow);
-		}
+		selWindow(baseWindow);
 	}
 }
 

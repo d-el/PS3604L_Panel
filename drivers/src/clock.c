@@ -51,6 +51,8 @@ clockState_type clock_init(void){
 
 	/* Enable HSE */
 	RCC->CR |= ((uint32_t) RCC_CR_HSEON);
+	RCC->CFGR &= ~RCC_CFGR_MCO1;	//MCO1 - disable
+	RCC->CFGR &= ~RCC_CFGR_MCO2;	//MCO2 - disable
 
 	/* Wait till HSE is ready and if Time out is reached exit */
 	do{

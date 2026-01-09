@@ -70,6 +70,7 @@ void disp_fillScreen(lcd_color_type color);
 void disp_fillRect(int16_t x, int16_t y, int16_t w, int16_t h, lcd_color_type color);
 void disp_putChar(uint16_t x, uint16_t y, const font_type *font, char c);
 void disp_putStr(uint16_t x, uint16_t y, const font_type *font, uint8_t distance, const char *s);
+void disp_putStrCenter(uint16_t y, const font_type *font, uint8_t distance, const char *s);
 void disp_PrintImageMonochrome(uint8_t x, uint8_t y, const image_type *image);
 
 #ifdef __cplusplus

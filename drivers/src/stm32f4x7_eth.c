@@ -42,6 +42,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4x7_eth.h"
 #include <string.h>
+#include "htimer.h"
 
 /** @addtogroup STM32F4x7_ETH_Driver
  * @brief ETH driver modules
@@ -144,9 +145,7 @@ __IO uint32_t Frame_Rx_index;
  * @retval None
  */
 static void ETH_Delay(__IO uint32_t nCount){
-	__IO uint32_t index = 0;
-	for(index = nCount; index != 0; index--){
-	}
+	htimer_delay(nCount);
 }
 #endif /* USE_Delay*/
 

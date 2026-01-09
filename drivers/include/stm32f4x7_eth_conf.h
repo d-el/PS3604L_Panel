@@ -53,9 +53,9 @@ extern "C" {
 
 /* PHY configuration section **************************************************/
 /* PHY Reset delay */
-#define PHY_RESET_DELAY			((uint32_t)0x00000FFF)
+#define PHY_RESET_DELAY			(1000)
 /* PHY Configuration delay */
-#define PHY_CONFIG_DELAY		((uint32_t)0x00000FFF)
+#define PHY_CONFIG_DELAY		(1000)
 
 /* INTERRUPT SOURCE FLAG REGISTER */
 #define PHY_ISFR				((uint16_t)29)

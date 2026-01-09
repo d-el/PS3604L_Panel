@@ -14,10 +14,12 @@
 #include <regulatorConnTSK.h>
 
 #define LOG_LOCAL_LEVEL P_LOG_INFO
+
 static const char *logTag = "ModBusTCP";
 uint32_t numberRequest;
 struct netconn *conn;
 struct netconn *newconn;
+uint8_t workbuffer[256];
 
 /*!****************************************************************************
  * @brief
@@ -253,7 +255,11 @@ BOOL xMBTCPPortGetRequest(UCHAR **ppucMBTCPFrame, USHORT *usTCPLength){
 			uint8_t *readdata = NULL;
 			u16_t buflen;
 			netbuf_data(inbuf, (void**)&readdata, &buflen);
-
+			memcpy(workbuffer, readdata, buflen);
+			/* Delete the buffer (netconn_recv gives us ownership,
+			 so we have to make sure to deallocate the buffer) */
+			netbuf_delete(inbuf);
+			readdata = workbuffer;
 			if(readdata[6 /*UnitIdentifier*/] == 2){
 				P_LOGD(logTag, "Panel");
 				*ppucMBTCPFrame = readdata;
@@ -265,10 +271,6 @@ BOOL xMBTCPPortGetRequest(UCHAR **ppucMBTCPFrame, USHORT *usTCPLength){
 				*ppucMBTCPFrame = nullptr;
 				*usTCPLength = 0;
 			}
-			/* Delete the buffer (netconn_recv gives us ownership,
-			 so we have to make sure to deallocate the buffer) */
-			netbuf_delete(inbuf);
-
 		}else if(res == ERR_TIMEOUT){
 			bool up = netif_is_link_up(netif_default) ? true : false;
 			if(!up){
