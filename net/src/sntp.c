@@ -1,9 +1,9 @@
 ﻿/*!****************************************************************************
  * @file		sntp.c
  * @author		Author: Simon Goldschmidt (lwIP raw API part), d_el - Storozhenko Roman
- * @version		V1.0
- * @date		24.09.2017
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @version		V1.1
+ * @date		10.01.2025
+ * @copyright	The MIT License (MIT). Copyright (c) 2025 Storozhenko Roman
  * @brief		SNTP client module
  */
 
@@ -26,7 +26,7 @@
 /**
  * SNTP_DEBUG_LEVEL: Enable debugging for SNTP
  */
-#define LOG_LOCAL_LEVEL P_LOG_INFO
+#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
 
 /**
  * SNTP_SINGLESYNC: Enable single sync
@@ -35,7 +35,7 @@
 
 /** SNTP server port */
 #ifndef SNTP_PORT
-#define SNTP_PORT                   123
+#define SNTP_PORT					123
 #endif
 
 /** SNTP server address:
@@ -43,57 +43,57 @@
  * - as a DNS name if SNTP_SERVER_DNS is set to 1
  * May contain multiple server names (e.g. "pool.ntp.org","second.time.server")
  */
-#define SNTP_SERVER_ADDRESS         "1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org", "second.time.server"
+#define SNTP_SERVER_ADDRESS			"1.pool.ntp.org", "2.pool.ntp.org", "3.pool.ntp.org", "second.time.server"
 
 /** SNTP receive timeout - in milliseconds
  * Also used as retry timeout - this shouldn't be too low.
  * Default is 3 seconds.
  */
-#define SNTP_RECV_TIMEOUT           5000
+#define SNTP_RECV_TIMEOUT			4500
 
 /** Default retry timeout (in milliseconds) if the response
  * received is invalid.
  * This is doubled with each retry until SNTP_RETRY_TIMEOUT_MAX is reached.
  */
-#define SNTP_RETRY_TIMEOUT          5000
+#define SNTP_RETRY_TIMEOUT			5000
 
 /** SNTP update delay - in milliseconds
  * Default is 1 hour.
  * SNTPv4 RFC 4330 enforces a minimum update time of 15 seconds!
  */
-#define SNTP_UPDATE_DELAY           30000
+#define SNTP_UPDATE_DELAY			30000
 
-#define SNTP_RECEIVE_TIME_SIZE      1
+#define SNTP_RECEIVE_TIME_SIZE		1
 
-#define SNTP_ERR_KOD                1
+#define SNTP_ERR_KOD				1
 
 /* SNTP protocol defines */
-#define SNTP_MSG_LEN                48
+#define SNTP_MSG_LEN				48
 
-#define SNTP_OFFSET_LI_VN_MODE      0
-#define SNTP_LI_MASK                0xC0
-#define SNTP_LI_NO_WARNING          0x00
-#define SNTP_LI_LAST_MINUTE_61_SEC  0x01
-#define SNTP_LI_LAST_MINUTE_59_SEC  0x02
-#define SNTP_LI_ALARM_CONDITION     0x03 /* (clock not synchronized) */
+#define SNTP_OFFSET_LI_VN_MODE		0
+#define SNTP_LI_MASK				0xC0
+#define SNTP_LI_NO_WARNING			0x00
+#define SNTP_LI_LAST_MINUTE_61_SEC	0x01
+#define SNTP_LI_LAST_MINUTE_59_SEC	0x02
+#define SNTP_LI_ALARM_CONDITION	0x03 /* (clock not synchronized) */
 
-#define SNTP_VERSION_MASK           0x38
-#define SNTP_VERSION                (4/* NTP Version 4*/<<3)
+#define SNTP_VERSION_MASK			0x38
+#define SNTP_VERSION				(4/* NTP Version 4*/<<3)
 
-#define SNTP_MODE_MASK              0x07
-#define SNTP_MODE_CLIENT            0x03
-#define SNTP_MODE_SERVER            0x04
-#define SNTP_MODE_BROADCAST         0x05
+#define SNTP_MODE_MASK				0x07
+#define SNTP_MODE_CLIENT			0x03
+#define SNTP_MODE_SERVER			0x04
+#define SNTP_MODE_BROADCAST			0x05
 
-#define SNTP_OFFSET_STRATUM         1
-#define SNTP_STRATUM_KOD            0x00
+#define SNTP_OFFSET_STRATUM			1
+#define SNTP_STRATUM_KOD			0x00
 
-#define SNTP_OFFSET_ORIGINATE_TIME  24
-#define SNTP_OFFSET_RECEIVE_TIME    32
-#define SNTP_OFFSET_TRANSMIT_TIME   40
+#define SNTP_OFFSET_ORIGINATE_TIME	24
+#define SNTP_OFFSET_RECEIVE_TIME	32
+#define SNTP_OFFSET_TRANSMIT_TIME	40
 
 /* number of seconds between 1900 and 1970 */
-#define DIFF_SEC_1900_1970         (2208988800UL)
+#define DIFF_SEC_1900_1970			(2208988800UL)
 
 /**
  * SNTP packet format (without optional fields)
@@ -131,7 +131,9 @@ PACK_STRUCT_END
 static char *logTag = "SNTP";
 
 /* function prototypes */
+static void sntp_send_request_timeout(void* arg);
 static void sntp_request(void *arg);
+
 /** The UDP pcb used by the SNTP client */
 static struct udp_pcb* sntp_pcb;
 /** Addresses of servers */
@@ -194,10 +196,12 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, const ip_a
 	u32_t receive_timestamp[SNTP_RECEIVE_TIME_SIZE];
 	err_t err;
 
-	LWIP_UNUSED_ARG(arg);
 	LWIP_UNUSED_ARG(pcb);
 
+	P_LOGD(logTag, "sntp_recv, arg %p", arg);
+
 	/* packet received: stop retry timeout  */
+	sys_untimeout(sntp_send_request_timeout, arg);
 	sys_untimeout(sntp_try_next_server, NULL);
 	sys_untimeout(sntp_request, NULL);
 
@@ -247,13 +251,26 @@ static void sntp_recv(void *arg, struct udp_pcb* pcb, struct pbuf *p, const ip_a
 	}
 }
 
+/** Timeout send an sntp request to a server.
+ *
+ * @param pointer a active pbuf
+ */
+static void sntp_send_request_timeout(void* arg){
+	(void)arg;
+	P_LOGD(logTag, "sntp_send_request_timeout: Timeout, pbuf %p", arg);
+	if(arg){
+		pbuf_free(arg);
+	}
+	sntp_try_next_server(NULL);
+}
+
 /** Actually send an sntp request to a server.
  *
  * @param server_addr resolved IP address of the SNTP server
  */
 static void sntp_send_request(const ip_addr_t *server_addr){
-	struct pbuf* p;
-	p = pbuf_alloc(PBUF_TRANSPORT, SNTP_MSG_LEN, PBUF_RAM);
+	struct pbuf* p = pbuf_alloc(PBUF_TRANSPORT, SNTP_MSG_LEN, PBUF_RAM);
+	P_LOGD(logTag, "sntp_send_request: pbuf_alloc pbuf %p", p);
 	if(p != NULL){
 		struct sntp_msg *sntpmsg = (struct sntp_msg *) p->payload;
 		P_LOGD(logTag, "sntp_send_request: Sending request to server");
@@ -262,7 +279,8 @@ static void sntp_send_request(const ip_addr_t *server_addr){
 		/* send request */
 		udp_sendto(sntp_pcb, p, server_addr, SNTP_PORT);
 		/* set up receive timeout: try next server or retry on timeout */
-		sys_timeout((u32_t) SNTP_RECV_TIMEOUT, sntp_try_next_server, NULL);
+		sys_timeout((u32_t) SNTP_RECV_TIMEOUT, sntp_send_request_timeout, p);
+		udp_recv(sntp_pcb, sntp_recv, p);
 	}else{
 		P_LOGD(logTag, "sntp_send_request: Out of memory, trying again in %"PRIu16" ms", SNTP_RETRY_TIMEOUT);
 		/* out of memory: set up a timer to send a retry */
@@ -315,7 +333,7 @@ static void sntp_request(void *arg){
 		sntp_send_request(&sntp_server_address);
 	}else{
 		/* address conversion failed, try another server */
-		//debug("sntp_request: Invalid server address, trying next server.\n");
+		P_LOGD(logTag, "sntp_request: Invalid server address, trying next server.");
 		sys_timeout(SNTP_RETRY_TIMEOUT, sntp_try_next_server, NULL);
 	}
 }
@@ -327,7 +345,6 @@ static void sntp_request(void *arg){
 void sntp_init(void){
 	sntp_pcb = udp_new();
 	if(sntp_pcb != NULL){
-		udp_recv(sntp_pcb, sntp_recv, NULL);
 		sntp_request(NULL);
 	}else{
 		P_LOGE(logTag, "Error create sntp_pcb");

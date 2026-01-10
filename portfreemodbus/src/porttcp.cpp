@@ -13,7 +13,7 @@
 #include <imageheader.h>
 #include <regulatorConnTSK.h>
 
-#define LOG_LOCAL_LEVEL P_LOG_INFO
+#define LOG_LOCAL_LEVEL P_LOG_WARN
 
 static const char *logTag = "ModBusTCP";
 uint32_t numberRequest;
@@ -233,10 +233,9 @@ BOOL xMBPortTCPPoll(void){
 			newconn = nullptr;
 			return FALSE;
 		}
-		else{
+		else if(err == ERR_TIMEOUT){
 			P_LOGI(logTag, "Connection, Remote IP address: %s", ipaddr_ntoa(&newconn->pcb.ip->remote_ip));
 			netconn_set_recvtimeout(conn, 1000/*ms*/);
-			xMBPortEventPost(EV_FRAME_RECEIVED);
 		}
 	}
 	xMBPortEventPost(EV_FRAME_RECEIVED);
