@@ -24,10 +24,10 @@
 #include <lwip/tcpip.h>
 #include <lwip/dns.h>
 #include <lwip/dhcp.h>
+#include <st7735.h>
 #include <display.h>
 #include <beep.h>
 #include <pvd.h>
-#include <ledpwm.h>
 #include <board.h>
 #include <ui.h>
 #include <startupTSK.h>
@@ -82,7 +82,9 @@ void systemTSK(void *pPrm){
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate(Prm::timezone.val);
 	pvd_setSupplyFaultCallBack(pvdCallback);						// Setup callback for Supply Fault
-	disp_init();
+	st7735_init(JD_T18003, ST7735_R270);
+	Disp disp = Disp(&st7735_driver);
+	disp.init();
 	LwIP_Init();	// Initialize the LwIP stack
 	uint64_t mac = 0;
 	memcpy(&mac, xnetif.hwaddr, xnetif.hwaddr_len);
@@ -145,16 +147,16 @@ void systemTSK(void *pPrm){
 				case noneWindow:
 					break;
 				case startupWindow:
-					osres = xTaskCreate(startupTSK, "startupTSK", STARTUP_TSK_SZ_STACK, NULL, STARTUP_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(startupTSK, "startupTSK", STARTUP_TSK_SZ_STACK, &disp, STARTUP_TSK_PRIO, &windowTskHandle);
 					break;
 				case settingWindow:
-					osres = xTaskCreate(settingTSK, "settingTSK", SETT_TSK_SZ_STACK, NULL, SETT_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(settingTSK, "settingTSK", SETT_TSK_SZ_STACK, &disp, SETT_TSK_PRIO, &windowTskHandle);
 					break;
 				case baseWindow:
-					osres = xTaskCreate(baseTSK, "baseTSK", BASE_TSK_SZ_STACK, NULL, BASE_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(baseTSK, "baseTSK", BASE_TSK_SZ_STACK, &disp, BASE_TSK_PRIO, &windowTskHandle);
 					break;
 				case chargerWindow:
-					osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, NULL, CHARG_TSK_PRIO, &windowTskHandle);
+					osres = xTaskCreate(chargeTSK, "chargeTSK", CHARG_TSK_SZ_STACK, &disp, CHARG_TSK_PRIO, &windowTskHandle);
 					break;
 				default:
 					osres = pdTRUE;
@@ -269,7 +271,7 @@ void saveparametersUser(void){
  * Shutdown
  */
 static void pvdCallback(void){
-	setLcdBrightness(0);
+	//setLcdBrightness(0);
 	LED_OFF();
 	ETH_BSP_Deinit();
 

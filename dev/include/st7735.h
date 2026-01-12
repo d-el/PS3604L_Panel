@@ -1,9 +1,9 @@
 /*!****************************************************************************
  * @file		st7735.h
  * @author		d_el
- * @version		V1.0
- * @date		31.01.2018
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @version		V1.1
+ * @date		11.01.2026
+ * @copyright	The MIT License (MIT). Copyright (c) 2026 Storozhenko Roman
  * @brief		Driver display on controller ST7735
  */
 
@@ -18,13 +18,8 @@ extern "C" {
 /*!****************************************************************************
  * Include
  */
-#include "stdint.h"
-
-/*!****************************************************************************
- * Define
- */
-#define ST7735_W			160
-#define ST7735_H			128
+#include <stdint.h>
+#include "display-driver.h"
 
 /*!****************************************************************************
  * Enumeration
@@ -41,51 +36,13 @@ typedef enum {
 	ST7735_R270
 }displayRotation_type;
 
-/*!****************************************************************************
- * Typedef
- */
-typedef void (*flushcb_type)(void *arg);
-typedef void (*setbufcb_type)(void *arg);
-
-typedef enum {
-	sky = 0x54fb,
-	black = 0x0000,
-	white = 0xFFFF,
-	green = 0x07E0,
-	blue = 0x001f,
-	red = 0xF800,
-	yellow = 0xFFE0,
-	orange = 0xAB00,
-	pink = 0xF97F,
-	brown = 0x8200,
-	gray = 0x8410,
-	lilac = 0x91D4,
-
-	darkGreen = 0x3DA5,
-	halfLightGray = 0x39E6,
-	halfLightYellow = 0xFFF8,
-	halfLightRed = 0xFF18,
-	halfLightGreen = 0xC7F8,
-	halfLightBlue = 0x861F,
-} color_type;
-
 typedef uint16_t lcd_color_type;
-
-/*!****************************************************************************
- * Exported variables
- */
-extern uint16_t videoBff[ST7735_W * ST7735_H];
-
-static inline void st7735_setPixel(uint16_t x, uint16_t y, lcd_color_type color){
-	videoBff[y * ST7735_W + x] = color;
-}
+extern const disp_driver_t st7735_driver;
 
 /*!****************************************************************************
  * Function declaration
  */
 void st7735_init(display_type type, displayRotation_type r);
-void st7735_flush(flushcb_type cb);
-void st7735_fillBuffer(const lcd_color_type *color, setbufcb_type cb);
 
 #ifdef __cplusplus
 }

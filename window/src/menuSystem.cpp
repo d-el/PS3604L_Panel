@@ -16,7 +16,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <display.h>
-#include <graphics.h>
 #include <key.h>
 #include <enco.h>
 #include <beep.h>
@@ -26,8 +25,8 @@
 
 namespace Menu {
 
-#define MENU_SCREEN_W		DISP_W
-#define MENU_SCREEN_H		DISP_H
+#define MENU_SCREEN_W		160
+#define MENU_SCREEN_H		128
 #define MENU_PATH_FONT		font6x8
 #define MENU_PATH_H			9
 #define MENU_PATH_CHAR_W	6
@@ -37,14 +36,16 @@ namespace Menu {
 #define MENU_MAXPATH		5
 #define MENU_PERIOD			20
 
+Disp* pdisp;
+
 /*!****************************************************************************
  * @brief	Print message
  */
 void printMessageWindow(const char *string){
-	disp_fillScreen(black);
-	disp_setColor(black, white);
-	disp_putStr(0, MENU_ITEM_H, &MENU_ITEM_FONT, 0, string);
-	disp_flushfill(&ui.color.background);
+	pdisp->fillScreen(black);
+	pdisp->setColor(black, white);
+	pdisp->putStr(0, MENU_ITEM_H, &MENU_ITEM_FONT, string);
+	pdisp->flushfill(&ui.color.background);
 	while(keyProc() == 0){
 		vTaskDelay(pdMS_TO_TICKS(MENU_PERIOD));
 	}
@@ -157,20 +158,20 @@ void outItemString(const MenuItem *m, uint8_t itemNumber, bool select){
 				m->change ? menuItemUnselect: menuItemUnselectUnchangeable;
 
 	// Delimiter
-	grf_line(0, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1,
+	pdisp->line(0, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1,
 				MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
 
 	// Label and spaces
 	strncpy(string, m->label, sizeof(string) - 1);
 	memset(string + strlen(m->label), ' ', sizeof(string) - 1 - strlen(m->label));
 	string[sizeof(string) -1 - strlen(value)] = 0;
-	disp_setContentColor(colorLabel[sel]);
-	disp_putStr(0, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, string);
+	pdisp->setContentColor(colorLabel[sel]);
+	pdisp->putStr(0, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, string);
 
 	// Value
 	if(!m->editor){
-		disp_setContentColor(colorValue[sel]);
-		disp_putStr(MENU_ITEM_CHAR_W * strlen(string), MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, value);
+		pdisp->setContentColor(colorValue[sel]);
+		pdisp->putStr(MENU_ITEM_CHAR_W * strlen(string), MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, value);
 	}
 }
 
@@ -180,24 +181,24 @@ void outItemString(const char *string, uint8_t itemNumber, uint8_t selectPositio
 	char s[MENU_SCREEN_W / MENU_ITEM_CHAR_W + 1];
 	uint8_t offset = 0;
 
-	grf_line(0, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1,
+	pdisp->line(0, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1,
 				MENU_SCREEN_W - 1, MENU_PATH_H + itemNumber * MENU_ITEM_H - 1, halfLightGray);
 
 	memset(s, '\0', sizeof(s));
 	strncpy(s, string, selectPosition);
-	disp_setContentColor(colorValue[menuItemUnselect]);
-	disp_putStr(0, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, s);
+	pdisp->setContentColor(colorValue[menuItemUnselect]);
+	pdisp->putStr(0, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, s);
 	offset = selectPosition;
 
 	memset(s, '\0', sizeof(s) - offset);
 	strncpy(s, &string[selectPosition], unselectPosition - selectPosition);
-	disp_setContentColor(colorValue[menuItemSelect]);
-	disp_putStr(offset * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, s);
+	pdisp->setContentColor(colorValue[menuItemSelect]);
+	pdisp->putStr(offset * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, s);
 	offset += unselectPosition - selectPosition;
 
 	strncpy(s, &string[unselectPosition], sizeof(s) - offset);
-	disp_setContentColor(colorValue[menuItemUnselect]);
-	disp_putStr(offset * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, 0, s);
+	pdisp->setContentColor(colorValue[menuItemUnselect]);
+	pdisp->putStr(offset * MENU_ITEM_CHAR_W, MENU_PATH_H + MENU_ITEM_H * itemNumber, &MENU_ITEM_FONT, s);
 }
 
 /*!****************************************************************************
@@ -208,20 +209,21 @@ void printHistory(const MenuItem* history[], uint8_t historyDepth){
 	for(size_t i = 0; i < historyDepth; i++){
 		offset += snprintf(&s[offset], sizeof(s) - offset, "/%s", history[i]->label);
 	}
-	disp_setContentColor(green);
-	disp_putStr(0, 0, &MENU_PATH_FONT, 0, s);
+	pdisp->setContentColor(green);
+	pdisp->putStr(0, 0, &MENU_PATH_FONT, s);
 }
 
 /*!****************************************************************************
  */
-bool run(const MenuItem *m){
+bool run(Disp& disp, const MenuItem *m){
+	pdisp = &disp;
 	const MenuItem* history[6] = { };
 	uint8_t historyIndex = 0;
 	const MenuItem *top = m;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	bool change = false;
-	disp_setColor(black, white);
-	disp_fillScreen(black);
+	pdisp->setColor(black, white);
+	pdisp->fillScreen(black);
 	ksSet(15, 5, kUp | kDown);
 	enco_settic(3);
 
@@ -309,7 +311,7 @@ bool run(const MenuItem *m){
 			outItemString(w, numItem++, w == m);
 			w = w->next;
 		}
-		disp_flushfill(&ui.color.background);
+		pdisp->flushfill(&ui.color.background);
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(MENU_PERIOD));
 	}
 }
@@ -386,7 +388,7 @@ ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex){
 		snprintf(str, sizeof(str), "time %02" PRIi32 ":%02" PRIi32 ":%02" PRIi32, val.hour, val.min, val.sec);
 		outItemString(str, 1, hilightsTime[var].min, m->change ? hilightsTime[var].max : hilightsTime[var].min);
 
-		disp_flushfill(&ui.color.background);
+		pdisp->flushfill(&ui.color.background);
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(MENU_PERIOD));
 	}
 
@@ -444,7 +446,7 @@ ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex){
 		}
 
 		outItemString(str, 0, select, unselect);
-		disp_flushfill(&ui.color.background);
+		pdisp->flushfill(&ui.color.background);
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(MENU_PERIOD));
 	}
 	static_cast<Prm::Val<uint32_t>*>(m->prm)->val = ip.ip;
@@ -476,7 +478,7 @@ ItemState ipMacEditor(const MenuItem* history[], uint8_t historyIndex){
 		char str[64];
 		snprintf(str, sizeof(str), "%02X:%02X:%02X:%02X:%02X:%02X", mac.v[0], mac.v[1], mac.v[2], mac.v[3], mac.v[4], mac.v[5]);
 		outItemString(str, 0, 0, 0);
-		disp_flushfill(&ui.color.background);
+		pdisp->flushfill(&ui.color.background);
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(MENU_PERIOD));
 	}
 	return ItemState{  true, "" };

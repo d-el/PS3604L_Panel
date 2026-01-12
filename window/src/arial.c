@@ -26,7 +26,7 @@
 /*!****************************************************************************
 * Include
 */
-#include "display.h"
+#include "font.h"
 
 static const uint8_t image_data_arial_0x20[15] = {
 	0xf0,

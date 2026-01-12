@@ -6,7 +6,7 @@
 /*!****************************************************************************
 * Include
 */
-#include "display.h"
+#include "font.h"
 
 static const uint8_t image_data_ico_0x00[40] = {
 	0xe0, 0x1c,

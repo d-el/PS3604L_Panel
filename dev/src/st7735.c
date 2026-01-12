@@ -1,9 +1,9 @@
 /*!****************************************************************************
  * @file		st7735.c
  * @author		d_el
- * @version		V1.0
- * @date		31.01.2018
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @version		V1.1
+ * @date		11.01.2026
+ * @copyright	The MIT License (MIT). Copyright (c) 2026 Storozhenko Roman
  * @brief		Driver display on controller ST7735R
  */
 
@@ -13,7 +13,12 @@
 #include <stddef.h>
 #include <gpio.h>
 #include <spi.h>
+#include <ledpwm.h>
+#include <htimer.h>
 #include "st7735.h"
+
+#define ST7735_W			160
+#define ST7735_H			128
 
 /*!****************************************************************************
  * Enumeration
@@ -79,10 +84,11 @@ enum lcdDescribed{
 /*!****************************************************************************
  * MEMORY
  */
+typedef void (*flushcb_type)(void *arg);
+typedef void (*setbufcb_type)(void *arg);
+
 uint16_t videoBff[ST7735_W * ST7735_H];
 static uint8_t xstart, ystart, width, height;
-static flushcb_type flushcb;
-static setbufcb_type setbufcb;
 
 typedef struct{
 	uint8_t w;
@@ -178,15 +184,8 @@ static void st7735_lcdDat(uint8_t data){
 /*!****************************************************************************
  * @brief
  */
-static void lcdDelay(uint64_t delay){
-	delay = delay * 10000;
-	for(uint64_t i = 0; i < delay; i++){
-		__NOP();
-		__NOP();
-		__NOP();
-		__NOP();
-		__NOP();
-	}
+static void lcdDelay(uint16_t delay){
+	htimer_delay(delay);
 }
 
 /*!****************************************************************************
@@ -291,7 +290,7 @@ void setRotation(display_type t, displayRotation_type r){
 /*!****************************************************************************
  * @brief Set invert display
  */
-void invertDisplay(uint8_t i){
+static void invertDisplay(uint8_t i){
 	if(i != 0){
 		st7735_lcdCmd(ST7735_INVON);
 	}else{
@@ -303,7 +302,7 @@ void invertDisplay(uint8_t i){
  * @brief Initialization for ST7735R screens (green or red tabs)
  */
 void st7735_init(display_type type, displayRotation_type r){
-	spi_init();
+	spi_init(spiDiv2);
 	commonInit();
 	commandList(rcmd);
 	setRotation(type, r);
@@ -313,37 +312,41 @@ void st7735_init(display_type type, displayRotation_type r){
 }
 
 /*!****************************************************************************
- * @brief Write block callback
- */
-static void st7735_writeBlockCb(void){
-	if(flushcb){
-		flushcb(NULL);
-	}
-}
-
-/*!****************************************************************************
  * @brief Flush video buffer
  */
-void st7735_flush(flushcb_type cb){
-	flushcb = cb;
-	spi_writeBlock(videoBff, sizeof(videoBff)/2, st7735_writeBlockCb);
-}
-
-/*!****************************************************************************
- * @brief Fill block callback
- */
-static void st7735_fillBlockCb(void){
-	if(setbufcb){
-		setbufcb(NULL);
-	}
+static void st7735_flush(flushcb_type cb, void* arg){
+	spi_writeBlock(videoBff, sizeof(videoBff)/2, cb, arg);
 }
 
 /*!****************************************************************************
  * @brief Fill video buffer
  */
-void st7735_fillBuffer(const lcd_color_type *color, setbufcb_type cb){
-	setbufcb = cb;
-	spi_fillBlock(videoBff, sizeof(videoBff)/2, color, st7735_fillBlockCb);
+static void st7735_fillBuffer(const lcd_color_type *color, setbufcb_type cb, void* arg){
+	spi_fillBlock(videoBff, sizeof(videoBff)/2, color, cb, arg);
 }
+
+static void st7735_setPixel(uint16_t x, uint16_t y, lcd_color_type color){
+	videoBff[y * ST7735_W + x] = color;
+}
+
+static lcd_color_type st7735_getPixel(uint16_t x, uint16_t y){
+	return videoBff[y * ST7735_W + x];
+}
+
+static void st7735_rightness(uint16_t val){
+	setLcdBrightness(val);
+}
+
+const disp_driver_t st7735_driver = {
+	.init = NULL,
+	.setPixel = st7735_setPixel,
+	.getPixel = st7735_getPixel,
+	.flush = st7735_flush,
+	.fillBuffer = st7735_fillBuffer,
+	.h = ST7735_H,
+	.w = ST7735_W,
+	.setBrightness = st7735_rightness,
+	.name = "ST7735"
+};
 
 /******************************** END OF FILE ********************************/

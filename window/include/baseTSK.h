@@ -17,7 +17,6 @@
  * Function declaration
  */
 void baseTSK(void *pPrm);
-void printFooter(void);
 
 #endif //BASE_H
 /******************************** END OF FILE ********************************/

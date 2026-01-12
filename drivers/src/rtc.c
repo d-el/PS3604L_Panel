@@ -132,7 +132,7 @@ bool rtc_init(void){
 			;		  //Wait for calendar registers update is allowed
 
 		RTC->TR		= 0x000000;								//Setting time to 00.00.00
-		RTC->DR		= 0x250101;								//Set date
+		RTC->DR		= 0x260101;								//Set date
 		RTC->CR		&= ~RTC_CR_FMT;							//Set FMT 24H format
 
 		RTC->ISR	&= ~RTC_ISR_INIT;						//Exit initialization mode

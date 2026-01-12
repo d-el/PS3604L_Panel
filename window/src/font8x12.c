@@ -10,7 +10,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "display.h"
+#include "font.h"
 
 static const uint8_t image_data_font8x12_0x20 [12] = {
 	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,

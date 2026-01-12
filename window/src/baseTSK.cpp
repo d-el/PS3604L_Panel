@@ -23,7 +23,6 @@
 #include "beep.h"
 #include "key.h"
 #include "display.h"
-#include "graphics.h"
 #include "systemTSK.h"
 #include "regulatorConnTSK.h"
 #include "sysTimeMeas.h"
@@ -45,7 +44,7 @@ enum {
  * Base task
  */
 void baseTSK(void *pPrm){
-	(void)pPrm;
+	Disp& disp = *(Disp*)pPrm;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	uint8_t varParam = VAR_VOLT;
 	char str[30];
@@ -67,8 +66,8 @@ void baseTSK(void *pPrm){
 			&Prm::baseu2, &Prm::basei2, &Prm::basemode2
 	};
 
-	disp_setColor(black, red);
-	disp_fillScreen(black);
+	disp.setColor(black, red);
+	disp.fillScreen(black);
 	ksSet(30, 3, kUp | kDown);
 	enco_settic(3);
 	bool func = false;
@@ -122,7 +121,7 @@ void baseTSK(void *pPrm){
 							reg_enableSet(false);
 						}
 						if(result != 0){
-							disp_putStr(0, 0, &arial, 0, "Error Connect");
+							disp.putStr(0, 0, &arial, "Error Connect");
 							vTaskDelay(1000);
 						}
 					}else if(keyState(kUp)){
@@ -203,47 +202,47 @@ void baseTSK(void *pPrm){
 		// Print voltage
 		printValue(str, sizeof(str), regmeas.voltage);
 		if(!reg_getremote() && varParam == VAR_VOLT){
-			disp_setColor(black, ui.color.cursor);
+			disp.setColor(black, ui.color.cursor);
 		}else{
-			disp_setColor(black, ui.color.voltage);
+			disp.setColor(black, ui.color.voltage);
 		}
-		disp_putStr(10, 0, &dSegBold, 6, str);
-		disp_putChar(146, 14, &arial, 'V');
+		disp.putStr(10, 0, &dSegBold, str, 6);
+		disp.putChar(146, 14, &arial, 'V');
 		// Print voltage setting
 		int32_t setv = reg_getremote() ? (target.voltage_set + 500) / 1000 : params[Prm::basepreset.val].voltage->val;
 		snprintf(str, sizeof(str), "%2" PRIi32 ".%03" PRIi32 " V", setv / 1000, setv % 1000);
-		disp_putStr(12, 33, &arial, 0, str);
+		disp.putStr(12, 33, &arial, str);
 
 		//Print current
 		int32_t measI = regmeas.current;
 		if(!reg_getremote() && varParam == VAR_CURR){
-			disp_setColor(black, ui.color.cursor);
+			disp.setColor(black, ui.color.cursor);
 		}else{
-			disp_setColor(black, ui.color.current);
+			disp.setColor(black, ui.color.current);
 		}
 		bool minus = false;
 		if(measI < 0) measI = -measI, minus = true;
 		if(measI < 9999 && crange == reg_crange_auto){
 			snprintf(str, sizeof(str), "%s%" PRIi32 ".%03" PRIi32, minus ? "-" : "0", measI / 1000, measI % 1000);
-			disp_putChar(147, 54, &font8x12, 'm');
+			disp.putChar(147, 54, &font8x12, 'm');
 		}else if(measI < 59000  && crange == reg_crange_auto){
 			snprintf(str, sizeof(str), "%02" PRIi32 ".%03" PRIi32, measI / 1000, measI % 1000);
-			disp_putChar(147, 54, &font8x12, 'm');
+			disp.putChar(147, 54, &font8x12, 'm');
 		}else{
 			measI = (measI + 50) / 100;
 			snprintf(str, sizeof(str), "%01" PRIi32 ".%04" PRIi32, measI / 10000, measI % 10000);
 		}
-		disp_putChar(146, 69, &arial, 'A');
-		disp_putStr(10, 53, &dSegBold, 6, str);
+		disp.putChar(146, 69, &arial, 'A');
+		disp.putStr(10, 53, &dSegBold, str, 6);
 		// Print limiting value
 		int32_t limi = reg_getremote() ? (target.current_set + 500) / 1000 : params[Prm::basepreset.val].current->val;
 		snprintf(str, sizeof(str), "%1" PRIi32 ".%03" PRIi32 " A", limi / 1000, limi % 1000);
-		disp_putStr(12, 87, &arial, 0, str);
+		disp.putStr(12, 87, &arial, str);
 
-		disp_setColor(black, red);
+		disp.setColor(black, red);
 		if(!regenable){
 			snprintf(str, sizeof(str), "%s", "DIS");
-			disp_putStr(130, 89, &font8x12, 0, str);
+			disp.putStr(130, 89, &font8x12, str);
 		}
 		else{
 			if(regmeas.status.m_limitation){
@@ -252,7 +251,7 @@ void baseTSK(void *pPrm){
 			else{
 				snprintf(str, sizeof(str), "%s", "CV");
 			}
-			disp_putStr(106, 89, &font8x12, 0, str);
+			disp.putStr(106, 89, &font8x12, str, 0);
 		}
 
 		if((!reg_getremote() && crange == reg_crange_auto)){
@@ -261,33 +260,33 @@ void baseTSK(void *pPrm){
 			}else{
 				snprintf(str, sizeof(str), "%s", "CRL");
 			}
-			disp_putStr(75, 89, &font8x12, 0, str);
+			disp.putStr(75, 89, &font8x12, str);
 		}
 
 		// Print current settings
 		switch(Prm::basepreset.val){
 			case 0:
-				grf_fillRect(0, 104, 53, 3, white);
-				grf_fillRect(105, 104, 55, 3, black);
+				disp.fillRect(0, 104, 53, 3, white);
+				disp.fillRect(105, 104, 55, 3, black);
 				break;
 			case 1:
-				grf_fillRect(53, 104, 53, 3, white);
-				grf_fillRect(0, 104, 53, 3, black);
+				disp.fillRect(53, 104, 53, 3, white);
+				disp.fillRect(0, 104, 53, 3, black);
 				break;
 			case 2:
-				grf_fillRect(105, 104, 55, 3, white);
-				grf_fillRect(53, 104, 53, 3, black);
+				disp.fillRect(105, 104, 55, 3, white);
+				disp.fillRect(53, 104, 53, 3, black);
 				break;
 		}
 
 		if(func){
-			grf_fillRoundRect(0, 8, 6, 12, 2, red);
+			disp.fillRoundRect(0, 8, 6, 12, 2, red);
 		}
 
 		// Print status bar
-		printFooter();
+		printFooter(disp);
 
-		disp_flushfill(&ui.color.background);
+		disp.flushfill(&ui.color.background);
 
 		// Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(BASE_TSK_PERIOD));

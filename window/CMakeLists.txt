@@ -2,6 +2,7 @@ add_library(window STATIC
 	src/arial.c
 	src/baseTSK.cpp
 	src/chargeTSK.cpp
+	src/display.cpp
 	src/dsegBold.c
 	src/dSegBold8x14.c
 	src/font6x8.c
@@ -12,7 +13,7 @@ add_library(window STATIC
 	src/menuSystem.cpp
 	src/settingTSK.cpp
 	src/startupTSK.cpp
-	src/ui.c
+	src/ui.cpp
 	)
 
 target_include_directories(window PUBLIC

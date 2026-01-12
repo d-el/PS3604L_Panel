@@ -21,7 +21,6 @@
 #include <display.h>
 #include <regulatorConnTSK.h>
 #include <ui.h>
-#include <graphics.h>
 #include <prmSystem.h>
 #include <systemTSK.h>
 #include "chargeTSK.h"
@@ -46,7 +45,7 @@ enum {
  * Charger task
  */
 void chargeTSK(void *pPrm){
-	(void)pPrm;
+	Disp& disp = *(Disp*)pPrm;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	uint8_t varParam = 0;
 	char str[32];
@@ -71,7 +70,7 @@ void chargeTSK(void *pPrm){
 			&Prm::chargermode
 	};
 
-	disp_fillScreen(black);
+	disp.fillScreen(black);
 	ksSet(30, 5, kUp | kDown);
 	enco_settic(5);
 
@@ -146,11 +145,11 @@ void chargeTSK(void *pPrm){
 			snprintf(str, sizeof(str), "U:        %02" PRIu16 ".%03" PRIu16, params.voltage->val / 1000, params.voltage->val % 1000);
 		}
 		if(varParam == C_VOLT && !stateenable){
-			disp_setColor(black, ui.color.cursor);
+			disp.setColor(black, ui.color.cursor);
 		}else{
-			disp_setColor(black, ui.color.voltage);
+			disp.setColor(black, ui.color.voltage);
 		}
-		disp_putStr(10, 00, &arial, 0, str);
+		disp.putStr(10, 00, &arial, str);
 
 		//Print current
 		if(stateenable){
@@ -161,11 +160,11 @@ void chargeTSK(void *pPrm){
 			snprintf(str, sizeof(str), "I:          %0" PRIu16 ".%03" PRIu16 " A", params.current->val / 1000, params.current->val % 1000);
 		}
 		if(varParam == C_CURR && !stateenable){
-			disp_setColor(black, ui.color.cursor);
+			disp.setColor(black, ui.color.cursor);
 		}else{
-			disp_setColor(black, ui.color.current);
+			disp.setColor(black, ui.color.current);
 		}
-		disp_putStr(10, 20, &arial, 0, str);
+		disp.putStr(10, 20, &arial, str);
 
 		//Time
 		uint32_t reg_time_s = (regmeas.time + 500) / 1000;
@@ -184,11 +183,11 @@ void chargeTSK(void *pPrm){
 			snprintf(str, sizeof(str), "Time:  %02" PRIu32 "h%02" PRIu32 "m%02" PRIu32 "s", view_time_s / 3600, view_time_s / 60 % 60, view_time_s % 60);
 		}
 		if(varParam == C_TIME && !stateenable){
-			disp_setColor(black, ui.color.cursor);
+			disp.setColor(black, ui.color.cursor);
 		}else{
-			disp_setColor(black, ui.color.current);
+			disp.setColor(black, ui.color.current);
 		}
-		disp_putStr(10, 40, &arial, 0, str);
+		disp.putStr(10, 40, &arial, str);
 
 		// Print Mode
 		if(params.mode->val == ch_modeTime){
@@ -197,16 +196,16 @@ void chargeTSK(void *pPrm){
 			snprintf(str, sizeof(str), "Mode: VOLTAGE");
 		}
 		if(varParam == C_MODE && !stateenable){
-			disp_setColor(black, ui.color.cursor);
+			disp.setColor(black, ui.color.cursor);
 		}else{
-			disp_setColor(black, ui.color.mode);
+			disp.setColor(black, ui.color.mode);
 		}
-		disp_putStr(10, 60, &arial, 0, str);
+		disp.putStr(10, 60, &arial, str);
 
 		//Print Capacity
 		snprintf(str, sizeof(str), "C:         %01" PRIu32 ".%03" PRIu32 " Ah", regmeas.capacity / 1000, regmeas.capacity % 1000);
-		disp_setColor(black, ui.color.capacity);
-		disp_putStr(10, 80, &arial, 0, str);
+		disp.setColor(black, ui.color.capacity);
+		disp.putStr(10, 80, &arial, str);
 
 		if(finishBeep && (regmeas.disablecause == v_timeShutdown || regmeas.disablecause == v_lowCurrentShutdown)){
 			BeepTime(ui.beep.chargeFinish.time, ui.beep.chargeFinish.freq);
@@ -217,9 +216,9 @@ void chargeTSK(void *pPrm){
 		}
 
 		//Print status bar
-		printFooter();
+		printFooter(disp);
 
-		disp_flushfill(&ui.color.background);
+		disp.flushfill(&ui.color.background);
 		//Cyclic delay
 		vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(CH_TSK_PERIOD));
 	}

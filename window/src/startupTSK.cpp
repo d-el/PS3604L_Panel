@@ -29,7 +29,7 @@
  * @brief	GUI invitation program task
  */
 void startupTSK(void *pPrm){
-	(void)pPrm;
+	Disp& disp = *(Disp*)pPrm;
 
 	while(1){
 		Prm::startcnt.val++;
@@ -40,9 +40,9 @@ void startupTSK(void *pPrm){
 		vTaskDelay(pdMS_TO_TICKS(60));
 		LED_OFF();
 
-		disp_setColor(black, white);
-		disp_fillScreen(black);
-		disp_PrintImageMonochrome((DISP_W - ImageLogo.w) / 2, 0, &ImageLogo);  //Logo
+		disp.setColor(black, white);
+		disp.fillScreen(black);
+		disp.printImageMonochrome((disp.getWith() - ImageLogo.w) / 2, 0, &ImageLogo);  //Logo
 
 		char str[64];
 		regVersion_t regVersion;
@@ -50,20 +50,20 @@ void startupTSK(void *pPrm){
 		sprintf(str, "P%s : R%" PRIu16 ".%" PRIu16 ".%" PRIu16,
 				getVersion(),
 				regVersion.major, regVersion.minor, regVersion.patch);
-		disp_putStr(0, 70, &arial, 0, str);
+		disp.putStr(0, 70, &arial, str);
 
 		if(fp.state.sysSettingLoadDefault == 0){
 			sprintf(str, "%" PRIu32, Prm::startcnt.val);
 		}else{
 			sprintf(str, "-");
 		}
-		disp_putStr(0, 90, &arial, 0, str);
-		disp_putStr(0, 110, &arial, 0, "2012 - 2025");
-		disp_flush();
+		disp.putStr(0, 90, &arial, str);
+		disp.putStr(0, 110, &arial, "2012 - 2026");
+		disp.flush();
 
 
 		for(uint16_t i = 0; i < Prm::brightness.val * 10; i++){
-			setLcdBrightness(i);
+			disp.setBrightness(i);
 			vTaskDelay(pdMS_TO_TICKS(2));
 		}
 		vTaskDelay(pdMS_TO_TICKS(150));
@@ -78,18 +78,18 @@ void startupTSK(void *pPrm){
 
 		//Show default settings load message
 		if((fp.state.sysSettingLoadDefault != 0)||((fp.state.userSettingLoadDefault != 0))){
-			disp_fillScreen(black);
+			disp.fillScreen(black);
 			if(fp.state.sysSettingLoadDefault != 0){
-				disp_putStrCenter(00, &arial, 0, "Load default system");
-				disp_putStrCenter(16, &arial, 0, "setting");
+				disp.putStrCenter(00, &arial, "Load default system");
+				disp.putStrCenter(16, &arial, "setting");
 			}
 			if(fp.state.userSettingLoadDefault != 0){
-				disp_putStrCenter(40, &arial, 0, "Load default user");
-				disp_putStrCenter(56, &arial, 0, "setting");
+				disp.putStrCenter(40, &arial, "Load default user");
+				disp.putStrCenter(56, &arial, "setting");
 			}
 			saveparametersSystem();
-			disp_putStr(00, 112, &arial, 0, "Press any key");
-			disp_flush();
+			disp.putStr(00, 112, &arial, "Press any key");
+			disp.flush();
 			while(keyProc() == 0){
 				vTaskDelay(pdMS_TO_TICKS(10));
 			}

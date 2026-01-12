@@ -492,8 +492,8 @@ m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, nu
  * @brief    Setting system task
  */
 void settingTSK(void *pPrm){
-	(void)pPrm;
-	run(&m1);
+	Disp& disp = *(Disp*)pPrm;
+	run(disp, &m1);
 	saveparametersSystem();
 	selWindow(baseWindow);
 	vTaskSuspend(NULL);

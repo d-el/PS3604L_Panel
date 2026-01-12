@@ -12,8 +12,9 @@
 /*!****************************************************************************
  * Include
  */
-#include "stdint.h"
+#include <stdint.h>
 #include "prmSystem.h"
+#include "display.h"
 
 namespace Menu {
 
@@ -65,7 +66,7 @@ public:
 	const Editor editor;
 };
 
-bool run(const MenuItem *m);
+bool run(Disp& disp, const MenuItem *m);
 ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex);
 ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex);
 ItemState ipMacEditor(const MenuItem* history[], uint8_t historyIndex);

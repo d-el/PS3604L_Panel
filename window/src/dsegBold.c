@@ -26,7 +26,7 @@
 /*!****************************************************************************
 * Include
 */
-#include "display.h"
+#include "font.h"
 
 static const uint8_t image_data_dSegBold_0x20[84] = {
 	0xff, 0xff, 0xff,
