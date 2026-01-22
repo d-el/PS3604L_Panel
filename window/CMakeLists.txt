@@ -21,4 +21,4 @@ target_include_directories(window PUBLIC
 	PRIVATE ../app/inc
 	)
 
-target_link_libraries(window freertos drivers dev utils)
+target_link_libraries(window freertos hal dev utils lwip regulator task)

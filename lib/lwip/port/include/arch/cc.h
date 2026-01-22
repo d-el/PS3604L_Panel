@@ -69,7 +69,7 @@ typedef int sys_prot_t;
 #endif
 
 /* Platform specific diagnostic output */
-#include "plog.h"
+#include <plog.h>
 
 #define LWIP_PRINT_ASSERT(format, ...) plog_write(P_LOG_ERROR, "LWIP", LOG_COLOR_E "E (%" PRIu32 ") LWIP: " format LOG_RESET_COLOR, plog_timestamp(), ##__VA_ARGS__)
 #define LWIP_PLATFORM_ASSERT(x) { LWIP_PRINT_ASSERT("%s %u: %s\n", __FILE__, __LINE__, x); }
@@ -78,7 +78,7 @@ typedef int sys_prot_t;
 #define LWIP_PLATFORM_DIAG(x) do { LWIP_PRINT_DIAG x ; } while(0)
 
 /* Platform random number generator */
-#include "rng.h"
+#include <hal/rng.h>
 #define LWIP_RAND rng_get
 
 #endif /* __CC_H__ */

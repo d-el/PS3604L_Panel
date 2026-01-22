@@ -7,4 +7,4 @@ target_include_directories(regulator PUBLIC
 	include
 	)
 
-target_link_libraries(regulator freertos drivers utils lwip systems prmsystem libmodbus)
+target_link_libraries(regulator freertos hal utils lwip systems prmsystem libmodbus)

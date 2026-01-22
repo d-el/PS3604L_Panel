@@ -15,10 +15,10 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <display.h>
-#include <ledpwm.h>
-#include <key.h>
-#include <board.h>
-#include <beep.h>
+#include <hal/ledpwm.h>
+#include <hal/key.h>
+#include <hal/board.h>
+#include <hal/beep.h>
 #include <version.h>
 #include <systemTSK.h>
 #include <prmSystem.h>
@@ -35,11 +35,8 @@ void startupTSK(void *pPrm){
 		Prm::startcnt.val++;
 
 		//Start Beep
-		BeepTime(ui.beep.welcome.time, ui.beep.welcome.freq);
+		BeepTime(Prm::bpWelcomeOnOff ? ui.beep.welcome.time : 0, ui.beep.welcome.freq);
 		LED_ON();
-		vTaskDelay(pdMS_TO_TICKS(60));
-		LED_OFF();
-
 		disp.setColor(black, white);
 		disp.fillScreen(black);
 		disp.printImageMonochrome((disp.getWith() - ImageLogo.w) / 2, 0, &ImageLogo);  //Logo

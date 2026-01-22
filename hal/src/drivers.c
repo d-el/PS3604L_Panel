@@ -14,7 +14,6 @@
 #include "htimer.h"
 #include "stm32f4x7_eth_bsp.h"
 #include "beep.h"
-#include "st7735.h"
 #include "uart.h"
 #include "enco.h"
 #include "clock.h"
@@ -23,20 +22,16 @@
 #include "sysTimeMeas.h"
 #include "gpio.h"
 #include "rng.h"
-#include "systemTSK.h"
 #include "uniqueDeviceId.h"
-#include "24AAxx.h"
+
+clockState_type gClockState;
+bool gRtcOscillatorInit;
 
 /*!****************************************************************************
  * MCU peripheral initialization
  */
 void hardInit(void){
-	clockState_type clockState = clock_init();
-	if(clockState == clockOk){
-		fp.state.mainOscillatorError = 0;
-	}else{
-		fp.state.mainOscillatorError = 1;
-	}
+	gClockState = clock_init();
 	htimer_init();
 	gpio_init();
 	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
@@ -44,14 +39,8 @@ void hardInit(void){
 	enco_init();
 	beep_init();
 	ledPwm_init();
-	if(rtc_init()){
-		fp.state.rtcOscillatorError = 0;
-	}else{
-		fp.state.rtcOscillatorError = 1;
-	}
-	i2c_init(i2c1);
+	gRtcOscillatorInit = rtc_init();
 	rng_init();
-	eep_init();
 	pvd_init();
 }
 

@@ -17,9 +17,7 @@
 /*!****************************************************************************
  * Define
  */
-#define SYSTEM_TSK_PERIOD   (20)		///< [ms]
-#define LINK_DETECT_PERIOD  (500)		///< [ms]
-#define I_SHORT_CIRCUIT     (4000000)	///< [X_XXXXXX A]
+#define SYSTEM_TSK_PERIOD	(20)		///< [ms]
 
 /*!****************************************************************************
  * Enumeration
@@ -49,7 +47,7 @@ typedef struct {
 
 typedef struct {
 	frontPanelState_type	state;
-	selWindow_type 			currentSelWindow;
+	selWindow_type			currentSelWindow;
 } frontPanel_type;
 
 /*!****************************************************************************

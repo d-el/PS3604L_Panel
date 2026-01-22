@@ -16,9 +16,9 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <display.h>
-#include <key.h>
-#include <enco.h>
-#include <beep.h>
+#include <hal/key.h>
+#include <hal/enco.h>
+#include <hal/beep.h>
 #include "menuSystem.h"
 #include "ui.h"
 #include <timegm.h>
@@ -49,7 +49,7 @@ void printMessageWindow(const char *string){
 	while(keyProc() == 0){
 		vTaskDelay(pdMS_TO_TICKS(MENU_PERIOD));
 	}
-	BeepTime(ui.beep.key.time, ui.beep.key.freq);
+	BeepTime(Prm::bpKeyOnOff ? ui.beep.key.time : 0, ui.beep.key.freq);
 }
 
 void callUnselect(const MenuItem *m){
@@ -230,7 +230,7 @@ bool run(Disp& disp, const MenuItem *m){
 	while(1){
 		change = false;
 		if(keyProc() != 0){
-			BeepTime(ui.beep.key.time, ui.beep.key.freq);
+			BeepTime(Prm::bpKeyOnOff ? ui.beep.key.time : 0, ui.beep.key.freq);
 			if(keyState(kUp)){
 				if(m->prm) m->prm->bigstep(1);
 				change = true;
@@ -341,7 +341,7 @@ ItemState clockEditor(const MenuItem* history[], uint8_t historyIndex){
 
 	while(1){
 		if(keyProc() != 0){
-			BeepTime(ui.beep.key.time, ui.beep.key.freq);
+			BeepTime(Prm::bpKeyOnOff ? ui.beep.key.time : 0, ui.beep.key.freq);
 
 			if(keyState(kUp)){
 				if(var < sec) var++;
@@ -415,7 +415,7 @@ ItemState ipAddressEditor(const MenuItem* history[], uint8_t historyIndex){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	while(1){
 		if(keyProc() != 0){
-			BeepTime(ui.beep.key.time, ui.beep.key.freq);
+			BeepTime(Prm::bpKeyOnOff ? ui.beep.key.time : 0, ui.beep.key.freq);
 
 			if(keyState(kUp)){
 				if(var < max) var++;
@@ -460,7 +460,7 @@ ItemState ipMacEditor(const MenuItem* history[], uint8_t historyIndex){
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 	while(1){
 		if(keyProc() != 0){
-			BeepTime(ui.beep.key.time, ui.beep.key.freq);
+			BeepTime(Prm::bpKeyOnOff ? ui.beep.key.time : 0, ui.beep.key.freq);
 			//Parent
 			if(keyState(kMode)){
 				callExit(m);

@@ -14,7 +14,7 @@
 #include <task.h>
 #include <portable.h>
 #include "plog.h"
-#include "sysTimeMeas.h"
+#include <hal/sysTimeMeas.h>
 #include <lwip/stats.h>
 
 /*!****************************************************************************

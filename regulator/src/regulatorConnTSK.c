@@ -18,7 +18,7 @@
 #include <queue.h>
 #include <semphr.h>
 #include <crc.h>
-#include <uart.h>
+#include <hal/uart.h>
 #include <modbus.h>
 #include <modbus-private.h> // For TCP bridge
 #include <plog.h>

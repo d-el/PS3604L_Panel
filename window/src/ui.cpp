@@ -31,14 +31,10 @@ const ui_type ui = {
 		.welcome		= { 4100, 250 },
 		.shutdown		= { 4100, 50 },
 		.key			= { 4100, 30 },
-		.vallim			= { 4100, 500 },
 		.cvToCc			= { 3000, 50 },
 		.ccToCv			= { 4500, 50 },
-		.ovfCurrent		= { 4500, 500 },
 		.chargeFinish	= { 4100, 2000 },
 		.error			= { 3000, 100 },
-		.encoLim		= { 4100, 200 },
-		.encoTransition = { 4100, 30 },
 	}
 };
 

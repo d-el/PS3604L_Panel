@@ -78,8 +78,8 @@ typedef enum{
 }i2cState_type;
 
 typedef enum{
-    i2cNeedStop,
-    i2cWithoutStop
+	i2cNeedStop,
+	i2cWithoutStop
 }i2c_stopMode_type;
 
 typedef struct i2cStruct{
@@ -90,8 +90,10 @@ typedef struct i2cStruct{
 	uint8_t				*pTxBff;
 	uint8_t				*pRxBff;
 	void (*tcHook)(struct i2cStruct *i2cx);
+	void*				tcHookArg;
 	uint8_t				dmaChannelRx	:4;
 	uint8_t				dmaChannelTx	:4;
+	uint8_t				lenOne			:1;
 	uint8_t				slaveAdr;
 	i2c_stopMode_type	stopMode;
 	volatile i2cState_type	state;
@@ -106,7 +108,9 @@ typedef void (*i2cCallback_type)(i2c_type *i2cx);
 * i2c1 memory
 */
 #if (I2C1_USE == 1)
-extern i2c_type		   *i2c1;
+extern i2c_type		*i2c1;
+extern uint8_t		i2c1TxBff[I2C1_TxBffSz];
+extern uint8_t		i2c1RxBff[I2C1_RxBffSz];
 #endif //I2C1_USE
 
 /******************************************************************************
@@ -118,7 +122,7 @@ extern i2c_type		   *i2c1;
 */
 void i2c_init(i2c_type *i2cx);
 void i2c_reInit(i2c_type *i2cx);
-void i2c_setCallback(i2c_type *i2cx, i2cCallback_type tcHook);
+void i2c_setCallback(i2c_type *i2cx, i2cCallback_type tcHook, void* arg);
 void i2c_write(i2c_type *i2cx, const void *src, uint16_t len, uint8_t slaveAdr, i2c_stopMode_type stopMode);
 void i2c_read(i2c_type *i2cx, void *dst, uint16_t len, uint8_t slaveAdr);
 

@@ -16,6 +16,10 @@ extern "C" {
  * Include
  */
 #include "stdint.h"
+#include "clock.h"
+
+extern clockState_type gClockState;
+extern bool gRtcOscillatorInit;
 
 /*!****************************************************************************
  * Function declaration

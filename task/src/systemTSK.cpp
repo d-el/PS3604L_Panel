@@ -14,33 +14,34 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <time.h>
-
 #include <plog.h>
 #include <prmSystem.h>
 #include <sntp.h>
-#include <stm32f4x7_eth_bsp.h>
-#include <stm32f4x7_eth.h>
+#include <hal/stm32f4x7_eth_bsp.h>
+#include <hal/stm32f4x7_eth.h>
+#include <hal/beep.h>
+#include <hal/pvd.h>
+#include <hal/board.h>
+#include <hal/drivers.h>
+#include <driver/i2c.h>
 #include <ethernetif.h>
 #include <lwip/tcpip.h>
 #include <lwip/dns.h>
 #include <lwip/dhcp.h>
-#include <st7735.h>
+#include <dev/st7735.h>
+#include <dev/24AAxx.h>
 #include <display.h>
-#include <beep.h>
-#include <pvd.h>
-#include <board.h>
 #include <ui.h>
+#include <write.h>
 #include <startupTSK.h>
 #include <settingTSK.h>
 #include <chargeTSK.h>
 #include <baseTSK.h>
-#include <monitorTSK.h>
-#include <24AAxx.h>
-#include "regulatorConnTSK.h"
-#include "systemTSK.h"
-#include <write.h>
 #include <httpServerTSK.h>
 #include <modbusServerTSK.h>
+#include "regulatorConnTSK.h"
+#include "systemTSK.h"
+#include "monitorTSK.h"
 
 /*!****************************************************************************
  * Memory
@@ -49,6 +50,7 @@ frontPanel_type fp;						///< Data structure front panel
 static TaskHandle_t windowTskHandle;	///< Program task handler
 static struct netif xnetif; 			///< Network interface structure
 static SemaphoreHandle_t lowPowerSem;
+static Eep24AA eeprom;
 
 /*!****************************************************************************
  * Local prototypes for the functions
@@ -79,6 +81,11 @@ void systemTSK(void *pPrm){
 
 	P_LOGI(logTag, "\n\nStarted systemTSK");
 
+	fp.state.mainOscillatorError = gClockState == clockOk;
+	fp.state.rtcOscillatorError = gRtcOscillatorInit;
+
+	i2c(1).init();
+	eeprom.setI2c(&i2c(1));
 	loadParameters();												// Load panel settings and user parameters
 	timezoneUpdate(Prm::timezone.val);
 	pvd_setSupplyFaultCallBack(pvdCallback);						// Setup callback for Supply Fault
@@ -201,7 +208,7 @@ void systemTSK(void *pPrm){
 		if((regulatorConnected && state.status.m_lowInputVoltage) || res == pdTRUE){
 			P_LOGD(logTag, "System saveparameters");
 			saveparametersUser();
-			BeepTime(ui.beep.shutdown.time, ui.beep.shutdown.freq);
+			BeepTime(Prm::bpWelcomeOnOff ? ui.beep.shutdown.time : 0, ui.beep.shutdown.freq);
 			LED_ON();
 			if(windowTskHandle != NULL){
 				vTaskDelete(windowTskHandle);	//Delete window
@@ -220,7 +227,7 @@ static void loadParameters(void){
 	if(size){
 		uint8_t buffer[size];
 		const uint16_t systemSettingsAddress = 0;
-		if(eep_read(buffer, systemSettingsAddress, size) == eepOk){
+		if(eeprom.read(buffer, systemSettingsAddress, size)){
 			if(!Prm::deserialize(Prm::Save::savesys, buffer, size)){
 				P_LOGW(logTag, "System settings load error");
 				fp.state.sysSettingLoadDefault = 1;
@@ -232,7 +239,7 @@ static void loadParameters(void){
 	if(size){
 		uint8_t buffer[size];
 		const uint16_t userSettingsAddress = 512;
-		if(eep_read(buffer, userSettingsAddress, size) == eepOk){
+		if(eeprom.read(buffer, userSettingsAddress, size)){
 			if(!Prm::deserialize(Prm::Save::saveuse, buffer, size)){
 				P_LOGW(logTag, "User settings load error");
 				fp.state.userSettingLoadDefault = 1;
@@ -250,7 +257,7 @@ void saveparametersSystem(void){
 	if(size){
 		uint8_t buffer[size];
 		Prm::serialize(Prm::Save::savesys, buffer);
-		eep_write(systemSettingsAddress, buffer, size);
+		eeprom.write(systemSettingsAddress, buffer, size);
 	}
 }
 
@@ -263,7 +270,7 @@ void saveparametersUser(void){
 	if(size){
 		uint8_t buffer[size];
 		Prm::serialize(Prm::Save::saveuse, buffer);
-		eep_write(userSettingsAddress, buffer, size);
+		eeprom.write(userSettingsAddress, buffer, size);
 	}
 }
 

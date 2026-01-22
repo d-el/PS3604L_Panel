@@ -17,18 +17,17 @@
 #include <task.h>
 #include <queue.h>
 #include <semphr.h>
-#include "plog.h"
+#include <plog.h>
+#include <hal/beep.h>
+#include <hal/key.h>
+#include <hal/enco.h>
+#include <hal/sysTimeMeas.h>
+#include <prmSystem.h>
 #include "ui.h"
-#include "rtc.h"
-#include "beep.h"
-#include "key.h"
 #include "display.h"
 #include "systemTSK.h"
 #include "regulatorConnTSK.h"
-#include "sysTimeMeas.h"
 #include "baseTSK.h"
-#include <prmSystem.h>
-#include <enco.h>
 #include "footer.h"
 
 
@@ -69,7 +68,7 @@ void baseTSK(void *pPrm){
 	disp.setColor(black, red);
 	disp.fillScreen(black);
 	ksSet(30, 3, kUp | kDown);
-	enco_settic(3);
+	enco_settic(1);
 	bool func = false;
 
 	while(1){
@@ -96,9 +95,9 @@ void baseTSK(void *pPrm){
 		 */
 		if(keyProc() != 0){
 			if(reg_getremote()){
-				BeepTime(ui.beep.error.time, ui.beep.error.freq);
+				BeepTime(Prm::bpErrOnOff ? ui.beep.error.time : 0, ui.beep.error.freq);
 			}else{
-				BeepTime(ui.beep.key.time, ui.beep.key.freq);
+				BeepTime(Prm::bpKeyOnOff ? ui.beep.key.time : 0, ui.beep.key.freq);
 				if(func == false){
 					if(keyState(kNext)){
 						varParam++;
@@ -109,7 +108,7 @@ void baseTSK(void *pPrm){
 						if(!regenable){
 							selWindow(chargerWindow);
 						}else{
-							BeepTime(ui.beep.error.time, ui.beep.error.freq);
+							BeepTime(Prm::bpErrOnOff ? ui.beep.error.time : 0, ui.beep.error.freq);
 						}
 					}else if(keyState(kFunc)){
 						func = true;
@@ -138,7 +137,7 @@ void baseTSK(void *pPrm){
 						if(!regenable){
 							nextPreset();
 						}else{
-							BeepTime(ui.beep.error.time, ui.beep.error.freq);
+							BeepTime(Prm::bpErrOnOff ? ui.beep.error.time : 0, ui.beep.error.freq);
 						}
 					}
 					else if(keyState(kMode)){
@@ -162,7 +161,7 @@ void baseTSK(void *pPrm){
 		auto encoval = enco_update();
 		if(encoval != 0){
 			if(reg_getremote()){
-				BeepTime(ui.beep.error.time, ui.beep.error.freq);
+				BeepTime(Prm::bpErrOnOff ? ui.beep.error.time : 0, ui.beep.error.freq);
 			}else{
 				params[Prm::basepreset.val].p[varParam]->step(encoval);
 			}

@@ -18,12 +18,14 @@
 #include <task.h>
 #include <queue.h>
 #include <semphr.h>
-#include "plog.h"
+#include <plog.h>
 #include "ui.h"
-#include "rtc.h"
-#include "beep.h"
+#include "hal/rtc.h"
+#include "hal/beep.h"
 #include "regulatorConnTSK.h"
 #include "systemTSK.h"
+#include <prmSystem.h>
+#include <lwip/tcpip.h>
 
 /*!****************************************************************************
  * @brief
@@ -31,7 +33,6 @@
 void printFooter(Disp& disp){
 	static uint8_t modeIlimPrev = 0;
 	static bool enablePrev = 0;
-	static uint16_t disablecausePrev = v_none;
 	static char str[30];
 
 	//Print line
@@ -44,21 +45,16 @@ void printFooter(Disp& disp){
 
 	if(modeIlimPrev != regmeas.status.m_limitation){
 		if(regmeas.status.m_limitation != 0){
-			BeepTime(ui.beep.cvToCc.time, ui.beep.cvToCc.freq);
+			BeepTime(Prm::bpCcCvOnOff ? ui.beep.cvToCc.time : 0, ui.beep.cvToCc.freq);
 		}else{
-			BeepTime(ui.beep.ccToCv.time, ui.beep.ccToCv.freq);
+			BeepTime(Prm::bpCcCvOnOff ? ui.beep.ccToCv.time : 0, ui.beep.ccToCv.freq);
 		}
 		modeIlimPrev = regmeas.status.m_limitation;
 	}
 
-	if(disablecausePrev != regmeas.disablecause && regmeas.disablecause == v_overCurrent){
-		BeepTime(ui.beep.ovfCurrent.time, ui.beep.ovfCurrent.freq);
-	}
-	disablecausePrev = regmeas.disablecause;
-
 	if(regmeas.status.m_errorTemperatureSensor || regmeas.status.m_overheated ||
 			regmeas.status.m_errorExternalIAdc || regmeas.status.m_calibrationEmpty || !regstate){
-		BeepTime(ui.beep.error.time, ui.beep.error.freq);
+		BeepTime(Prm::bpErrOnOff ? ui.beep.error.time : 0, ui.beep.error.freq);
 		disp.setColor(black, white);
 
 		if(!regstate){
@@ -137,9 +133,7 @@ void printFooter(Disp& disp){
 			}else{
 				disp.setColor(black, red);
 			}
-
-			snprintf(str, sizeof(str), "LAN");
-			disp.putStr(60, 110, &font6x8, str);
+			disp.putStr(60, 110, &font6x8, "LAN");
 		}
 
 		if(reg_getremote()){

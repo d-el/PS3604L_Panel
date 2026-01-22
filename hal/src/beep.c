@@ -32,7 +32,7 @@ void TIM7_IRQHandler(void){
  *		  freq - frequency (1 - 32767) [Hz]
  */
 void BeepTime(uint16_t time, uint16_t freq){
-	if((TIME_B_TIM->ARR - TIME_B_TIM->CNT) < time){
+	if(time && (TIME_B_TIM->ARR - TIME_B_TIM->CNT) < time){
 		TIME_B_TIM->CNT = 0;
 		BEEP_TIM->ARR = APB2_TIM_FREQ / (freq) / 2;
 		TIME_B_TIM->ARR = time * 2;

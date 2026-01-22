@@ -11,10 +11,10 @@
  * Include
  */
 #include <stddef.h>
-#include <gpio.h>
-#include <spi.h>
-#include <ledpwm.h>
-#include <htimer.h>
+#include <hal/gpio.h>
+#include <hal/spi.h>
+#include <hal/ledpwm.h>
+#include <hal/htimer.h>
 #include "st7735.h"
 
 #define ST7735_W			160

@@ -9,7 +9,7 @@
 #include "lwip/netif.h"
 #include <prmSystem.h>
 #include <plog.h>
-#include <flash.h>
+#include <hal/flash.h>
 #include <imageheader.h>
 #include <regulatorConnTSK.h>
 

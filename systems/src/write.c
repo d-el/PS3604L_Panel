@@ -12,11 +12,11 @@
  */
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
-#include <uart.h>
-#include <stdbool.h>
+#include <hal/uart.h>
 
 #define debugUart uart4
 #define BUFFER_LEN 1024*4

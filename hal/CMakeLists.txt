@@ -1,4 +1,4 @@
-add_library(drivers STATIC
+add_library(hal STATIC
 	src/beep.c
 	src/clock.c
 	src/cm4.c
@@ -16,12 +16,16 @@ add_library(drivers STATIC
 	src/spi.c
 	src/stm32f4x7_eth_bsp.c
 	src/stm32f4x7_eth.c
+	src/sysTimeMeas.c
 	src/uart.c
 	src/uniqueDeviceId.c
 	)
 
-target_include_directories(drivers PUBLIC
-	include
+target_include_directories(hal
+	PUBLIC
+		include
+	PRIVATE
+		include/hal
 	)
 
-target_link_libraries(drivers cmsis freertos task)
+target_link_libraries(hal cmsis)

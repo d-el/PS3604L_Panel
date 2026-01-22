@@ -10,7 +10,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "stm32f4xx.h"
+#include <stm32f4xx.h>
 #include "clock.h"
 
 #define HSI_VALUE			16000000	///< HSI VALUE [Hz]

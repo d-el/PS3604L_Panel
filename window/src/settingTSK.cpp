@@ -12,10 +12,10 @@
  */
 #include <FreeRTOS.h>
 #include <task.h>
-#include <rtc.h>
-#include <enco.h>
 #include <lwip/netif.h>
-#include <ledpwm.h>
+#include <hal/enco.h>
+#include <hal/ledpwm.h>
+#include <hal/rtc.h>
 #include <regulatorConnTSK.h>
 #include <systemTSK.h>
 #include "settingTSK.h"
@@ -395,7 +395,13 @@ m3,
 		m352,
 		m353,
 		m354,
-m4;
+m4,
+m5,
+	m50,
+	m51,
+	m52,
+	m53,
+	m54;
 
 const MenuItem
 m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullptr, &m11),
@@ -474,7 +480,7 @@ m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, 
 		m245("Sec", &Prm::DSTESec, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m244),
 
 m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30),
-	m30("DHCP", &Prm::dhcpOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr, nullptr),
+	m30("DHCP", &Prm::dhcpOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m31, nullptr),
 	m31("IP address", &Prm::ipadr, true, 0, nullptr, nullptr, nullptr, nullptr, &m32, &m30, nullptr, ipAddressEditor),
 	m32("subnet mask", &Prm::netmask, true, 0, nullptr, nullptr, nullptr, nullptr, &m33, &m31, nullptr, ipAddressEditor),
 	m33("gateway", &Prm::gateway, true, 0, nullptr, nullptr, nullptr, nullptr, &m34, &m32, nullptr, ipAddressEditor),
@@ -486,7 +492,14 @@ m3("LAN", nullptr, true, 0, nullptr, nullptr, netUpdate, nullptr, &m4, &m2, &m30
 		m353("DNS IP", &Prm::dnsServip, false, 0, nullptr, nullptr, nullptr, nullptr, &m354, &m352, nullptr, ipAddressEditor),
 		m354("MAC address", &Prm::mac0, false, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m353, nullptr, ipMacEditor),
 
-m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, nullptr, &m3);
+m4("Bright", &Prm::brightness, true, 0, setBright, nullptr, nullptr, nullptr, &m5, &m3, nullptr),
+
+m5("BeepVol", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m4, &m50),
+	m50("Welcome/Shutdown", &Prm::bpWelcomeOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m51, nullptr),
+	m51("Key", &Prm::bpKeyOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m52, &m50),
+	m52("CcCv", &Prm::bpCcCvOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m53, &m51),
+	m53("ChargerFinish", &Prm::bpChFinOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, &m54, &m52),
+	m54("Error", &Prm::bpErrOnOff, true, 0, nullptr, nullptr, nullptr, nullptr, nullptr, &m53);
 
 /*!****************************************************************************
  * @brief    Setting system task

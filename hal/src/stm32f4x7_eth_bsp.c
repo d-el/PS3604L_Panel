@@ -152,8 +152,6 @@ static void ETH_MACDMA_Config(void){
  * @retval None
  */
 void ETH_GPIO_Config(void){
-	volatile uint32_t i;
-
 	/* Enable SYSCFG clock */
 	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 

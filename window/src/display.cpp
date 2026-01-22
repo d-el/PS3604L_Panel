@@ -520,6 +520,18 @@ uint16_t Disp::getWith(){
 
 /*!****************************************************************************
  */
+uint16_t Disp::getHeight(){
+	return m_driver.h;
+}
+
+/*!****************************************************************************
+ */
+const char* Disp::geName(){
+	return m_driver.name;
+}
+
+/*!****************************************************************************
+ */
 void Disp::setBrightness(uint16_t brightness){
 	if(m_driver.setBrightness){
 		m_driver.setBrightness(brightness);

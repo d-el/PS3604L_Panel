@@ -11,10 +11,10 @@
 * Include
 */
 #include <string.h>
-#include <clock.h>
-#include <flash.h>
-#include <crc32.h>
-#include <cm4.h>
+#include <hal/clock.h>
+#include <hal/flash.h>
+#include <hal/crc32.h>
+#include <hal/cm4.h>
 #include <imageheader.h>
 
 static bool checkProgram(const uint8_t* addr);

@@ -13,7 +13,7 @@
  */
 #include <stdint.h>
 #include <stdbool.h>
-#include <display-driver.h>
+#include <dev/display-driver.h>
 #include "font.h"
 
 /*!****************************************************************************
@@ -53,6 +53,8 @@ public:
 	void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, disp_color_type color);
 
 	uint16_t getWith();
+	uint16_t getHeight();
+	const char* geName();
 	void setBrightness(uint16_t brightness);
 
 private:

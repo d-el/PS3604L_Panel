@@ -16,17 +16,19 @@
 #include <task.h>
 #include <queue.h>
 #include <semphr.h>
-#include <beep.h>
-#include <key.h>
+#include <hal/beep.h>
+#include <hal/key.h>
+#include <hal/enco.h>
 #include <display.h>
 #include <regulatorConnTSK.h>
 #include <ui.h>
 #include <prmSystem.h>
 #include <systemTSK.h>
-#include "chargeTSK.h"
 #include <prmSystem.h>
-#include <enco.h>
 #include "footer.h"
+#include "chargeTSK.h"
+
+#define CH_TSK_PERIOD	20 //[ms]
 
 enum {
 	C_VOLT,
@@ -71,8 +73,8 @@ void chargeTSK(void *pPrm){
 	};
 
 	disp.fillScreen(black);
-	ksSet(30, 5, kUp | kDown);
-	enco_settic(5);
+	ksSet(30, 3, kUp | kDown);
+	enco_settic(1);
 
 	while(1){
 		regState_t regmeas = {};
@@ -84,7 +86,7 @@ void chargeTSK(void *pPrm){
 		 * Key process
 		 */
 		if(keyProc() != 0){
-			BeepTime(ui.beep.key.time, ui.beep.key.freq);
+			BeepTime(Prm::bpKeyOnOff ? ui.beep.key.time : 0, ui.beep.key.freq);
 			if(keyState(kOnOff)){
 				if(!stateenable){
 					reg_enableSet(true);
@@ -208,7 +210,7 @@ void chargeTSK(void *pPrm){
 		disp.putStr(10, 80, &arial, str);
 
 		if(finishBeep && (regmeas.disablecause == v_timeShutdown || regmeas.disablecause == v_lowCurrentShutdown)){
-			BeepTime(ui.beep.chargeFinish.time, ui.beep.chargeFinish.freq);
+			BeepTime(Prm::bpChFinOnOff ? ui.beep.chargeFinish.time : 0, ui.beep.chargeFinish.freq);
 			finishBeep = false;
 		}
 		if(stateenable){

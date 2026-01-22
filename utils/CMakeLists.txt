@@ -8,4 +8,4 @@ target_include_directories(utils PUBLIC
 	include
 	)
 
-target_link_libraries(utils freertos drivers iqmathlib-cm4)
+target_link_libraries(utils freertos iqmathlib-cm4)

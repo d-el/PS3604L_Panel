@@ -10,7 +10,6 @@
  * Include
  */
 #include <string.h>
-#include <systemTSK.h>
 #include "htmlPage.h"
 #include <regulatorConnTSK.h>
 

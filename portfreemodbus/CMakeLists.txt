@@ -9,5 +9,5 @@ target_include_directories(portfreemodbus PUBLIC
 	include
 	)
 
-target_link_libraries(portfreemodbus freemodbus freertos utils config drivers regulator)
+target_link_libraries(portfreemodbus freemodbus freertos utils config hal regulator)
 	

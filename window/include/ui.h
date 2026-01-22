@@ -45,14 +45,10 @@ typedef struct {
 	beepmem_type welcome;
 	beepmem_type shutdown;
 	beepmem_type key;
-	beepmem_type vallim;
 	beepmem_type cvToCc;
 	beepmem_type ccToCv;
-	beepmem_type ovfCurrent;
 	beepmem_type chargeFinish;
 	beepmem_type error;
-	beepmem_type encoLim;
-	beepmem_type encoTransition;
 } uibeep_type;
 
 typedef struct {

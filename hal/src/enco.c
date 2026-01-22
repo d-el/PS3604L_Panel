@@ -10,7 +10,7 @@
 /*!****************************************************************************
  * Include
  */
-#include "stm32f4xx.h"
+#include <stm32f4xx.h>
 #include "gpio.h"
 #include "enco.h"
 
@@ -74,7 +74,7 @@ int32_t enco_update(void){
 	if(ntic >= enco_tic){
 		int32_t step = enco_read();
 		if((step > 2) || (step < -2)){
-			step = step * 5; //Accelerator
+			step = step * 7; //Accelerator
 		}
 		ntic = 0;
 		return step;

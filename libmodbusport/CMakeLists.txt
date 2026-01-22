@@ -3,4 +3,4 @@ add_library(libmodbusport STATIC
 	rtuport.c
 	)
 
-target_link_libraries(libmodbusport freertos drivers utils)
+target_link_libraries(libmodbusport freertos hal utils)

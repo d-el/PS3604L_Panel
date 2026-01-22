@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 
 project(PS3604LF
-	VERSION 2.5.16
+	VERSION 2.5.18
 	LANGUAGES CXX C
 	)
 
@@ -48,7 +48,8 @@ include(embeddedfiles.cmake)
 
 add_subdirectory(config)
 add_subdirectory(dev)
-add_subdirectory(drivers)
+add_subdirectory(driver)
+add_subdirectory(hal)
 add_subdirectory(lib/CMSIS)
 add_subdirectory(lib/freemodbus)
 add_subdirectory(lib/freertos)
@@ -81,7 +82,7 @@ target_link_options(${PROJECT_NAME}.elf
 	-T main.ld
 	)
 target_link_libraries(${PROJECT_NAME}.elf
-	drivers
+	hal
 	freertos
 	systems
 	task
@@ -96,7 +97,7 @@ target_link_options(${PROJECT_NAME}b.elf
 	-T boot.ld
 	)
 target_link_libraries(${PROJECT_NAME}b.elf
-	drivers
+	hal
 	systems
 	task
 	utils

@@ -16,7 +16,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <semphr.h>
-#include <uart.h>
+#include <hal/uart.h>
 #include <plog.h>
 
 /*!****************************************************************************

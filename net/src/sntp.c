@@ -14,8 +14,8 @@
 #include <string.h>
 #include <assert.h>
 #include <time.h>
-#include "plog.h"
-#include "rtc.h"
+#include <plog.h>
+#include "hal/rtc.h"
 #include "lwipopts.h"
 #include "lwip/timeouts.h"
 #include "lwip/udp.h"
@@ -26,7 +26,7 @@
 /**
  * SNTP_DEBUG_LEVEL: Enable debugging for SNTP
  */
-#define LOG_LOCAL_LEVEL P_LOG_VERBOSE
+#define LOG_LOCAL_LEVEL P_LOG_INFO
 
 /**
  * SNTP_SINGLESYNC: Enable single sync
@@ -303,7 +303,7 @@ static void sntp_dns_found(const char* hostname, const ip_addr_t *ipaddr, void *
 	}else{
 		/* DNS resolving failed -> try another server */
 		P_LOGD(logTag, "sntp_dns_found: Failed to resolve server address resolved, trying next server");
-		sntp_try_next_server(NULL);
+		sys_timeout(SNTP_RETRY_TIMEOUT, sntp_try_next_server, NULL);
 	}
 }
 

@@ -1,10 +1,13 @@
 add_library(dev STATIC
-	src/24AAxx.c
+	src/24AAxx.cpp
 	src/st7735.c
 	)
 
-target_include_directories(dev PUBLIC
-	include
+target_include_directories(dev
+	PUBLIC
+		include
+	PRIVATE
+		include/dev
 	)
 
-target_link_libraries(dev freertos drivers utils)
+target_link_libraries(dev freertos hal driver utils)

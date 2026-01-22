@@ -44,6 +44,7 @@
  */
 
 #include <stdbool.h>
+#include <string.h>
 #include "lwip/opt.h"
 #include "lwip/def.h"
 #include "lwip/mem.h"
@@ -53,9 +54,8 @@
 #include "lwip/err.h"
 #include "ethernetif.h"
 #include "lwip/timeouts.h"
-#include "stm32f4x7_eth.h"
-#include "stm32f4x7_eth_bsp.h"
-#include "string.h"
+#include "hal/stm32f4x7_eth.h"
+#include "hal/stm32f4x7_eth_bsp.h"
 
 #define netifMTU								(1500)
 #define netifGUARD_BLOCK_TIME					(100)

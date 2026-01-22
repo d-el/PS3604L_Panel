@@ -89,4 +89,4 @@ target_include_directories(lwip
 			port/include
 	)
 
-target_link_libraries(lwip drivers config)
+target_link_libraries(lwip hal config utils)
