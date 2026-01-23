@@ -40,8 +40,6 @@ void printFooter(Disp& disp){
 
 	regState_t regmeas = {};
 	bool regstate = reg_getState(&regmeas);
-	bool enable;
-	reg_enableGet(&enable);
 
 	if(modeIlimPrev != regmeas.status.m_limitation){
 		if(regmeas.status.m_limitation != 0){

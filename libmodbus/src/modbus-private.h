@@ -36,8 +36,8 @@ MODBUS_BEGIN_DECLS
 #define _MODBUS_EXCEPTION_RSP_LENGTH 5
 
 /* Timeouts in microsecond (0.2 s) */
-#define _RESPONSE_TIMEOUT    200000
-#define _BYTE_TIMEOUT        200000
+#define _RESPONSE_TIMEOUT    100000
+#define _BYTE_TIMEOUT        100000
 
 typedef enum {
     _MODBUS_BACKEND_TYPE_RTU=0,

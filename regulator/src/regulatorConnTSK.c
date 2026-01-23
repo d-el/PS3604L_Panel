@@ -27,7 +27,7 @@
 /*!****************************************************************************
  * MEMORY
  */
-#define LOG_LOCAL_LEVEL P_LOG_DEBUG
+#define LOG_LOCAL_LEVEL P_LOG_WARN
 static char *logTag = "regulator";
 
 typedef struct{
@@ -36,6 +36,7 @@ typedef struct{
 	void *src, *dst;
 	uint16_t writeAddr, readAddr;
 	uint16_t writeNum, readNum;
+	TickType_t expireTime;
 }command_t;
 
 static SemaphoreHandle_t regulatorMutex;
@@ -53,17 +54,23 @@ static bool connected = true;
 static const uint16_t defaultslave = 1;
 
 static bool reg_waitCommand(command_t* cmd){
+	if(!connected || uxQueueSpacesAvailable(commandQueue) == 0){
+		return false;
+	}
 	bool res;
 	cmd->result = &res;
 	cmd->semaphore = xSemaphoreCreateBinary();
 	if(cmd->semaphore == NULL){
-		P_LOGE(logTag, "error create semaphore");
+		P_LOGD(logTag, "error create semaphore");
 		return false;
 	}
+	const TickType_t expire = 150;
+	cmd->expireTime = xTaskGetTickCount() + pdMS_TO_TICKS(expire);
+	P_LOGD(logTag, "expire time %lu", cmd->expireTime);
 	xQueueSend(commandQueue, cmd, 0);
-	BaseType_t osres = xSemaphoreTake(cmd->semaphore, 500);
+	BaseType_t osres = xSemaphoreTake(cmd->semaphore, pdMS_TO_TICKS(expire + 10));
 	vSemaphoreDelete(cmd->semaphore);
-	return osres == pdTRUE && cmd->result;
+	return cmd->result;
 }
 
 bool reg_versionGet(regVersion_t *v){
@@ -362,20 +369,26 @@ void regulatorConnTSK(void *pPrm){
 
 		// Process command
 		command_t command;
-		if(xQueueReceive(commandQueue, &command, 0) == pdPASS ){
-			bool result = false;
-			if(command.writeNum){
-				if(command.writeNum == 1){
-					result = writeReg(ctx, command.writeAddr, *(uint16_t*)command.src);
-				}else{
-					result = writeRegs(ctx, command.writeAddr, command.src, command.writeNum);
+		if(xQueueReceive(commandQueue, &command, 0) == pdPASS){
+			TickType_t currentTime = xTaskGetTickCount();
+			if(command.expireTime > currentTime){
+				bool result = false;
+				if(command.writeNum){
+					if(command.writeNum == 1){
+						result = writeReg(ctx, command.writeAddr, *(uint16_t*)command.src);
+					}else{
+						result = writeRegs(ctx, command.writeAddr, command.src, command.writeNum);
+					}
 				}
+				if(command.readNum){
+					result = readRegs(ctx, command.readAddr, command.dst, command.readNum, 3);
+				}
+				*command.result = result;
+				xSemaphoreGive(command.semaphore);
 			}
-			if(command.readNum){
-				result = readRegs(ctx, command.readAddr, command.dst, command.readNum, 3);
+			else{
+				P_LOGD(logTag, "cmd expire %lu, currentTime %lu", command.expireTime, currentTime);
 			}
-			*command.result = result;
-			xSemaphoreGive(command.semaphore);
 		}
 
 		// Read enable state

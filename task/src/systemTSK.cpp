@@ -23,6 +23,7 @@
 #include <hal/pvd.h>
 #include <hal/board.h>
 #include <hal/drivers.h>
+#include <hal/ledpwm.h>
 #include <driver/i2c.h>
 #include <ethernetif.h>
 #include <lwip/tcpip.h>
@@ -113,7 +114,7 @@ void systemTSK(void *pPrm){
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started httpServerTSK");
 
-	vTaskDelay(1);
+	vTaskDelay(pdMS_TO_TICKS(2));
 
 	// Regulator initialization
 	bool regres = reg_wireResistanceSet(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
@@ -210,6 +211,7 @@ void systemTSK(void *pPrm){
 			saveparametersUser();
 			BeepTime(Prm::bpWelcomeOnOff ? ui.beep.shutdown.time : 0, ui.beep.shutdown.freq);
 			LED_ON();
+			setLcdBrightness(0);
 			if(windowTskHandle != NULL){
 				vTaskDelete(windowTskHandle);	//Delete window
 			}
@@ -278,7 +280,7 @@ void saveparametersUser(void){
  * Shutdown
  */
 static void pvdCallback(void){
-	//setLcdBrightness(0);
+	setLcdBrightness(0);
 	LED_OFF();
 	ETH_BSP_Deinit();
 
