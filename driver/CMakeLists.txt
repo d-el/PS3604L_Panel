@@ -1,5 +1,5 @@
 add_library(driver STATIC
-	src/i2c
+	src/i2c.cpp
 	)
 
 target_include_directories(driver PUBLIC
