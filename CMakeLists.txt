@@ -35,8 +35,6 @@ add_link_options(
 	-Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.map
 	)
 
-configure_file(utils/include/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/utils/include/version.h @ONLY)
-
 set(PROJECT_EMBED_FILES
 	net/resource/404.html
 	net/resource/favicon.png
