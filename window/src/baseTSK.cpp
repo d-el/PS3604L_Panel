@@ -238,21 +238,24 @@ void baseTSK(void *pPrm){
 		snprintf(str, sizeof(str), "%1" PRIi32 ".%03" PRIi32 " A", limi / 1000, limi % 1000);
 		disp.putStr(12, 87, &arial, str);
 
-		disp.setColor(black, red);
 		if(!regenable){
+			disp.setColor(black, white);
 			snprintf(str, sizeof(str), "%s", "DIS");
 			disp.putStr(130, 89, &font8x12, str);
 		}
 		else{
 			if(regmeas.status.m_limitation){
+				disp.setColor(black, red);
 				snprintf(str, sizeof(str), "%s", "CC");
 			}
 			else{
+				disp.setColor(black, green);
 				snprintf(str, sizeof(str), "%s", "CV");
 			}
 			disp.putStr(106, 89, &font8x12, str, 0);
 		}
 
+		disp.setColor(black, red);
 		if((!reg_getremote() && crange == reg_crange_auto)){
 			if(regmeas.status.cRangeLoOverflow){
 				snprintf(str, sizeof(str), "%s", "CRH");
