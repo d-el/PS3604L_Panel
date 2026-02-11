@@ -8,6 +8,11 @@ project(PS3604LF
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
+find_program(CRC32_EXECUTABLE NAMES crc32)
+if(NOT CRC32_EXECUTABLE)
+    message(FATAL_ERROR "The 'crc32' command was not found on this system. Cannot proceed.")
+endif()
+
 add_compile_options(
 	-DSTM32F407xx
 	)
