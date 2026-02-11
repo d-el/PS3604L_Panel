@@ -50,6 +50,7 @@
 #define configCHECK_FOR_STACK_OVERFLOW          ( 2 )
 #define configUSE_MALLOC_FAILED_HOOK            ( 1 )
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      ( 0 )
+#define configCHECK_HANDLER_INSTALLATION        ( 0 )
 
 /* Run time and task stats gathering related definitions. */
 #define configGENERATE_RUN_TIME_STATS           ( 1 )
