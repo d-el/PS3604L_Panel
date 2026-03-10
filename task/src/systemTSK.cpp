@@ -114,7 +114,7 @@ void systemTSK(void *pPrm){
 	assert(osres == pdTRUE);
 	P_LOGI(logTag, "Started httpServerTSK");
 
-	vTaskDelay(pdMS_TO_TICKS(2));
+	vTaskDelay(pdMS_TO_TICKS(10));
 
 	// Regulator initialization
 	bool regres = reg_wireResistanceSet(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);

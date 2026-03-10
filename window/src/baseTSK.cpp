@@ -113,16 +113,7 @@ void baseTSK(void *pPrm){
 					}else if(keyState(kFunc)){
 						func = true;
 					}else if(keyState(kOnOff)){
-						uint8_t result = 0;
-						if(!regenable){
-							reg_enableSet(true);
-						}else{
-							reg_enableSet(false);
-						}
-						if(result != 0){
-							disp.putStr(0, 0, &arial, "Error Connect");
-							vTaskDelay(1000);
-						}
+						reg_enableSet(!regenable);
 					}else if(keyState(kUp)){
 						params[Prm::basepreset.val].p[varParam]->bigstep(1);
 					}else if(keyState(kDown)){

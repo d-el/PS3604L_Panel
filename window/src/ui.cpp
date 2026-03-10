@@ -34,7 +34,7 @@ const ui_type ui = {
 		.cvToCc			= { 3000, 50 },
 		.ccToCv			= { 4500, 50 },
 		.chargeFinish	= { 4100, 2000 },
-		.error			= { 3000, 100 },
+		.error			= { 3000, 1000 },
 	}
 };
 
