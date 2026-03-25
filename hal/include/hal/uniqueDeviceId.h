@@ -20,7 +20,7 @@ extern "C" {
 /*!****************************************************************************
  * Function declaration
  */
-uint32_t uid_get(void);
+const uint8_t* uid_get(void);
 
 #ifdef __cplusplus
 }

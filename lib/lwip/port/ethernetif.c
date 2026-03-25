@@ -119,9 +119,6 @@ static void low_level_init(struct netif *netif){
 	/* set netif MAC hardware address length */
 	netif->hwaddr_len = ETHARP_HWADDR_LEN;
 
-	/* set netif MAC hardware address */
-	ETH_BSP_getMAC(&netif->hwaddr[0]);
-
 	/* set netif maximum transfer unit */
 	netif->mtu = netifMTU;
 
@@ -329,6 +326,16 @@ void ethernetif_input(void * pvParameters){
 			}
 		}
 	}
+}
+
+/**
+ * @brief  ETH_BSP_getMAC
+ * @param  pointer to mac destination
+ * @retval None
+ */
+void ethernetif_setMAC(struct netif *netif, const uint8_t mac[6]){
+	netif->hwaddr_len = 6;
+	memcpy(netif->hwaddr, mac, netif->hwaddr_len);
 }
 
 /**

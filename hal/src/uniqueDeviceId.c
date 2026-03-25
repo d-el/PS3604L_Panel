@@ -24,14 +24,13 @@
 /*!****************************************************************************
  * MEMORY
  */
-const uint32_t *const uniqDevId = (uint32_t*)UNIQDEVID_BASE;
+const uint8_t *const uniqDevId = (uint8_t*)UNIQDEVID_BASE;
 
 /*!****************************************************************************
- * @retval ID
+ * @retval 96bit ID
  */
-uint32_t uid_get(void){
-	uint32_t dId = uniqDevId[0];
-	return dId;
+const uint8_t* uid_get(void){
+	return &uniqDevId[0];;
 }
 
 /******************************** END OF FILE ********************************/

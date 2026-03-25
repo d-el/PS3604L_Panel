@@ -43,6 +43,7 @@
 #include "regulatorConnTSK.h"
 #include "systemTSK.h"
 #include "monitorTSK.h"
+#include "hal/uniqueDeviceId.h"
 
 /*!****************************************************************************
  * Memory
@@ -333,6 +334,13 @@ void LwIP_Init(void){
 	ip_addr_t l_netmask = { .addr = htonl(Prm::dhcpOnOff.val ? IPADDR_ANY : Prm::netmask.val) };
 	ip_addr_t l_gateway = { .addr = htonl(Prm::dhcpOnOff.val ? IPADDR_ANY : Prm::gateway.val) };
 	ip_addr_t l_dns = { .addr = htonl(Prm::dhcpOnOff.val ? IPADDR_ANY : Prm::dnsServip.val) };
+
+	uint8_t mac[] = {0x92, 0x05, 0x28,
+			uid_get()[2],
+			uid_get()[1],
+			uid_get()[0]
+	};
+	ethernetif_setMAC(&xnetif, mac);
 	netif_add(&xnetif, &l_ipaddr, &l_netmask, &l_gateway, NULL, &ethernetif_init, &tcpip_input); // Adds network interface to the netif_list
 	netif_set_default(&xnetif); // Registers the default network interface
 	if(!Prm::dhcpOnOff.val){
