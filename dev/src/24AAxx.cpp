@@ -75,8 +75,8 @@ bool Eep24AA::write(uint16_t dst, const void *src, uint16_t len){
 		eepAdr.bit.blockSelect = dst / BYTESINPAGE;
 		adrInBlock = dst % BYTESINPAGE;
 
-		canWrite = (BYTESINPAGE - adrInBlock);
-		if(canWrite >= BYTESINBLOCK){
+		canWrite = (BYTESINPAGE - adrInBlock) % BYTESINBLOCK;
+		if(canWrite == 0){
 			canWrite = BYTESINBLOCK;
 		}
 
