@@ -207,7 +207,7 @@ void systemTSK(void *pPrm){
 			NVIC_SystemReset();
 		}
 
-		if((regulatorConnected && state.status.m_lowInputVoltage) || res == pdTRUE){
+		if((regulatorConnected && state.error.e_lowInputV1) || res == pdTRUE){
 			P_LOGD(logTag, "System saveparameters");
 			saveparametersUser();
 			BeepTime(Prm::bpWelcomeOnOff ? ui.beep.shutdown.time : 0, ui.beep.shutdown.freq);

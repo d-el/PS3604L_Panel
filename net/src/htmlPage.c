@@ -12,20 +12,31 @@
 #include <string.h>
 #include "htmlPage.h"
 #include <regulatorConnTSK.h>
+#include <version.h>
 
 /*!****************************************************************************
  * Local prototypes for the functions
  */
-urlData_type handle_statemeastask(void);
+static urlData_type handle_version(void);
+static urlData_type handle_statemeastask(void);
 
 /*!****************************************************************************
  * MEMORY
  */
-typedef struct __attribute__ ((packed)){
-	uint16_t major;
-	uint16_t minor;
-	uint16_t patch;
+struct __attribute__ ((packed)){
+	struct{
+		uint16_t major;
+		uint16_t minor;
+		uint16_t patch;
+	}panel;
+	struct{
+		uint16_t major;
+		uint16_t minor;
+		uint16_t patch;
+	}regulator;
+} bin_version;
 
+struct __attribute__ ((packed)){
 	uint8_t connect;
 	uint8_t enable;
 
@@ -38,13 +49,12 @@ typedef struct __attribute__ ((packed)){
 	int32_t input_voltage;	///< [X_XXXXXX V]
 	int16_t temperature;	///< [X_X °С]
 	uint16_t status;
+	uint16_t error;
 	uint16_t disablecause;
 
 	int32_t voltage_set;		///< [X_XXXXXX V]
 	int32_t current_set;		///< [X_XXXXXX A]
-} powerSupplyState_t;
-
-powerSupplyState_t bin_statemeastask;
+} bin_statemeastask;
 
 #define resource_reg(resource) \
 	extern const char *const _binary_##resource##_start; \
@@ -81,6 +91,12 @@ const httpResource_type httpResource[] = {
 		.handler = NULL
 	},
 	{
+		.url = "/version.bin",
+		.data.type = urlDataType_bin,
+		.data.size = sizeof(bin_version),
+		.handler = handle_version
+	},
+	{
 		.url = "/statemeastask.bin",
 		.data.type = urlDataType_bin,
 		.data.size = sizeof(bin_statemeastask),
@@ -105,7 +121,31 @@ const uint8_t getUrlNumber = sizeof(httpResource) / sizeof(httpResource[0]);
 /*!****************************************************************************
  *
  */
-urlData_type handle_statemeastask(void){
+static urlData_type handle_version(void){
+	static urlData_type urlData;
+
+	bin_version.panel.major = getVersionMajor();
+	bin_version.panel.minor = getVersionMinor();
+	bin_version.panel.patch = getVersionPatch();
+
+	regState_t regMeas = {};
+	bool connect = reg_getState(&regMeas);
+	if(connect){
+		regVersion_t v;
+		reg_versionGet(&v);
+		bin_version.regulator.major = v.major;
+		bin_version.regulator.minor = v.minor;
+		bin_version.regulator.patch = v.patch;
+	}
+	urlData.payload = &bin_version;
+	urlData.size = sizeof(bin_version);
+	urlData.type = urlDataType_bin;
+	return urlData;
+}
+/*!****************************************************************************
+ *
+ */
+static urlData_type handle_statemeastask(void){
 	static urlData_type urlData;
 	regState_t regMeas = {};
 	bin_statemeastask.connect = reg_getState(&regMeas);
@@ -116,9 +156,10 @@ urlData_type handle_statemeastask(void){
 		bin_statemeastask.resistance = regMeas.resistance;
 		bin_statemeastask.time = regMeas.time;
 		bin_statemeastask.capacity = regMeas.capacity;
-		bin_statemeastask.input_voltage = regMeas.input_voltage;
+		bin_statemeastask.input_voltage = regMeas.iFan;
 		bin_statemeastask.temperature = regMeas.temp_heatsink;
 		bin_statemeastask.status = regMeas.status.all;
+		bin_statemeastask.error = regMeas.error.all;
 		bin_statemeastask.disablecause = regMeas.disablecause;
 
 		bool regenable = false;
@@ -129,12 +170,6 @@ urlData_type handle_statemeastask(void){
 		reg_getTarget(&regTarget);
 		bin_statemeastask.voltage_set = regTarget.voltage_set;
 		bin_statemeastask.current_set = regTarget.current_set;
-
-		regVersion_t v;
-		reg_versionGet(&v);
-		bin_statemeastask.major = v.major;
-		bin_statemeastask.minor = v.minor;
-		bin_statemeastask.patch = v.patch;
 	}
 
 	urlData.payload = &bin_statemeastask;

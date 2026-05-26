@@ -205,7 +205,11 @@ ItemState updateReg(const MenuItem* m){
 		Prm::Umeas.val = regmeas.voltage;
 		Prm::Imeas.val = regmeas.current;
 		Prm::resistance = regmeas.resistance;
-		Prm::Vdc = regmeas.input_voltage / 100000;
+		Prm::input_v1 = regmeas.input_v1;
+		Prm::input_v2 = regmeas.input_v2;
+		Prm::input_v3 = regmeas.input_v3;
+		Prm::input_v4 = regmeas.input_v4;
+		Prm::input_vg = regmeas.input_vg;
 		Prm::temp_heatsink = regmeas.temp_heatsink;
 		Prm::temp_shunt = regmeas.temp_shunt;
 		Prm::temp_ref = regmeas.temp_ref;
@@ -358,12 +362,16 @@ m1,
 		m163,
 		m164,
 		m165,
+		m166,
+		m167,
+		m168,
 	m17,
 		m170,
 		m171,
 		m172,
 		m173,
 	m18,
+	m19,
 
 m2,
 	m20,
@@ -446,19 +454,24 @@ m1("Regulator", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m2, nullp
 
 	m16("Info", nullptr, false, 0, nullptr, prepareInfo, nullptr, nullptr, &m17, &m15, &m160),
 		m160("Serial", &Prm::reg_serial, false, 0, nullptr, nullptr, nullptr, updateReg, &m161, nullptr),
-		m161("CalibrationTime", &Prm::utcTime, false, 0, nullptr, calibrDateSelect, calibrDateUnselect, nullptr, &m162, &m160, nullptr, clockEditor),
-		m162("Vdc", &Prm::Vdc, false, 0, nullptr, nullptr, nullptr, updateReg, &m163, &m161),
-		m163("Ths", &Prm::temp_heatsink, false, 0, nullptr, nullptr, nullptr, updateReg, &m164, &m162),
-		m164("Tsh", &Prm::temp_shunt, false, 0, nullptr, nullptr, nullptr, updateReg, &m165, &m163),
-		m165("Tref", &Prm::temp_ref, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m164),
+		m161("V1", &Prm::input_v1, false, 0, nullptr, nullptr, nullptr, updateReg, &m162, &m160),
+		m162("V2", &Prm::input_v2, false, 0, nullptr, nullptr, nullptr, updateReg, &m163, &m161),
+		m163("V3", &Prm::input_v3, false, 0, nullptr, nullptr, nullptr, updateReg, &m164, &m162),
+		m164("V4", &Prm::input_v4, false, 0, nullptr, nullptr, nullptr, updateReg, &m165, &m163),
+		m165("VG", &Prm::input_vg, false, 0, nullptr, nullptr, nullptr, updateReg, &m166, &m164),
+		m166("Ths", &Prm::temp_heatsink, false, 0, nullptr, nullptr, nullptr, updateReg, &m167, &m165),
+		m167("Tsh", &Prm::temp_shunt, false, 0, nullptr, nullptr, nullptr, updateReg, &m168, &m166),
+		m168("Tref", &Prm::temp_ref, false, 0, nullptr, nullptr, nullptr, updateReg, nullptr, &m167),
 
-	m17("Acquisition", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m18, &m16, &m170),
+	m17("CalibrationTime", &Prm::utcTime, false, 0, nullptr, calibrDateSelect, calibrDateUnselect, nullptr, &m18, &m16, nullptr, clockEditor),
+
+	m18("Acquisition", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m19, &m17, &m170),
 		m170("vIntegration", &Prm::vintegration, true, 0, setAcquisition, nullptr, nullptr, nullptr, &m171, nullptr),
 		m171("vFilter", &Prm::vfilter, true, 0, setAcquisition, nullptr, nullptr, nullptr, &m172, &m170),
 		m172("iIntegration", &Prm::iintegration, true, 0, setAcquisition, nullptr, nullptr, nullptr, &m173, &m171),
 		m173("iFilter", &Prm::ifilter, true, 0, setAcquisition, nullptr, nullptr, nullptr, nullptr, &m172),
 
-	m18("Save", &Prm::save_settings, true, 0, saveSettings, nullptr, nullptr, updateSaveSettings, nullptr, &m16, nullptr),
+	m19("Save", &Prm::save_settings, true, 0, saveSettings, nullptr, nullptr, updateSaveSettings, nullptr, &m17, nullptr),
 
 m2("Date&Time", nullptr, true, 0, nullptr, nullptr, nullptr, nullptr, &m3, &m1, &m20),
 	m20("Clock", &Prm::utcTime, true, 0, nullptr, rtcSelect, rtcUnselect, nullptr, &m21, nullptr, nullptr, clockEditor),

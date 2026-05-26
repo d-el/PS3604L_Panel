@@ -41,34 +41,57 @@ void printFooter(Disp& disp){
 	regState_t regmeas = {};
 	bool regstate = reg_getState(&regmeas);
 
-	if(modeIlimPrev != regmeas.status.m_limitation){
-		if(regmeas.status.m_limitation != 0){
+	if(modeIlimPrev != regmeas.status.s_limitation){
+		if(regmeas.status.s_limitation != 0){
 			BeepTime(Prm::bpCcCvOnOff ? ui.beep.cvToCc.time : 0, ui.beep.cvToCc.freq);
 		}else{
 			BeepTime(Prm::bpCcCvOnOff ? ui.beep.ccToCv.time : 0, ui.beep.ccToCv.freq);
 		}
-		modeIlimPrev = regmeas.status.m_limitation;
+		modeIlimPrev = regmeas.status.s_limitation;
 	}
 
-	if(regmeas.status.m_errorTemperatureSensor || regmeas.status.m_overheated ||
-			regmeas.status.m_errorExternalIAdc || regmeas.status.m_calibrationEmpty || !regstate){
+	if(!regstate || regmeas.error.all || regmeas.status.s_overheated || regmeas.status.s_calibrationEmpty){
 		BeepTime(Prm::bpErrOnOff ? ui.beep.error.time : 0, ui.beep.error.freq);
 		disp.setColor(black, white);
 
 		if(!regstate){
-			disp.putStr(35, 112, &arial, "No Connect");
+			disp.putStrCenter(112, &arial, "No Connect");
 		}
-		else if(regmeas.status.m_errorTemperatureSensor){
-			disp.putStr(16, 112, &arial, "Err Temp Sensor");
+		else if(regmeas.error.e_temperatureSensor){
+			disp.putStrCenter(112, &arial, "Err Temp Sensor");
 		}
-		else if(regmeas.status.m_overheated != 0){
-			disp.putStr(40, 112, &arial, "Overheat");
+		else if(regmeas.error.e_temperatureSensorRef){
+			disp.putStrCenter(112, &arial, "Err TempRef Sensor");
 		}
-		else if(regmeas.status.m_errorExternalIAdc){
-			disp.putStr(2, 112, &arial, "Error External ADC");
+		else if(regmeas.error.e_temperatureSensorShunt){
+			disp.putStrCenter(112, &arial, "Err TempSh Sensor");
 		}
-		else if(regmeas.status.m_calibrationEmpty){
-			disp.putStr(2, 112, &arial, "Err Calibration Empty");
+		else if(regmeas.error.e_lowInputV1){
+			disp.putStrCenter(112, &arial, "Low Input V1");
+		}
+		else if(regmeas.error.e_lowInputV2){
+			disp.putStrCenter(112, &arial, "Low Input V2");
+		}
+		else if(regmeas.error.e_lowInputV3){
+			disp.putStrCenter(112, &arial, "Low Input V3");
+		}
+		else if(regmeas.error.e_lowInputV4){
+			disp.putStrCenter(112, &arial, "Low Input V4");
+		}
+		else if(regmeas.error.e_lowInputVg){
+			disp.putStrCenter(112, &arial, "Low Input Vg");
+		}
+		else if(regmeas.error.e_fan){
+			disp.putStrCenter(112, &arial, "Error Fan");
+		}
+		else if(regmeas.error.e_fanOvercurrent){
+			disp.putStrCenter(112, &arial, "Error FanOvc");
+		}
+		else if(regmeas.status.s_overheated != 0){
+			disp.putStrCenter(112, &arial, "Overheat");
+		}
+		else if(regmeas.status.s_calibrationEmpty){
+			disp.putStrCenter(112, &arial, "Err Calibration Empty");
 		}
 	}else{	//Not failure
 		disp.setColor(black, white);

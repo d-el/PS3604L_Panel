@@ -235,7 +235,7 @@ void baseTSK(void *pPrm){
 			disp.putStr(130, 89, &font8x12, str);
 		}
 		else{
-			if(regmeas.status.m_limitation){
+			if(regmeas.status.s_limitation){
 				disp.setColor(black, red);
 				snprintf(str, sizeof(str), "%s", "CC");
 			}
@@ -248,7 +248,7 @@ void baseTSK(void *pPrm){
 
 		disp.setColor(black, red);
 		if((!reg_getremote() && crange == reg_crange_auto)){
-			if(regmeas.status.cRangeLoOverflow){
+			if(regmeas.status.s_cRangeLoOverflow){
 				snprintf(str, sizeof(str), "%s", "CRH");
 			}else{
 				snprintf(str, sizeof(str), "%s", "CRL");

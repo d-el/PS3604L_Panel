@@ -64,18 +64,29 @@ typedef enum {
 
 typedef union __attribute__ ((packed)){
 	struct{
-	uint16_t m_errorExternalIAdc :1;
-	uint16_t m_errorTemperatureSensor :1;
-	uint16_t m_overheated :1;
-	uint16_t m_lowInputVoltage :1;
-	uint16_t m_reserved :1;
-	uint16_t m_calibrationEmpty :1;
-	uint16_t m_limitation :1;
-	uint16_t m_externaIDac :1;
-	uint16_t cRangeLoOverflow :1;
+	uint16_t s_limitation :1;
+	uint16_t s_cRangeLoOverflow :1;
+	uint16_t s_overheated :1;
+	uint16_t s_calibrationEmpty :1;
 	};
 	uint16_t all;
 } regStatus_t;
+
+typedef union __attribute__ ((packed)){
+	struct{
+	uint16_t e_temperatureSensor :1;
+	uint16_t e_temperatureSensorRef :1;
+	uint16_t e_temperatureSensorShunt :1;
+	uint16_t e_lowInputV1 :1;
+	uint16_t e_lowInputV2 :1;
+	uint16_t e_lowInputV3 :1;
+	uint16_t e_lowInputV4 :1;
+	uint16_t e_lowInputVg :1;
+	uint16_t e_fan :1;
+	uint16_t e_fanOvercurrent :1;
+	};
+	uint16_t all;
+} regError_t;
 
 typedef enum {
 	v_none = 0,
@@ -96,11 +107,17 @@ typedef struct __attribute__ ((packed)){
 	int32_t resistance;		///< [X_XXXX Ohm]
 	uint32_t time;			///< [X_XXX s]
 	uint32_t capacity;		///< [X_XXX Ah]
-	int32_t input_voltage;	///< [X_XXXXXX V]
+	int16_t iFan;			///< [X_XXX A]
+	int16_t input_v1;		///< [X_XXX V]
+	int16_t input_v2;		///< [X_XXX V]
+	int16_t input_v3;		///< [X_XXX V]
+	int16_t input_v4;		///< [X_XXX V]
+	int16_t input_vg;		///< [X_XXX V]
 	int16_t temp_heatsink;	///< [X_X °С]
 	int16_t temp_shunt;		///< [X_X °С]
 	int16_t temp_ref;		///< [X_X °С]
 	regStatus_t status;
+	regError_t error;
 	uint16_t disablecause;
 	int32_t vadc;			///< [LSB]
 	int32_t iadc;			///< [LSB]
