@@ -36,6 +36,7 @@ public:
 	void putChar(uint16_t x, uint16_t y, const font_type *font, char c);
 	void putStr(uint16_t x, uint16_t y, const font_type *font, const char *s, uint8_t distance=0);
 	void putStrCenter(uint16_t y, const font_type *font, const char *s, uint8_t distance=0);
+	void putStrRight(uint16_t y, const font_type *font, const char *s, uint8_t distance=0);
 	void printImageMonochrome(uint8_t x, uint8_t y, const image_type *image);
 
 	void pixel(int16_t x, int16_t y, disp_color_type color);

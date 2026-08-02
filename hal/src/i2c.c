@@ -65,8 +65,8 @@ void i2c_init(i2c_type *i2cx){
 		* PB6, PB8 - clk
 		* PB7, PB9 - sda
 		*/
-		gppin_init(GPIOB, 8, alternateFunctionOpenDrain, pullUp, 1, I2C1_PINAF);
-		gppin_init(GPIOB, 9, alternateFunctionOpenDrain, pullUp, 1, I2C1_PINAF);
+		gppin_init(GPIOB, 8, alternateFunctionOpenDrain, pullUp, 1, I2C1_PINAF, speed2MHz);
+		gppin_init(GPIOB, 9, alternateFunctionOpenDrain, pullUp, 1, I2C1_PINAF, speed2MHz);
 
 		/************************************************
 		* NVIC

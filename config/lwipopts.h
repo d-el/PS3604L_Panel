@@ -16,10 +16,10 @@
 #include <sys/errno.h>
 
 
-/*-------------------------------------
-   -------------- NO SYS --------------
-   ------------------------------------
-*/
+/**
+ * Host name
+ */
+#define LWIP_NETIF_HOSTNAME 1
 
 /**
  * NO_SYS==1: Provides VERY minimal functionality. Otherwise,

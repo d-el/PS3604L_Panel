@@ -77,9 +77,9 @@ void uart_init(uart_type *uartx, uint32_t baudRate){
 		/************************************************
 		 * IO
 		 */
-		gppin_init(GPIOB, 6, alternateFunctionPushPull, pullDisable, 0, UART1_PINAFTX);		//PA9, PB6 USART1_TX
+		gppin_init(GPIOB, 6, alternateFunctionPushPull, pullDisable, 0, UART1_PINAFTX, speed2MHz);		//PA9, PB6 USART1_TX
 		#if(UART1_HALFDUPLEX == 0)
-		gppin_init(GPIOB, 7, alternateFunctionPushPull, pullUp, 0, UART1_PINAFRX);			//PA10, PB7 USART1_RX
+		gppin_init(GPIOB, 7, alternateFunctionPushPull, pullUp, 0, UART1_PINAFRX, speed2MHz);			//PA10, PB7 USART1_RX
 		#else
 		uartx->halfDuplex = 1;
 		#endif
@@ -133,9 +133,9 @@ void uart_init(uart_type *uartx, uint32_t baudRate){
 		/************************************************
 		 * IO
 		 */
-		gppin_init(GPIOD, 8, alternateFunctionOpenDrain, pullDisable, 0, UART3_PINAFTX);		//PD8, PC10 USART3_TX
+		gppin_init(GPIOD, 8, alternateFunctionOpenDrain, pullDisable, 0, UART3_PINAFTX, speed2MHz);		//PD8, PC10 USART3_TX
 		#if(UART3_HALFDUPLEX == 0)
-		gppin_init(GPIOD, 9, alternateFunctionPushPull, pullUp, 0, UART3_PINAFRX);			//PD9, PC11 USART3_RX
+		gppin_init(GPIOD, 9, alternateFunctionPushPull, pullUp, 0, UART3_PINAFRX, speed2MHz);			//PD9, PC11 USART3_RX
 		#else
 		uartx->halfDuplex = 1;
 		#endif
@@ -180,7 +180,7 @@ void uart_init(uart_type *uartx, uint32_t baudRate){
 		uartx->dmaIfcrRx		= &DMA1->LIFCR;
 		uartx->dmaIfcrMaskTx	= DMA_HIFCR_CTCIF4;
 		uartx->dmaIfcrMaskRx	= DMA_LIFCR_CTCIF2;
-		uartx->frequency        = APB1_FREQ;
+		uartx->frequency		= APB1_FREQ;
 
 		#if(UART4_RX_IDLE_LINE_MODE > 0)
 		uartx->rxIdleLineMode = 1;
@@ -189,9 +189,9 @@ void uart_init(uart_type *uartx, uint32_t baudRate){
 		/************************************************
 		 * IO
 		 */
-		gppin_init(GPIOC, 10, alternateFunctionPushPull, pullDisable, 0, UART4_PINAFTX);		//PC10 USART4_TX
+		gppin_init(GPIOC, 10, alternateFunctionPushPull, pullDisable, 0, UART4_PINAFTX, speed2MHz);		//PC10 USART4_TX
 		#if(UART4_HALFDUPLEX == 0)
-		gppin_init(GPIOC, 11, alternateFunctionPushPull, pullUp, 0, UART4_PINAFRX);				//PC11 USART4_RX
+		gppin_init(GPIOC, 11, alternateFunctionPushPull, pullUp, 0, UART4_PINAFRX, speed2MHz);			//PC11 USART4_RX
 		#else
 		uartx->halfDuplex = 1;
 		#endif

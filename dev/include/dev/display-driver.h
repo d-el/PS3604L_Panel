@@ -18,16 +18,16 @@
 /*!****************************************************************************
  * Typedef
  */
-typedef void (*lcd_flushcb_type)(void* arg);
-typedef void (*lcd_setbufcb_type)(void* arg);
+typedef void (*disp_flushcb_type)(void* arg);
+typedef void (*disp_setbufcb_type)(void* arg);
 typedef uint16_t disp_color_type;
 
 typedef struct{
 	void (*init)(void);
 	void (*setPixel)(uint16_t x, uint16_t y, disp_color_type color);
 	disp_color_type (*getPixel)(uint16_t x, uint16_t y);
-	void (*flush)(lcd_flushcb_type cb, void* arg);
-	void (*fillBuffer)(const disp_color_type *color, lcd_setbufcb_type cb, void* arg);
+	void (*flush)(disp_flushcb_type cb, void* arg);
+	void (*fillBuffer)(const disp_color_type *color, disp_setbufcb_type cb, void* arg);
 	void (*setBrightness)(uint16_t brightness);
 	uint16_t h, w;
 	const char* name;

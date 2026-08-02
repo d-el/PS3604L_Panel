@@ -44,9 +44,9 @@ void spi_init(spiDiv_t divClock){
 	LCD_SPI->CR1 |= divClock << SPI_CR1_BR_Pos;	// BR
 	LCD_SPI->CR1 |= SPI_CR1_SPE;				// SPI enable
 
-	gppin_init(GPIOB, 3, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_SCK
-	//gppin_init(GPIOB, 4, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_MISO
-	gppin_init(GPIOB, 5, alternateFunctionPushPull, pullDisable, 0, 6);	//SPI1_MOSI
+	gppin_init(GPIOB, 3, alternateFunctionPushPull, pullDisable, 0, 6, speed50MHz);	//SPI1_SCK
+	//gppin_init(GPIOB, 4, alternateFunctionPushPull, pullDisable, 0, 6, speed50MHz);	//SPI1_MISO
+	gppin_init(GPIOB, 5, alternateFunctionPushPull, pullDisable, 0, 6, speed50MHz);	//SPI1_MOSI
 }
 
 /*!****************************************************************************

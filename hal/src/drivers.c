@@ -34,6 +34,7 @@ void hardInit(void){
 	gClockState = clock_init();
 	htimer_init();
 	gpio_init();
+	gpio_compensationCellInit();
 	ETH_BSP_Config();			//Configure Ethernet (GPIOs, clocks, MAC, DMA)
 	sysTimeMeasEnable();
 	enco_init();

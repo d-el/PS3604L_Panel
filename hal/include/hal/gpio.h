@@ -1,9 +1,9 @@
 ﻿/*!****************************************************************************
  * @file		gpio.h
  * @author		d_el
- * @version		V1.0
- * @date		22.11.2016
- * @copyright	The MIT License (MIT). Copyright (c) 2017 Storozhenko Roman
+ * @version		V1.1
+ * @date		22.11.2026
+ * @copyright	The MIT License (MIT). Copyright (c) 2026 Storozhenko Roman
  * @brief		gpio driver for stm32F4 microcontroller
  */
 #ifndef GPIO_H
@@ -74,8 +74,9 @@ typedef enum{
 
 typedef enum{
 	speed2MHz,
-	speed10MHz,
+	speed25MHz,
 	speed50MHz,
+	speed100MHz
 }gpioSpeed_type;
 
 typedef enum{
@@ -92,6 +93,7 @@ typedef struct{
 	uint8_t			iniState	:1;		///< Initial state
 	gpioPull_type	pull		:2;		///< 0 - disable, 1 - pullUp, 2 - pullDown
 	uint8_t			nAF			:4;		///< Number alternate function
+	uint8_t			ospeed		:2;		///< Output speed
 }pinMode_type;
 
 typedef enum{
@@ -122,7 +124,7 @@ GP_NOT_USED
 /*!****************************************************************************
  * Macro functions
  */
-#define makepin(port, npin, mode, pull, iniState, nAF)	  { port, (1<<npin), npin, mode, iniState, pull, nAF }
+#define makepin(port, npin, mode, pull, iniState, nAF, oSP)    { port, (1<<npin), npin, mode, iniState, pull, nAF, oSP }
 
 #define _gppin_set(port, pinmask)		port->BSRR = (uint16_t)(pinmask)
 #define _gppin_reset(port, pinmask)		*((volatile uint16_t*)&(port)->BSRR + 1) =  (uint16_t)(pinmask)
@@ -167,7 +169,8 @@ extern pinMode_type	  const pinsMode[];
  * Prototypes for the functions in gpio.c
  */
 void gpio_init(void);
-void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_type pull, uint8_t iniState, uint8_t nAF);
+void gpio_compensationCellInit(void);
+void gppin_init(GPIO_TypeDef *port, uint8_t npin, gpioMode_type mode, gpioPull_type pull, uint8_t iniState, uint8_t nAF, uint8_t ospeed);
 
 #ifdef __cplusplus
 }

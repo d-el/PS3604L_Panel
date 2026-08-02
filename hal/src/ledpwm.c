@@ -22,7 +22,7 @@
  */
 void ledPwm_init(void){
 	//TIM8_CH2 - PC7
-	gppin_init(GPIOC, 7, alternateFunctionPushPull, pullDisable, 0, 3);
+	gppin_init(GPIOC, 7, alternateFunctionPushPull, pullDisable, 0, 3, speed2MHz);
 
 	RCC->APB2ENR |= RCC_APB2ENR_TIM8EN;						//Clock Enable
 	RCC->APB2RSTR |= RCC_APB2RSTR_TIM8RST;					//Reset

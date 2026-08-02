@@ -197,6 +197,19 @@ void Disp::putStrCenter(uint16_t y, const font_type *font, const char *s, uint8_
 /*!****************************************************************************
  *
  */
+void Disp::putStrRight(uint16_t y, const font_type *font, const char *s, uint8_t distance){
+	uint16_t with = 0;
+	const char *c = s;
+	while(*c != 0){
+		with += font->chars[*(uint8_t*)c - font->chars[0].n].image->w + distance;
+		c++;
+	}
+	putStr(m_driver.w - with, y, font, s, distance);
+}
+
+/*!****************************************************************************
+ *
+ */
 void Disp::printImageMonochrome(uint8_t x, uint8_t y, const image_type *image){
 	uint8_t width, height;
 	uint8_t c_width = image->w;

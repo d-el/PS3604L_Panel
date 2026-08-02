@@ -46,9 +46,9 @@ void BeepTime(uint16_t time, uint16_t freq){
  */
 void beep_init(void){
 	// TIM12_CH1 - PB14
-	gppin_init(GPIOB, 14, alternateFunctionPushPull, pullDisable, 0, 9);
+	gppin_init(GPIOB, 14, alternateFunctionPushPull, pullDisable, 0, 9, speed2MHz);
 	// TIM12_CH2 - PB15
-	gppin_init(GPIOB, 15, alternateFunctionPushPull, pullDisable, 0, 9);
+	gppin_init(GPIOB, 15, alternateFunctionPushPull, pullDisable, 0, 9, speed2MHz);
 
 	/*!***********************
 	 * PWM timer

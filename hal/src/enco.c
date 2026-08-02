@@ -23,8 +23,8 @@ static uint16_t enco_tic;
  * @brief  Initialize peripheral for incremental encoder
  */
 void enco_init(void){
-	gppin_init(GPIOD, 12, alternateFunctionPushPull, pullUp, 0, 2);	//CH1
-	gppin_init(GPIOD, 13, alternateFunctionPushPull, pullUp, 0, 2);	//CH2
+	gppin_init(GPIOD, 12, alternateFunctionPushPull, pullUp, 0, 2, speed2MHz);	//CH1
+	gppin_init(GPIOD, 13, alternateFunctionPushPull, pullUp, 0, 2, speed2MHz);	//CH2
 
 	//Timer init
 	RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;							//Clock enable

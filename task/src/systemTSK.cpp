@@ -118,6 +118,11 @@ void systemTSK(void *pPrm){
 	vTaskDelay(pdMS_TO_TICKS(300));
 
 	// Regulator initialization
+	uint32_t serialNumber;
+	if(reg_serialGet(&serialNumber) && Prm::serial_number.val != serialNumber){
+		Prm::serial_number.val = serialNumber;
+		saveparametersSystem();
+	}
 	bool regres = reg_wireResistanceSet(Prm::wirecompensateOnOff.val ? Prm::wireResistance.val : 0);
 	if(!regres){
 		P_LOGE(logTag, "Fail set regulator wire resistance");
@@ -347,6 +352,10 @@ void LwIP_Init(void){
 		P_LOGI(logTag, "set static IP: %s", ipaddr_ntoa(&l_ipaddr));
 		dns_setserver(0, &l_dns); // Set DNS server address
 	}
+
+	static char hostname[24];
+	snprintf(hostname, sizeof(hostname), "PS3604L SN%" PRIu32, Prm::serial_number.val);
+	netif_set_hostname(&xnetif, hostname);
 
 	// Link UP callback
 	auto linkcallback = [](struct netif *netif){

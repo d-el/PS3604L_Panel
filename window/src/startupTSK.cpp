@@ -55,6 +55,8 @@ void startupTSK(void *pPrm){
 			sprintf(str, "-");
 		}
 		disp.putStr(0, 90, &arial, str);
+		sprintf(str, "SN%" PRIu32, Prm::serial_number.val);
+		disp.putStrRight(90, &arial, str);
 		disp.putStr(0, 110, &arial, "2012 - 2026");
 		disp.flush();
 

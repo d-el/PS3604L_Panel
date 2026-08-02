@@ -143,17 +143,17 @@ void ETH_GPIO_Config(void){
 	SYSCFG->PMC |= SYSCFG_PMC_MII_RMII_SEL;	//RMII PHY interface is selected
 
 	/* Ethernet pins configuration ************************************************/
-	gppin_init(GPIOA, 2, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_MDIO --------------> PA2
-	gppin_init(GPIOC, 1, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_MDC ---------------> PC1
-	gppin_init(GPIOA, 1, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_REF_CLK-------> PA1
-	gppin_init(GPIOA, 7, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_CRS_DV -------> PA7
-	gppin_init(GPIOB, 10, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_MII_RX_ER	  -------> PB10
-	gppin_init(GPIOC, 4, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_RXD0	  -------> PC4
-	gppin_init(GPIOC, 5, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_RXD1	  -------> PC5
-	gppin_init(GPIOB, 11, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TX_EN  -------> PB11
-	gppin_init(GPIOB, 12, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD0	  -------> PB12
-	gppin_init(GPIOB, 13, alternateFunctionPushPull, pullDisable, 0, 11);	//ETH_RMII_TXD1	  -------> PB13
-	gppin_init(GPIOC, 2, outPushPull, pullDisable, 1, 0);					//ETH_RST_PIN	  -------> PC2
+	gppin_init(GPIOA, 2, alternateFunctionPushPull, pullDisable, 0, 11, speed2MHz);		// ETH_MDIO ----------> PA2
+	gppin_init(GPIOC, 1, alternateFunctionPushPull, pullDisable, 0, 11, speed2MHz);		// ETH_MDC -----------> PC1
+	gppin_init(GPIOA, 1, alternateFunctionPushPull, pullDisable, 0, 11, speed50MHz);	// ETH_RMII_REF_CLK---> PA1
+	gppin_init(GPIOA, 7, alternateFunctionPushPull, pullDisable, 0, 11, speed2MHz);		// ETH_RMII_CRS_DV ---> PA7
+	gppin_init(GPIOB, 10, alternateFunctionPushPull, pullDisable, 0, 11, speed2MHz);	// ETH_MII_RX_ER -----> PB10
+	gppin_init(GPIOC, 4, alternateFunctionPushPull, pullDisable, 0, 11, speed50MHz);	// ETH_RMII_RXD0 -----> PC4
+	gppin_init(GPIOC, 5, alternateFunctionPushPull, pullDisable, 0, 11, speed50MHz);	// ETH_RMII_RXD1 -----> PC5
+	gppin_init(GPIOB, 11, alternateFunctionPushPull, pullDisable, 0, 11, speed50MHz);	// ETH_RMII_TX_EN ----> PB11
+	gppin_init(GPIOB, 12, alternateFunctionPushPull, pullDisable, 0, 11, speed50MHz);	// ETH_RMII_TXD0 -----> PB12
+	gppin_init(GPIOB, 13, alternateFunctionPushPull, pullDisable, 0, 11, speed50MHz);	// ETH_RMII_TXD1 -----> PB13
+	gppin_init(GPIOC, 2, outPushPull, pullDisable, 1, 0, speed2MHz);					// ETH_RST_PIN -------> PC2
 
 	htimer_delay(10);
 	_gppin_reset(GPIOC, pinm2);

@@ -33,7 +33,7 @@ function updateInfo(){
 				rminor = x.getUint16(8, true);
 				rpatch = x.getUint16(10, true);
 				document.querySelector('footer').innerHTML =
-					'©copyright: 2013-2026 DEL	P' + pmajor + '.' + pminor + '.' + ppatch + ' : R' + rmajor + '.' + rminor + '.' + rpatch;
+					'©copyright: 2013-2026 DEL.	PS3604L P' + pmajor + '.' + pminor + '.' + ppatch + ', R' + rmajor + '.' + rminor + '.' + rpatch;
 			}
 		}
 		vReq.send(null);
